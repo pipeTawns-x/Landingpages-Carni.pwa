@@ -1,0 +1,303 @@
+body {
+  font-family: "Roboto", sans-serif;
+  color: #363432;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #e4d1b0;
+}
+
+.mini-header {
+  background-color: rgba(51, 93, 218, 0.9960784314);
+  font-size: 0.9rem;
+}
+.mini-header i {
+  color: gold;
+}
+
+.main-header {
+  background-color: #363432;
+  color: #f9f8f7;
+  position: relative;
+  z-index: 1000;
+}
+.main-header .navbar-brand {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-right: 2rem;
+}
+.main-header .nav {
+  margin-top: 0.5rem;
+}
+.main-header .nav .nav-link {
+  color: #f9f8f7;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  transition: color 0.15s;
+}
+.main-header .nav .nav-link:hover {
+  color: white;
+}
+.main-header .header-icons .icon-btn {
+  background-color: transparent;
+  border: none;
+  color: #f9f8f7;
+  font-size: 1.3rem;
+  transition: all 0.15s;
+  padding: 0.5rem;
+  margin-left: 0.5rem;
+}
+.main-header .header-icons .icon-btn:hover {
+  color: white;
+  transform: translateY(-2px);
+}
+.main-header .header-icons .icon-btn .badge {
+  font-size: 0.6rem;
+  padding: 0.25em 0.4em;
+  background-color: rgb(53.5652173913, 49.2608695652, 45.4347826087);
+  color: #f9f8f7;
+}
+
+.hero-section {
+  padding: 100px 0;
+  background-color: #363432;
+  color: #f9f8f7;
+  background-image: linear-gradient(rgba(54, 52, 50, 0.9), rgba(54, 52, 50, 0.9)), url("carniceria-bg.jpg");
+  background-size: cover;
+  background-position: center;
+}
+.hero-section__title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+  line-height: 1.2;
+}
+.hero-section__subtitle {
+  font-size: 1.25rem;
+  margin-bottom: 24px;
+  opacity: 0.9;
+}
+.hero-section .btn-primary {
+  background-color: #f9f8f7;
+  color: #363432;
+  border-color: #f9f8f7;
+  font-weight: 500;
+  padding: 0.75rem 1.5rem;
+  transition: all 0.15s;
+}
+.hero-section .btn-primary:hover {
+  background-color: transparent;
+  color: #f9f8f7;
+}
+
+.products-section .card {
+  border: none;
+  border-radius: 4px;
+  overflow: hidden;
+  transition: transform 0.15s;
+  background-color: transparent;
+}
+.products-section .card:hover {
+  transform: translateY(-5px);
+}
+.products-section .card .card-img-top {
+  height: 200px;
+  -o-object-fit: cover;
+     object-fit: cover;
+  border-radius: 4px;
+}
+.products-section .card .card-title {
+  color: #363432;
+  font-weight: 600;
+}
+.products-section .card .card-body {
+  padding: 1.5rem 0;
+}
+
+.schedule-section, .location-section, .contact-section {
+  padding: 80px 0;
+}
+.schedule-section h2, .location-section h2, .contact-section h2 {
+  font-weight: 700;
+  color: #363432;
+  position: relative;
+  padding-bottom: 15px;
+  margin-bottom: 30px;
+}
+.schedule-section h2::after, .location-section h2::after, .contact-section h2::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 0;
+  width: 60px;
+  height: 3px;
+  background-color: #A0978F;
+}
+
+.schedule-box, .about-box {
+  border-radius: 4px;
+  background-color: rgba(249, 248, 247, 0.7);
+  padding: 2rem;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+.schedule-box i, .about-box i {
+  color: #A0978F;
+}
+
+.location-section .card {
+  border: none;
+  border-radius: 4px;
+  overflow: hidden;
+  background-color: rgba(249, 248, 247, 0.7);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+.location-section .card .card-body i {
+  color: #A0978F;
+  margin-right: 8px;
+}
+.location-section .card .card-body a {
+  color: #363432;
+  text-decoration: none;
+  transition: color 0.15s;
+}
+.location-section .card .card-body a:hover {
+  color: #A0978F;
+  text-decoration: underline;
+}
+
+.contact-form {
+  border-radius: 4px;
+  background-color: rgba(249, 248, 247, 0.7);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+.contact-form .form-control {
+  padding: 0.75rem;
+  border-color: #A0978F;
+  background-color: rgba(249, 248, 247, 0.8);
+}
+.contact-form .form-control:focus {
+  border-color: #363432;
+  box-shadow: 0 0 0 0.25rem rgba(54, 52, 50, 0.1);
+}
+.contact-form .btn-primary {
+  background-color: #363432;
+  border-color: #363432;
+  padding: 0.75rem;
+  font-weight: 500;
+  transition: all 0.15s;
+}
+.contact-form .btn-primary:hover {
+  background-color: rgb(40.7596153846, 39.25, 37.7403846154);
+  border-color: rgb(40.7596153846, 39.25, 37.7403846154);
+}
+
+.main-footer {
+  background-color: #363432;
+  color: #f9f8f7;
+  padding: 40px 0 20px;
+}
+.main-footer h5 {
+  font-weight: 600;
+  margin-bottom: 15px;
+}
+.main-footer a {
+  color: #f9f8f7;
+  text-decoration: none;
+  transition: color 0.15s;
+}
+.main-footer a:hover {
+  color: white;
+  text-decoration: underline;
+}
+.main-footer .social-icons a {
+  display: inline-block;
+  transition: transform 0.15s;
+}
+.main-footer .social-icons a:hover {
+  transform: translateY(-3px);
+  text-decoration: none;
+}
+.main-footer hr {
+  border-color: rgba(249, 248, 247, 0.1);
+}
+
+.login-page .mini-header {
+  background-color: rgba(51, 93, 218, 0.9960784314);
+}
+.login-page .login-main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  padding: 2rem 0;
+}
+.login-page .login-card {
+  border-radius: 4px;
+  background-color: rgba(249, 248, 247, 0.7);
+  margin: 2rem auto;
+  max-width: 500px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+.login-page .login-card h2 {
+  font-weight: 700;
+  color: #363432;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  position: relative;
+  padding-bottom: 15px;
+}
+.login-page .login-card h2::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 3px;
+  background-color: #A0978F;
+}
+.login-page .login-card .form-control {
+  border-color: #A0978F;
+  padding: 0.75rem;
+  background-color: rgba(249, 248, 247, 0.8);
+}
+.login-page .login-card .form-control:focus {
+  border-color: #363432;
+  box-shadow: 0 0 0 0.25rem rgba(54, 52, 50, 0.1);
+}
+.login-page .login-card .btn-dark {
+  background-color: #363432;
+  border-color: #363432;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.15s;
+}
+.login-page .login-card .btn-dark:hover {
+  background-color: rgb(40.7596153846, 39.25, 37.7403846154);
+  border-color: rgb(40.7596153846, 39.25, 37.7403846154);
+}
+.login-page .login-card a {
+  color: #363432;
+  transition: color 0.15s;
+}
+.login-page .login-card a:hover {
+  color: rgb(14.2788461538, 13.75, 13.2211538462);
+  text-decoration: underline;
+}
+.login-page .login-card .login-footer .contact-info h6, .login-page .login-card .login-footer .social-links h6 {
+  color: #363432;
+  letter-spacing: 0.5px;
+}
+.login-page .login-card .login-footer .social-icons a {
+  color: #363432;
+  transition: color 0.15s;
+}
+.login-page .login-card .login-footer .social-icons a:hover {
+  color: rgb(14.2788461538, 13.75, 13.2211538462);
+  text-decoration: none;
+}
+.login-page .login-card .login-footer .copyright {
+  color: #363432;
+  opacity: 0.7;
+}/*# sourceMappingURL=styles.css.map */

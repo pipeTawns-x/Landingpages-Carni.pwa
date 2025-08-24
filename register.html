@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#363432" />
+  <title>Registro - Carnicería El Señor de La Misericordia</title>
+  <meta name="description" content="Regístrate en Carnicería El Señor de La Misericordia para acceder a beneficios exclusivos">
+  
+  <link rel="manifest" href="manifest.json">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="icon" href="img/logo-user.png" type="image/png">
+  <link rel="apple-touch-icon" href="img/logo-user.png">
+</head>
+
+<body class="login-page">
+  <div class="offline-alert alert alert-warning d-none" role="alert">
+    <i class="bi bi-wifi-off me-2"></i> Estás en modo offline. Algunas funciones pueden estar limitadas.
+  </div>
+  
+  <!-- Mini Header -->
+  <div class="mini-header py-2 text-center text-black">
+    <div class="container">
+      <p class="mb-0"><i class="bi bi-bag-heart"></i>Forma parte de nuestra familia y disfruta cortes de calidad, atención personalizada y beneficios exclusivos.<i class="bi bi-bag-heart"></i></p>
+    </div>
+  </div>
+
+  <!-- Main Header -->
+  <header class="main-header bg-dark text-white py-3">
+    <div class="container">
+      <div class="d-flex justify-content-between align-items-center">
+        <a class="navbar-brand fs-4 text-white" href="index.html">
+          <img src="img/logo-user.png" alt="Logo" class="me-2" style="height: 40px;">
+          Carnicería El Señor de La Misericordia
+        </a>
+        <div class="header-icons d-flex align-items-center">
+          <a href="login.html" class="btn icon-btn me-2">
+            <i class="bi bi-person-heart"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="login-main">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8 col-10">
+          <div class="login-card p-4 p-md-5">
+            <div class="text-center mb-4">
+              <img src="img/logo-user.png" alt="Logo" class="mb-3" style="height: 80px;">
+              <h2 class="mt-3">CREAR CUENTA</h2>
+              <p class="text-muted">Únete a nuestro programa de fidelidad y obtén beneficios exclusivos</p>
+            </div>
+            
+            <form class="login-form" id="registerForm">
+              <!-- Name Input -->
+              <div class="mb-3">
+                <label for="name" class="form-label">Nombre completo</label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-person-fill"></i></span>
+                  <input type="text" class="form-control" id="registerName" placeholder="Ingresa tu nombre completo" required>
+                </div>
+              </div>
+              
+              <!-- Email Input -->
+              <div class="mb-3">
+                <label for="email" class="form-label">Correo electrónico</label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-envelope-fill"></i></span>
+                  <input type="email" class="form-control" id="registerEmail" placeholder="tucorreo@ejemplo.com" required>
+                </div>
+              </div>
+              
+              <!-- Phone Input -->
+              <div class="mb-3">
+                <label for="phone" class="form-label">Teléfono</label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-telephone-fill"></i></span>
+                  <input type="tel" class="form-control" id="registerPhone" placeholder="Ingresa tu teléfono" required>
+                </div>
+              </div>
+              
+              <!-- Password Input -->
+              <div class="mb-3">
+                <label for="password" class="form-label">Contraseña</label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+                  <input type="password" class="form-control" id="registerPassword" placeholder="Crea una contraseña segura" required>
+                </div>
+                <div class="form-text">Mínimo 8 caracteres, incluyendo mayúsculas, minúsculas y números</div>
+              </div>
+              
+              <!-- Confirm Password Input -->
+              <div class="mb-4">
+                <label for="confirmPassword" class="form-label">Confirmar contraseña</label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+                  <input type="password" class="form-control" id="registerConfirmPassword" placeholder="Repite tu contraseña" required>
+                </div>
+              </div>
+              
+              <!-- Terms Checkbox -->
+              <div class="mb-4 form-check">
+                <input type="checkbox" class="form-check-input" id="termsCheck" required>
+                <label class="form-check-label" for="termsCheck">Acepto los <a href="#" class="text-primary">Términos y Condiciones</a> y la <a href="#" class="text-primary">Política de Privacidad</a></label>
+              </div>
+              
+              <!-- Newsletter Checkbox -->
+              <div class="mb-4 form-check">
+                <input type="checkbox" class="form-check-input" id="newsletterCheck">
+                <label class="form-check-label" for="newsletterCheck">Deseo recibir ofertas y promociones por correo electrónico</label>
+              </div>
+              
+              <!-- Submit Button -->
+              <div class="d-grid">
+                <button type="submit" class="btn btn-primary btn-lg">
+                  <i class="bi bi-person-plus-fill me-2"></i>Registrarme
+                </button>
+              </div>
+              
+              <!-- Login Link -->
+              <div class="text-center mt-4 pt-3 border-top">
+                <p>¿Ya tienes una cuenta? <a href="login.html" class="text-primary fw-bold">Inicia sesión aquí</a></p>
+              </div>
+            </form>
+
+            <!-- Footer -->
+            <div class="login-footer text-center mt-4 pt-3">
+              <div class="contact-info mb-3">
+                <h6 class="fw-bold">LLÁMANOS</h6>
+                <p class="mb-0">444 271 5470</p>
+              </div>
+              
+              <div class="social-links mb-3">
+                <h6 class="fw-bold">SÍGUENOS</h6>
+                <div class="social-icons">
+                  <a href="#" class="text-dark me-3"><i class="bi bi-facebook fs-5"></i></a>
+                  <a href="#" class="text-dark me-3"><i class="bi bi-instagram fs-5"></i></a>
+                  <a href="#" class="text-dark"><i class="bi bi-whatsapp fs-5"></i></a>
+                </div>
+              </div>
+              
+              <p class="copyright small mt-3">© 2025, Carnicería El Señor de La Misericordia</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Main Footer -->
+  <footer class="main-footer bg-dark text-white py-3 mt-auto">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-6">
+          <p class="mb-0">&copy; 2025 Carnicería El Señor de La Misericordia</p>
+        </div>
+        <div class="col-md-6 text-md-end">
+          <ul class="list-inline mb-0">
+            <li class="list-inline-item"><a href="index.html" class="text-white text-decoration-none">Inicio</a></li>
+            <li class="list-inline-item"><a href="#productos" class="text-white text-decoration-none">Productos</a></li>
+            <li class="list-inline-item"><a href="#ubicacion" class="text-white text-decoration-none">Ubicación</a></li>
+            <li class="list-inline-item"><a href="#contacto" class="text-white text-decoration-none">Contacto</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/auth.js" type="module"></script>
+  <script src="js/service-worker.js"></script>
+  
+  <script>
+    // Registrar Service Worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/js/service-worker.js')
+          .then(registration => {
+            console.log('ServiceWorker registration successful');
+          })
+          .catch(err => {
+            console.log('ServiceWorker registration failed: ', err);
+          });
+      });
+    }
+    
+    // Detectar conexión
+    function updateOnlineStatus() {
+      const offlineAlert = document.querySelector('.offline-alert');
+      if (navigator.onLine) {
+        offlineAlert.classList.add('d-none');
+      } else {
+        offlineAlert.classList.remove('d-none');
+      }
+    }
+    
+    window.addEventListener('online', updateOnlineStatus);
+    window.addEventListener('offline', updateOnlineStatus);
+    updateOnlineStatus();
+  </script>
+</body>
+</html>

@@ -1,0 +1,26 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "16"
+
+[context.production.environment]
+  VITE_SUPABASE_URL = "https://your-project-ref.supabase.co"
+  VITE_SUPABASE_KEY = "your-anon-key"
+  VITE_WEATHER_API_KEY = "your-openweathermap-api-key"
+  VITE_VAPID_PUBLIC_KEY = "your-vapid-public-key"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data: https://api.qrserver.com; connect-src 'self' https://your-project-ref.supabase.co https://api.openweathermap.org;"

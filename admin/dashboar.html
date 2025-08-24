@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#363432" />
+  <title>Admin - Carnicería El Señor de La Misericordia</title>
+  
+  <link rel="manifest" href="../../manifest.json">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+  <link rel="stylesheet" href="../../css/styles.css">
+  <link rel="icon" href="../../img/logo-admin.png" type="image/png">
+  <link rel="apple-touch-icon" href="../../img/logo-admin.png">
+</head>
+
+<body class="admin-dashboard">
+  <div class="d-flex">
+    <!-- Sidebar -->
+    <div class="admin-sidebar bg-dark text-white">
+      <div class="sidebar-header p-3 text-center">
+        <img src="../../img/logo-admin.png" alt="Admin Logo" class="mb-2" style="height: 50px;">
+        <h4 class="mb-0">Panel de Administración</h4>
+      </div>
+      <ul class="nav flex-column">
+        <li class="nav-item">
+          <a class="nav-link active" href="dashboard.html">
+            <i class="bi bi-speedometer2 me-2"></i> Dashboard
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="products.html">
+            <i class="bi bi-box-seam me-2"></i> Productos
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="customers.html">
+            <i class="bi bi-people me-2"></i> Clientes
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="orders.html">
+            <i class="bi bi-cart-check me-2"></i> Pedidos
+          </a>
+        </li>
+        <li class="nav-item mt-auto">
+          <a class="nav-link text-danger" href="../../index.html">
+            <i class="bi bi-box-arrow-left me-2"></i> Salir
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="admin-content w-100">
+      <!-- Top Navbar -->
+      <nav class="admin-navbar navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container-fluid">
+          <button class="btn btn-primary" id="sidebarToggle">
+            <i class="bi bi-list"></i>
+          </button>
+          
+          <div class="d-flex align-items-center ms-auto">
+            <div class="dropdown me-3">
+              <button class="btn btn-primary dropdown-toggle" type="button" id="notificationsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-bell-fill"></i>
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                  3
+                </span>
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationsDropdown">
+                <li><h6 class="dropdown-header">Notificaciones</h6></li>
+                <li><a class="dropdown-item" href="#">Nuevo pedido recibido</a></li>
+                <li><a class="dropdown-item" href="#">Cliente registrado</a></li>
+                <li><a class="dropdown-item" href="#">Producto agotado</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="#">Ver todas</a></li>
+              </ul>
+            </div>
+            
+            <div class="dropdown">
+              <button class="btn btn-primary dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-person-circle me-1"></i> Admin
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                <li><a class="dropdown-item" href="#"><i class="bi bi-person me-2"></i>Perfil</a></li>
+                <li><a class="dropdown-item" href="#"><i class="bi bi-gear me-2"></i>Configuración</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="../../index.html"><i class="bi bi-box-arrow-left me-2"></i>Cerrar sesión</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <!-- Main Content Area -->
+      <div class="container-fluid py-4">
+        <div class="row mb-4">
+          <div class="col-12">
+            <h2 class="mb-0">Dashboard</h2>
+            <nav aria-label="breadcrumb">
+              <ol class="breadcrumb">
+                <li class="breadcrumb-item active" aria-current="page">Inicio</li>
+              </ol>
+            </nav>
+          </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="row mb-4">
+          <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+              <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                  <div class="col mr-2">
+                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                      Ventas Hoy</div>
+                    <div class="h5 mb-0 font-weight-bold text-gray-800">$24,500</div>
+                  </div>
+                  <div class="col-auto">
+                    <i class="bi bi-cash-stack fa-2x text-gray-300"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+              <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                  <div class="col mr-2">
+                    <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                      Nuevos Clientes</div>
+                    <div class="h5 mb-0 font-weight-bold text-gray-800">12</div>
+                  </div>
+                  <div class="col-auto">
+                    <i class="bi bi-people fa-2x text-gray-300"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+              <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                  <div class="col mr-2">
+                    <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                      Productos</div>
+                    <div class="h5 mb-0 font-weight-bold text-gray-800">48</div>
+                  </div>
+                  <div class="col-auto">
+                    <i class="bi bi-box-seam fa-2x text-gray-300"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+              <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                  <div class="col mr-2">
+                    <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                      Puntos Fidelidad</div>
+                    <div class="h5 mb-0 font-weight-bold text-gray-800">1,256</div>
+                  </div>
+                  <div class="col-auto">
+                    <i class="bi bi-award fa-2x text-gray-300"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="row">
+          <div class="col-xl-8 col-lg-7">
+            <div class="card shadow mb-4">
+              <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">Ventas Mensuales</h6>
+              </div>
+              <div class="card-body">
+                <div class="chart-area">
+                  <canvas id="salesChart"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-xl-4 col-lg-5">
+            <div class="card shadow mb-4">
+              <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">Productos Más Vendidos</h6>
+              </div>
+              <div class="card-body">
+                <div class="chart-pie pt-4 pb-2">
+                  <canvas id="productsChart"></canvas>
+                </div>
+                <div class="mt-4 text-center small">
+                  <span class="mr-2">
+                    <i class="fas fa-circle text-primary"></i> Rib Eye
+                  </span>
+                  <span class="mr-2">
+                    <i class="fas fa-circle text-success"></i> Filet Mignon
+                  </span>
+                  <span class="mr-2">
+                    <i class="fas fa-circle text-info"></i> Tomahawk
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Orders -->
+        <div class="row mt-4">
+          <div class="col-12">
+            <div class="card shadow">
+              <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Pedidos Recientes</h6>
+              </div>
+              <div class="card-body">
+                <div class="table-responsive">
+                  <table class="table table-bordered" id="recentOrdersTable" width="100%" cellspacing="0">
+                    <thead>
+                      <tr>
+                        <th>ID Pedido</th>
+                        <th>Cliente</th>
+                        <th>Fecha</th>
+                        <th>Total</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>ORD-1001</td>
+                        <td>Juan Pérez</td>
+                        <td>2023-10-15</td>
+                        <td>$1,250.00</td>
+                        <td><span class="badge bg-success">Completado</span></td>
+                        <td>
+                          <button class="btn btn-sm btn-primary"><i class="bi bi-eye"></i></button>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>ORD-1002</td>
+                        <td>María González</td>
+                        <td>2023-10-14</td>
+                        <td>$850.00</td>
+                        <td><span class="badge bg-warning">En proceso</span></td>
+                        <td>
+                          <button class="btn btn-sm btn-primary"><i class="bi bi-eye"></i></button>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>ORD-1003</td>
+                        <td>Carlos López</td>
+                        <td>2023-10-14</td>
+                        <td>$1,750.00</td>
+                        <td><span class="badge bg-danger">Cancelado</span></td>
+                        <td>
+                          <button class="btn btn-sm btn-primary"><i class="bi bi-eye"></i></button>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>ORD-1004</td>
+                        <td>Ana Martínez</td>
+                        <td>2023-10-13</td>
+                        <td>$950.00</td>
+                        <td><span class="badge bg-success">Completado</span></td>
+                        <td>
+                          <button class="btn btn-sm btn-primary"><i class="bi bi-eye"></i></button>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>ORD-1005</td>
+                        <td>Luis Rodríguez</td>
+                        <td>2023-10-12</td>
+                        <td>$2,150.00</td>
+                        <td><span class="badge bg-success">Completado</span></td>
+                        <td>
+                          <button class="btn btn-sm btn-primary"><i class="bi bi-eye"></i></button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+  <script src="../../js/admin.js" type="module"></script>
+  
+  <script>
+    // Activar DataTable
+    $(document).ready(function() {
+      $('#recentOrdersTable').DataTable({
+        language: {
+          url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json'
+        }
+      });
+    });
+    
+    // Charts
+    document.addEventListener('DOMContentLoaded', function() {
+      // Sales Chart
+      const salesCtx = document.getElementById('salesChart').getContext('2d');
+      const salesChart = new Chart(salesCtx, {
+        type: 'line',
+        data: {
+          labels: ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct"],
+          datasets: [{
+            label: "Ventas",
+            lineTension: 0.3,
+            backgroundColor: "rgba(78, 115, 223, 0.05)",
+            borderColor: "rgba(78, 115, 223, 1)",
+            pointRadius: 3,
+            pointBackgroundColor: "rgba(78, 115, 223, 1)",
+            pointBorderColor: "rgba(78, 115, 223, 1)",
+            pointHoverRadius: 3,
+            pointHoverBackgroundColor: "rgba(78, 115, 223, 1)",
+            pointHoverBorderColor: "rgba(78, 115, 223, 1)",
+            pointHitRadius: 10,
+            pointBorderWidth: 2,
+            data: [15000, 18000, 21000, 19000, 24000, 28000, 25000, 26000, 23000, 29000],
+          }],
+        },
+        options: {
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      });
+
+      // Products Chart
+      const productsCtx = document.getElementById('productsChart').getContext('2d');
+      const productsChart = new Chart(productsCtx, {
+        type: 'doughnut',
+        data: {
+          labels: ["Rib Eye", "Filet Mignon", "Tomahawk", "Otros"],
+          datasets: [{
+            data: [45, 30, 15, 10],
+            backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc', '#f6c23e'],
+            hoverBackgroundColor: ['#2e59d9', '#17a673', '#2c9faf', '#dda20a'],
+            hoverBorderColor: "rgba(234, 236, 244, 1)",
+          }],
+        },
+        options: {
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false
+            }
+          },
+          cutout: '70%',
+        },
+      });
+    });
+
+    // Toggle sidebar on mobile
+    document.getElementById('sidebarToggle').addEventListener('click', function() {
+      document.querySelector('.admin-sidebar').classList.toggle('show');
+    });
+  </script>
+</body>
+</html>
