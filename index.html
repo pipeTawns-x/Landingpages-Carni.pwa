@@ -168,13 +168,228 @@
 
     <section id="productos" class="products-section py-5">
       <div class="container">
-        <h2 class="text-center mb-5">Nuestros Productos</h2>
-        <div class="row" id="productsGrid">
-          <div class="col-12 text-center">
-            <div class="spinner-border text-primary" role="status">
-              <span class="visually-hidden">Cargando productos...</span>
+        <h2 class="text-center mb-5 section-title">Nuestros Productos</h2>
+        <!-- cartas para productos-->
+        <div class="row g-4">
+          <!-- Carne de Res -->
+          <div class="col-md-6 col-lg-4">
+            <div class="card product-card h-100">
+              <div class="product-img-container">
+                <img src="img/res.png" class="card-img-top" alt="Carne de res">
+                <span class="badge bg-danger product-badge">Popular</span>
+              </div>
+              <div class="card-body">
+                <span class="product-category">CORTES PREMIUM</span>
+                <h5 class="card-title mt-1">Carne de Res</h5>
+                <p class="card-text">Los mejores cortes de res premium, seleccionados cuidadosamente para garantizar calidad y sabor.</p>
+                
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                  <div class="product-price">$320/kg</div>
+                  <div class="rating">
+                    <i class="bi bi-star-fill text-warning"></i>
+                    <i class="bi bi-star-fill text-warning"></i>
+                    <i class="bi bi-star-fill text-warning"></i>
+                    <i class="bi bi-star-fill text-warning"></i>
+                    <i class="bi bi-star-half text-warning"></i>
+                    <span class="ms-1">(48)</span>
+                  </div>
+                </div>
+                
+                <div class="product-actions">
+                  <button class="btn btn-primary btn-product">
+                    <i class="bi bi-cart-plus me-1"></i> Agregar
+                  </button>
+                  <button class="btn btn-outline-primary btn-product">
+                    <i class="bi bi-info-circle me-1"></i> Detalles
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
+          
+          <!-- Carne de Cerdo -->
+          <div class="col-md-6 col-lg-4">
+            <div class="card product-card h-100">
+              <div class="product-img-container">
+                <img src="img/cerdo.png" class="card-img-top" alt="Carne de cerdo">
+              </div>
+              <div class="card-body">
+                <span class="product-category">CORTES FRESCOS</span>
+                <h5 class="card-title mt-1">Carne de Cerdo</h5>
+                <p class="card-text">Variedad de cortes de cerdo frescos, ideales para tus recetas favoritas y preparaciones especiales.</p>
+                
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                  <div class="product-price">$180/kg</div>
+                  <div class="rating">
+                    <i class="bi bi-star-fill text-warning"></i>
+                    <i class="bi bi-star-fill text-warning"></i>
+                    <i class="bi bi-star-fill text-warning"></i>
+                    <i class="bi bi-star-fill text-warning"></i>
+                    <i class="bi bi-star text-warning"></i>
+                    <span class="ms-1">(32)</span>
+                  </div>
+                </div>
+                
+                <div class="product-actions">
+                  <button class="btn btn-primary btn-product">
+                    <i class="bi bi-cart-plus me-1"></i> Agregar
+                  </button>
+                  <button class="btn btn-outline-primary btn-product">
+                    <i class="bi bi-info-circle me-1"></i> Detalles
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Pollo -->
+          <div class="col-md-6 col-lg-4">
+            <div class="card product-card h-100">
+              <div class="product-img-container">
+                <img src="img/pollo.png" class="card-img-top" alt="Pollo">
+                <span class="badge bg-success product-badge">Nuevo</span>
+              </div>
+              <div class="card-body">
+                <span class="product-category">AVES DE CORRAL</span>
+                <h5 class="card-title mt-1">Pollo</h5>
+                <p class="card-text">Pollo fresco de la mejor calidad, preparado según tus necesidades. Ideal para todas tus recetas.</p>
+                
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                  <div class="product-price">$95/kg</div>
+                  <div class="rating">
+                    <i class="bi bi-star-fill text-warning"></i>
+                    <i class="bi bi-star-fill text-warning"></i>
+                    <i class="bi bi-star-fill text-warning"></i>
+                    <i class="bi bi-star-fill text-warning"></i>
+                    <i class="bi bi-star-fill text-warning"></i>
+                    <span class="ms-1">(65)</span>
+                  </div>
+                </div>
+                
+                <div class="product-actions">
+                  <button class="btn btn-primary btn-product">
+                    <i class="bi bi-cart-plus me-1"></i> Agregar
+                  </button>
+                  <button class="btn btn-outline-primary btn-product">
+                    <i class="bi bi-info-circle me-1"></i> Detalles
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Embutidos -->
+          <div class="col-md-6 col-lg-4">
+            <div class="card product-card h-100">
+              <div class="product-img-container">
+                <img src="img/embutidos.png" class="card-img-top" alt="Embutidos">
+              </div>
+              <div class="card-body">
+                <span class="product-category">PRODUCTOS ELABORADOS</span>
+                <h5 class="card-title mt-1">Embutidos</h5>
+                <p class="card-text">Variedad de embutidos artesanales y de alta calidad. Perfectos para desayunos y comidas rápidas.</p>
+                
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                  <div class="product-price">$120/kg</div>
+                  <div class="rating">
+                    <i class="bi bi-star-fill text-warning"></i>
+                    <i class="bi bi-star-fill text-warning"></i>
+                    <i class="bi bi-star-fill text-warning"></i>
+                    <i class="bi bi-star-fill text-warning"></i>
+                    <i class="bi bi-star-half text-warning"></i>
+                    <span class="ms-1">(41)</span>
+                  </div>
+                </div>
+                
+                <div class="product-actions">
+                  <button class="btn btn-primary btn-product">
+                    <i class="bi bi-cart-plus me-1"></i> Agregar
+                  </button>
+                  <button class="btn btn-outline-primary btn-product">
+                    <i class="bi bi-info-circle me-1"></i> Detalles
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Cortes Especiales -->
+          <div class="col-md-6 col-lg-4">
+            <div class="card product-card h-100">
+              <div class="product-img-container">
+                <img src="img/premium.png" class="card-img-top" alt="Cortes especiales">
+                <span class="badge bg-info product-badge">Premium</span>
+              </div>
+              <div class="card-body">
+                <span class="product-category">CORTES SELECCIONADOS</span>
+                <h5 class="card-title mt-1">Cortes Especiales</h5>
+                <p class="card-text">Cortes especiales seleccionados para los paladares más exigentes. Calidad superior garantizada.</p>
+                
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                  <div class="product-price">$450/kg</div>
+                  <div class="rating">
+                    <i class="bi bi-star-fill text-warning"></i>
+                    <i class="bi bi-star-fill text-warning"></i>
+                    <i class="bi bi-star-fill text-warning"></i>
+                    <i class="bi bi-star-fill text-warning"></i>
+                    <i class="bi bi-star-fill text-warning"></i>
+                    <span class="ms-1">(28)</span>
+                  </div>
+                </div>
+                
+                <div class="product-actions">
+                  <button class="btn btn-primary btn-product">
+                    <i class="bi bi-cart-plus me-1"></i> Agregar
+                  </button>
+                  <button class="btn btn-outline-primary btn-product">
+                    <i class="bi bi-info-circle me-1"></i> Detalles
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Preparados -->
+          <div class="col-md-6 col-lg-4">
+            <div class="card product-card h-100">
+              <div class="product-img-container">
+                <img src="img/preparadas.png" class="card-img-top" alt="Productos preparados">
+                <span class="badge bg-warning text-dark product-badge">Oferta</span>
+              </div>
+              <div class="card-body">
+                <span class="product-category">LISTOS PARA COCINAR</span>
+                <h5 class="card-title mt-1">Productos Preparados</h5>
+                <p class="card-text">Productos marinados y preparados listos para cocinar. Ahorra tiempo sin sacrificar sabor.</p>
+                
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                  <div class="product-price">$210/kg</div>
+                  <div class="rating">
+                    <i class="bi bi-star-fill text-warning"></i>
+                    <i class="bi bi-star-fill text-warning"></i>
+                    <i class="bi bi-star-fill text-warning"></i>
+                    <i class="bi bi-star-fill text-warning"></i>
+                    <i class="bi bi-star text-warning"></i>
+                    <span class="ms-1">(37)</span>
+                  </div>
+                </div>
+                
+                <div class="product-actions">
+                  <button class="btn btn-primary btn-product">
+                    <i class="bi bi-cart-plus me-1"></i> Agregar
+                  </button>
+                  <button class="btn btn-outline-primary btn-product">
+                    <i class="bi bi-info-circle me-1"></i> Detalles
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="text-center mt-5">
+          <a href="#" class="btn btn-outline-primary btn-lg">
+            <i class="bi bi-grid me-2"></i>Ver todos los productos
+          </a>
         </div>
       </div>
     </section>
