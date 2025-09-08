@@ -1,0 +1,65 @@
+// Dashboard styles (additional styles if needed)
+.border-left-primary {
+  border-left: 0.25rem solid #4e73df !important;
+}
+
+.border-left-success {
+  border-left: 0.25rem solid #1cc88a !important;
+}
+
+.border-left-info {
+  border-left: 0.25rem solid #36b9cc !important;
+}
+
+.border-left-warning {
+  border-left: 0.25rem solid #f6c23e !important;
+}
+
+.stats-card {
+  .card-body {
+    display: flex;
+    align-items: center;
+    
+    .stats-icon {
+      font-size: 2rem;
+      margin-right: map-get($spacers, 3);
+      opacity: 0.7;
+    }
+    
+    .stats-content {
+      flex: 1;
+      
+      .stats-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+      }
+      
+      .stats-label {
+        color: #6c757d;
+        text-transform: uppercase;
+        font-size: 0.8rem;
+        letter-spacing: 0.5px;
+      }
+    }
+  }
+  
+  @include media-breakpoint-down(md) {
+    margin-bottom: map-get($spacers, 3);
+    
+    .card-body {
+      padding: map-get($spacers, 3);
+      
+      .stats-icon {
+        font-size: 1.75rem;
+        margin-right: map-get($spacers, 2);
+      }
+      
+      .stats-content {
+        .stats-value {
+          font-size: 1.25rem;
+        }
+      }
+    }
+  }
+}

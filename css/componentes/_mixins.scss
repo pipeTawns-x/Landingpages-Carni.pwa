@@ -1,0 +1,93 @@
+// Mixins
+@mixin transition($property: all, $duration: $transition-fast, $timing: ease-in-out) {
+  transition: $property $duration $timing;
+}
+
+@mixin box-shadow($level: 1) {
+  @if $level == 1 {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+  } @else if $level == 2 {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.12), 0 2px 4px rgba(0,0,0,0.06);
+  } @else if $level == 3 {
+    box-shadow: 0 10px 20px rgba(0,0,0,0.15), 0 6px 6px rgba(0,0,0,0.1);
+  } @else if $level == 4 {
+    box-shadow: 0 20px 30px rgba(0,0,0,0.2), 0 10px 10px rgba(0,0,0,0.15);
+  } @else if $level == 5 {
+    box-shadow: 0 25px 40px rgba(0,0,0,0.25), 0 15px 15px rgba(0,0,0,0.2);
+  }
+}
+
+// Responsive image
+@mixin responsive-image {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+// Fluid typography
+@mixin fluid-type($min-vw, $max-vw, $min-font-size, $max-font-size) {
+  $u1: unit($min-vw);
+  $u2: unit($max-vw);
+  $u3: unit($min-font-size);
+  $u4: unit($max-font-size);
+
+  @if $u1 == $u2 and $u1 == $u3 and $u1 == $u4 {
+    & {
+      font-size: $min-font-size;
+      @media screen and (min-width: $min-vw) {
+        font-size: calc(#{$min-font-size} + #{strip-unit($max-font-size - $min-font-size)} * ((100vw - #{$min-vw}) / #{strip-unit($max-vw - $min-vw)}));
+      }
+      @media screen and (min-width: $max-vw) {
+        font-size: $max-font-size;
+      }
+    }
+  }
+}
+
+// Container adaptive
+@mixin container-adaptive {
+  width: 100%;
+  margin-right: auto;
+  margin-left: auto;
+  padding-right: map-get($spacers, 3);
+  padding-left: map-get($spacers, 3);
+  
+  @each $breakpoint, $width in $container-max-widths {
+    @include media-breakpoint-up($breakpoint) {
+      max-width: $width;
+    }
+  }
+}
+
+// Media queries
+@mixin media-breakpoint-up($breakpoint) {
+  @if $breakpoint == xs {
+    @content;
+  } @else if $breakpoint == sm {
+    @media (min-width: $breakpoint-sm) { @content; }
+  } @else if $breakpoint == md {
+    @media (min-width: $breakpoint-md) { @content; }
+  } @else if $breakpoint == lg {
+    @media (min-width: $breakpoint-lg) { @content; }
+  } @else if $breakpoint == xl {
+    @media (min-width: $breakpoint-xl) { @content; }
+  } @else if $breakpoint == xxl {
+    @media (min-width: $breakpoint-xxl) { @content; }
+  }
+}
+
+@mixin media-breakpoint-down($breakpoint) {
+  @if $breakpoint == xs {
+    @media (max-width: $breakpoint-sm - 0.02px) { @content; }
+  } @else if $breakpoint == sm {
+    @media (max-width: $breakpoint-md - 0.02px) { @content; }
+  } @else if $breakpoint == md {
+    @media (max-width: $breakpoint-lg - 0.02px) { @content; }
+  } @else if $breakpoint == lg {
+    @media (max-width: $breakpoint-xl - 0.02px) { @content; }
+  } @else if $breakpoint == xl {
+    @media (max-width: $breakpoint-xxl - 0.02px) { @content; }
+  } @else if $breakpoint == xxl {
+    @media (max-width: 9999px) { @content; }
+  }
+}

@@ -1,42 +1,23 @@
-// Variables
-$primary-color: #363432;
-$secondary-color: #A0978F;
-$white: #f9f8f7;
-$body-bg: #e4d1b0;
-$blue-header: rgba(51, 93, 218, 0.9960784314);
-$border-radius-sm: 4px;
-$transition-fast: 0.15s;
-$spacer: 1rem;
-$spacers: (
-  0: 0,
-  1: $spacer * 0.25,
-  2: $spacer * 0.5,
-  3: $spacer,
-  4: $spacer * 1.5,
-  5: $spacer * 3,
-  6: $spacer * 4.5,
-  7: $spacer * 6,
-  8: $spacer * 7.5
-);
+// Import variables and mixins
+@import 'components/variables';
+@import 'components/mixins';
 
-// Mixins
-@mixin transition($property: all, $duration: $transition-fast, $timing: ease-in-out) {
-  transition: $property $duration $timing;
-}
+// Import components
+@import 'components/buttons';
+@import 'components/cards';
+@import 'components/footer';
+@import 'components/forms';
+@import 'components/header';
+@import 'components/modals';
+@import 'components/navigation';
+@import 'components/qr';
 
-@mixin box-shadow($level: 1) {
-  @if $level == 1 {
-    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
-  } @else if $level == 2 {
-    box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
-  } @else if $level == 3 {
-    box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
-  } @else if $level == 4 {
-    box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
-  } @else if $level == 5 {
-    box-shadow: 0 19px 38px rgba(0,0,0,0.30), 0 15px 12px rgba(0,0,0,0.22);
-  }
-}
+// Import pages
+@import 'pages/admin';
+@import 'pages/catalog';
+@import 'pages/dashboard';
+@import 'pages/home';
+@import 'pages/login';
 
 // Base Styles
 body {
@@ -46,6 +27,7 @@ body {
   flex-direction: column;
   min-height: 100vh;
   background-color: $body-bg;
+  line-height: 1.6;
 }
 
 // Spacing Utilities
@@ -67,159 +49,9 @@ body {
   .py-#{$spacer} { padding-top: $value !important; padding-bottom: $value !important; }
 }
 
-// Mini Header
-.mini-header {
-  background-color: $blue-header;
-  font-size: 0.9rem;
-  
-  i {
-    color: gold;
-  }
-}
-
-// Header Styles
-.main-header {
-  background-color: $primary-color;
-  color: $white;
-  position: relative;
-  z-index: 1000;
-
-  .navbar-brand {
-    font-size: 1.75rem;
-    font-weight: 700;
-    margin-right: 2rem;
-    @include transition;
-    
-    &:hover {
-      color: lighten($white, 10%);
-    }
-  }
-
-  .nav {
-    margin-top: map-get($spacers, 2);
-
-    .nav-link {
-      color: $white;
-      font-weight: 500;
-      padding: map-get($spacers, 2) map-get($spacers, 3);
-      @include transition(color);
-      
-      &:hover {
-        color: lighten($white, 10%);
-      }
-    }
-  }
-
-  .header-icons {
-    .icon-btn {
-      background-color: transparent;
-      border: none;
-      color: $white;
-      font-size: 1.3rem;
-      @include transition(all);
-      padding: map-get($spacers, 2);
-      margin-left: map-get($spacers, 2);
-
-      &:hover {
-        color: lighten($white, 15%);
-        transform: translateY(-2px);
-      }
-
-      .badge {
-        font-size: 0.6rem;
-        padding: 0.25em 0.4em;
-        background-color: darken($secondary-color, 40%);
-        color: $white;
-      }
-    }
-  }
-  
-  .search-bar {
-    @include transition(all);
-    
-    input {
-      border-radius: $border-radius-sm 0 0 $border-radius-sm;
-    }
-    
-    button {
-      border-radius: 0 $border-radius-sm $border-radius-sm 0;
-    }
-  }
-}
-
-// Hero Section
-.hero-section {
-  padding: map-get($spacers, 6) 0;
-  background: linear-gradient(rgba($body-bg, 0.9), rgba($body-bg, 0.9)), url('../img/meat-pattern.png');
-  background-size: 300px;
-  
-  &__title {
-    font-size: 2.5rem;
-    font-weight: 700;
-    margin-bottom: map-get($spacers, 3);
-    color: $primary-color;
-  }
-  
-  &__subtitle {
-    font-size: 1.25rem;
-    margin-bottom: map-get($spacers, 4);
-    color: darken($secondary-color, 20%);
-  }
-  
-  .weather-widget {
-    background-color: rgba($white, 0.8);
-    padding: map-get($spacers, 2) map-get($spacers, 3);
-    border-radius: $border-radius-sm;
-    display: inline-block;
-    @include box-shadow(1);
-    
-    .weather-icon {
-      color: $primary-color;
-    }
-    
-    .weather-temp {
-      font-weight: 600;
-    }
-    
-    .weather-desc {
-      font-size: 0.8rem;
-    }
-  }
-}
-
-// Products Section
-.products-section {
-  background-color: $white;
-  
-  .card {
-    @include transition(all);
-    @include box-shadow(1);
-    border-radius: $border-radius-sm;
-    
-    &:hover {
-      @include box-shadow(3);
-      transform: translateY(-5px);
-    }
-    
-    .card-img-top {
-      border-radius: $border-radius-sm $border-radius-sm 0 0;
-      height: 200px;
-      object-fit: cover;
-    }
-    
-    .card-title {
-      color: $primary-color;
-      font-weight: 600;
-    }
-    
-    .card-text {
-      color: $secondary-color;
-    }
-  }
-}
-
 // Schedule Section
-.schedule-section, .location-section, .contact-section {
+.schedule-section {
+  padding: map-get($spacers, 5) 0;
   background-color: lighten($body-bg, 5%);
   
   .schedule-box, .about-box {
@@ -227,363 +59,146 @@ body {
     border-radius: $border-radius-sm;
     @include box-shadow(1);
     @include transition(all);
+    height: 100%;
+    padding: map-get($spacers, 4);
     
     &:hover {
       @include box-shadow(2);
     }
   }
   
-  .about-box {
-    height: 100%;
-  }
-}
-
-// Contact Form
-.contact-form {
-  background-color: $white;
-  border-radius: $border-radius-sm;
-  @include box-shadow(3);
-  
-  .form-control {
-    @include transition(all);
-    
-    &:focus {
-      border-color: $primary-color;
-      box-shadow: 0 0 0 0.2rem rgba($primary-color, 0.1);
-    }
+  h2 {
+    color: $primary-color;
+    font-weight: 700;
+    margin-bottom: map-get($spacers, 4);
   }
   
-  .input-group-text {
-    background-color: $primary-color;
-    color: $white;
-    border-color: $primary-color;
-  }
-}
-
-// Footer
-.main-footer {
-  background-color: $primary-color;
-  color: $white;
-  padding: map-get($spacers, 5) 0 map-get($spacers, 3);
-  margin-top: auto;
-
-  h5 {
+  h3 {
+    color: $primary-color;
     font-weight: 600;
     margin-bottom: map-get($spacers, 3);
   }
-
-  a {
-    color: $white;
-    text-decoration: none;
-    @include transition(color);
+  
+  .d-flex.align-items-center.mb-3 {
+    i {
+      font-size: 1.5rem;
+      color: $primary-color;
+    }
     
-    &:hover {
-      color: lighten($white, 10%);
-      text-decoration: underline;
+    h4 {
+      color: $primary-color;
+      font-weight: 600;
+      margin-bottom: 0;
+    }
+    
+    p {
+      margin-bottom: 0;
+      color: $secondary-color;
     }
   }
-
-  .social-icons a {
-    display: inline-block;
-    @include transition(transform);
+  
+  @include media-breakpoint-down(md) {
+    padding: map-get($spacers, 4) 0;
     
-    &:hover {
-      transform: translateY(-3px);
-      text-decoration: none;
+    .schedule-box, .about-box {
+      padding: map-get($spacers, 3);
     }
-  }
-
-  hr {
-    border-color: rgba($white, 0.1);
+    
+    .row > div:first-child {
+      margin-bottom: map-get($spacers, 4);
+    }
   }
 }
 
-// Login Page Styles
-.login-page {
-  background-color: $body-bg;
-  background-image: url('../img/meat-pattern.png');
-  background-size: 300px;
-  background-blend-mode: overlay;
-
-  .mini-header {
-    background-color: $blue-header;
+// Location Section
+.location-section {
+  padding: map-get($spacers, 5) 0;
+  background-color: lighten($body-bg, 3%);
+  
+  h2 {
+    color: $primary-color;
+    font-weight: 700;
+    margin-bottom: map-get($spacers, 5);
+    text-align: center;
   }
-
-  .login-main {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    padding: map-get($spacers, 5) 0;
-    min-height: calc(100vh - 120px);
-  }
-
-  .login-card {
+  
+  .card {
+    border: none;
+    @include box-shadow(1);
     border-radius: $border-radius-sm;
-    background-color: rgba($white, 0.95);
-    @include box-shadow(3);
-    @include transition(all);
-    border: 1px solid rgba($primary-color, 0.1);
-    overflow: hidden;
-
-    &:hover {
-      @include box-shadow(4);
+    height: 100%;
+    
+    .card-body {
+      padding: map-get($spacers, 4);
     }
-
-    h2 {
-      font-weight: 700;
+    
+    .card-title {
       color: $primary-color;
-      position: relative;
+      font-weight: 600;
       margin-bottom: map-get($spacers, 3);
-      font-size: 1.8rem;
     }
-
-    .text-muted {
-      color: lighten($primary-color, 25%) !important;
-      font-size: 0.95rem;
-    }
-
-    .form-control {
-      border-color: $secondary-color;
-      padding: map-get($spacers, 3);
-      background-color: rgba($white, 0.9);
-      @include transition(all);
+    
+    address, p {
+      color: $secondary-color;
+      margin-bottom: map-get($spacers, 2);
       
-      &:focus {
-        border-color: $primary-color;
-        box-shadow: 0 0 0 0.25rem rgba($primary-color, 0.1);
+      i {
+        color: $primary-color;
+        margin-right: map-get($spacers, 2);
+        width: 20px;
       }
     }
-
-    .input-group-text {
-      background-color: $primary-color;
-      color: $white;
-      border-color: $primary-color;
-    }
-
-    .btn-primary {
-      background-color: $primary-color;
-      border-color: $primary-color;
-      font-weight: 500;
-      @include transition(all);
-      padding: map-get($spacers, 2) map-get($spacers, 5);
-
-      &:hover {
-        background-color: darken($primary-color, 8%);
-        border-color: darken($primary-color, 8%);
-        transform: translateY(-2px);
-      }
-
-      &:active {
-        transform: translateY(0);
-      }
-    }
-
-    .btn-outline-primary {
-      color: $primary-color;
-      border-color: $primary-color;
-      
-      &:hover {
-        background-color: $primary-color;
-        color: $white;
-      }
-    }
-
+    
     a {
       color: $primary-color;
-      @include transition(color);
       text-decoration: none;
-
+      @include transition(color);
+      
       &:hover {
-        color: darken($primary-color, 15%);
+        color: darken($primary-color, 10%);
         text-decoration: underline;
       }
     }
-
-    .form-check-label {
-      font-size: 0.9rem;
-      color: lighten($primary-color, 15%);
-    }
-
-    .login-footer {
-      .contact-info, .social-links {
-        h6 {
-          color: $primary-color;
-          font-weight: 600;
-          font-size: 1rem;
-          margin-bottom: map-get($spacers, 2);
-        }
-      }
-
-      .social-icons {
-        a {
-          color: $primary-color;
-          @include transition(all);
-          display: inline-block;
-          margin: 0 map-get($spacers, 2);
-
-          &:hover {
-            color: darken($primary-color, 15%);
-            transform: translateY(-2px);
-          }
-        }
-      }
-
-      .copyright {
-        color: $primary-color;
-        opacity: 0.7;
-        font-size: 0.85rem;
-        margin-top: map-get($spacers, 3);
-      }
-    }
-  }
-}
-
-// Admin Dashboard Styles
-.admin-dashboard {
-  background-color: #f8f9fa;
-  
-  .admin-sidebar {
-    width: 250px;
-    min-height: 100vh;
-    @include transition(all);
-    
-    .sidebar-header {
-      border-bottom: 1px solid rgba($white, 0.1);
-    }
-    
-    .nav-link {
-      color: rgba($white, 0.8);
-      padding: map-get($spacers, 2) map-get($spacers, 3);
-      @include transition(all);
-      
-      &:hover, &.active {
-        color: $white;
-        background-color: rgba($white, 0.1);
-      }
-      
-      i {
-        width: 20px;
-        text-align: center;
-      }
-    }
   }
   
-  .admin-content {
-    @include transition(all);
-    
-    .admin-navbar {
-      box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
-    }
-    
-    .card {
-      border: none;
-      @include box-shadow(1);
-      @include transition(all);
-      
-      &:hover {
-        @include box-shadow(2);
-      }
-      
-      .card-header {
-        background-color: #f8f9fc;
-        border-bottom: 1px solid #e3e6f0;
-      }
-    }
-    
-    .border-left-primary {
-      border-left: 0.25rem solid #4e73df !important;
-    }
-    
-    .border-left-success {
-      border-left: 0.25rem solid #1cc88a !important;
-    }
-    
-    .border-left-info {
-      border-left: 0.25rem solid #36b9cc !important;
-    }
-    
-    .border-left-warning {
-      border-left: 0.25rem solid #f6c23e !important;
-    }
-  }
-}
-
-// Responsive Adjustments
-@media (max-width: 992px) {
-  .admin-dashboard {
-    .admin-sidebar {
-      position: fixed;
-      z-index: 1050;
-      transform: translateX(-100%);
-      
-      &.show {
-        transform: translateX(0);
-      }
-    }
-    
-    .admin-content {
-      margin-left: 0;
-    }
-  }
-}
-
-@media (max-width: 768px) {
-  .login-page {
-    .login-card {
-      padding: map-get($spacers, 4) !important;
-    }
-    
-    .main-header {
-      .navbar-brand {
-        font-size: 1.3rem;
-      }
-    }
-  }
-  
-  .hero-section {
+  @include media-breakpoint-down(md) {
     padding: map-get($spacers, 4) 0;
     
-    &__title {
-      font-size: 2rem;
+    h2 {
+      margin-bottom: map-get($spacers, 4);
     }
     
-    &__subtitle {
-      font-size: 1.1rem;
+    .card .card-body {
+      padding: map-get($spacers, 3);
+    }
+    
+    .row > div {
+      margin-bottom: map-get($spacers, 3);
+      
+      &:last-child {
+        margin-bottom: 0;
+      }
     }
   }
 }
 
-@media (max-width: 576px) {
-  .login-page {
-    .login-main {
-      padding: map-get($spacers, 3) 0;
-    }
-    
-    .login-card {
-      padding: map-get($spacers, 3) !important;
-      margin: map-get($spacers, 2);
-      
-      h2 {
-        font-size: 1.5rem;
-      }
-      
-      .btn-primary {
-        padding: map-get($spacers, 2) map-get($spacers, 3);
-        font-size: 0.9rem;
-      }
-    }
+// Contact Section
+.contact-section {
+  padding: map-get($spacers, 5) 0;
+  background-color: lighten($body-bg, 5%);
+  
+  h2 {
+    color: $primary-color;
+    font-weight: 700;
+    margin-bottom: map-get($spacers, 5);
+    text-align: center;
   }
   
-  .main-header {
-    .navbar-brand {
-      font-size: 1.1rem;
-    }
+  @include media-breakpoint-down(md) {
+    padding: map-get($spacers, 4) 0;
     
-    .nav {
-      .nav-link {
-        padding: map-get($spacers, 1) map-get($spacers, 2);
-        font-size: 0.9rem;
-      }
+    h2 {
+      margin-bottom: map-get($spacers, 4);
     }
   }
 }
@@ -597,9 +212,20 @@ body {
   @include box-shadow(3);
   display: flex;
   align-items: center;
+  padding: map-get($spacers, 2) map-get($spacers, 3);
+  border-radius: $border-radius-sm;
+  max-width: 350px;
   
   i {
     margin-right: map-get($spacers, 2);
+    font-size: 1.2rem;
+  }
+  
+  @include media-breakpoint-down(sm) {
+    bottom: 10px;
+    right: 10px;
+    left: 10px;
+    max-width: none;
   }
 }
 
@@ -620,42 +246,45 @@ body {
   }
 }
 
-
-// Estilos específicos para admin
-.admin-login-brand {
-  color: #1a237e;
-  font-weight: 700;
-}
-
-.admin-login-card {
-  border-top: 4px solid #1a237e;
-}
-
-.admin-login-btn {
-  background-color: #1a237e;
-  border-color: #1a237e;
+// Utility classes
+.section-title {
+  position: relative;
+  padding-bottom: map-get($spacers, 3);
+  margin-bottom: map-get($spacers, 5);
   
-  &:hover {
-    background-color: #303f9f;
-    border-color: #303f9f;
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 3px;
+    background-color: $primary-color;
   }
 }
 
-// Navbar de admin
-.admin-navbar {
-  background-color: #1a237e !important;
+.text-primary {
+  color: $primary-color !important;
 }
 
-// Sidebar de admin
-.admin-sidebar {
-  .nav-link {
-    &.active {
-      background-color: rgba(26, 35, 126, 0.2);
-      border-left: 3px solid #1a237e;
-    }
-    
-    &:hover {
-      background-color: rgba(26, 35, 126, 0.1);
-    }
+.bg-primary {
+  background-color: $primary-color !important;
+}
+
+// Responsive helpers
+.d-none-mobile {
+  @include media-breakpoint-down(md) {
+    display: none !important;
+  }
+}
+
+.d-only-desktop {
+  @include media-breakpoint-up(lg) {
+    display: block !important;
+  }
+  
+  @include media-breakpoint-down(md) {
+    display: none !important;
   }
 }

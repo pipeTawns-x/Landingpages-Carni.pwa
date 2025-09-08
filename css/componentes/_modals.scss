@@ -1,0 +1,30 @@
+// Modal styles
+.modal-content {
+  border-radius: $border-radius-sm;
+  @include box-shadow(4);
+  border: none;
+  
+  .modal-header {
+    border-bottom: 1px solid rgba($primary-color, 0.1);
+    padding: map-get($spacers, 3) map-get($spacers, 4);
+    
+    .modal-title {
+      font-weight: 600;
+      color: $primary-color;
+    }
+    
+    .btn-close {
+      padding: map-get($spacers, 2);
+      margin: calc(-1 * #{map-get($spacers, 2)}) calc(-1 * #{map-get($spacers, 3)}) calc(-1 * #{map-get($spacers, 2)}) auto;
+    }
+  }
+  
+  .modal-body {
+    padding: map-get($spacers, 4);
+  }
+  
+  .modal-footer {
+    border-top: 1px solid rgba($primary-color, 0.1);
+    padding: map-get($spacers, 3) map-get($spacers, 4);
+  }
+}

@@ -1,0 +1,102 @@
+// Card styles
+.card {
+  @include transition(all);
+  @include box-shadow(1);
+  border-radius: $border-radius-sm;
+  border: none;
+  overflow: hidden;
+  width: 100%;
+  
+  &:hover {
+    @include box-shadow(3);
+    transform: translateY(-3px);
+  }
+
+  @include media-breakpoint-up(md) {
+    &:hover {
+      transform: translateY(-5px);
+    }
+  }
+}
+
+.product-card {
+  height: 100%;
+  
+  .product-img-container {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 16/9;
+    
+    img {
+      @include responsive-image;
+      @include transition(transform);
+      min-height: 100%;
+    }
+    
+    &:hover img {
+      transform: scale(1.05);
+    }
+    
+    .product-badge {
+      position: absolute;
+      top: map-get($spacers, 2);
+      right: map-get($spacers, 2);
+      z-index: 1;
+    }
+
+    @include media-breakpoint-up(md) {
+      aspect-ratio: 4/3;
+    }
+  }
+  
+  .card-body {
+    display: flex;
+    flex-direction: column;
+    padding: map-get($spacers, 3);
+    flex: 1;
+  }
+  
+  .product-category {
+    @include fluid-type($breakpoint-sm, $breakpoint-xl, 0.8rem, 0.9rem);
+    color: $secondary-color;
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+  
+  .product-price {
+    font-weight: 700;
+    font-size: 1.2rem;
+    color: $primary-color;
+  }
+  
+  .product-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: auto;
+    padding-top: map-get($spacers, 3);
+  }
+  
+  .rating {
+    font-size: 0.9rem;
+    
+    i {
+      font-size: 0.85rem;
+    }
+  }
+  
+  @include media-breakpoint-down(md) {
+    .product-img-container {
+      height: 180px;
+    }
+    
+    .product-actions {
+      flex-direction: column;
+      gap: 0.5rem;
+      
+      .btn {
+        width: 100%;
+      }
+    }
+  }
+}
