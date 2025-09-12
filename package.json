@@ -1,0 +1,10 @@
+{
+  "name": "carniceria-pwa",
+  "version": "1.0.0",
+  "description": "PWA de la Carnicería El Señor de La Misericordia",
+  "scripts": {
+    "build": "echo 'No build step needed'",
+    "start": "npx serve ."
+  },
+  "license": "MIT"
+}
