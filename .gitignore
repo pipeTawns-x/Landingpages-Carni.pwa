@@ -1,0 +1,61 @@
+# Dependencies
+node_modules/
+package-lock.json
+yarn.lock
+
+# Build files
+dist/
+build/
+*.min.js
+*.min.css
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Cache directories
+.cache/
+.npm/
+.eslintcache
+
+# Temporary files
+*.tmp
+*.temp
+*.log
+
+# Coverage directory
+coverage/
+
+# Production configuration
+config.production.json
+
+# Compiled Python files
+*.pyc
+__pycache__/
+
+# Local SSL certificates
+*.pem
+*.key
+*.crt
