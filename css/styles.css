@@ -18,25 +18,36 @@ body {
 .main-header {
   background-color: #363432;
   color: #f9f8f7;
-  position: relative;
+  position: fixed;
+  width: 100%;
+  top: 0;
   z-index: 1000;
+  transition: all 0.3s ease;
 }
 .main-header .navbar-brand {
   font-size: 1.75rem;
   font-weight: 700;
   margin-right: 2rem;
 }
+.main-header .navbar-brand img {
+  transition: transform 0.3s ease;
+}
+.main-header .navbar-brand:hover img {
+  transform: scale(1.05);
+}
 .main-header .nav {
   margin-top: 0.5rem;
+  transition: opacity 0.3s ease;
 }
 .main-header .nav .nav-link {
   color: #f9f8f7;
   font-weight: 500;
   padding: 0.5rem 1rem;
-  transition: color 0.15s;
+  transition: color 0.15s, transform 0.3s;
 }
 .main-header .nav .nav-link:hover {
   color: white;
+  transform: translateY(-2px);
 }
 .main-header .header-icons .icon-btn {
   background-color: transparent;
@@ -48,9 +59,67 @@ body {
   margin-left: 0.5rem;
 }
 .main-header .header-icons .icon-btn:hover {
-  color: white;
   transform: translateY(-2px);
 }
+
+.main-header.scrolled .nav {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.mobile-menu {
+  position: fixed;
+  top: 0;
+  right: -300px;
+  width: 300px;
+  height: 100vh;
+  background-color: #363432;
+  padding: 80px 20px 20px;
+  transition: right 0.3s ease;
+  z-index: 999;
+}
+
+.mobile-menu.active {
+  right: 0;
+}
+
+.mobile-menu .nav-link {
+  color: #f9f8f7;
+  padding: 12px 0;
+  display: block;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+.mobile-menu .nav-link:hover {
+  color: #e4d1b0;
+  padding-left: 10px;
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  z-index: 998;
+}
+
+.overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+@media (max-width: 768px) {
+  .main-header .nav {
+    display: none;
+  }
+}
+
 .main-header .header-icons .icon-btn .badge {
   font-size: 0.6rem;
   padding: 0.25em 0.4em;

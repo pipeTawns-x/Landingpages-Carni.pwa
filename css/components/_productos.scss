@@ -1,0 +1,355 @@
+// components/_productos.scss
+
+// Estilos para la sección de productos
+.productos-container {
+  .categoria-productos {
+    animation: fadeIn 0.5s ease-in-out;
+    
+    h3 {
+      @include section-title($primary-color);
+    }
+  }
+}
+
+// Tarjetas de producto mejoradas
+.product-card {
+  @include product-card-style;
+  
+  &:hover {
+    .card-body {
+      .personalizar-btn {
+        @include primary-button($primary-color, $color-white);
+        transform: translateY(-2px);
+      }
+    }
+  }
+  
+  .card-body {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    
+    .product-name {
+      font-weight: 700;
+      color: $color-text;
+      margin-bottom: 1rem;
+      font-size: 1.1rem;
+      line-height: 1.4;
+      @include multiline-truncate(2, 3rem);
+    }
+    
+    .precio-info {
+      margin-bottom: 1.5rem;
+      
+      .precio-kg {
+        font-size: 1.3rem;
+        font-weight: 800;
+        color: $primary-color;
+        display: block;
+        margin-bottom: 0.25rem;
+      }
+      
+      .precio-lb {
+        font-size: 0.9rem;
+        color: $color-text-light;
+        font-weight: 500;
+      }
+    }
+    
+    .personalizar-btn {
+      width: 100%;
+      margin-top: auto;
+      @include primary-button($primary-color, $color-white);
+    }
+  }
+}
+
+// Menú de categorías mejorado
+.categorias-menu {
+  background: $color-white;
+  border-radius: $border-radius-lg;
+  @include box-shadow(2);
+  padding: 1.25rem;
+  margin-bottom: 2rem;
+  border: 1px solid rgba($primary-color, 0.1);
+  
+  .nav-scroll {
+    display: flex;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+    @include custom-scroll($primary-color);
+    
+    .categoria-btn {
+      white-space: nowrap;
+      margin-right: 0.75rem;
+      @include primary-button($primary-color, $color-white);
+      
+      &:last-child {
+        margin-right: 0;
+      }
+      
+      &.active {
+        @include primary-button($primary-color, $color-white);
+      }
+      
+      &:hover:not(.active) {
+        background-color: rgba($primary-color, 0.1);
+        transform: translateY(-1px);
+      }
+    }
+  }
+}
+
+// Modal de producto mejorado
+.producto-modal {
+  .modal-content {
+    border: none;
+    border-radius: $border-radius-lg;
+    @include box-shadow(4);
+    
+    .modal-header {
+      background: $primary-color;
+      color: $color-white;
+      border-bottom: none;
+      border-radius: $border-radius-lg $border-radius-lg 0 0;
+      
+      .modal-title {
+        font-weight: 700;
+        font-size: 1.25rem;
+      }
+      
+      .btn-close {
+        filter: invert(1);
+        opacity: 0.8;
+        
+        &:hover {
+          opacity: 1;
+        }
+      }
+    }
+    
+    .modal-body {
+      padding: 2rem;
+      
+      .product-image {
+        border-radius: $border-radius;
+        @include box-shadow(2);
+        width: 100%;
+        height: 250px;
+        object-fit: cover;
+      }
+      
+      .product-info {
+        .product-name {
+          font-weight: 700;
+          color: $color-text;
+          margin-bottom: 1rem;
+          font-size: 1.5rem;
+        }
+        
+        .precio-info {
+          .precio-kg {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: $primary-color;
+          }
+          
+          .precio-lb {
+            font-size: 1rem;
+            color: $color-text-light;
+          }
+        }
+      }
+      
+      .order-options {
+        .btn-group {
+          .btn {
+            font-weight: 600;
+            
+            &.active {
+              background-color: $primary-color;
+              border-color: $primary-color;
+            }
+          }
+        }
+        
+        .input-group {
+          .btn {
+            background-color: $color-light;
+            border-color: $color-border;
+            
+            &:hover {
+              background-color: darken($color-light, 5%);
+            }
+          }
+        }
+        
+        .order-summary {
+          @include gradient-bg(lighten($primary-color, 45%), lighten($accent-color, 45%));
+          border: none;
+          border-radius: $border-radius;
+          border-left: 4px solid $primary-color;
+          
+          .card-body {
+            padding: 1.25rem;
+            
+            .card-title {
+              font-weight: 600;
+              color: $color-text;
+              margin-bottom: 0.75rem;
+            }
+            
+            #resumenPedido {
+              color: $color-text-light;
+              margin-bottom: 1rem;
+            }
+            
+            #totalPedido {
+              font-size: 1.5rem;
+              font-weight: 800;
+            }
+          }
+        }
+      }
+    }
+    
+    .modal-footer {
+      border-top: 1px solid $color-border;
+      padding: 1.5rem 2rem;
+      
+      .btn {
+        font-weight: 600;
+        padding: 0.75rem 2rem;
+        
+        &.btn-primary {
+          background-color: $primary-color;
+          border-color: $primary-color;
+          
+          &:hover {
+            background-color: darken($primary-color, 10%);
+            border-color: darken($primary-color, 10%);
+          }
+        }
+      }
+    }
+  }
+}
+
+// Estados de carga y vacío
+#loading-state, #no-results {
+  min-height: 400px;
+  @include flex-center;
+  flex-direction: column;
+  
+  .spinner-border {
+    width: 3rem;
+    height: 3rem;
+    color: $primary-color;
+  }
+  
+  i {
+    font-size: 4rem;
+    color: $color-text-light;
+    margin-bottom: 1rem;
+  }
+  
+  p {
+    color: $color-text-light;
+    font-size: 1.1rem;
+  }
+}
+
+// Animaciones
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+// Responsive
+@include media-breakpoint-down(md) {
+  .productos-container {
+    .categoria-productos {
+      h3 {
+        font-size: 1.5rem;
+      }
+    }
+  }
+  
+  .categorias-menu {
+    padding: 1rem;
+    
+    .nav-scroll {
+      .categoria-btn {
+        padding: 0.6rem 1.25rem;
+        font-size: 0.9rem;
+      }
+    }
+  }
+  
+  .product-card {
+    .card-body {
+      padding: 1.25rem;
+      
+      .product-name {
+        font-size: 1rem;
+      }
+      
+      .precio-info {
+        .precio-kg {
+          font-size: 1.2rem;
+        }
+      }
+    }
+  }
+  
+  .producto-modal {
+    .modal-content {
+      .modal-body {
+        padding: 1.5rem;
+      }
+      
+      .modal-footer {
+        padding: 1.25rem 1.5rem;
+      }
+    }
+  }
+}
+
+@include media-breakpoint-down(sm) {
+  .productos-container {
+    .categoria-productos {
+      h3 {
+        font-size: 1.25rem;
+        text-align: center;
+        
+        &::after {
+          left: 50%;
+          transform: translateX(-50%);
+        }
+      }
+    }
+  }
+  
+  .categorias-menu {
+    .nav-scroll {
+      flex-wrap: nowrap;
+      justify-content: flex-start;
+    }
+  }
+}

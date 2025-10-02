@@ -1,166 +1,307 @@
-import { supabase, appState, updateCartCounter } from './app.js';
+// js/modules/catalog.js
+import { productos } from './base_dinamica.js';
 
-// Cargar productos al cargar la página
-document.addEventListener('DOMContentLoaded', async () => {
-  await loadProducts();
-  setupProductFilters();
-
-// Cargar productos desde Supabase
-async function loadProducts() {
-  const productsGrid = document.getElementById('productsGrid');
-  if (!productsGrid) return;
-  
-  productsGrid.innerHTML = `
-    <div class="col-12 text-center">
-      <div class="spinner-border text-primary" role="status">
-        <span class="visually-hidden">Cargando productos...</span>
-      </div>
-    </div>
-  `;
-  
-  const { data: products, error } = await supabase
-    .from('products')
-    .select('*')
-    .order('category', { ascending: true });
-  
-  if (error) {
-    console.error('Error loading products:', error);
-    productsGrid.innerHTML = `
-      <div class="col-12 text-center text-danger">
-        <i class="bi bi-exclamation-triangle-fill fs-1"></i>
-        <p class="mt-3">Error cargando los productos. Por favor intenta nuevamente.</p>
-      </div>
-    `;
-    return;
-  }
-  
-  if (products.length === 0) {
-    productsGrid.innerHTML = `
-      <div class="col-12 text-center text-muted">
-        <i class="bi bi-box-seam fs-1"></i>
-        <p class="mt-3">No hay productos disponibles en este momento.</p>
-      </div>
-    `;
-    return;
-  }
-  
-  // Agrupar productos por categoría
-  const productsByCategory = {};
-  products.forEach(product => {
-    if (!productsByCategory[product.category]) {
-      productsByCategory[product.category] = [];
+export class CatalogManager {
+    constructor() {
+        this.currentProduct = null;
+        this.setupEventListeners();
+        this.loadInitialProducts();
     }
-    productsByCategory[product.category].push(product);
-  });
-  
-  // Mostrar productos
-  let html = '';
-  
-  for (const category in productsByCategory) {
-    html += `
-      <div class="col-12 mt-4">
-        <h3 class="category-title">${category}</h3>
-        <hr>
-      </div>
-    `;
-    
-    productsByCategory[category].forEach(product => {
-      html += `
-        <div class="col-md-4 mb-4">
-          <div class="card h-100 product-card">
-            <img src="${product.image_url || 'img/placeholder-meat.jpg'}" 
-                 class="card-img-top" 
-                 alt="${product.name}"
-                 loading="lazy">
-            <div class="card-body">
-              <h5 class="card-title">${product.name}</h5>
-              <p class="card-text">${product.description || 'Producto de alta calidad'}</p>
-              <div class="d-flex justify-content-between align-items-center">
-                <span class="price">$${product.price.toFixed(2)}</span>
-                <button class="btn btn-sm btn-primary add-to-cart" 
-                        data-id="${product.id}"
-                        data-name="${product.name}"
-                        data-price="${product.price}">
-                  <i class="bi bi-cart-plus"></i> Añadir
-                </button>
-              </div>
+
+    setupEventListeners() {
+        // Manejo de cambio de categorías
+        document.addEventListener('DOMContentLoaded', () => {
+            const categoriaBtns = document.querySelectorAll('.categoria-btn');
+            const categoriaProductos = document.querySelectorAll('.categoria-productos');
+            
+            categoriaBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    // Remover clase active de todos los botones
+                    categoriaBtns.forEach(b => b.classList.remove('active'));
+                    // Añadir clase active al botón clickeado
+                    btn.classList.add('active');
+                    
+                    // Obtener la categoría seleccionada
+                    const categoria = btn.getAttribute('data-categoria');
+                    
+                    // Ocultar todas las categorías de productos
+                    categoriaProductos.forEach(prod => {
+                        prod.classList.add('d-none');
+                        prod.classList.remove('active');
+                    });
+                    
+                    // Mostrar la categoría seleccionada
+                    const categoriaSeleccionada = document.getElementById(categoria);
+                    if (categoriaSeleccionada) {
+                        categoriaSeleccionada.classList.remove('d-none');
+                        categoriaSeleccionada.classList.add('active');
+                        
+                        // Cargar productos de la categoría
+                        this.loadCategoryProducts(categoria);
+                    }
+                });
+            });
+
+            // Cargar productos iniciales
+            this.loadCategoryProducts('res');
+        });
+
+        // Manejo del modal de productos
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('personalizar-btn')) {
+                const productId = e.target.getAttribute('data-product-id');
+                const categoria = e.target.getAttribute('data-categoria');
+                this.openProductModal(productId, categoria);
+            }
+        });
+
+        // Configurar eventos del modal
+        this.setupModalEvents();
+    }
+
+    loadInitialProducts() {
+        // Cargar productos de res por defecto
+        this.loadCategoryProducts('res');
+    }
+
+    loadCategoryProducts(categoria) {
+        const contenedor = document.getElementById(`productos-${categoria}`);
+        if (!contenedor) return;
+
+        // Mostrar loading
+        contenedor.innerHTML = this.getLoadingHTML();
+
+        // Simular delay de carga
+        setTimeout(() => {
+            const productosCategoria = productos[categoria] || [];
+            this.renderProducts(contenedor, productosCategoria, categoria);
+        }, 500);
+    }
+
+    renderProducts(container, productosList, categoria) {
+        if (productosList.length === 0) {
+            container.innerHTML = this.getNoProductsHTML();
+            return;
+        }
+
+        let html = '';
+        productosList.forEach(producto => {
+            html += this.createProductCardHTML(producto, categoria);
+        });
+        
+        container.innerHTML = html;
+    }
+
+    createProductCardHTML(producto, categoria) {
+        const precioHtml = this.getPriceHTML(producto);
+        
+        return `
+            <div class="col-md-6 col-lg-4 col-xl-3">
+                <div class="card product-card h-100">
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="product-name">${producto.nombre}</h5>
+                        <div class="precio-info mb-2">
+                            ${precioHtml}
+                        </div>
+                        <button class="btn btn-outline-primary personalizar-btn mt-auto" 
+                                data-product-id="${producto.id}" 
+                                data-categoria="${categoria}">
+                            Haz clic para personalizar tu pedido
+                        </button>
+                    </div>
+                </div>
             </div>
-          </div>
-        </div>
-      `;
-    });
-  }
-  
-  productsGrid.innerHTML = html;
-  
-  // Configurar event listeners para los botones de añadir al carrito
-  document.querySelectorAll('.add-to-cart').forEach(button => {
-    button.addEventListener('click', addToCart);
-  });
-}
-});
-
-// Añadir producto al carrito
-function addToCart(e) {
-  const button = e.currentTarget;
-  const product = {
-    id: button.dataset.id,
-    name: button.dataset.name,
-    price: parseFloat(button.dataset.price),
-    quantity: 1
-  };
-  
-  // Verificar si el producto ya está en el carrito
-  const existingItem = appState.cart.find(item => item.id === product.id);
-  
-  if (existingItem) {
-    existingItem.quantity += 1;
-  } else {
-    appState.cart.push(product);
-  }
-  
-  // Actualizar almacenamiento local y contador
-  saveCartToStorage();
-  updateCartCounter();
-  
-  // Feedback visual
-  button.innerHTML = '<i class="bi bi-check"></i> Añadido';
-  button.classList.remove('btn-primary');
-  button.classList.add('btn-success');
-  
-  setTimeout(() => {
-    button.innerHTML = '<i class="bi bi-cart-plus"></i> Añadir';
-    button.classList.remove('btn-success');
-    button.classList.add('btn-primary');
-  }, 1000);
-}
-
-// Configurar filtros de productos
-function setupProductFilters() {
-  const searchInput = document.getElementById('searchInput');
-  if (searchInput) {
-    searchInput.addEventListener('input', filterProducts);
-  }
-}
-
-// Filtrar productos basado en búsqueda
-function filterProducts() {
-  const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-  const productCards = document.querySelectorAll('.product-card');
-  
-  productCards.forEach(card => {
-    const title = card.querySelector('.card-title').textContent.toLowerCase();
-    const description = card.querySelector('.card-text').textContent.toLowerCase();
-    
-    if (title.includes(searchTerm) || description.includes(searchTerm)) {
-      card.parentElement.style.display = 'block';
-    } else {
-      card.parentElement.style.display = 'none';
+        `;
     }
-  });
+
+    getPriceHTML(producto) {
+        if (producto.tipo === 'unidad') {
+            return `<div class="precio-kg">$${producto.precioPorUnidad}/pieza</div>`;
+        } else if (producto.tipo === 'paquete') {
+            return `<div class="precio-kg">$${producto.precioPorPaquete}/paquete</div>`;
+        } else {
+            return `
+                <div class="precio-kg">$${producto.precioPorKg}/kg</div>
+                <div class="precio-lb">$${producto.precioLb}/lb</div>
+            `;
+        }
+    }
+
+    openProductModal(productId, categoria) {
+        const producto = productos[categoria].find(p => p.id === productId);
+        if (!producto) return;
+        
+        this.currentProduct = producto;
+        this.updateModalContent(producto);
+        
+        const productoModal = new bootstrap.Modal(document.getElementById('productoModal'));
+        productoModal.show();
+    }
+
+    updateModalContent(producto) {
+        // Actualizar información básica del producto
+        document.querySelector('.product-name').textContent = producto.nombre;
+        document.querySelector('.precio-valor').textContent = producto.precioPorKg || producto.precioPorUnidad || producto.precioPorPaquete;
+        document.querySelector('.precio-lb-valor').textContent = producto.precioLb || 'N/A';
+        
+        // Actualizar imagen si existe
+        const productImage = document.querySelector('.product-image');
+        if (producto.imagen && productImage) {
+            productImage.src = producto.imagen;
+            productImage.alt = producto.nombre;
+        }
+
+        // Configurar el botón de agregar al carrito
+        const addToCartBtn = document.getElementById('addToCartBtn');
+        addToCartBtn.onclick = () => this.addToCart(producto);
+    }
+
+    setupModalEvents() {
+        // Manejar cambios en el tipo de pedido
+        document.querySelectorAll('input[name="tipoPedido"]').forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                this.toggleQuantityInputs(e.target.value);
+                this.updateOrderSummary();
+            });
+        });
+
+        // Manejar cambios en cantidades
+        document.getElementById('cantidadPeso')?.addEventListener('input', () => this.updateOrderSummary());
+        document.getElementById('unidadPeso')?.addEventListener('change', () => this.updateOrderSummary());
+        document.getElementById('cantidadPrecio')?.addEventListener('input', () => this.updateOrderSummary());
+        document.getElementById('cantidadPiezas')?.addEventListener('input', () => this.updateOrderSummary());
+        document.getElementById('preparacion')?.addEventListener('change', () => this.updateOrderSummary());
+
+        // Botones de incremento/decremento
+        document.getElementById('increasePeso')?.addEventListener('click', () => this.adjustQuantity('peso', 0.1));
+        document.getElementById('decreasePeso')?.addEventListener('click', () => this.adjustQuantity('peso', -0.1));
+        document.getElementById('increasePieces')?.addEventListener('click', () => this.adjustQuantity('piezas', 1));
+        document.getElementById('decreasePieces')?.addEventListener('click', () => this.adjustQuantity('piezas', -1));
+    }
+
+    toggleQuantityInputs(tipo) {
+        document.getElementById('pesoCantidad').style.display = tipo === 'peso' ? 'block' : 'none';
+        document.getElementById('precioCantidad').style.display = tipo === 'precio' ? 'block' : 'none';
+        document.getElementById('piezasCantidad').style.display = tipo === 'piezas' ? 'block' : 'none';
+    }
+
+    adjustQuantity(tipo, cambio) {
+        if (tipo === 'peso') {
+            const input = document.getElementById('cantidadPeso');
+            let valor = parseFloat(input.value) || 0;
+            valor = Math.max(0.1, valor + cambio);
+            input.value = valor.toFixed(1);
+        } else if (tipo === 'piezas') {
+            const input = document.getElementById('cantidadPiezas');
+            let valor = parseInt(input.value) || 0;
+            valor = Math.max(1, valor + cambio);
+            input.value = valor;
+        }
+        this.updateOrderSummary();
+    }
+
+    updateOrderSummary() {
+        if (!this.currentProduct) return;
+
+        const tipoPedido = document.querySelector('input[name="tipoPedido"]:checked').value;
+        let cantidad, unidad, total, resumen;
+
+        if (tipoPedido === 'peso') {
+            cantidad = parseFloat(document.getElementById('cantidadPeso').value) || 0;
+            unidad = document.getElementById('unidadPeso').value;
+            
+            // Convertir a kg para cálculo
+            let cantidadKg = cantidad;
+            if (unidad === 'lb') {
+                cantidadKg = cantidad / 2.20462;
+            } else if (unidad === 'g') {
+                cantidadKg = cantidad / 1000;
+            }
+            
+            total = cantidadKg * this.currentProduct.precioPorKg;
+            resumen = `${cantidad} ${unidad}`;
+        } else if (tipoPedido === 'precio') {
+            const monto = parseFloat(document.getElementById('cantidadPrecio').value) || 0;
+            const cantidadKg = monto / this.currentProduct.precioPorKg;
+            total = monto;
+            resumen = `$${monto.toFixed(2)} (${cantidadKg.toFixed(2)} kg)`;
+        } else if (tipoPedido === 'piezas') {
+            cantidad = parseInt(document.getElementById('cantidadPiezas').value) || 0;
+            total = cantidad * (this.currentProduct.precioPorUnidad || this.currentProduct.precioPorPaquete);
+            resumen = `${cantidad} pieza(s)`;
+        }
+
+        // Aplicar recargo por preparación premium
+        const preparacion = document.getElementById('preparacion').value;
+        if (preparacion === 'premium') {
+            total *= 1.2;
+            resumen += ' + preparación premium';
+        }
+
+        // Actualizar UI
+        document.getElementById('resumenPedido').textContent = `${resumen} de ${this.currentProduct.nombre}`;
+        document.getElementById('totalPedido').textContent = total.toFixed(2);
+    }
+
+    addToCart(producto) {
+        const tipoPedido = document.querySelector('input[name="tipoPedido"]:checked').value;
+        const preparacion = document.getElementById('preparacion').value;
+        const instrucciones = document.getElementById('instrucciones').value;
+
+        let quantity, price, customizations = {};
+
+        if (tipoPedido === 'peso') {
+            quantity = parseFloat(document.getElementById('cantidadPeso').value) || 0;
+            const unidad = document.getElementById('unidadPeso').value;
+            price = producto.precioPorKg;
+            customizations = { tipo: 'peso', cantidad: quantity, unidad, preparacion, instrucciones };
+        } else if (tipoPedido === 'precio') {
+            const monto = parseFloat(document.getElementById('cantidadPrecio').value) || 0;
+            quantity = monto / producto.precioPorKg;
+            price = producto.precioPorKg;
+            customizations = { tipo: 'precio', monto, preparacion, instrucciones };
+        } else if (tipoPedido === 'piezas') {
+            quantity = parseInt(document.getElementById('cantidadPiezas').value) || 0;
+            price = producto.precioPorUnidad || producto.precioPorPaquete;
+            customizations = { tipo: 'piezas', cantidad: quantity, preparacion, instrucciones };
+        }
+
+        if (window.cartManager) {
+            window.cartManager.addItem({
+                id: producto.id,
+                name: producto.nombre,
+                price: price,
+                image: producto.imagen
+            }, quantity, customizations);
+
+            // Cerrar modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('productoModal'));
+            modal.hide();
+        }
+    }
+
+    getLoadingHTML() {
+        return `
+            <div class="col-12 text-center">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Cargando productos...</span>
+                </div>
+                <p class="mt-2">Cargando productos...</p>
+            </div>
+        `;
+    }
+
+    getNoProductsHTML() {
+        return `
+            <div class="col-12 text-center">
+                <i class="bi bi-box-seam fs-1 text-muted"></i>
+                <p class="mt-3">No hay productos disponibles en esta categoría.</p>
+            </div>
+        `;
+    }
 }
 
-// Guardar carrito en almacenamiento local
-function saveCartToStorage() {
-  localStorage.setItem('cart', JSON.stringify(appState.cart));
-}
+// Inicializar el catálogo cuando se cargue la página
+document.addEventListener('DOMContentLoaded', () => {
+    window.catalogManager = new CatalogManager();
+});
