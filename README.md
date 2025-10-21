@@ -1,193 +1,220 @@
---------------------------------------------------------------------------------
-LANDINGPAGES-CARNI.PWA
-Carnicería El Señor de La Misericordia - E-commerce y PWA
-Aplicación Web Progresiva (PWA) de doble enfoque: una Landing Page principal (index.html) y una Web Secundaria de E-commerce (products.html) optimizada para pedidos personalizados, ciberseguridad y experiencia Mobile First [Contexto, 6, 7].
-El proyecto se encuentra en una fase de migración a una arquitectura modular estricta para garantizar escalabilidad, rendimiento y facilidad de mantenimiento.
----
+# 🥩 Carnicería El Señor de La Misericordia - E-commerce PWA
 
----
+### Arquitectura Modular Mobile First
 
-🎯 Metas del Producto Mínimo Viable (MVP)
-El objetivo principal es implementar la lógica de carrito y pedidos avanzados (como se ve en el CodePen de origen) y transformar su interfaz de pestañas internas a un flujo moderno, responsivo y modular [Contexto].
+[![PWA Status](https://img.shields.io/badge/PWA-Ready_for_Offline-blue.svg)](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps) [1, 2]
+[![Arquitectura](https://img.shields.io/badge/Architecture-Modular_SCSS_%2F_JS_Modules-green.svg)]()
+[![Frontend](https://img.shields.io/badge/Frontend-JS_Vanilla_%7C_Bootstrap_5-informational.svg)](https://getbootstrap.com/) [3]
+[![Seguridad](https://img.shields.io/badge/Security-OWASP_A01_%7C_RLS-red.svg)](https://owasp.org/www-project-top-ten/) [2, 4]
 
-1. Estrategia de la Web de Productos (products.html)
-   La página products.html (Web Secundaria) dejará de ser una página de pestañas monolíticas y se convertirá en un E-commerce dedicado y accesible.
-   Característica
-   Base Anterior (CodePen Tabs)
-   Mejora Implementada (MVP)
-   Módulos Impactados
-   Navegación Principal
-   Pestañas internas: Categorías, Carrito, Registro.
-   Eliminación de pestañas. El header debe ser ligero y solo incluir iconos de búsqueda, Carrito y Navegación Móvil [Contexto].
-   \_header.scss, header.js
-   Catálogo/Categorías
-   Tablero horizontal con botones de categoría.
-   Para Mobile First: La navegación de categorías (Res, Pollo, Cerdo, Embutidos, Premium, Preparadas) se moverá a un Menú Hamburger (Sidebar) [Contexto, 2].
-   \_sidebar.scss, catalog.js
-   Flujo de Carrito
-   Contenido visible en la pestaña "Carrito".
-   El carrito (carritoItems) se integra como un Modal lateral o Off-Canvas que se activa al hacer clic en el icono de Carrito en el Header [Contexto, 12].
-   \_modals.scss, cart.js
-   Personalización de Producto
-   Modal para definir peso/corte/piezas.
-   Se mantiene y se robustece. Esta lógica avanzada es clave del MVP (ej. Cálculo de precio por peso, precio por monto, o por pieza; grosor de corte para Premium).
-   productos.js, ui.js
-2. Integración Landing Page ↔ E-commerce
-   La navegación debe permitir que los usuarios lleguen al catálogo de productos (products.html) de dos maneras [Contexto]:
-3. Búsqueda Directa: Indexación SEO para búsquedas como "Carniceria el señor de la misericordia Productos" [Contexto].
-4. Redirección con Contexto: Desde la Landing Page (index.html), al seleccionar una categoría específica (ej. "Premium"), el usuario será redireccionado directamente al contenedor de productos de esa categoría (#premium dentro de products.html) y se activará su vista, mejorando la usabilidad [Contexto, 107].
-5. Flujo de Pedido (Checkout) y Fidelización
-   El proceso de confirmación de pedido debe ser flexible, integrando el Sistema de Fidelización solo para usuarios registrados. La lógica del tab de Registro del CodePen se separa y se vuelve más robusta.
-   Escenario
-   Resultado Requerido
-   Base de Ciberseguridad
-   Registro de Usuario y Fidelización
-   El usuario accede a la página register.html o se registra en el flujo de checkout. El registro se refuerza con la verificación de código OTP por teléfono y se garantiza la robustez en ciberseguridad (hashing, prevención de fuerza bruta, Control de Acceso Riguroso - BAC) [Contexto, 328].
-   Módulos: js/modules/core/auth.js, js/modules/pages/checkout.js.
-   Orden Básica (Invitado)
-   El usuario puede generar una orden sin necesidad de registro completo/login. Se requiere información mínima (Nombre, Teléfono y Dirección/Hora de Recogida) para completar el pedido, como se manejaba en la base del CodePen. No activa el sistema de fidelización.
-   Módulos: js/modules/pages/checkout.js. Validación rigurosa de nombre (solo letras), teléfono (10 dígitos) y dirección (contiene número).
+Una **Aplicación Web Progresiva (PWA)** moderna y de alto rendimiento que transforma el catálogo de la Carnicería El Señor de La Misericordia en una experiencia de e-commerce optimizada para pedidos personalizados y móviles [1]. Este proyecto se enfoca en la **migración modular** del código legado (monolítico) a una estructura escalable y de alta mantenibilidad [5].
 
----
+## 🚀 Características Clave
 
-📂 Arquitectura Modular y Rutas Detalladas
-La arquitectura sigue un modelo modular estricto separando las responsabilidades de lógica de negocio (Core), Interfaz (UI) y Vistas de Página (Pages).
+El proyecto abarca la funcionalidad completa de un e-commerce con enfoque en la experiencia del usuario y la robustez del sistema [6].
 
-1. Estructura de Directorios
-   LANDINGPAGES-CARNI.PWA/
-   ├── dist/ # Salida de Distribución (Generada por Bundler/Vite) [69]
-   │ ├── css/
-   │ │ └── main.css # CSS compilado de SCSS [66]
-   │ └── js/
-   │ └── bundle.js # JS compilado y modularizado [69]
-   │
-   ├── img/ # Archivos de Imagen, Iconos y Assets [69]
-   ├── scss/ # Archivos Fuente SCSS (Patrón 7-1) [67, 70]
-   ├── js/ # Archivos Fuente JavaScript [69]
-   ├── index.html # Landing Page Principal (ESTABLE) [32]
-   ├── products.html # Web Secundaria E-commerce / Catálogo (MODIFICADO) [32]
-   ├── login.html # Flujo de inicio de sesión seguro [71]
-   ├── register.html # Flujo de registro de cliente (MODIFICADO) [71]
-   ├── premium.html # Ruta de Fidelización (Requiere Control de Acceso Riguroso) [32]
-   ├── manifest.json # Configuración PWA [71, 72]
-   ├── package.json # Dependencias y Scripts
-   └── README.md
-2. Rutas Modulares JS (Lógica y Funcionalidad)
-   Ruta Confirmada
-   Propósito Principal
-   Comentarios
-   js/app.js
-   Punto de entrada principal para el bundler.
-   Inicializa listeners globales y el Service Worker.
-   js/modules/core/api.js
-   Manejo de llamadas a Supabase/API.
-   Encapsula la comunicación con el Backend.
-   js/modules/core/auth.js
-   Lógica de autenticación y seguridad.
-   Controla Login/Registro, gestión de tokens y seguridad de acceso.
-   js/modules/core/cart.js
-   Lógica de negocio del Carrito.
-   Maneja adición/eliminación de ítems, cálculo de subtotales y totales.
-   js/modules/core/loyalty.js
-   Programa de Fidelización.
-   Gestión de puntos, estatus Premium y funcionalidades asociadas.
-   js/modules/core/productos.js
-   Gestión de datos de productos.
-   Procesa la base de datos de productos (similar al const productos del CodePen) y aplica filtros.
-   js/modules/ui/header.js
-   Control del Header.
-   Maneja el estado de los iconos (Carrito/Hamburguer) y redirecciones.
-   js/modules/ui/notifications.js
-   Manejo de notificaciones.
-   Notificaciones push PWA y alertas internas (ej. Producto añadido al carrito).
-   js/modules/pages/catalog.js
-   Lógica de la vista de Productos.
-   Carga dinámica de la cuadrícula de productos, interacción con el Modal de Personalización.
-   js/modules/pages/checkout.js
-   Lógica de finalización de Pedido/Registro.
-   Implementa la validación de campos del CodePen (nombre, teléfono, dirección) y el flujo de OTP.
-   js/modules/utils/dom-utils.js
-   Utilidades de manipulación del DOM.
-   Funciones de ayuda genéricas (antes llamado base_dinamica.js).
-   js/modules/utils/service_worker.js
-   Lógica del Service Worker.
-   Para funcionalidad offline y caché de la PWA.
-3. Rutas Modulares SCSS (Estilos)
-   La estructura de estilos garantiza la adherencia a BEM y Mobile First [Contexto].
-   Ruta Confirmada
-   Propósito Principal
-   Comentarios
-   scss/abstracts/\_variables.scss
-   Variables globales.
-   Colores, tipografía y breakpoints (clave para Mobile First).
-   scss/abstracts/\_bem-utilities.scss
-   Utilidades para BEM.
-   Mixins que fuerzan el cumplimiento de la metodología BEM.
-   scss/base/\_reset.scss
-   Normalize o Reset CSS.
-   Asegura consistencia entre navegadores.
-   scss/components/\_cards.scss
-   Estilos para las tarjetas de producto.
-   Estilización de .producto-card (visto en CodePen) y optimización visual de precios.
-   scss/components/\_modals.scss
-   Estilos de Modales y el Off-Canvas del Carrito.
-   Controla el diseño del productoModal y el nuevo modal del carrito.
-   scss/layout/\_header.scss
-   Estilos del Encabezado.
-   Optimización para Mobile, incluyendo los nuevos iconos de Carrito/Hamburger.
-   scss/layout/\_sidebar.scss
-   Estilos del Menú Hamburger.
-   Aloja la navegación de categorías en dispositivos móviles.
-   scss/pages/\_catalog.scss
-   Estilos específicos para la vista de Catálogo.
-   Controla la visualización de los productos.
-   scss/pages/\_cart.scss
-   Estilos de la interfaz del Carrito.
-   Controla carrito-item y carrito-total.
-   scss/pages/\_login.scss / \_admin.scss
-   Estilos de Autenticación y Administración.
-   Refuerza el diseño de formularios seguros y acceso a panel.
-   scss/main.scss
-   Archivo Maestro.
-   Importa todos los módulos en el orden correcto.
+- **PWA Completa:** Soporte para funcionamiento _offline_ y capacidades de instalación en dispositivos (manifest.json) [2, 7].
+- **Catálogo Interactivo:** Productos organizados por categorías y con opciones de personalización avanzada de pedidos (peso, corte, grosor) [2, 8].
+- **Diseño Mobile First (MVP):** Refactorización del diseño de pestañas internas a un **Header ligero**, **Menú Hamburger** para navegación de categorías (`_sidebar.scss`) y **Modal Off-Canvas** para el Carrito (`_modals.scss`) [8].
+- **Programa de Fidelización:** Soporte para acumulación de puntos y acceso a rutas restringidas (`premium.html`) [2, 9, 10].
+- **Seguridad:** Autenticación robusta basada en **Supabase** y control de acceso a nivel de fila (**RLS**) [6].
+- **Integración Inteligente:** Funcionalidad para sugerencias basadas en el clima actual (futura implementación) [6].
 
----
+## 💻 Tecnologías Utilizadas
 
-🎨 Recomendación de Integración de Diseño (Templates)
-Dado el énfasis en el E-commerce de productos alimenticios (products.html) y la necesidad de mantener un diseño limpio y moderno (Mobile First, PWA), se recomienda integrar elementos de los siguientes temas de Bootstrap:
+Este proyecto sigue una arquitectura ligera y moderna, priorizando el rendimiento del lado del cliente.
 
-1. Enfoque E-commerce: El template Foodmart o Fruitables ofrece un diseño fresco con colores brillantes y un enfoque directo en el producto, ideal para la web secundaria.
-2. Enfoque de Componentes y Navegación: El diseño debe ser limpio y orientado a resultados, similar a Spectra o Codecraft (con amplio espacio en blanco), utilizando la paleta de colores roja de la carnicería.
-   Integración de Componentes Clave:
-   • Tarjetas de Producto (Cards): Utilizar un diseño de tarjeta (.producto-card) que destaque la información de precios (por kg, por pieza) de manera clara, con una animación sutil al pasar el mouse (como sugiere Spectra o Stride) para indicar que son interactivos.
-   • Modal de Personalización: El modal de detalles del producto debe ser visualmente prominente, utilizando los Custom Forms de Bootstrap para los radios de tipoPedido y el Range Slider para el grosor de corte, asegurando una UX fluida en móvil.
-   • Navegación Móvil: El menú Hamburger debe ser claro y funcional, siguiendo el diseño responsivo detallado en \_sidebar.scss para facilitar la selección de categorías rápidamente, un requerimiento clave para la navegabilidad Mobile First.
+| Componente        | Tecnología                       | Notas de Arquitectura                                                                                                                                        |
+| :---------------- | :------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Frontend Core** | **JavaScript Vanilla** [3]       | Lógica de negocio 100% modularizada [5].                                                                                                                     |
+| **Estilos**       | **SCSS** [3]                     | Implementación estricta de la metodología **BEM** [11].                                                                                                      |
+| **Framework CSS** | **Bootstrap 5** [3]              | Utilizado como base de componentes, con overrides en `scss/vendors/` [12, 13]. (Inspiración en diseños como Spectra o Codecraft para un layout limpio) [14]. |
+| **Backend/DB**    | **Supabase** (PostgreSQL) [15]   | Manejo de autenticación, _storage_ y seguridad a nivel de base de datos.                                                                                     |
+| **Herramientas**  | **Vite, Workbox, Chart.js** [15] | Bundling rápido, funcionalidad offline y visualización de datos (Admin Panel) [15].                                                                          |
+| **API/HTTP**      | **Axios** (Recomendado)          | Se recomienda su uso para encapsular la comunicación con Supabase dentro del módulo `js/modules/core/api.js`.                                                |
 
----
+## 📁 Estructura Modular del Proyecto
 
-🔒 Ciberseguridad y Validación (Foco en Checkout)
-Se mantiene el compromiso de robustecer la seguridad, especialmente en los puntos críticos de login y registro. El enfoque debe ser Seguridad por Diseño.
+El proyecto está en proceso de migración de `script.js` y `style.css` [10] a la siguiente estructura modular estándar (Patrón 7-1 en SCSS) [5, 16]:
 
-1. Validación Frontend Reforzada: La validación de datos críticos (nombre: solo letras, teléfono: 10 dígitos, dirección: al menos un número) se migra al módulo js/modules/pages/checkout.js para su manejo, ofreciendo una experiencia de usuario clara con mensajes de error inmediatos.
-2. Verificación OTP (One-Time Password): El proceso de verificación por código (simulado en el CodePen) es esencial. En la implementación real con Supabase, este proceso debe ser robusto y rápido, migrado completamente al módulo auth.js.
-3. Control de Acceso (BAC): Es fundamental asegurar que la ruta premium.html (Fidelización) aplique un Control de Acceso Riguroso (BAC) del lado del servidor/Supabase (RLS), previniendo el Broken Access Control (vulnerabilidad crítica).
+LANDINGPAGES-CARNI.PWA/ ├── 📁 css/ # Archivos CSS compilados │ └── main.css # Salida principal de SCSS │ ├── 🎨 scss/ # Fuentes SCSS (Estructura 7-1) │ ├── 📁 abstracts/ # Variables (\_variables.scss), Mixins y soporte BEM │ ├── 📁 base/ # Reset, Tipografía y Utilidades │ ├── 📁 components/ # Componentes reutilizables (\_cards.scss, \_modals.scss) │ ├── 📁 layout/ # Estructura principal (\_header.scss, \_sidebar.scss) │ ├── 📁 pages/ # Estilos específicos por vista (\_catalog.scss, \_cart.scss) │ ├── 📁 vendors/ # Integración y overrides de Bootstrap │ └── 🎯 main.scss # Archivo de importación maestro │ ├── ⚙️ js/ │ ├── app.js # Punto de entrada y orquestación │ └── 📁 modules/ │ ├── 📁 core/ # Lógica de Negocio │ │ ├── api.js # Capa de API y peticiones HTTP │ │ └── cart.js # Motor avanzado de gestión de carrito │ ├── 📁 pages/ # Lógica específica de la vista │ │ ├── catalog.js # Interacciones en products.html │ │ └── checkout.js # Lógica de registro y validaciones críticas │ └── 📁 utils/ # Helpers (ej. service_worker.js para PWA) │ └── 🌐 Páginas HTML ├── index.html # Landing Page (Referencia estable) ├── products.html # Vista Crítica del E-commerce (MODIFICADO) └── premium.html # Área de Fidelización (Acceso Restringido - BAC)
 
----
+## 🛡️ Estándares de Ciberseguridad y Calidad
 
-🛠️ Configuración del Proyecto y Tareas de Desarrollo
-Para poner en marcha el desarrollo, se requiere:
-Requisitos Previos
-• Node.js (LTS) y NPM.
-• Un proyecto configurado en Supabase con los endpoints de autenticación.
-• Configurar las reglas de RLS (Row-Level Security) en Supabase.
-Puesta en Marcha
+El código debe adherirse a los principios de **Security by Design** [24] y **TDD** (Desarrollo Guiado por Pruebas) [25].
 
-1. Clonar y Dependencias:
-2. Variables de Entorno: Crear el archivo .env basado en .env.example y configurar las claves de Supabase.
-3. Ejecución en Desarrollo (Vite):
-4. Compilación de Estilos (SCSS): Es obligatorio el uso de un compilador (como Vite o Live Sass Compiler) para generar dist/css/main.css desde los archivos fuente en la carpeta scss/.
-5. Compilación de Lógica (Módulos JS): Se utiliza un bundler (Vite) para resolver la arquitectura modular en js/modules/ y empaquetarla en dist/js/bundle.js.
+### A. Estándares de Código
 
----
+1.  **Metodología BEM (Bloque-Elemento-Modificador):** Es **obligatorio** en todos los archivos SCSS/CSS [11]. Ejemplos de clases: `.carrito-item-info`, `.ejemplos-direccion` [11].
+2.  **Documentación JSDoc:** Toda función o módulo nuevo debe incluir documentación **JSDoc completa** [5, 26].
+3.  **Filosofía DRY:** Evitar código duplicado, extrayendo lógica común a módulos de utilidad (`js/modules/utils/dom-utils.js`) [27, 28].
 
-Hecho por pipeTawns-x | Arquitectura Modular PWA
+### B. Validaciones de Seguridad Críticas
+
+La validación del lado del cliente (y se asume la validación del lado del servidor) debe ser estricta para mitigar la inyección de datos inseguros (OWASP A03:2021) [4].
+
+| Campo             | Restricción                                                     | Patrón/Lógica                                                                   | Fuente en Código Monolítico              |
+| :---------------- | :-------------------------------------------------------------- | :------------------------------------------------------------------------------ | :--------------------------------------- |
+| **Nombre**        | Solo letras y espacios.                                         | Patrón Regex: `[A-Za-záéíóúñÁÉÍÓÚÑ\s]+` [5, 29].                                | `script.js` -> `validarNombre()` [29]    |
+| **Teléfono**      | Exactamente 10 dígitos.                                         | Patrón: `{10}` [5, 30].                                                         | `script.js` -> `validarTelefono()` [30]  |
+| **Dirección**     | Debe contener al menos un número (para la numeración de calle). | Lógica: `/\d/` [5, 31].                                                         | `script.js` -> `validarDireccion()` [31] |
+| **Autenticación** | Requiere OTP.                                                   | Implementación de verificación de código **OTP** por teléfono simulada [4, 32]. |
+
+### C. Control de Acceso
+
+- **Rutas Restringidas:** La página `premium.html` está marcada como **Backlog** y debe requerir un **Control de Acceso Riguroso (BAC)** del lado del servidor (utilizando RLS de Supabase) para evitar el acceso directo no autorizado [4, 10].
+
+## ⚙️ Configuración del Entorno
+
+Siga estos pasos para configurar el entorno de desarrollo y comenzar a trabajar en la refactorización [3]:
+
+### 📋 Prerrequisitos
+
+- Node.js (versión LTS)
+- NPM o Yarn
+- Configuración de proyecto **Supabase** (ver `supabase-setup.sql` para esquema de tablas) [3].
+
+### ⚡ Inicio Rápido
+
+1. Crear un proyecto en Supabase [15].
+2. Configurar las tablas necesarias (ver `supabase-setup.sql`) [3].
+3. Crear archivo `.env` basado en `.env.example` [3].
+4. Instalar dependencias:
+   ````bash
+   npm install
+   ``` [3]
+   ````
+5. Ejecutar en desarrollo (usando Vite):
+   ````bash
+   npm run dev
+   ``` [3]
+   ````
+6. Construir para producción:
+   ````bash
+   npm run build
+   ``` [3]
+   ````
+
+## 📝 Guía para Desarrolladores
+
+Si utiliza agentes de IA, considere el archivo de contexto `GOB.md` (o `AGENTS.md`) como la fuente de verdad para el comportamiento del agente [33-35].
+
+**Flujo de Trabajo TDD:** Las nuevas funcionalidades deben ser definidas usando criterios de aceptación estilo **Gherkin** (`Given-When-Then`) antes de escribir el código [36].
+le falta quiero que la ruta modular se vea completa como PWA E-commerce Carnicería: Arquitectura Mobile First
+
+🥩 Carnicería El Señor de La Misericordia - E-commerce PWA
+Arquitectura Modular Mobile First: Fuente de Verdad para Desarrolladores
+
+Este es el repositorio de la Aplicación Web Progresiva (PWA) de e-commerce de la Carnicería El Señor de La Misericordia. El proyecto se encuentra en una fase crítica de migración y refactorización de código monolítico (script.js, style.css) a una arquitectura modular escalable, orientada a un diseño Mobile First.
+La autenticación se maneja con Supabase y RLS (Row-Level Security), y la comunicación API debe priorizar llamadas HTTP modernas, idealmente usando Axios (o fetch) encapsuladas.
+🎯 Objetivo de Migración y Características
+El objetivo principal es eliminar la dependencia de los archivos monolíticos (como las pestañas internas en products.html) y trasladar la lógica de negocio a un sistema de módulos [14, 8 orientada a un diseño Mobile First.
+La autenticación se maneja con Supabase y RLS (Row-Level Security), y la comunicación API debe priorizar llamadas HTTP modernas, idealmente usando Axios (o fetch) encapsuladas.
+🎯 Objetivo de Migración y Características
+El objetivo principal es eliminar la dependencia de los archivos monolíticos (como las pestañas internas en products.html) y trasladar la lógica de negocio a un sistema de módulos.
+Característica
+Estado Anterior (Monolítico)
+Nueva Implementación (Modular)
+Página Focal
+products.html con pestañas de Catálogo, Carrito, Registro.
+Diseño Mobile First con Off-Canvas para Carrito y Sidebar para categorías.
+Lógica
+Toda la lógica en script.js.
+Modularización estricta en js/modules/ (Core, UI, Pages) con JSDoc obligatorio.
+Estilos
+style.css.
+SCSS modular (Patrón 7-1) y adhesión estricta a la metodología BEM.
+Seguridad
+Validación básica de formularios.
+Validación reforzada de Inputs Críticos y Control de Acceso Riguroso (BAC) para premium.html.
+Interacciones
+Lógica de cálculo en el DOM.
+Lógica de pedido avanzada (peso/corte/piezas) encapsulada en cart.js y productos.js.
+📁 Arquitectura Modular PWA (Ruta Completa)
+Esta estructura representa la arquitectura final de producción y es la Fuente de Verdad para la refactorización.
+LANDINGPAGES-CARNI.PWA/
+├── 📁 dist/ # 📦 Archivos de distribución (Producción) [14]
+│ ├── 📁 css/
+│ │ └── main.css # Salida final de la compilación SCSS [14].
+│ └── 📁 js/
+│ └── bundle.js # Salida de la compilación de módulos JS (via Vite) [14].
+│
+├── ⚙️ js/
+│ ├── app.js # Punto de entrada principal (Inicialización de la PWA/Módulos) [15].
+│ └── 📁 modules/ # Módulos JavaScript organizados por responsabilidad [14].
+│ ├── 📁 core/ # 🧠 Lógica de Negocio y Datos (Responsabilidad Única) [5].
+│ │ ├── api.js # Abstracción de llamadas HTTP (Axios) a Supabase/APIs externas [5, 16].
+│ │ ├── auth.js # Autenticación, gestión de tokens y flujo de OTP [5, 17].
+│ │ ├── cart.js # Motor central del carrito, cálculos y estado [5, 17].
+│ │ ├── loyalty.js # Lógica del programa de fidelización (puntos, estatus Premium) [5].
+│ │ ├── productos.js # Gestión de datos del catálogo, filtros y personalización de cortes [5].
+│ │ └── search.js # Lógica de búsqueda optimizada [5].
+│ ├── 📁 pages/ # 🌐 Lógica de Scripts específicos de cada vista [5].
+│ │ ├── admin.js # Interacción para el Panel de Administración [15].
+│ │ ├── catalog.js # Lógica de la vista principal de `products.html` [15].
+│ │ ├── dashboard.js # Lógica del dashboard de usuario (historial de pedidos) [15].
+│ │ └── checkout.js # Flujo de registro y validaciones de envío [17].
+│ ├── 📁 ui/ # 🎨 Lógica de Componentes de Interfaz y widgets [5].
+│ │ ├── header.js # Control de navegación, menú Hamburger [5].
+│ │ ├── notifications.js # Sistema de alertas y mensajes de usuario [5].
+│ │ └── weather.js # Lógica para integración con clima (sugerencias) [5].
+│ └── 📁 utils/ # 🛠 Funciones de ayuda reutilizables (DRY) [15].
+│ ├── dom-utils.js # Utilidades para manipulación del DOM (antes base_dinamica.js) [15].
+│ └── service_worker.js # Gestión del Service Worker para funcionalidad PWA Offline [15].
+│
+├── 🎨 scss/ # Fuentes de Estilos SCSS (Patrón Arquitectónico 7-1) [15].
+│ ├── 📁 abstracts/ # Herramientas: variables, mixins, placeholders [15].
+│ │ ├── \_bem-utilities.scss # Mixins para forzar la nomenclatura BEM [18].
+│ │ ├── \_variables.scss # Paleta de colores, tipografía, breakpoints [15].
+│ │ └── \_mixins.scss # Funciones reutilizables de CSS [15].
+│ ├── 📁 base/ # Estilos base: Reset, Tipografía y Utilidades [15].
+│ │ ├── \_reset.scss # Normalize o Reset CSS [19].
+│ │ ├── \_typography.scss # Declaración de fuentes y estilos de texto [19].
+│ │ └── \_utilities.scss # Clases helper (margen, padding, etc.) [19].
+│ ├── 📁 components/ # Componentes reutilizables a nivel de UI [19].
+│ │ ├── \_alerts.scss # Estilos para alertas y mensajes [19].
+│ │ ├── \_cards.scss # Estilos para `.producto-card` [19].
+│ │ └── \_modals.scss # Estilos para modales y Off-Canvas del Carrito [19].
+│ ├── 📁 layout/ # Estructura del sitio: Header, Footer, Grid [19].
+│ │ ├── \_header.scss # Estilos del encabezado principal [19].
+│ │ ├── \_sidebar.scss # Estilos para el menú lateral/hamburger móvil [19].
+│ │ ├── \_forms.scss # Estilos globales para formularios [19].
+│ │ └── \_grid.scss # Sistema de layout responsivo (ej. CSS Grid) [19].
+│ ├── 📁 pages/ # Estilos específicos de cada vista [19].
+│ │ ├── \_admin.scss # Estilos exclusivos del panel de administración [20].
+│ │ ├── \_catalog.scss # Estilos de la grilla de productos [20].
+│ │ ├── \_cart.scss # Estilos específicos para la vista de carrito [20].
+│ │ └── \_login.scss # Estilos para las páginas de autenticación [20].
+│ ├── 📁 themes/ # Temas, como Dark Mode [13].
+│ │ └── \_dark-mode.scss # Soporte para tema oscuro [20].
+│ ├── 📁 vendors/ # Estilos de librerías de terceros [13].
+│ │ └── \_bootstrap.scss # Integración y overrides de Bootstrap [13].
+│ └── 🎯 main.scss # Archivo principal de compilación (importa todo) [13].
+│
+└── 🌐 Páginas HTML (Vistas)
+├── index.html # Landing Page [8].
+├── products.html # Vista de Catálogo (Focal, debe ser Mobile First) [8].
+└── premium.html # Ruta Restringida (BACKLOG - Requiere BAC) [3].
+🔒 Seguridad y Estándares de Calidad
+El PM/Arquitecto experto requiere la adhesión a las siguientes restricciones de diseño (Hard Constraints):
+A. Ciberseguridad y Validación (OWASP)
+
+1. Control de Acceso Roto (BAC): La página premium.html es una ruta crítica y requiere verificación de roles en el lado del servidor, asumiendo la implementación de RLS en Supabase para proteger los datos.
+2. Validación de Inputs Críticos: La validación en checkout.js (o en script.js durante la refactorización) es crucial.
+   ◦ Nombre: Solo letras y espacios. Patrón Regex: ^[A-Za-záéíóúñÁÉÍÓÚÑ\s]+$.
+    ◦ Teléfono: Exactamente 10 dígitos. Patrón: ^{10}$.
+   ◦ Dirección: Debe contener al menos un número (para la numeración de calle). Lógica de verificación: /\d/.
+3. Prevención de Inyección: Utilizar siempre consultas parametrizadas en la capa API (api.js) para evitar la Inyección SQL (A03:2021).
+4. Autenticación: El proceso de registro simula el envío y verificación de un código OTP (One-Time Password) por teléfono.
+   B. Estándares de Desarrollo
+   • BEM Obligatorio: Toda clase CSS/SCSS nueva o refactorizada debe seguir la metodología BEM (ej. .carrito-item, .ejemplos-direccion).
+   • JSDoc: La documentación JSDoc es obligatoria para todas las funciones y módulos para mejorar la legibilidad y la mantenibilidad.
+   • Metodología: El desarrollo de nuevas funcionalidades se guía por TDD (Test-Driven Development), utilizando Gherkin (Given-When-Then) para los criterios de aceptación.
+   🛠 Configuración y Scripts
+   Para comenzar a trabajar en la refactorización modular:
+5. Crear un proyecto en Supabase.
+6. Configurar las tablas necesarias (ver supabase-setup.sql).
+7. Instalar dependencias: npm install.
+8. Ejecutar en desarrollo: npm run dev.
+9. Construir para producción: npm run build.
+10. Asegurar que el compilador SCSS (ej. Live Sass Compiler o Vite) esté monitoreando los archivos en scss/ para generar la salida dist/css/main.css
