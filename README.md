@@ -96,9 +96,12 @@ LANDINGPAGES-CARNI.PWA/
 │   ├── products.html           # 🛍️ E-commerce (Vista Principal)
 │   ├── login.html              # 🔐 Autenticación
 │   ├── register.html           # 📝 Registro Usuarios
-│   └── premium.html            # ⭐ Área Fidelización (BAC)
+│   ├── premium.html            # ⭐ Área Fidelización (BAC)
+│   ├── offline.html            # 📲 Página Offline
+│   └── admin/
+│       └── dashboard.html      # 👨‍💼 Panel Administración
 │
-├── ⚙️ Núcleo de Aplicación
+├── ⚙️ Núcleo de Aplicación (js/)
 │   ├── app.js                  # 🚀 Punto de Entrada Principal
 │   └── modules/
 │       ├── 🧠 core/            # Lógica de Negocio
@@ -107,45 +110,44 @@ LANDINGPAGES-CARNI.PWA/
 │       │   ├── cart.js         # 🛒 Motor del Carrito
 │       │   ├── productos.js    # 📦 Gestión Catálogo
 │       │   ├── loyalty.js      # 💎 Programa Fidelización
-│       │   └── search.js       # 🔍 Búsqueda Avanzada
+│       │   ├── search.js       # 🔍 Búsqueda Avanzada
+│       │   └── delivery.js     # 🚚 Lógica de Delivery
 │       │
 │       ├── 🌐 pages/           # Lógica por Vista
 │       │   ├── catalog.js      # products.html
 │       │   ├── checkout.js     # 🧾 Validaciones Pedido
 │       │   ├── admin.js        # 👨‍💼 Panel Administración
-│       │   └── dashboard.js    # 📊 Dashboard Usuario
+│       │   ├── dashboard.js    # 📊 Dashboard Usuario
+│       │   └── premium.js      # ⭐ Página Premium
 │       │
 │       ├── 🎨 ui/              # Componentes Interfaz
 │       │   ├── header.js       # 🧭 Navegación Principal
 │       │   ├── notifications.js # 💬 Sistema Alertas
-│       │   └── weather.js      # 🌤️ Integración Clima
+│       │   ├── weather.js      # 🌤️ Integración Clima
+│       │   └── ui-utils.js     # 🛠️ Utilidades UI
 │       │
 │       └── 🛠️ utils/           # Utilidades
 │           ├── dom-utils.js    # 🎯 Manipulación DOM
-│           └── service_worker.js # 📲 PWA Offline
+│           ├── service_worker.js # 📲 PWA Offline
+│           ├── offline.js      # 🔌 Lógica Offline
+│           ├── admin-auth.js   # 🔐 Autenticación Admin
+│           └── base_dinamica.js # 🏗️ Base Dinámica
 │
-├── 🎨 Sistema de Diseño SCSS
+├── 🎨 Sistema de Diseño SCSS (scss/)
 │   ├── main.scss               # 🎛️ Archivo Maestro
 │   │
 │   ├── abstracts/              # 🛠️ Herramientas
 │   │   ├── _variables.scss     # 🎨 Colores & Tipografía
 │   │   ├── _mixins.scss        # 🔄 Funciones Reutilizables
 │   │   ├── _bem-utilities.scss # 📐 Mixins BEM
-│   │   └── _functions.scss     # 🧮 Funciones SCSS
+│   │   ├── _functions.scss     # 🧮 Funciones SCSS
+│   │   └── _placeholders.scss  # 🏷️ Placeholders
 │   │
 │   ├── base/                   # 🏗️ Fundamentos
 │   │   ├── _reset.scss         # 🧹 Normalize CSS
 │   │   ├── _typography.scss    # 🔤 Sistema Tipográfico
 │   │   ├── _utilities.scss     # ⚡ Clases Helper
 │   │   └── _base.scss          # 🎯 Estilos Base
-│   │
-│   ├── layout/                 # 🏛️ Estructura
-│   │   ├── _grid.scss          # 📐 Sistema Grid
-│   │   ├── _header.scss        # 🔝 Header & Navegación
-│   │   ├── _sidebar.scss       # 📱 Menú Hamburger
-│   │   ├── _footer.scss        # 🔻 Footer
-│   │   ├── _forms.scss         # 📝 Formularios
-│   │   └── _navigation.scss    # 🧭 Navegación Global
 │   │
 │   ├── components/             # 🧩 Componentes UI
 │   │   ├── _buttons.scss       # 🔘 Sistema de Botones
@@ -174,16 +176,39 @@ LANDINGPAGES-CARNI.PWA/
 │       └── _custom-vendors.scss # 🔧 Personalización
 │
 ├── 📦 Build y Distribución
-│   ├── dist/
-│   │   ├── css/main.css        # 🎨 CSS Final Compilado
-│   │   └── js/bundle.js        # ⚙️ JS Modularizado
+│   ├── dist/                   # 🏗️ Build de Producción
+│   │   ├── assets/
+│   │   │   ├── index-*.js      # 🔨 JS Compilado
+│   │   │   ├── index-*.css     # 🎨 CSS Compilado
+│   │   │   └── *.png           # 🖼️ Imágenes de Productos
+│   │   └── index.html          # 📄 Página Principal Compilada
+│   │
+│   ├── css/                    # 🎨 CSS Compilado (NO TOCAR)
+│   │   ├── main.css            # 🎨 CSS Final Compilado
+│   │   └── main.css.map        # 🗺️ Source Maps para Debugging
 │   │
 │   └── package.json            # 📋 Dependencias & Scripts
 │
-└── 🔧 Configuración
-    ├── manifest.json           # 📱 Config PWA
-    ├── .env.example            # 🗝️ Variables Entorno
-    └── supabase-setup.sql      # 🗃️ Esquema Base Datos
+├── 🖼️ Recursos Multimedia
+│   └── img/                    # 🖼️ Imágenes en Desarrollo
+│       ├── carrusel_products/  # 🖼️ Imágenes del Carrusel
+│       ├── products/           # 🖼️ Imágenes de Productos
+│       └── logo-user.png       # 👤 Avatar Usuario
+│
+├── 🔧 Configuración
+│   ├── manifest.json           # 📱 Config PWA
+│   ├── netlfly.toml           # 🚀 Config Despliegue Netlify
+│   ├── package.json           # 📦 Dependencias
+│   ├── postcss.config.js      # 🔧 PostCSS
+│   ├── tailwind.config.js     # 🎨 Tailwind
+│   ├── tsconfig.json          # 📝 TypeScript
+│   └── .env.example           # 🗝️ Variables Entorno
+│
+└── 🗃️ Archivos No Modificables
+    ├── node_modules/          # 📚 Dependencias (NO TOCAR)
+    ├── css/main.css          # 🎨 CSS Compilado (NO TOCAR)
+    ├── css/main.css.map      # 🗺️ Source Maps (NO TOCAR)
+    └── dist/                 # 🏗️ Build Producción (NO TOCAR)
 ```
 
 ## 🔒 Seguridad y Estándares
@@ -368,3 +393,32 @@ Feature: Personalización de cortes de carne
 [📚 Documentación Técnica](docs/) • [🐛 Reportar Bug](issues/) • [💡 Sugerir Feature](issues/)
 
 </div>
+
+---
+
+## 📝 Notas de Implementación
+
+### ✅ Archivos Existentes y Estado
+
+| Archivo             | Estado    | Ubicación Actual             | Ubicación Objetivo                   |
+| ------------------- | --------- | ---------------------------- | ------------------------------------ |
+| `main.css`          | ✅ Existe | `css/main.css`               | NO TOCAR - Compilado                 |
+| `main.css.map`      | ✅ Existe | `css/main.css.map`           | NO TOCAR - Source Maps               |
+| `service-worker.js` | ✅ Existe | `js/utils/service-worker.js` | `js/modules/utils/service_worker.js` |
+| `admin-auth.js`     | ✅ Existe | `js/utils/admin-auth.js`     | `js/modules/utils/admin-auth.js`     |
+| `base_dinamica.js`  | ✅ Existe | `js/utils/base_dinamica.js`  | `js/modules/utils/base_dinamica.js`  |
+
+### 🔄 Archivos por Migrar
+
+Los siguientes archivos requieren migración a la estructura modular:
+
+- `js/utils/` → `js/modules/utils/`
+- Lógica de `script.js` → Módulos core/pages correspondientes
+- Refactorización de estilos a SCSS modular
+
+### 🚫 Archivos No Modificables
+
+- `node_modules/` - Dependencias del sistema
+- `css/main.css` - Archivo compilado (modificar solo SCSS)
+- `css/main.css.map` - Source maps generados
+- `dist/` - Build de producción generado automáticamente
