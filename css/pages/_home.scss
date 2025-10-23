@@ -1,334 +1,418 @@
-// _home.scss - Estilos específicos para la página de inicio
-
-// Hero Section
-.hero-section {
-  background: linear-gradient(135deg, rgba($primary-color, 0.1) 0%, rgba($secondary-color, 0.05) 100%);
-  padding: 4rem 0;
-  position: relative;
-  overflow: hidden;
-  
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: url('../../img/pattern.svg') repeat;
-    opacity: 0.1;
-    z-index: 1;
-  }
-  
-  .container {
+// Página de inicio BEM
+.home {
+  // Hero Section BEM
+  &__hero {
+    background: linear-gradient(135deg, rgba($primary, 0.1) 0%, rgba($secondary, 0.05) 100%);
+    padding: map-get($spacers, 6) 0;
     position: relative;
-    z-index: 2;
-  }
-  
-  &__title {
-    font-size: 3rem;
-    font-weight: 700;
-    color: $dark;
-    margin-bottom: 1rem;
-    line-height: 1.2;
+    overflow: hidden;
+    
+    @include media-breakpoint-down(lg) {
+      padding: map-get($spacers, 5) 0;
+    }
     
     @include media-breakpoint-down(md) {
-      font-size: 2.5rem;
+      padding: map-get($spacers, 4) 0;
     }
     
-    @include media-breakpoint-down(sm) {
-      font-size: 2rem;
-    }
-  }
-  
-  &__subtitle {
-    font-size: 1.25rem;
-    color: $gray-700;
-    margin-bottom: 2rem;
-    line-height: 1.6;
-    
-    @include media-breakpoint-down(md) {
-      font-size: 1.1rem;
-    }
-  }
-}
-
-// Products Section (específico para home)
-.products-section {
-  .section-title {
-    font-size: 2.5rem;
-    font-weight: 700;
-    color: $dark;
-    text-align: center;
-    margin-bottom: 3rem;
-    position: relative;
-    
-    &::after {
+    &::before {
       content: '';
       position: absolute;
-      bottom: -10px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 80px;
-      height: 4px;
-      background: linear-gradient(90deg, $primary-color, $secondary-color);
-      border-radius: 2px;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('../img/pattern.svg') repeat;
+      opacity: 0.1;
+      z-index: 1;
     }
     
-    @include media-breakpoint-down(md) {
-      font-size: 2rem;
+    &__container {
+      position: relative;
+      z-index: 2;
     }
-  }
-}
-
-// Weather Widget
-.weather-widget {
-  background: linear-gradient(135deg, $white 0%, $gray-100 100%);
-  border-radius: 12px;
-  padding: 1rem;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  border: 1px solid $gray-200;
-  max-width: 250px;
-  
-  .weather-icon {
-    color: $primary-color;
-  }
-  
-  .weather-temp {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: $dark;
-  }
-  
-  .weather-desc {
-    font-size: 0.875rem;
-  }
-}
-
-// Carousel de cortes de carne
-#meatCutsCarousel {
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
-  
-  .carousel-item {
-    img {
-      height: 400px;
-      object-fit: cover;
+    
+    &__content {
+      @include media-breakpoint-up(lg) {
+        padding-right: map-get($spacers, 5);
+      }
+    }
+    
+    &__title {
+      @extend .typography__title--primary;
+      margin-bottom: map-get($spacers, 4);
+    }
+    
+    &__subtitle {
+      @extend .typography__body--primary;
+      font-size: 1.25rem;
+      margin-bottom: map-get($spacers, 5);
       
       @include media-breakpoint-down(md) {
-        height: 300px;
-      }
-    }
-  }
-  
-  .carousel-caption {
-    background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
-    left: 0;
-    right: 0;
-    bottom: 0;
-    padding: 2rem;
-    
-    h5 {
-      font-size: 1.5rem;
-      font-weight: 600;
-      margin-bottom: 0.5rem;
-    }
-    
-    p {
-      font-size: 0.9rem;
-      opacity: 0.9;
-      margin-bottom: 0;
-    }
-  }
-  
-  .carousel-control-prev,
-  .carousel-control-next {
-    width: 50px;
-    height: 50px;
-    background: rgba($white, 0.9);
-    border-radius: 50%;
-    top: 50%;
-    transform: translateY(-50%);
-    opacity: 0.8;
-    
-    &:hover {
-      opacity: 1;
-    }
-    
-    @include media-breakpoint-down(md) {
-      width: 40px;
-      height: 40px;
-    }
-  }
-  
-  .carousel-indicators {
-    button {
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      margin: 0 4px;
-      border: 2px solid $white;
-      background: transparent;
-      
-      &.active {
-        background: $white;
-      }
-    }
-  }
-}
-
-// Schedule Section
-.schedule-section {
-  background: linear-gradient(135deg, $gray-50 0%, $white 100%);
-  position: relative;
-  
-  .schedule-box,
-  .about-box {
-    background: $white;
-    border-radius: 16px;
-    padding: 2rem;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-    border: 1px solid $gray-200;
-    height: 100%;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    
-    &:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
-    }
-  }
-  
-  h2 {
-    color: $dark;
-    font-weight: 700;
-    margin-bottom: 2rem;
-  }
-  
-  h3 {
-    color: $dark;
-    font-weight: 600;
-    margin-bottom: 1.5rem;
-  }
-}
-
-// Location Section
-.location-section {
-  background: linear-gradient(135deg, $white 0%, $gray-50 100%);
-  
-  h2 {
-    color: $dark;
-    font-weight: 700;
-    margin-bottom: 3rem;
-  }
-  
-  .card {
-    border: none;
-    border-radius: 16px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    
-    &:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
-    }
-    
-    .card-body {
-      padding: 2rem;
-    }
-  }
-}
-
-// Contact Section
-.contact-section {
-  background: linear-gradient(135deg, $gray-50 0%, $white 100%);
-  
-  h2 {
-    color: $dark;
-    font-weight: 700;
-    margin-bottom: 3rem;
-  }
-  
-  .contact-form {
-    background: $white;
-    border-radius: 16px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-    border: 1px solid $gray-200;
-    
-    .input-group-text {
-      background: linear-gradient(135deg, $primary-color, $secondary-color);
-      border: none;
-      color: $white;
-      
-      i {
         font-size: 1.1rem;
       }
     }
     
-    .form-control {
-      border: 1px solid $gray-300;
-      padding: 0.75rem 1rem;
+    &__weather {
+      background: linear-gradient(135deg, $white 0%, $light 100%);
+      border-radius: $border-radius-lg;
+      padding: map-get($spacers, 3);
+      @include box-shadow(1);
+      border: 1px solid $color-border;
+      max-width: 250px;
+      margin-bottom: map-get($spacers, 4);
       
-      &:focus {
-        border-color: $primary-color;
-        box-shadow: 0 0 0 0.2rem rgba($primary-color, 0.25);
+      &-content {
+        display: flex;
+        align-items: center;
+        gap: map-get($spacers, 2);
+      }
+      
+      &-icon {
+        font-size: 2rem;
+        color: $primary;
+      }
+      
+      &-temp {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: $dark;
+      }
+      
+      &-desc {
+        font-size: 0.875rem;
+        color: $color-text-light;
+      }
+    }
+    
+    &__actions {
+      display: flex;
+      gap: map-get($spacers, 3);
+      flex-wrap: wrap;
+      
+      @include media-breakpoint-down(sm) {
+        flex-direction: column;
+        gap: map-get($spacers, 2);
+      }
+    }
+    
+    &__carousel {
+      border-radius: $border-radius-xl;
+      overflow: hidden;
+      @include box-shadow(3);
+      
+      .carousel-item img {
+        height: 400px;
+        object-fit: cover;
+        
+        @include media-breakpoint-down(md) {
+          height: 300px;
+        }
+      }
+    }
+  }
+  
+  // Products Section BEM
+  &__products {
+    padding: map-get($spacers, 6) 0;
+    background-color: $white;
+    
+    @include media-breakpoint-down(lg) {
+      padding: map-get($spacers, 5) 0;
+    }
+    
+    &__title {
+      @extend .typography__title--section;
+    }
+    
+    &__grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: map-get($spacers, 4);
+      margin-bottom: map-get($spacers, 5);
+      
+      @include media-breakpoint-down(sm) {
+        grid-template-columns: 1fr;
+        gap: map-get($spacers, 3);
+      }
+    }
+  }
+  
+  // Schedule Section BEM
+  &__schedule {
+    padding: map-get($spacers, 6) 0;
+    background: linear-gradient(135deg, $light 0%, $white 100%);
+    
+    @include media-breakpoint-down(lg) {
+      padding: map-get($spacers, 5) 0;
+    }
+    
+    &__container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: map-get($spacers, 5);
+      align-items: start;
+      
+      @include media-breakpoint-down(md) {
+        grid-template-columns: 1fr;
+        gap: map-get($spacers, 4);
+      }
+    }
+    
+    &__title {
+      @extend .typography__title--secondary;
+      margin-bottom: map-get($spacers, 4);
+    }
+    
+    &__box {
+      background: $white;
+      border-radius: $border-radius-xl;
+      padding: map-get($spacers, 4);
+      @include box-shadow(2);
+      border: 1px solid $color-border;
+      height: 100%;
+      @include transition(transform box-shadow);
+      
+      &:hover {
+        transform: translateY(-5px);
+        @include box-shadow(3);
+      }
+      
+      &--hours {
+        .home__schedule__time {
+          display: flex;
+          align-items: center;
+          gap: map-get($spacers, 3);
+          margin-bottom: map-get($spacers, 3);
+          
+          &-icon {
+            font-size: 1.5rem;
+            color: $primary;
+          }
+          
+          &-info {
+            flex: 1;
+          }
+          
+          &-main {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: $dark;
+            margin-bottom: map-get($spacers, 1);
+          }
+          
+          &-days {
+            color: $color-text-light;
+          }
+        }
+      }
+    }
+    
+    &__about {
+      &-title {
+        @extend .typography__title--secondary;
+        margin-bottom: map-get($spacers, 3);
+      }
+      
+      &-text {
+        @extend .typography__body--primary;
+        
+        & + & {
+          margin-top: map-get($spacers, 3);
+        }
+      }
+    }
+  }
+  
+  // Location Section BEM
+  &__location {
+    padding: map-get($spacers, 6) 0;
+    background: linear-gradient(135deg, $white 0%, $light 100%);
+    
+    @include media-breakpoint-down(lg) {
+      padding: map-get($spacers, 5) 0;
+    }
+    
+    &__title {
+      @extend .typography__title--section;
+      margin-bottom: map-get($spacers, 5);
+    }
+    
+    &__grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: map-get($spacers, 4);
+    }
+    
+    &__card {
+      background: $white;
+      border-radius: $border-radius-xl;
+      padding: map-get($spacers, 4);
+      @include box-shadow(2);
+      border: none;
+      height: 100%;
+      @include transition(transform box-shadow);
+      
+      &:hover {
+        transform: translateY(-5px);
+        @include box-shadow(3);
+      }
+      
+      &-title {
+        @extend .typography__title--secondary;
+        font-size: 1.5rem;
+        margin-bottom: map-get($spacers, 3);
+      }
+      
+      &-address {
+        @extend .typography__body--primary;
+        margin-bottom: map-get($spacers, 3);
+        
+        i {
+          color: $primary;
+          margin-right: map-get($spacers, 2);
+        }
+      }
+      
+      &-contact {
+        @extend .typography__body--primary;
+        margin-bottom: map-get($spacers, 2);
+        
+        i {
+          color: $primary;
+          margin-right: map-get($spacers, 2);
+          width: 20px;
+        }
+        
+        a {
+          @extend .typography__link;
+        }
+      }
+    }
+  }
+  
+  // Contact Section BEM
+  &__contact {
+    padding: map-get($spacers, 6) 0;
+    background: linear-gradient(135deg, $light 0%, $white 100%);
+    
+    @include media-breakpoint-down(lg) {
+      padding: map-get($spacers, 5) 0;
+    }
+    
+    &__title {
+      @extend .typography__title--section;
+      margin-bottom: map-get($spacers, 5);
+    }
+    
+    &__form-container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    
+    &__form {
+      background: $white;
+      border-radius: $border-radius-xl;
+      padding: map-get($spacers, 5);
+      @include box-shadow(2);
+      border: 1px solid $color-border;
+      
+      @include media-breakpoint-down(md) {
+        padding: map-get($spacers, 4);
+      }
+      
+      &-header {
+        text-align: center;
+        margin-bottom: map-get($spacers, 4);
+        
+        i {
+          font-size: 3rem;
+          color: $primary;
+          margin-bottom: map-get($spacers, 3);
+        }
+      }
+      
+      &-title {
+        @extend .typography__title--secondary;
+        margin-bottom: map-get($spacers, 2);
+      }
+      
+      &-subtitle {
+        @extend .typography__body--muted;
+      }
+    }
+    
+    &__direct {
+      margin-top: map-get($spacers, 4);
+      text-align: center;
+      
+      &-title {
+        @extend .typography__body--primary;
+        margin-bottom: map-get($spacers, 3);
+      }
+      
+      &-actions {
+        display: flex;
+        justify-content: center;
+        gap: map-get($spacers, 3);
+        flex-wrap: wrap;
       }
     }
   }
 }
 
-// Responsive adjustments
-@include media-breakpoint-down(lg) {
-  .hero-section {
-    padding: 3rem 0;
-    
-    &__title {
-      font-size: 2.5rem;
-    }
-  }
-  
-  .products-section {
-    .section-title {
-      font-size: 2rem;
+// Utilidades responsive
+@include media-breakpoint-down(xl) {
+  .home {
+    &__hero {
+      &__container {
+        > .row {
+          > [class*="col-"] {
+            margin-bottom: map-get($spacers, 4);
+          }
+        }
+      }
     }
   }
 }
 
 @include media-breakpoint-down(md) {
-  .hero-section {
-    padding: 2rem 0;
-    
-    &__title {
-      font-size: 2rem;
+  .home {
+    &__hero {
+      &__title {
+        text-align: center;
+      }
+      
+      &__subtitle {
+        text-align: center;
+      }
+      
+      &__weather {
+        margin-left: auto;
+        margin-right: auto;
+      }
+      
+      &__actions {
+        justify-content: center;
+      }
     }
     
-    &__subtitle {
-      font-size: 1.1rem;
-    }
-  }
-  
-  .schedule-section,
-  .location-section,
-  .contact-section {
-    .container {
-      padding: 0 1rem;
-    }
-  }
-}
-
-@include media-breakpoint-down(sm) {
-  .hero-section {
-    &__title {
-      font-size: 1.75rem;
+    &__products {
+      &__title {
+        text-align: center;
+      }
     }
     
-    &__subtitle {
-      font-size: 1rem;
+    &__location {
+      &__title {
+        text-align: center;
+      }
     }
-  }
-  
-  .products-section {
-    .section-title {
-      font-size: 1.75rem;
+    
+    &__contact {
+      &__title {
+        text-align: center;
+      }
     }
   }
 }

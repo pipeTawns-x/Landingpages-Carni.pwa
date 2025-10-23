@@ -1,6 +1,6 @@
 // Offline functionality and sync management
 import { supabase } from './supabase.js';
-import { appState, showNotification } from './app.js';
+import { appState, showNotification } from '../app.js';
 import { isAuthenticated } from './auth.js';
 
 // Offline manager class

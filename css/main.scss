@@ -1,0 +1,48 @@
+// main.scss - Archivo principal que importa todos los módulos SCSS
+
+// Abstracts (utilidades y configuraciones)
+@import 'abstracts/variables';
+@import 'abstracts/functions';
+@import 'abstracts/mixins';
+@import 'abstracts/placeholders';
+@import 'abstracts/bem-utilities';
+
+// Vendors (librerías externas)
+@import 'vendors/bootstrap';
+@import 'vendors/custom-vendors';
+
+// Base (estilos base y reset)
+@import 'base/reset';
+@import 'base/typography';
+@import 'base/base';
+@import 'base/utilities';
+
+// Layout (estructura principal)
+@import 'layout/grid';
+@import 'layout/header';
+@import 'layout/navigation';
+@import 'layout/sidebar';
+@import 'layout/forms';
+@import 'layout/footer';
+
+// Components (componentes reutilizables)
+@import 'components/buttons';
+@import 'components/cards';
+@import 'components/carousel';
+@import 'components/alerts';
+@import 'components/badges';
+@import 'components/loading';
+@import 'components/modals';
+
+// Pages (estilos específicos de páginas)
+@import 'pages/home';
+@import 'pages/products';
+@import 'pages/catalog';
+@import 'pages/cart';
+@import 'pages/login';
+@import 'pages/admin';
+@import 'pages/dashboard';
+
+// Themes (temas y variantes)
+@import 'themes/theme';
+@import 'themes/dark-mode';

@@ -1,0 +1,18 @@
+// Utilidades BEM
+@mixin element($name) {
+    &__#{$name} {
+      @content;
+    }
+  }
+  
+  @mixin modifier($name) {
+    &--#{$name} {
+      @content;
+    }
+  }
+  
+  @mixin when($state) {
+    &.#{$state} {
+      @content;
+    }
+  }

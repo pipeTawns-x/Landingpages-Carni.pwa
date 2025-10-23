@@ -1,0 +1,105 @@
+// Estilos de tipografía BEM
+.typography {
+    // Títulos
+    &__title {
+      &--primary {
+        font-size: 2.5rem;
+        font-weight: 700;
+        line-height: 1.2;
+        color: $dark;
+        margin-bottom: map-get($spacers, 3);
+        
+        @include media-breakpoint-down(md) {
+          font-size: 2rem;
+        }
+        
+        @include media-breakpoint-down(sm) {
+          font-size: 1.75rem;
+        }
+      }
+      
+      &--secondary {
+        font-size: 2rem;
+        font-weight: 600;
+        line-height: 1.3;
+        color: $dark;
+        margin-bottom: map-get($spacers, 3);
+        
+        @include media-breakpoint-down(md) {
+          font-size: 1.75rem;
+        }
+      }
+      
+      &--section {
+        @include section-title($primary);
+        font-size: 2.25rem;
+        
+        @include media-breakpoint-down(md) {
+          font-size: 1.75rem;
+        }
+      }
+    }
+    
+    // Texto body
+    &__body {
+      &--primary {
+        font-size: 1rem;
+        line-height: 1.6;
+        color: $color-text;
+        margin-bottom: map-get($spacers, 3);
+      }
+      
+      &--secondary {
+        font-size: 0.9rem;
+        line-height: 1.5;
+        color: $color-text-light;
+      }
+      
+      &--muted {
+        font-size: 0.875rem;
+        color: $color-text-muted;
+      }
+    }
+    
+    // Enlaces
+    &__link {
+      color: $primary;
+      text-decoration: none;
+      @include transition(color);
+      
+      &:hover {
+        color: $carniceria-dark-red;
+      }
+      
+      &--underline {
+        text-decoration: underline;
+        
+        &:hover {
+          text-decoration: none;
+        }
+      }
+    }
+  }
+  
+  // Utilidades de texto
+  .text {
+    &--center { text-align: center; }
+    &--left { text-align: left; }
+    &--right { text-align: right; }
+    
+    &--uppercase { text-transform: uppercase; }
+    &--lowercase { text-transform: lowercase; }
+    &--capitalize { text-transform: capitalize; }
+    
+    &--bold { font-weight: 700; }
+    &--semibold { font-weight: 600; }
+    &--medium { font-weight: 500; }
+    &--normal { font-weight: 400; }
+    &--light { font-weight: 300; }
+    
+    &--primary { color: $primary; }
+    &--success { color: $success; }
+    &--warning { color: $warning; }
+    &--danger { color: $danger; }
+    &--muted { color: $color-text-muted; }
+  }

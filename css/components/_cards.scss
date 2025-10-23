@@ -1,258 +1,165 @@
-// _cards.scss - Cards modernas para productos
-.product-card-modern {
-  border: none;
-  border-radius: 16px;
+// Cards de productos BEM
+.product-card {
+  @include card-style($border-radius-xl);
+  height: 100%;
+  background: linear-gradient(145deg, $white, $light);
   overflow: hidden;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  background: linear-gradient(145deg, #ffffff, #f8f9fa);
   
-  &:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
-  }
-  
-  .product-img-container {
+  &__image-container {
     position: relative;
     overflow: hidden;
-    border-radius: 16px 16px 0 0;
+    border-radius: $border-radius-xl $border-radius-xl 0 0;
+  }
+  
+  &__image {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    @include transition(transform);
+  }
+  
+  &__overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to bottom, transparent 60%, rgba($black, 0.3));
+    opacity: 0;
+    @include transition(opacity);
+  }
+  
+  &__badge {
+    position: absolute;
+    top: map-get($spacers, 3);
+    right: map-get($spacers, 3);
+    z-index: 2;
+    font-size: 0.75rem;
+    padding: 0.35rem 0.75rem;
+    border-radius: 20px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
     
-    .card-img-top {
-      width: 100%;
-      height: 220px;
-      object-fit: cover;
-      transition: transform 0.3s ease;
+    &--primary {
+      background-color: $primary;
+      color: $white;
     }
     
-    .product-overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: linear-gradient(to bottom, transparent 60%, rgba(0, 0, 0, 0.3));
-      opacity: 0;
-      transition: opacity 0.3s ease;
+    &--success {
+      background-color: $success;
+      color: $white;
     }
     
-    .product-badge {
-      position: absolute;
-      top: 12px;
-      right: 12px;
-      z-index: 2;
-      font-size: 0.75rem;
-      padding: 0.35rem 0.75rem;
-      border-radius: 20px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+    &--warning {
+      background-color: $warning;
+      color: $black;
+    }
+    
+    &--info {
+      background-color: $info;
+      color: $white;
     }
   }
   
-  .card-body {
-    padding: 1.5rem;
+  &__body {
+    padding: map-get($spacers, 4);
     display: flex;
     flex-direction: column;
     height: 100%;
+  }
+  
+  &__category {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: $primary;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: map-get($spacers, 2);
+  }
+  
+  &__title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: $dark;
+    margin-bottom: map-get($spacers, 3);
+    line-height: 1.3;
+    @include multiline-truncate(2);
+  }
+  
+  &__description {
+    color: $color-text-light;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin-bottom: map-get($spacers, 4);
+    flex-grow: 1;
+    @include multiline-truncate(3);
+  }
+  
+  &__info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: map-get($spacers, 4);
     
-    .product-category {
-      font-size: 0.75rem;
-      font-weight: 700;
-      color: $primary-color;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 0.5rem;
-    }
-    
-    .card-title {
-      font-size: 1.25rem;
-      font-weight: 700;
-      color: #2c3e50;
-      margin-bottom: 0.75rem;
-      line-height: 1.3;
-    }
-    
-    .card-text {
-      color: #6c757d;
-      font-size: 0.9rem;
-      line-height: 1.5;
-      margin-bottom: 1rem;
-      flex-grow: 1;
-    }
-    
-    .product-info {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1.25rem;
-      
-      .product-price {
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: $primary-color;
-      }
-      
-      .rating {
-        display: flex;
-        align-items: center;
-        font-size: 0.85rem;
-        color: #6c757d;
-        
-        i {
-          margin-right: 1px;
-        }
-      }
-    }
-    
-    .product-actions {
-      .btn-view-products {
-        width: 100%;
-        padding: 0.75rem 1.5rem;
-        border-radius: 12px;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        transition: all 0.3s ease;
-        border: none;
-        background: linear-gradient(135deg, $primary-color, darken($primary-color, 10%));
-        
-        &:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 6px 20px rgba($primary-color, 0.3);
-          background: linear-gradient(135deg, darken($primary-color, 5%), darken($primary-color, 15%));
-        }
-        
-        &:active {
-          transform: translateY(0);
-        }
-      }
+    @include media-breakpoint-down(sm) {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: map-get($spacers, 2);
     }
   }
   
+  &__price {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: $primary;
+  }
+  
+  &__rating {
+    display: flex;
+    align-items: center;
+    gap: map-get($spacers, 1);
+    font-size: 0.85rem;
+    color: $color-text-light;
+    
+    &-stars {
+      color: $warning;
+    }
+    
+    &-count {
+      font-weight: 500;
+    }
+  }
+  
+  &__actions {
+    margin-top: auto;
+  }
+  
+  // Estados hover
   &:hover {
-    .product-img-container {
-      .card-img-top {
-        transform: scale(1.05);
-      }
-      
-      .product-overlay {
-        opacity: 1;
-      }
+    .product-card__image {
+      transform: scale(1.05);
+    }
+    
+    .product-card__overlay {
+      opacity: 1;
     }
   }
 }
 
-// Cart counter styles
-.cart-counter {
-    font-size: 0.75rem;
-    padding: 0.25rem 0.5rem;
-    transform: translate(25%, -50%);
+// Card links BEM
+.card-link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  
+  &:hover {
+    color: inherit;
+    text-decoration: none;
+  }
 }
 
-.cart-item {
-    .card-body {
-        padding: 0.75rem;
-    }
-    
-    .product-image {
-        width: 100%;
-        height: 100px;
-        object-fit: cover;
-        border-radius: 0.375rem;
-    }
-
-    .input-group-sm {
-        .form-control {
-            text-align: center;
-            min-width: 40px;
-        }
-        
-        .btn {
-            padding: 0.25rem 0.5rem;
-        }
-    }
-}
-
-.delivery-options {
-    .btn-group {
-        .btn {
-            flex: 1;
-            white-space: nowrap;
-        }
-    }
-
-    .form-control {
-        &:focus {
-            border-color: var(--bs-primary);
-            box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25);
-        }
-    }
-}
-
-.cart-summary {
-    .card-body {
-        padding: 1rem;
-    }
-
-    .btn {
-        i {
-            font-size: 1.1em;
-        }
-    }
-}
-
-.delivery-fee {
-    margin-bottom: 0;
-    padding: 0.5rem;
-    font-size: 0.875rem;
-}
-
-// Toast notifications
-.toast {
-    z-index: 1056; // Por encima del offcanvas
-    
-    .toast-header {
-        i {
-            color: var(--bs-primary);
-        }
-    }
-}
-
-// Responsive
-@media (max-width: 576px) {
-    .delivery-options {
-        .btn-group {
-            flex-direction: column;
-            
-            .btn {
-                border-radius: 0.375rem !important;
-                margin-bottom: 0.5rem;
-                
-                &:last-child {
-                    margin-bottom: 0;
-                }
-            }
-        }
-    }
-    
-    .product-card-modern {
-        .card-body {
-            padding: 1.25rem;
-            
-            .product-info {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 0.5rem;
-                
-                .product-price {
-                    font-size: 1.25rem;
-                }
-            }
-        }
-    }
-}
-
-// Animaciones para las cards
+// Animaciones para cards
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -264,10 +171,11 @@
   }
 }
 
-.product-card-modern {
+.product-card {
   animation: fadeInUp 0.6s ease forwards;
   
-  @for $i from 1 through 9 {
+  // Retraso escalonado para las cards
+  @for $i from 1 through 12 {
     &:nth-child(#{$i}) {
       animation-delay: #{$i * 0.1}s;
     }

@@ -1,5 +1,5 @@
 // js/modules/catalog.js
-import { productos } from './base_dinamica.js';
+import { productos } from '../utils/base_dinamica.js';
 
 export class CatalogManager {
     constructor() {

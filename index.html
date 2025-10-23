@@ -1,102 +1,78 @@
 <!DOCTYPE html>
-<html lang="es">
-
+<html lang="es" data-bs-theme="dark">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#363432" />
-  <title>Carnicería El Señor de La Misericordia</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#d32f2f">
+  <title>Carnicería El Señor de La Misericordia - Premium</title>
   <meta name="description" content="Carnicería premium con los mejores cortes de carne y programa de fidelización">
   
   <link rel="manifest" href="manifest.json">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
   <link rel="stylesheet" href="css/styles.css">
   <link rel="icon" href="img/logo-user.png" type="image/png">
   <link rel="apple-touch-icon" href="img/logo-user.png">
-  <script src="js/modules/header.js" defer></script>
 </head>
 
-<body>
-  <div class="offline-alert alert alert-warning d-none" role="alert">
+<body class="cs-body">
+  <!-- Alerta Offline -->
+  <div class="cs-offline-alert alert alert-warning d-none" role="alert">
     <i class="bi bi-wifi-off me-2"></i> Estás en modo offline. Algunas funciones pueden estar limitadas.
   </div>
   
-  <header class="main-header bg-dark text-white py-3">
-    <div class="container">
-      <div class="d-flex justify-content-between align-items-center">
-        <a class="navbar-brand fs-4 text-white" href="index.html">
-          <img src="img/logo-user.png" alt="Logo" class="me-2" style="height: 100px;">
+  <!-- Header Principal -->
+  <header class="cs-header bs-bg-dark bs-text-white bs-py-3">
+    <div class="bs-container">
+      <div class="bs-d-flex bs-justify-content-between bs-align-items-center">
+        <a class="cs-header__brand bs-navbar-brand bs-fs-4 bs-text-white" href="index.html">
+          <img src="img/logo-user.png" alt="Logo Carnicería" class="cs-header__logo bs-me-2">
+          Carnicería El Señor de La Misericordia
         </a>
         
-        <div class="header-icons d-flex align-items-center">
-          <button class="btn icon-btn me-2" aria-label="Buscar" id="searchBtn">
+        <div class="cs-header__icons bs-d-flex bs-align-items-center">
+          <button class="cs-header__icon-btn bs-btn bs-me-2" aria-label="Buscar" id="searchBtn">
             <i class="bi bi-search"></i>
           </button>
-          <button class="btn icon-btn me-2 position-relative" aria-label="Carrito" id="cartBtn">
+          <button class="cs-header__icon-btn bs-btn bs-me-2 bs-position-relative" aria-label="Carrito" id="cartBtn" data-bs-toggle="offcanvas" data-bs-target="#cartOffcanvas">
             <i class="bi bi-cart"></i>
-            <span class="badge bg-danger position-absolute top-0 start-100 translate-middle p-1 rounded-circle cart-counter">0</span>
+            <span class="cs-header__cart-counter bs-badge bs-bg-danger bs-position-absolute bs-top-0 bs-start-100 bs-translate-middle bs-p-1 bs-rounded-circle">0</span>
           </button>
-          <a href="login.html" class="btn icon-btn me-2" id="userBtn">
+          <a href="user/login.html" class="cs-header__icon-btn bs-btn bs-me-2" id="userBtn">
             <i class="bi bi-person"></i>
           </a>
-          <button class="btn icon-btn" aria-label="Menú" id="menuBtn">
+          <button class="cs-header__icon-btn bs-btn" aria-label="Menú" id="menuBtn">
             <i class="bi bi-list"></i>
           </button>
         </div>
       </div>
 
-      <div class="d-flex justify-content-center mt-3">
-        <ul class="nav flex-wrap justify-content-center">
-          <li class="nav-item"><a class="nav-link" href="index.html">Inicio</a></li>
-          <li class="nav-item"><a class="nav-link" href="#productos">Productos</a></li>
-          <li class="nav-item"><a class="nav-link" href="#contacto">Contacto</a></li>
-          <li class="nav-item"><a class="nav-link" href="premium.html">Premium</a></li>
-        </ul>
-      </div>
-    </div>
-  </header>
-
-  <!-- Mobile Menu -->
-  <div class="mobile-menu">
-    <ul class="nav flex-column">
-      <li class="nav-item"><a class="nav-link" href="index.html">Inicio</a></li>
-      <li class="nav-item"><a class="nav-link" href="#productos">Productos</a></li>
-      <li class="nav-item"><a class="nav-link" href="#contacto">Contacto</a></li>
-      <li class="nav-item"><a class="nav-link" href="premium.html">Premium</a></li>
-      <li class="nav-item"><a class="nav-link" href="register.html">Registro</a></li>
-      <li class="nav-item"><a class="nav-link" href="login.html">Iniciar Sesión</a></li>
-    </ul>
-  </div>
-
-  <!-- Overlay -->
-  <div class="overlay"></div>
-
-  <!-- Rest of the content -->
-  <div class="d-flex justify-content-center mt-3">
-        <ul class="nav flex-wrap justify-content-center">
-          <li class="nav-item">
-            <a class="nav-link text-white" href="index.html">Inicio</a>
+      <!-- Navegación Principal -->
+      <div class="bs-d-flex bs-justify-content-center bs-mt-3">
+        <ul class="cs-header__nav bs-nav bs-flex-wrap bs-justify-content-center">
+          <li class="cs-header__nav-item bs-nav-item">
+            <a class="cs-header__nav-link bs-nav-link bs-text-white" href="index.html">Inicio</a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link text-white" href="#productos">Productos</a>
+          <li class="cs-header__nav-item bs-nav-item">
+            <a class="cs-header__nav-link bs-nav-link bs-text-white" href="#productos">Productos</a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link text-white" href="#horario">Horario</a>
+          <li class="cs-header__nav-item bs-nav-item">
+            <a class="cs-header__nav-link bs-nav-link bs-text-white" href="#horario">Horario</a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link text-white" href="#ubicacion">Ubicación</a>
+          <li class="cs-header__nav-item bs-nav-item">
+            <a class="cs-header__nav-link bs-nav-link bs-text-white" href="#ubicacion">Ubicación</a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link text-white" href="#contacto">Contacto</a>
+          <li class="cs-header__nav-item bs-nav-item">
+            <a class="cs-header__nav-link bs-nav-link bs-text-white" href="#contacto">Contacto</a>
           </li>
         </ul>
       </div>
       
-      <div class="search-bar mt-3 d-none" id="searchBar">
-        <div class="input-group">
-          <input type="text" class="form-control" placeholder="Buscar productos..." id="searchInput">
-          <button class="btn btn-primary" type="button" id="searchSubmit">
+      <!-- Barra de Búsqueda -->
+      <div class="cs-header__search bs-mt-3 bs-d-none" id="searchBar">
+        <div class="bs-input-group">
+          <input type="text" class="cs-header__search-input bs-form-control" placeholder="Buscar productos..." id="searchInput" maxlength="100">
+          <button class="cs-header__search-btn bs-btn bs-btn-primary" type="button" id="searchSubmit">
             <i class="bi bi-search"></i>
           </button>
         </div>
@@ -104,31 +80,49 @@
     </div>
   </header>
 
-  <main>
-    <section class="hero-section">
-      <div class="container">
-        <div class="row align-items-center">
-          <div class="col-md-6">
-            <h1 class="hero-section__title">Bienvenido a Carnicería El Señor de La Misericordia</h1>
-            <p class="hero-section__subtitle">Disfruta de nuestros productos frescos y de alta calidad.</p>
-            <div class="weather-widget mb-3" id="weatherWidget">
-              <div class="d-flex align-items-center">
-                <i class="bi bi-cloud-sun fs-3 me-2 weather-icon"></i>
+  <!-- Menú Móvil -->
+  <div class="cs-mobile-menu">
+    <ul class="cs-mobile-menu__nav bs-nav bs-flex-column">
+      <li class="cs-mobile-menu__nav-item bs-nav-item"><a class="cs-mobile-menu__nav-link bs-nav-link" href="index.html">Inicio</a></li>
+      <li class="cs-mobile-menu__nav-item bs-nav-item"><a class="cs-mobile-menu__nav-link bs-nav-link" href="#productos">Productos</a></li>
+      <li class="cs-mobile-menu__nav-item bs-nav-item"><a class="cs-mobile-menu__nav-link bs-nav-link" href="#contacto">Contacto</a></li>
+      <li class="cs-mobile-menu__nav-item bs-nav-item"><a class="cs-mobile-menu__nav-link bs-nav-link" href="premium.html">Premium</a></li>
+      <li class="cs-mobile-menu__nav-item bs-nav-item"><a class="cs-mobile-menu__nav-link bs-nav-link" href="user/register.html">Registro</a></li>
+      <li class="cs-mobile-menu__nav-item bs-nav-item"><a class="cs-mobile-menu__nav-link bs-nav-link" href="user/login.html">Iniciar Sesión</a></li>
+    </ul>
+  </div>
+
+  <!-- Overlay -->
+  <div class="cs-overlay"></div>
+
+  <!-- Contenido Principal -->
+  <main class="cs-main">
+    <!-- Hero Section -->
+    <section class="cs-hero-section">
+      <div class="bs-container">
+        <div class="bs-row bs-align-items-center">
+          <div class="bs-col-md-6">
+            <h1 class="cs-hero-section__title">Bienvenido a Carnicería El Señor de La Misericordia</h1>
+            <p class="cs-hero-section__subtitle">Disfruta de nuestros productos frescos y de alta calidad.</p>
+            <div class="cs-weather-widget bs-mb-3" id="weatherWidget">
+              <div class="bs-d-flex bs-align-items-center">
+                <i class="cs-weather-widget__icon bi bi-cloud-sun bs-fs-3 bs-me-2"></i>
                 <div>
-                  <div class="weather-temp">Cargando clima...</div>
-                  <small class="weather-desc text-muted"></small>
+                  <div class="cs-weather-widget__temp">Cargando clima...</div>
+                  <small class="cs-weather-widget__desc bs-text-muted"></small>
                 </div>
               </div>
             </div>
-            <div class="d-flex gap-2">
-              <a href="#productos" class="btn btn-primary">Ver Productos</a>
-              <button class="btn btn-outline-primary" id="loyaltyBtn">Mi Programa de Fidelidad</button>
+            <div class="bs-d-flex bs-gap-2">
+              <a href="#productos" class="cs-hero-section__btn bs-btn bs-btn-primary">Ver Productos</a>
+              <button class="cs-hero-section__btn bs-btn bs-btn-outline-primary" id="loyaltyBtn">Mi Programa de Fidelidad</button>
             </div>
           </div>
-          <div class="col-md-6">
-            <div id="meatCutsCarousel" class="carousel slide" data-bs-ride="carousel">
-              <div class="carousel-indicators">
-                <button type="button" data-bs-target="#meatCutsCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+          <div class="bs-col-md-6">
+            <!-- Carrusel de Cortes de Carne - MANTENIDO INTACTO -->
+            <div id="meatCutsCarousel" class="cs-carousel bs-carousel bs-slide" data-bs-ride="carousel">
+              <div class="bs-carousel-indicators">
+                <button type="button" data-bs-target="#meatCutsCarousel" data-bs-slide-to="0" class="bs-active" aria-current="true" aria-label="Slide 1"></button>
                 <button type="button" data-bs-target="#meatCutsCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
                 <button type="button" data-bs-target="#meatCutsCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
                 <button type="button" data-bs-target="#meatCutsCarousel" data-bs-slide-to="3" aria-label="Slide 4"></button>
@@ -138,78 +132,78 @@
                 <button type="button" data-bs-target="#meatCutsCarousel" data-bs-slide-to="7" aria-label="Slide 8"></button>
                 <button type="button" data-bs-target="#meatCutsCarousel" data-bs-slide-to="8" aria-label="Slide 9"></button>
               </div>
-              <div class="carousel-inner rounded-3">
-                <div class="carousel-item active">
-                  <img src="img/carrusel_products/rib-eye.png" class="d-block w-100" alt="Rib Eye Premium" loading="lazy">
-                  <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-75 rounded-3">
+              <div class="cs-carousel__inner bs-carousel-inner bs-rounded-3">
+                <div class="cs-carousel__item bs-carousel-item bs-active">
+                  <img src="img/carrusel_products/rib-eye.png" class="cs-carousel__img bs-d-block bs-w-100" alt="Rib Eye Premium" loading="lazy">
+                  <div class="cs-carousel__caption bs-carousel-caption bs-d-none bs-d-md-block bs-bg-dark bs-bg-opacity-75 bs-rounded-3">
                     <h5>Rib Eye Premium</h5>
                     <p>Nuestro corte estrella con marmoleo perfecto que garantiza terneza y sabor excepcional en cada bocado</p>
                   </div>
                 </div>
-                <div class="carousel-item">
-                  <img src="img/carrusel_products/filet_mignon.png" class="d-block w-100" alt="Filet Mignon" loading="lazy">
-                  <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-75 rounded-3">
+                <div class="cs-carousel__item bs-carousel-item">
+                  <img src="img/carrusel_products/filet_mignon.png" class="cs-carousel__img bs-d-block bs-w-100" alt="Filet Mignon" loading="lazy">
+                  <div class="cs-carousel__caption bs-carousel-caption bs-d-none bs-d-md-block bs-bg-dark bs-bg-opacity-75 bs-rounded-3">
                     <h5>Filet Mignon</h5>
                     <p>La máxima expresión de ternura, seleccionado entre los mejores ejemplares para una experiencia gourmet</p>
                   </div>
                 </div>
-                <div class="carousel-item">
-                  <img src="img/carrusel_products/porterhouse.png" class="d-block w-100" alt="Porterhouse" loading="lazy">
-                  <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-75 rounded-3">
+                <div class="cs-carousel__item bs-carousel-item">
+                  <img src="img/carrusel_products/porterhouse.png" class="cs-carousel__img bs-d-block bs-w-100" alt="Porterhouse" loading="lazy">
+                  <div class="cs-carousel__caption bs-carousel-caption bs-d-none bs-d-md-block bs-bg-dark bs-bg-opacity-75 bs-rounded-3">
                     <h5>Porterhouse</h5>
                     <p>Dos cortes en uno: la suavidad del filet mignon y el intenso sabor del New York Strip, ideal para compartir</p>
                   </div>
                 </div>
-                <div class="carousel-item">
-                  <img src="img/carrusel_products/ney_york_strip.png" class="d-block w-100" alt="New York Strip" loading="lazy">
-                  <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-75 rounded-3">
+                <div class="cs-carousel__item bs-carousel-item">
+                  <img src="img/carrusel_products/ney_york_strip.png" class="cs-carousel__img bs-d-block bs-w-100" alt="New York Strip" loading="lazy">
+                  <div class="cs-carousel__caption bs-carousel-caption bs-d-none bs-d-md-block bs-bg-dark bs-bg-opacity-75 bs-rounded-3">
                     <h5>New York Strip</h5>
                     <p>Balance perfecto entre marmoleo y textura firme, con un sabor robusto que deleita a los paladares exigentes</p>
                   </div>
                 </div>
-                <div class="carousel-item">
-                  <img src="img/carrusel_products/tomahawk.png" class="d-block w-100" alt="Tomahawk" loading="lazy">
-                  <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-75 rounded-3">
+                <div class="cs-carousel__item bs-carousel-item">
+                  <img src="img/carrusel_products/tomahawk.png" class="cs-carousel__img bs-d-block bs-w-100" alt="Tomahawk" loading="lazy">
+                  <div class="cs-carousel__caption bs-carousel-caption bs-d-none bs-d-md-block bs-bg-dark bs-bg-opacity-75 bs-rounded-3">
                     <h5>Tomahawk</h5>
                     <p>El corte más impresionante con su hueso largo, perfecto para ocasiones especiales y parrillas espectaculares</p>
                   </div>
                 </div>
-                <div class="carousel-item">
-                  <img src="img/carrusel_products/bravette_steak.png" class="d-block w-100" alt="Bavette Steak" loading="lazy">
-                  <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-75 rounded-3">
+                <div class="cs-carousel__item bs-carousel-item">
+                  <img src="img/carrusel_products/bravette_steak.png" class="cs-carousel__img bs-d-block bs-w-100" alt="Bavette Steak" loading="lazy">
+                  <div class="cs-carousel__caption bs-carousel-caption bs-d-none bs-d-md-block bs-bg-dark bs-bg-opacity-75 bs-rounded-3">
                     <h5>Bavette Steak</h5>
                     <p>También conocido como flap steak, ofrece una textura única y un sabor intenso que sorprende gratamente</p>
                   </div>
                 </div>
-                <div class="carousel-item">
-                  <img src="img/carrusel_products/flak_steak.png" class="d-block w-100" alt="Flank Steak" loading="lazy">
-                  <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-75 rounded-3">
+                <div class="cs-carousel__item bs-carousel-item">
+                  <img src="img/carrusel_products/flak_steak.png" class="cs-carousel__img bs-d-block bs-w-100" alt="Flank Steak" loading="lazy">
+                  <div class="cs-carousel__caption bs-carousel-caption bs-d-none bs-d-md-block bs-bg-dark bs-bg-opacity-75 bs-rounded-3">
                     <h5>Flank Steak</h5>
                     <p>Corte magro con fibras pronunciadas, ideal para marinar y preparar en fajitas o asados a la parrilla</p>
                   </div>
                 </div>
-                <div class="carousel-item">
-                  <img src="img/carrusel_products/skirt_steak.png" class="d-block w-100" alt="Skirt Steak" loading="lazy">
-                  <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-75 rounded-3">
+                <div class="cs-carousel__item bs-carousel-item">
+                  <img src="img/carrusel_products/skirt_steak.png" class="cs-carousel__img bs-d-block bs-w-100" alt="Skirt Steak" loading="lazy">
+                  <div class="cs-carousel__caption bs-carousel-caption bs-d-none bs-d-md-block bs-bg-dark bs-bg-opacity-75 bs-rounded-3">
                     <h5>Skirt Steak</h5>
                     <p>Delgado y lleno de sabor, perfecto para tacos y fajitas. Absorbe marinados excepcionalmente bien</p>
                   </div>
                 </div>
-                <div class="carousel-item">
-                  <img src="img/carrusel_products/top_sirloin.png" class="d-block w-100" alt="Top Sirloin" loading="lazy">
-                  <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-75 rounded-3">
+                <div class="cs-carousel__item bs-carousel-item">
+                  <img src="img/carrusel_products/top_sirloin.png" class="cs-carousel__img bs-d-block bs-w-100" alt="Top Sirloin" loading="lazy">
+                  <div class="cs-carousel__caption bs-carousel-caption bs-d-none bs-d-md-block bs-bg-dark bs-bg-opacity-75 bs-rounded-3">
                     <h5>Top Sirloin</h5>
                     <p>Versátil y económico sin sacrificar sabor. Perfecto para bistecs jugosos y brochetas irresistibles</p>
                   </div>
                 </div>
               </div>
-              <button class="carousel-control-prev" type="button" data-bs-target="#meatCutsCarousel" data-bs-slide="prev">
-                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Anterior</span>
+              <button class="cs-carousel__control bs-carousel-control-prev" type="button" data-bs-target="#meatCutsCarousel" data-bs-slide="prev">
+                <span class="cs-carousel__control-icon bs-carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="bs-visually-hidden">Anterior</span>
               </button>
-              <button class="carousel-control-next" type="button" data-bs-target="#meatCutsCarousel" data-bs-slide="next">
-                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Siguiente</span>
+              <button class="cs-carousel__control bs-carousel-control-next" type="button" data-bs-target="#meatCutsCarousel" data-bs-slide="next">
+                <span class="cs-carousel__control-icon bs-carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="bs-visually-hidden">Siguiente</span>
               </button>
             </div>
           </div>
@@ -217,384 +211,387 @@
       </div>
     </section>
 
-    <section id="productos" class="products-section py-5">
-      <div class="container">
-        <h2 class="text-center mb-5 section-title">Nuestros Productos</h2>
+    <!-- Sección de Productos - Categorías MANTENIDAS con enlaces mejorados -->
+    <section id="productos" class="cs-products-section bs-py-5">
+      <div class="bs-container">
+        <h2 class="cs-products-section__title bs-text-center bs-mb-5">Nuestros Productos</h2>
         
-        
-      <!-- cartas de categorias principales -->
-<div class="row g-4">
-  <!-- Carne de Res -->
-  <div class="col-md-6 col-lg-4">
-    <a href="products.html#res" class="card-link">
-      <div class="card product-card h-100">
-        <div class="product-img-container">
-          <img src="img/products/res.png" class="card-img-top" alt="Carne de res">
-          <span class="badge bg-danger product-badge">Popular</span>
-        </div>
-        <div class="card-body">
-          <span class="product-category">CORTES PREMIUM</span>
-          <h5 class="card-title mt-1">Carne de Res</h5>
-          <p class="card-text">Los mejores cortes de res premium, seleccionados cuidadosamente para garantizar calidad y sabor.</p>
-          
-          <div class="d-flex justify-content-between align-items-center mt-3">
-            <div class="product-price">$320/kg</div>
-            <div class="rating">
-              <i class="bi bi-star-fill text-warning"></i>
-              <i class="bi bi-star-fill text-warning"></i>
-              <i class="bi bi-star-fill text-warning"></i>
-              <i class="bi bi-star-fill text-warning"></i>
-              <i class="bi bi-star-half text-warning"></i>
-              <span class="ms-1">(48)</span>
-            </div>
-          </div>
-          
-          <div class="product-actions">
-            <span class="btn-category">
-              <i class="bi bi-cart-plus me-1"></i> Ver productos
-            </span>
-          </div>
-        </div>
-      </div>
-    </a>
-  </div>
-          
-  <!-- Carne de Cerdo -->
-  <div class="col-md-6 col-lg-4">
-    <a href="products.html#cerdo" class="card-link">
-      <div class="card product-card h-100">
-        <div class="product-img-container">
-          <img src="img/products/cerdo.png" class="card-img-top" alt="Carne de cerdo">
-        </div>
-        <div class="card-body">
-          <span class="product-category">CORTES FRESCOS</span>
-          <h5 class="card-title mt-1">Carne de Cerdo</h5>
-          <p class="card-text">Variedad de cortes de cerdo frescos, ideales para tus recetas favoritas y preparaciones especiales.</p>
-          
-          <div class="d-flex justify-content-between align-items-center mt-3">
-            <div class="product-price">$180/kg</div>
-            <div class="rating">
-              <i class="bi bi-star-fill text-warning"></i>
-              <i class="bi bi-star-fill text-warning"></i>
-              <i class="bi bi-star-fill text-warning"></i>
-              <i class="bi bi-star-fill text-warning"></i>
-              <i class="bi bi-star text-warning"></i>
-              <span class="ms-1">(32)</span>
-            </div>
-          </div>
-          
-          <div class="product-actions">
-            <span class="btn-category">
-              <i class="bi bi-cart-plus me-1"></i> Ver productos
-            </span>
-          </div>
-        </div>
-      </div>
-    </a>
-  </div>
-          
-  <!-- Pollo -->
-  <div class="col-md-6 col-lg-4">
-    <a href="products.html#pollo" class="card-link">
-      <div class="card product-card h-100">
-        <div class="product-img-container">
-          <img src="img/products/pollo.png" class="card-img-top" alt="Pollo">
-          <span class="badge bg-success product-badge">Nuevo</span>
-        </div>
-        <div class="card-body">
-          <span class="product-category">AVES DE CORRAL</span>
-          <h5 class="card-title mt-1">Pollo</h5>
-          <p class="card-text">Pollo fresco de la mejor calidad, preparado según tus necesidades. Ideal para todas tus recetas.</p>
-          
-          <div class="d-flex justify-content-between align-items-center mt-3">
-            <div class="product-price">$95/kg</div>
-            <div class="rating">
-              <i class="bi bi-star-fill text-warning"></i>
-              <i class="bi bi-star-fill text-warning"></i>
-              <i class="bi bi-star-fill text-warning"></i>
-              <i class="bi bi-star-fill text-warning"></i>
-              <i class="bi bi-star-fill text-warning"></i>
-              <span class="ms-1">(65)</span>
-            </div>
-          </div>
-          
-          <div class="product-actions">
-            <span class="btn-category">
-              <i class="bi bi-cart-plus me-1"></i> Ver productos
-            </span>
-          </div>
-        </div>
-      </div>
-    </a>
-  </div>
-          
-  <!-- Embutidos -->
-  <div class="col-md-6 col-lg-4">
-    <a href="products.html#embutidos" class="card-link">
-      <div class="card product-card h-100">
-        <div class="product-img-container">
-          <img src="img/products/embutidos.png" class="card-img-top" alt="Embutidos">
-        </div>
-        <div class="card-body">
-          <span class="product-category">PRODUCTOS ELABORADOS</span>
-          <h5 class="card-title mt-1">Embutidos</h5>
-          <p class="card-text">Variedad de embutidos artesanales y de alta calidad. Perfectos para desayunos y comidas rápidas.</p>
-          
-          <div class="d-flex justify-content-between align-items-center mt-3">
-            <div class="product-price">$120/kg</div>
-            <div class="rating">
-              <i class="bi bi-star-fill text-warning"></i>
-              <i class="bi bi-star-fill text-warning"></i>
-              <i class="bi bi-star-fill text-warning"></i>
-              <i class="bi bi-star-fill text-warning"></i>
-              <i class="bi bi-star-half text-warning"></i>
-              <span class="ms-1">(41)</span>
-            </div>
-          </div>
-          
-          <div class="product-actions">
-            <span class="btn-category">
-              <i class="bi bi-cart-plus me-1"></i> Ver productos
-            </span>
-          </div>
-        </div>
-      </div>
-    </a>
-  </div>
-          
-  <!-- Cortes Especiales -->
-  <div class="col-md-6 col-lg-4">
-    <a href="products.html#especiales" class="card-link">
-      <div class="card product-card h-100">
-        <div class="product-img-container">
-          <img src="img/products/premium.png" class="card-img-top" alt="Cortes especiales">
-          <span class="badge bg-info product-badge">Premium</span>
-        </div>
-        <div class="card-body">
-          <span class="product-category">CORTES SELECCIONADOS</span>
-          <h5 class="card-title mt-1">Cortes Especiales</h5>
-          <p class="card-text">Cortes especiales seleccionados para los paladares más exigentes. Calidad superior garantizada.</p>
-          
-          <div class="d-flex justify-content-between align-items-center mt-3">
-            <div class="product-price">$450/kg</div>
-            <div class="rating">
-              <i class="bi bi-star-fill text-warning"></i>
-              <i class="bi bi-star-fill text-warning"></i>
-              <i class="bi bi-star-fill text-warning"></i>
-              <i class="bi bi-star-fill text-warning"></i>
-              <i class="bi bi-star-fill text-warning"></i>
-              <span class="ms-1">(28)</span>
-            </div>
-          </div>
-          
-          <div class="product-actions">
-            <span class="btn-category">
-              <i class="bi bi-cart-plus me-1"></i> Ver productos
-            </span>
-          </div>
-        </div>
-      </div>
-    </a>
-  </div>
-          
-  <!-- Preparados -->
-  <div class="col-md-6 col-lg-4">
-    <a href="products.html#preparados" class="card-link">
-      <div class="card product-card h-100">
-        <div class="product-img-container">
-          <img src="img/products/preparadas.png" class="card-img-top" alt="Productos preparados">
-          <span class="badge bg-warning text-dark product-badge">Oferta</span>
-        </div>
-        <div class="card-body">
-          <span class="product-category">LISTOS PARA COCINAR</span>
-          <h5 class="card-title mt-1">Productos Preparados</h5>
-          <p class="card-text">Productos marinados y preparados listos para cocinar. Ahorra tiempo sin sacrificar sabor.</p>
-          
-          <div class="d-flex justify-content-between align-items-center mt-3">
-            <div class="product-price">$210/kg</div>
-            <div class="rating">
-              <i class="bi bi-star-fill text-warning"></i>
-              <i class="bi bi-star-fill text-warning"></i>
-              <i class="bi bi-star-fill text-warning"></i>
-              <i class="bi bi-star-fill text-warning"></i>
-              <i class="bi bi-star text-warning"></i>
-              <span class="ms-1">(37)</span>
-            </div>
-          </div>
-          
-          <div class="product-actions">
-            <span class="btn-category">
-              <i class="bi bi-cart-plus me-1"></i> Ver productos
-            </span>
-          </div>
-        </div>
-      </div>
-    </a>
-  </div>
-
-  <!-- Merchandising -->
-  <div class="col-md-6 col-lg-4">
-    <a href="products.html#merch" class="card-link">
-      <div class="card product-card h-100">
-        <div class="product-img-container">
-          <img src="img/products/merch.png" class="card-img-top" alt="Merchandising">
-          <span class="badge bg-primary product-badge">Nuevo</span>
-        </div>
-        <div class="card-body">
-          <span class="product-category">MERCHANDISING</span>
-          <h5 class="card-title mt-1">Mercancía de la Carnicería</h5>
-          <p class="card-text">Productos exclusivos con la marca de nuestra carnicería. Gorras, playeras y más para los verdaderos fans.</p>
-          
-          <div class="d-flex justify-content-between align-items-center mt-3">
-            <div class="product-price">Desde $150</div>
-            <div class="rating">
-              <i class="bi bi-star-fill text-warning"></i>
-              <i class="bi bi-star-fill text-warning"></i>
-              <i class="bi bi-star-fill text-warning"></i>
-              <i class="bi bi-star-fill text-warning"></i>
-              <i class="bi bi-star text-warning"></i>
-              <span class="ms-1">(23)</span>
-            </div>
-          </div>
-          
-          <div class="product-actions">
-            <span class="btn-category">
-              <i class="bi bi-cart-plus me-1"></i> Ver productos
-            </span>
-          </div>
-        </div>
-      </div>
-    </a>
-  </div>
-
-  <!-- Frutas y Verduras -->
-  <div class="col-md-6 col-lg-4">
-    <a href="products.html#frutas-verduras" class="card-link">
-      <div class="card product-card h-100">
-        <div class="product-img-container">
-          <img src="img/products/frutasverduras.png" class="card-img-top" alt="Frutas y verduras">
-          <span class="badge bg-success product-badge">Fresco</span>
-        </div>
-        <div class="card-body">
-          <span class="product-category">PRODUCTOS FRESCOS</span>
-          <h5 class="card-title mt-1">Frutas y Verduras</h5>
-          <p class="card-text">Selección de frutas y verduras frescas de la más alta calidad. Perfecto para complementar tus comidas.</p>
-          
-          <div class="d-flex justify-content-between align-items-center mt-3">
-            <div class="product-price">Variado</div>
-            <div class="rating">
-              <i class="bi bi-star-fill text-warning"></i>
-              <i class="bi bi-star-fill text-warning"></i>
-              <i class="bi bi-star-fill text-warning"></i>
-              <i class="bi bi-star-fill text-warning"></i>
-              <i class="bi bi-star-half text-warning"></i>
-              <span class="ms-1">(35)</span>
-            </div>
-          </div>
-          
-          <div class="product-actions">
-            <span class="btn-category">
-              <i class="bi bi-cart-plus me-1"></i> Ver productos
-            </span>
-          </div>
-        </div>
-      </div>
-    </a>
-  </div>
-
-  <!-- Otros Productos -->
-  <div class="col-md-6 col-lg-4">
-    <a href="products.html#otros" class="card-link">
-      <div class="card product-card h-100">
-        <div class="product-img-container">
-          <img src="img/products/otrosproductos.png" class="card-img-top" alt="Otros productos">
-        </div>
-        <div class="card-body">
-          <span class="product-category">COMPLEMENTOS</span>
-          <h5 class="card-title mt-1">Otros Productos</h5>
-          <p class="card-text">Variedad de productos complementarios para tu cocina. Salsas, aderezos, especias y mucho más.</p>
-          
-          <div class="d-flex justify-content-between align-items-center mt-3">
-            <div class="product-price">Desde $50</div>
-            <div class="rating">
-              <i class="bi bi-star-fill text-warning"></i>
-              <i class="bi bi-star-fill text-warning"></i>
-              <i class="bi bi-star-fill text-warning"></i>
-              <i class="bi bi-star-fill text-warning"></i>
-              <i class="bi bi-star text-warning"></i>
-              <span class="ms-1">(19)</span>
-            </div>
-          </div>
-          
-          <div class="product-actions">
-            <span class="btn-category">
-              <i class="bi bi-cart-plus me-1"></i> Ver productos
-            </span>
-          </div>
-        </div>
-      </div>
-    </a>
-  </div>
-</div>
-    </section>
-
-    <section id="horario" class="schedule-section py-5">
-      <div class="container">
-        <div class="row align-items-center">
-          <div class="col-md-6">
-            <h2 class="mb-4">Horario de Atención</h2>
-            <div class="schedule-box p-4">
-              <div class="d-flex align-items-center mb-3">
-                <i class="bi bi-clock fs-4 me-3"></i>
-                <div>
-                  <h4 class="mb-0">8:00 - 17:00</h4>
-                  <p class="mb-0">Lunes a Sábado</p>
+        <!-- Cartas de Categorías Principales - MEJORADAS con enlaces seguros -->
+        <div class="bs-row bs-g-4">
+          <!-- Carne de Res -->
+          <div class="bs-col-md-6 bs-col-lg-4">
+            <a href="products.html#res" class="cs-products-section__card-link">
+              <div class="cs-product-card bs-card bs-h-100">
+                <div class="cs-product-card__img-container">
+                  <img src="img/products/res.png" class="cs-product-card__img bs-card-img-top" alt="Carne de res" loading="lazy">
+                  <span class="cs-product-card__badge bs-badge bs-bg-danger">Popular</span>
+                </div>
+                <div class="cs-product-card__body bs-card-body">
+                  <span class="cs-product-card__category">CORTES PREMIUM</span>
+                  <h5 class="cs-product-card__title bs-card-title bs-mt-1">Carne de Res</h5>
+                  <p class="cs-product-card__text bs-card-text">Los mejores cortes de res premium, seleccionados cuidadosamente para garantizar calidad y sabor.</p>
+                  
+                  <div class="cs-product-card__info bs-d-flex bs-justify-content-between bs-align-items-center bs-mt-3">
+                    <div class="cs-product-card__price">$320/kg</div>
+                    <div class="cs-product-card__rating bs-d-flex bs-align-items-center">
+                      <i class="bi bi-star-fill bs-text-warning"></i>
+                      <i class="bi bi-star-fill bs-text-warning"></i>
+                      <i class="bi bi-star-fill bs-text-warning"></i>
+                      <i class="bi bi-star-fill bs-text-warning"></i>
+                      <i class="bi bi-star-half bs-text-warning"></i>
+                      <span class="bs-ms-1">(48)</span>
+                    </div>
+                  </div>
+                  
+                  <div class="cs-product-card__actions">
+                    <span class="cs-product-card__btn">
+                      <i class="bi bi-cart-plus bs-me-1"></i> Ver productos
+                    </span>
+                  </div>
                 </div>
               </div>
-              <p class="mt-4">Estamos cerrados los domingos y días festivos.</p>
+            </a>
+          </div>
+                  
+          <!-- Carne de Cerdo -->
+          <div class="bs-col-md-6 bs-col-lg-4">
+            <a href="products.html#cerdo" class="cs-products-section__card-link">
+              <div class="cs-product-card bs-card bs-h-100">
+                <div class="cs-product-card__img-container">
+                  <img src="img/products/cerdo.png" class="cs-product-card__img bs-card-img-top" alt="Carne de cerdo" loading="lazy">
+                </div>
+                <div class="cs-product-card__body bs-card-body">
+                  <span class="cs-product-card__category">CORTES FRESCOS</span>
+                  <h5 class="cs-product-card__title bs-card-title bs-mt-1">Carne de Cerdo</h5>
+                  <p class="cs-product-card__text bs-card-text">Variedad de cortes de cerdo frescos, ideales para tus recetas favoritas y preparaciones especiales.</p>
+                  
+                  <div class="cs-product-card__info bs-d-flex bs-justify-content-between bs-align-items-center bs-mt-3">
+                    <div class="cs-product-card__price">$180/kg</div>
+                    <div class="cs-product-card__rating bs-d-flex bs-align-items-center">
+                      <i class="bi bi-star-fill bs-text-warning"></i>
+                      <i class="bi bi-star-fill bs-text-warning"></i>
+                      <i class="bi bi-star-fill bs-text-warning"></i>
+                      <i class="bi bi-star-fill bs-text-warning"></i>
+                      <i class="bi bi-star bs-text-warning"></i>
+                      <span class="bs-ms-1">(32)</span>
+                    </div>
+                  </div>
+                  
+                  <div class="cs-product-card__actions">
+                    <span class="cs-product-card__btn">
+                      <i class="bi bi-cart-plus bs-me-1"></i> Ver productos
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </a>
+          </div>
+                  
+          <!-- Pollo -->
+          <div class="bs-col-md-6 bs-col-lg-4">
+            <a href="products.html#pollo" class="cs-products-section__card-link">
+              <div class="cs-product-card bs-card bs-h-100">
+                <div class="cs-product-card__img-container">
+                  <img src="img/products/pollo.png" class="cs-product-card__img bs-card-img-top" alt="Pollo" loading="lazy">
+                  <span class="cs-product-card__badge bs-badge bs-bg-success">Nuevo</span>
+                </div>
+                <div class="cs-product-card__body bs-card-body">
+                  <span class="cs-product-card__category">AVES DE CORRAL</span>
+                  <h5 class="cs-product-card__title bs-card-title bs-mt-1">Pollo</h5>
+                  <p class="cs-product-card__text bs-card-text">Pollo fresco de la mejor calidad, preparado según tus necesidades. Ideal para todas tus recetas.</p>
+                  
+                  <div class="cs-product-card__info bs-d-flex bs-justify-content-between bs-align-items-center bs-mt-3">
+                    <div class="cs-product-card__price">$95/kg</div>
+                    <div class="cs-product-card__rating bs-d-flex bs-align-items-center">
+                      <i class="bi bi-star-fill bs-text-warning"></i>
+                      <i class="bi bi-star-fill bs-text-warning"></i>
+                      <i class="bi bi-star-fill bs-text-warning"></i>
+                      <i class="bi bi-star-fill bs-text-warning"></i>
+                      <i class="bi bi-star-fill bs-text-warning"></i>
+                      <span class="bs-ms-1">(65)</span>
+                    </div>
+                  </div>
+                  
+                  <div class="cs-product-card__actions">
+                    <span class="cs-product-card__btn">
+                      <i class="bi bi-cart-plus bs-me-1"></i> Ver productos
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </a>
+          </div>
+                  
+          <!-- Embutidos -->
+          <div class="bs-col-md-6 bs-col-lg-4">
+            <a href="products.html#embutidos" class="cs-products-section__card-link">
+              <div class="cs-product-card bs-card bs-h-100">
+                <div class="cs-product-card__img-container">
+                  <img src="img/products/embutidos.png" class="cs-product-card__img bs-card-img-top" alt="Embutidos" loading="lazy">
+                </div>
+                <div class="cs-product-card__body bs-card-body">
+                  <span class="cs-product-card__category">PRODUCTOS ELABORADOS</span>
+                  <h5 class="cs-product-card__title bs-card-title bs-mt-1">Embutidos</h5>
+                  <p class="cs-product-card__text bs-card-text">Variedad de embutidos artesanales y de alta calidad. Perfectos para desayunos y comidas rápidas.</p>
+                  
+                  <div class="cs-product-card__info bs-d-flex bs-justify-content-between bs-align-items-center bs-mt-3">
+                    <div class="cs-product-card__price">$120/kg</div>
+                    <div class="cs-product-card__rating bs-d-flex bs-align-items-center">
+                      <i class="bi bi-star-fill bs-text-warning"></i>
+                      <i class="bi bi-star-fill bs-text-warning"></i>
+                      <i class="bi bi-star-fill bs-text-warning"></i>
+                      <i class="bi bi-star-fill bs-text-warning"></i>
+                      <i class="bi bi-star-half bs-text-warning"></i>
+                      <span class="bs-ms-1">(41)</span>
+                    </div>
+                  </div>
+                  
+                  <div class="cs-product-card__actions">
+                    <span class="cs-product-card__btn">
+                      <i class="bi bi-cart-plus bs-me-1"></i> Ver productos
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </a>
+          </div>
+                  
+          <!-- Cortes Especiales -->
+          <div class="bs-col-md-6 bs-col-lg-4">
+            <a href="products.html#especiales" class="cs-products-section__card-link">
+              <div class="cs-product-card bs-card bs-h-100">
+                <div class="cs-product-card__img-container">
+                  <img src="img/products/premium.png" class="cs-product-card__img bs-card-img-top" alt="Cortes especiales" loading="lazy">
+                  <span class="cs-product-card__badge bs-badge bs-bg-info">Premium</span>
+                </div>
+                <div class="cs-product-card__body bs-card-body">
+                  <span class="cs-product-card__category">CORTES SELECCIONADOS</span>
+                  <h5 class="cs-product-card__title bs-card-title bs-mt-1">Cortes Especiales</h5>
+                  <p class="cs-product-card__text bs-card-text">Cortes especiales seleccionados para los paladares más exigentes. Calidad superior garantizada.</p>
+                  
+                  <div class="cs-product-card__info bs-d-flex bs-justify-content-between bs-align-items-center bs-mt-3">
+                    <div class="cs-product-card__price">$450/kg</div>
+                    <div class="cs-product-card__rating bs-d-flex bs-align-items-center">
+                      <i class="bi bi-star-fill bs-text-warning"></i>
+                      <i class="bi bi-star-fill bs-text-warning"></i>
+                      <i class="bi bi-star-fill bs-text-warning"></i>
+                      <i class="bi bi-star-fill bs-text-warning"></i>
+                      <i class="bi bi-star-fill bs-text-warning"></i>
+                      <span class="bs-ms-1">(28)</span>
+                    </div>
+                  </div>
+                  
+                  <div class="cs-product-card__actions">
+                    <span class="cs-product-card__btn">
+                      <i class="bi bi-cart-plus bs-me-1"></i> Ver productos
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </a>
+          </div>
+                  
+          <!-- Preparados -->
+          <div class="bs-col-md-6 bs-col-lg-4">
+            <a href="products.html#preparados" class="cs-products-section__card-link">
+              <div class="cs-product-card bs-card bs-h-100">
+                <div class="cs-product-card__img-container">
+                  <img src="img/products/preparadas.png" class="cs-product-card__img bs-card-img-top" alt="Productos preparados" loading="lazy">
+                  <span class="cs-product-card__badge bs-badge bs-bg-warning bs-text-dark">Oferta</span>
+                </div>
+                <div class="cs-product-card__body bs-card-body">
+                  <span class="cs-product-card__category">LISTOS PARA COCINAR</span>
+                  <h5 class="cs-product-card__title bs-card-title bs-mt-1">Productos Preparados</h5>
+                  <p class="cs-product-card__text bs-card-text">Productos marinados y preparados listos para cocinar. Ahorra tiempo sin sacrificar sabor.</p>
+                  
+                  <div class="cs-product-card__info bs-d-flex bs-justify-content-between bs-align-items-center bs-mt-3">
+                    <div class="cs-product-card__price">$210/kg</div>
+                    <div class="cs-product-card__rating bs-d-flex bs-align-items-center">
+                      <i class="bi bi-star-fill bs-text-warning"></i>
+                      <i class="bi bi-star-fill bs-text-warning"></i>
+                      <i class="bi bi-star-fill bs-text-warning"></i>
+                      <i class="bi bi-star-fill bs-text-warning"></i>
+                      <i class="bi bi-star bs-text-warning"></i>
+                      <span class="bs-ms-1">(37)</span>
+                    </div>
+                  </div>
+                  
+                  <div class="cs-product-card__actions">
+                    <span class="cs-product-card__btn">
+                      <i class="bi bi-cart-plus bs-me-1"></i> Ver productos
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </a>
+          </div>
+
+          <!-- Merchandising -->
+          <div class="bs-col-md-6 bs-col-lg-4">
+            <a href="products.html#merch" class="cs-products-section__card-link">
+              <div class="cs-product-card bs-card bs-h-100">
+                <div class="cs-product-card__img-container">
+                  <img src="img/products/merch.png" class="cs-product-card__img bs-card-img-top" alt="Merchandising" loading="lazy">
+                  <span class="cs-product-card__badge bs-badge bs-bg-primary">Nuevo</span>
+                </div>
+                <div class="cs-product-card__body bs-card-body">
+                  <span class="cs-product-card__category">MERCHANDISING</span>
+                  <h5 class="cs-product-card__title bs-card-title bs-mt-1">Mercancía de la Carnicería</h5>
+                  <p class="cs-product-card__text bs-card-text">Productos exclusivos con la marca de nuestra carnicería. Gorras, playeras y más para los verdaderos fans.</p>
+                  
+                  <div class="cs-product-card__info bs-d-flex bs-justify-content-between bs-align-items-center bs-mt-3">
+                    <div class="cs-product-card__price">Desde $150</div>
+                    <div class="cs-product-card__rating bs-d-flex bs-align-items-center">
+                      <i class="bi bi-star-fill bs-text-warning"></i>
+                      <i class="bi bi-star-fill bs-text-warning"></i>
+                      <i class="bi bi-star-fill bs-text-warning"></i>
+                      <i class="bi bi-star-fill bs-text-warning"></i>
+                      <i class="bi bi-star bs-text-warning"></i>
+                      <span class="bs-ms-1">(23)</span>
+                    </div>
+                  </div>
+                  
+                  <div class="cs-product-card__actions">
+                    <span class="cs-product-card__btn">
+                      <i class="bi bi-cart-plus bs-me-1"></i> Ver productos
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </a>
+          </div>
+
+          <!-- Frutas y Verduras -->
+          <div class="bs-col-md-6 bs-col-lg-4">
+            <a href="products.html#frutas-verduras" class="cs-products-section__card-link">
+              <div class="cs-product-card bs-card bs-h-100">
+                <div class="cs-product-card__img-container">
+                  <img src="img/products/frutasverduras.png" class="cs-product-card__img bs-card-img-top" alt="Frutas y verduras" loading="lazy">
+                  <span class="cs-product-card__badge bs-badge bs-bg-success">Fresco</span>
+                </div>
+                <div class="cs-product-card__body bs-card-body">
+                  <span class="cs-product-card__category">PRODUCTOS FRESCOS</span>
+                  <h5 class="cs-product-card__title bs-card-title bs-mt-1">Frutas y Verduras</h5>
+                  <p class="cs-product-card__text bs-card-text">Selección de frutas y verduras frescas de la más alta calidad. Perfecto para complementar tus comidas.</p>
+                  
+                  <div class="cs-product-card__info bs-d-flex bs-justify-content-between bs-align-items-center bs-mt-3">
+                    <div class="cs-product-card__price">Variado</div>
+                    <div class="cs-product-card__rating bs-d-flex bs-align-items-center">
+                      <i class="bi bi-star-fill bs-text-warning"></i>
+                      <i class="bi bi-star-fill bs-text-warning"></i>
+                      <i class="bi bi-star-fill bs-text-warning"></i>
+                      <i class="bi bi-star-fill bs-text-warning"></i>
+                      <i class="bi bi-star-half bs-text-warning"></i>
+                      <span class="bs-ms-1">(35)</span>
+                    </div>
+                  </div>
+                  
+                  <div class="cs-product-card__actions">
+                    <span class="cs-product-card__btn">
+                      <i class="bi bi-cart-plus bs-me-1"></i> Ver productos
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </a>
+          </div>
+
+          <!-- Otros Productos -->
+          <div class="bs-col-md-6 bs-col-lg-4">
+            <a href="products.html#otros" class="cs-products-section__card-link">
+              <div class="cs-product-card bs-card bs-h-100">
+                <div class="cs-product-card__img-container">
+                  <img src="img/products/otrosproductos.png" class="cs-product-card__img bs-card-img-top" alt="Otros productos" loading="lazy">
+                </div>
+                <div class="cs-product-card__body bs-card-body">
+                  <span class="cs-product-card__category">COMPLEMENTOS</span>
+                  <h5 class="cs-product-card__title bs-card-title bs-mt-1">Otros Productos</h5>
+                  <p class="cs-product-card__text bs-card-text">Variedad de productos complementarios para tu cocina. Salsas, aderezos, especias y mucho más.</p>
+                  
+                  <div class="cs-product-card__info bs-d-flex bs-justify-content-between bs-align-items-center bs-mt-3">
+                    <div class="cs-product-card__price">Desde $50</div>
+                    <div class="cs-product-card__rating bs-d-flex bs-align-items-center">
+                      <i class="bi bi-star-fill bs-text-warning"></i>
+                      <i class="bi bi-star-fill bs-text-warning"></i>
+                      <i class="bi bi-star-fill bs-text-warning"></i>
+                      <i class="bi bi-star-fill bs-text-warning"></i>
+                      <i class="bi bi-star bs-text-warning"></i>
+                      <span class="bs-ms-1">(19)</span>
+                    </div>
+                  </div>
+                  
+                  <div class="cs-product-card__actions">
+                    <span class="cs-product-card__btn">
+                      <i class="bi bi-cart-plus bs-me-1"></i> Ver productos
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sección Horario -->
+    <section id="horario" class="cs-schedule-section bs-py-5">
+      <div class="bs-container">
+        <div class="bs-row bs-align-items-center">
+          <div class="bs-col-md-6">
+            <h2 class="cs-schedule-section__title bs-mb-4">Horario de Atención</h2>
+            <div class="cs-schedule-section__box bs-p-4">
+              <div class="bs-d-flex bs-align-items-center bs-mb-3">
+                <i class="cs-schedule-section__icon bi bi-clock bs-fs-4 bs-me-3"></i>
+                <div>
+                  <h4 class="cs-schedule-section__time bs-mb-0">8:00 - 17:00</h4>
+                  <p class="cs-schedule-section__days bs-mb-0">Lunes a Sábado</p>
+                </div>
+              </div>
+              <p class="cs-schedule-section__note bs-mt-4">Estamos cerrados los domingos y días festivos.</p>
             </div>
           </div>
-          <div class="col-md-6">
-            <div class="about-box p-4">
-              <h3 class="mb-3">Sobre Nosotros</h3>
-              <p>Carnicería El Señor de La Misericordia es una carnicería que ofrece cortes y productos cárnicos frescos. Los clientes destacan la calidad de la carne y el buen servicio, valorando la atención personalizada y la confianza en la procedencia de los productos.</p>
-              <p>Algunos comentarios mencionan precios justos y recomendaciones por parte de la familia. No se encontraron opiniones negativas relevantes. La carnicería cuenta con una ubicación accesible y mantiene una reputación positiva entre sus clientes habituales.</p>
+          <div class="bs-col-md-6">
+            <div class="cs-about-box bs-p-4">
+              <h3 class="cs-about-box__title bs-mb-3">Sobre Nosotros</h3>
+              <p class="cs-about-box__text">Carnicería El Señor de La Misericordia es una carnicería que ofrece cortes y productos cárnicos frescos. Los clientes destacan la calidad de la carne y el buen servicio, valorando la atención personalizada y la confianza en la procedencia de los productos.</p>
+              <p class="cs-about-box__text">Algunos comentarios mencionan precios justos y recomendaciones por parte de la familia. No se encontraron opiniones negativas relevantes. La carnicería cuenta con una ubicación accesible y mantiene una reputación positiva entre sus clientes habituales.</p>
             </div>
           </div>
         </div>
       </div>
     </section>
 
-    <section id="ubicacion" class="location-section py-5">
-      <div class="container">
-        <h2 class="text-center mb-5">Nuestra Ubicación</h2>
-        <div class="row">
-          <div class="col-md-6 mb-4">
-            <div class="card h-100 border-0">
-              <div class="card-body">
-                <h4 class="card-title">Dirección</h4>
-                <address class="card-text">
+    <!-- Sección Ubicación -->
+    <section id="ubicacion" class="cs-location-section bs-py-5">
+      <div class="bs-container">
+        <h2 class="cs-location-section__title bs-text-center bs-mb-5">Nuestra Ubicación</h2>
+        <div class="bs-row">
+          <div class="bs-col-md-6 bs-mb-4">
+            <div class="cs-location-section__card bs-card bs-h-100 bs-border-0">
+              <div class="cs-location-section__card-body bs-card-body">
+                <h4 class="cs-location-section__card-title bs-card-title">Dirección</h4>
+                <address class="cs-location-section__address bs-card-text">
                   <i class="bi bi-geo-alt-fill"></i> Agua Marina 110, Manuel J. Othon<br>
                   78150 San Luis Potosí, S.L.P.<br>
                   México
                 </address>
-                <a href="https://maps.google.com/?q=Agua+Marina+110,Manuel+J.+Othon,San+Luis+Potosí" class="btn btn-outline-primary mt-3" target="_blank">
+                <a href="https://maps.google.com/?q=Agua+Marina+110,Manuel+J.+Othon,San+Luis+Potosí" class="cs-location-section__btn bs-btn bs-btn-outline-primary bs-mt-3" target="_blank" rel="noopener noreferrer">
                   <i class="bi bi-map"></i> Cómo llegar en Google Maps
                 </a>
               </div>
             </div>
           </div>
-          <div class="col-md-6 mb-4">
-            <div class="card h-100 border-0">
-              <div class="card-body">
-                <h4 class="card-title">Contacto Directo</h4>
-                <p class="card-text">
+          <div class="bs-col-md-6 bs-mb-4">
+            <div class="cs-location-section__card bs-card bs-h-100 bs-border-0">
+              <div class="cs-location-section__card-body bs-card-body">
+                <h4 class="cs-location-section__card-title bs-card-title">Contacto Directo</h4>
+                <p class="cs-location-section__contact bs-card-text">
                   <i class="bi bi-telephone-fill"></i> Teléfono: <a href="tel:+524442715470">+52 444 271 5470</a>
                 </p>
-                <p class="card-text">
-                  <i class="bi bi-whatsapp"></i> WhatsApp: <a href="https://wa.me/524442715470">+52 444 271 5470</a>
+                <p class="cs-location-section__contact bs-card-text">
+                  <i class="bi bi-whatsapp"></i> WhatsApp: <a href="https://wa.me/524442715470" target="_blank" rel="noopener noreferrer">+52 444 271 5470</a>
                 </p>
-                <p class="card-text">
+                <p class="cs-location-section__contact bs-card-text">
                   <i class="bi bi-envelope-fill"></i> Email: <a href="mailto:contacto@carniceriasenormisericordia.com">contacto@carniceriasenormisericordia.com</a>
                 </p>
               </div>
@@ -604,67 +601,90 @@
       </div>
     </section>
 
-    <section id="contacto" class="contact-section py-5">
-      <div class="container">
-        <h2 class="text-center mb-5">Contáctanos</h2>
-        <div class="row justify-content-center">
-          <div class="col-lg-8">
-            <div class="contact-form p-4 p-md-5">
-              <div class="text-center mb-4">
-                <i class="bi bi-envelope-heart-fill fs-1 text-primary"></i>
-                <h3 class="mt-3">Envía un mensaje</h3>
-                <p class="text-muted">Estamos aquí para responder a tus preguntas</p>
+    <!-- Sección Contacto -->
+    <section id="contacto" class="cs-contact-section bs-py-5">
+      <div class="bs-container">
+        <h2 class="cs-contact-section__title bs-text-center bs-mb-5">Contáctanos</h2>
+        <div class="bs-row bs-justify-content-center">
+          <div class="bs-col-lg-8">
+            <div class="cs-contact-form bs-p-4 bs-p-md-5">
+              <div class="bs-text-center bs-mb-4">
+                <i class="cs-contact-form__icon bi bi-envelope-heart-fill bs-fs-1 bs-text-primary"></i>
+                <h3 class="cs-contact-form__heading bs-mt-3">Envía un mensaje</h3>
+                <p class="cs-contact-form__subtitle bs-text-muted">Estamos aquí para responder a tus preguntas</p>
               </div>
               
-              <form id="contactForm">
-                <div class="row">
-                  <div class="col-md-6 mb-3">
-                    <label for="name" class="form-label">Nombre completo</label>
-                    <div class="input-group">
-                      <span class="input-group-text"><i class="bi bi-person-heart"></i></span>
-                      <input type="text" class="form-control" id="name" placeholder="Ingresa tu nombre" required>
+              <form id="contactForm" class="cs-contact-form__form bs-needs-validation" novalidate>
+                <div class="bs-row">
+                  <div class="bs-col-md-6 bs-mb-3">
+                    <label for="name" class="cs-contact-form__label bs-form-label">Nombre completo *</label>
+                    <div class="cs-contact-form__input-group bs-input-group">
+                      <span class="cs-contact-form__input-icon bs-input-group-text"><i class="bi bi-person-heart"></i></span>
+                      <input type="text" class="cs-contact-form__input bs-form-control" id="name" placeholder="Ingresa tu nombre" 
+                             pattern="[A-Za-záéíóúñÁÉÍÓÚÑ\s]{2,50}" 
+                             maxlength="50" 
+                             required>
+                      <div class="cs-contact-form__invalid-feedback bs-invalid-feedback">
+                        Por favor ingresa un nombre válido (2-50 caracteres, solo letras y espacios).
+                      </div>
                     </div>
                   </div>
-                  <div class="col-md-6 mb-3">
-                    <label for="email" class="form-label">Correo electrónico</label>
-                    <div class="input-group">
-                      <span class="input-group-text"><i class="bi bi-envelope-heart-fill"></i></span>
-                      <input type="email" class="form-control" id="email" placeholder="Ingresa tu correo" required>
+                  <div class="bs-col-md-6 bs-mb-3">
+                    <label for="email" class="cs-contact-form__label bs-form-label">Correo electrónico *</label>
+                    <div class="cs-contact-form__input-group bs-input-group">
+                      <span class="cs-contact-form__input-icon bs-input-group-text"><i class="bi bi-envelope-heart-fill"></i></span>
+                      <input type="email" class="cs-contact-form__input bs-form-control" id="email" placeholder="Ingresa tu correo" 
+                             pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
+                             maxlength="100"
+                             required>
+                      <div class="cs-contact-form__invalid-feedback bs-invalid-feedback">
+                        Por favor ingresa un correo electrónico válido.
+                      </div>
                     </div>
                   </div>
                 </div>
                 
-                <div class="mb-3">
-                  <label for="subject" class="form-label">Asunto</label>
-                  <div class="input-group">
-                    <span class="input-group-text"><i class="bi bi-tag-fill"></i></span>
-                    <input type="text" class="form-control" id="subject" placeholder="¿Sobre qué quieres contactarnos?">
+                <div class="bs-mb-3">
+                  <label for="subject" class="cs-contact-form__label bs-form-label">Asunto</label>
+                  <div class="cs-contact-form__input-group bs-input-group">
+                    <span class="cs-contact-form__input-icon bs-input-group-text"><i class="bi bi-tag-fill"></i></span>
+                    <input type="text" class="cs-contact-form__input bs-form-control" id="subject" placeholder="¿Sobre qué quieres contactarnos?"
+                           maxlength="100">
                   </div>
                 </div>
                 
-                <div class="mb-3">
-                  <label for="message" class="form-label">Mensaje</label>
-                  <div class="input-group">
-                    <span class="input-group-text"><i class="bi bi-chat-square-heart-fill"></i></span>
-                    <textarea class="form-control" id="message" rows="5" placeholder="Escribe tu mensaje aquí..." required></textarea>
+                <div class="bs-mb-3">
+                  <label for="message" class="cs-contact-form__label bs-form-label">Mensaje *</label>
+                  <div class="cs-contact-form__input-group bs-input-group">
+                    <span class="cs-contact-form__input-icon bs-input-group-text"><i class="bi bi-chat-square-heart-fill"></i></span>
+                    <textarea class="cs-contact-form__textarea bs-form-control" id="message" rows="5" 
+                              placeholder="Escribe tu mensaje aquí..." 
+                              maxlength="500"
+                              required></textarea>
+                    <div class="cs-contact-form__invalid-feedback bs-invalid-feedback">
+                      Por favor ingresa un mensaje (máximo 500 caracteres).
+                    </div>
+                  </div>
+                  <div class="cs-contact-form__char-count bs-form-text">
+                    <span id="charCount">0</span>/500 caracteres
                   </div>
                 </div>
                 
-                <div class="d-grid">
-                  <button type="submit" class="btn btn-primary btn-lg">
-                    <i class="bi bi-send-fill me-2"></i>Enviar Mensaje
+                <div class="bs-d-grid">
+                  <button type="submit" class="cs-contact-form__submit-btn bs-btn bs-btn-primary bs-btn-lg">
+                    <i class="bi bi-send-fill bs-me-2"></i>Enviar Mensaje
                   </button>
                 </div>
               </form>
               
-              <div class="mt-4 text-center">
-                <p class="mb-1">O contáctanos directamente:</p>
-                <div class="d-flex justify-content-center gap-3">
-                  <a href="tel:+524442715470" class="btn btn-outline-primary">
-                    <i class="bi bi-telephone-fill me-2"></i>Llamar
+              <div class="cs-contact-form__direct-contact bs-mt-4 bs-text-center">
+                <p class="cs-contact-form__direct-text bs-mb-1">O contáctanos directamente:</p>
+                <div class="bs-d-flex bs-justify-content-center bs-gap-3">
+                  <a href="tel:+524442715470" class="cs-contact-form__direct-btn bs-btn bs-btn-outline-primary">
+                    <i class="bi bi-telephone-fill bs-me-2"></i>Llamar
                   </a>
-                  <a href="https://wa.me/524442715470" class="btn btn-outline-success">
-                    <i class="bi bi-whatsapp me-2"></i>WhatsApp
+                  <a href="https://wa.me/524442715470" class="cs-contact-form__direct-btn bs-btn bs-btn-outline-success" target="_blank" rel="noopener noreferrer">
+                    <i class="bi bi-whatsapp bs-me-2"></i>WhatsApp
                   </a>
                 </div>
               </div>
@@ -674,106 +694,162 @@
       </div>
     </section>
     
-    <!-- Loyalty Modal -->
-    <div class="modal fade" id="loyaltyModal" tabindex="-1" aria-labelledby="loyaltyModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="loyaltyModalLabel">Programa de Fidelidad</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <!-- Modal Programa de Fidelidad -->
+    <div class="cs-loyalty-modal bs-modal bs-fade" id="loyaltyModal" tabindex="-1" aria-labelledby="loyaltyModalLabel" aria-hidden="true">
+      <div class="cs-loyalty-modal__dialog bs-modal-dialog bs-modal-lg">
+        <div class="cs-loyalty-modal__content bs-modal-content">
+          <div class="cs-loyalty-modal__header bs-modal-header">
+            <h5 class="cs-loyalty-modal__title bs-modal-title" id="loyaltyModalLabel">Programa de Fidelidad</h5>
+            <button type="button" class="cs-loyalty-modal__close bs-btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
-          <div class="modal-body">
+          <div class="cs-loyalty-modal__body bs-modal-body">
             <div id="loyaltyContent">
-              <div class="text-center py-4">
-                <div class="spinner-border text-primary" role="status">
-                  <span class="visually-hidden">Cargando...</span>
+              <div class="bs-text-center bs-py-4">
+                <div class="cs-loyalty-modal__spinner bs-spinner-border bs-text-primary" role="status">
+                  <span class="bs-visually-hidden">Cargando...</span>
                 </div>
               </div>
             </div>
           </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+          <div class="cs-loyalty-modal__footer bs-modal-footer">
+            <button type="button" class="cs-loyalty-modal__close-btn bs-btn bs-btn-secondary" data-bs-dismiss="modal">Cerrar</button>
           </div>
         </div>
       </div>
     </div>
   </main>
 
-  <footer class="main-footer bg-dark text-white py-4">
-    <div class="container">
-      <div class="row">
-        <div class="col-md-4 mb-3 mb-md-0">
-          <h5>Carnicería El Señor de La Misericordia</h5>
-          <p class="mb-0">Productos cárnicos frescos y de la más alta calidad.</p>
+  <!-- Footer -->
+  <footer class="cs-footer bs-bg-dark bs-text-white bs-py-4">
+    <div class="bs-container">
+      <div class="bs-row">
+        <div class="bs-col-md-4 bs-mb-3 bs-mb-md-0">
+          <h5 class="cs-footer__title">Carnicería El Señor de La Misericordia</h5>
+          <p class="cs-footer__description bs-mb-0">Productos cárnicos frescos y de la más alta calidad.</p>
         </div>
-        <div class="col-md-4 mb-3 mb-md-0">
-          <h5>Horario</h5>
-          <p class="mb-0">Lunes a Sábado: 8:00 - 17:00</p>
-          <p class="mb-0">Domingos: Cerrado</p>
+        <div class="bs-col-md-4 bs-mb-3 bs-mb-md-0">
+          <h5 class="cs-footer__title">Horario</h5>
+          <p class="cs-footer__schedule bs-mb-0">Lunes a Sábado: 8:00 - 17:00</p>
+          <p class="cs-footer__schedule bs-mb-0">Domingos: Cerrado</p>
         </div>
-        <div class="col-md-4">
-          <h5>Síguenos</h5>
-          <div class="social-icons">
-            <a href="#" class="text-white me-3"><i class="bi bi-facebook fs-5"></i></a>
-            <a href="#" class="text-white me-3"><i class="bi bi-instagram fs-5"></i></a>
-            <a href="#" class="text-white"><i class="bi bi-whatsapp fs-5"></i></a>
+        <div class="bs-col-md-4">
+          <h5 class="cs-footer__title">Síguenos</h5>
+          <div class="cs-footer__social-icons">
+            <a href="#" class="cs-footer__social-link bs-text-white bs-me-3" aria-label="Facebook"><i class="bi bi-facebook bs-fs-5"></i></a>
+            <a href="#" class="cs-footer__social-link bs-text-white bs-me-3" aria-label="Instagram"><i class="bi bi-instagram bs-fs-5"></i></a>
+            <a href="#" class="cs-footer__social-link bs-text-white" aria-label="WhatsApp"><i class="bi bi-whatsapp bs-fs-5"></i></a>
           </div>
         </div>
       </div>
-      <hr class="my-4">
-      <div class="row">
-        <div class="col-md-6">
-          <p class="mb-0">&copy; 2025 Carnicería El Señor de La Misericordia. Todos los derechos reservados.</p>
+      <hr class="cs-footer__divider bs-my-4">
+      <div class="bs-row">
+        <div class="bs-col-md-6">
+          <p class="cs-footer__copyright bs-mb-0">&copy; 2025 Carnicería El Señor de La Misericordia. Todos los derechos reservados.</p>
         </div>
-        <div class="col-md-6 text-md-end">
-          <ul class="list-inline mb-0">
-            <li class="list-inline-item"><a href="index.html" class="text-white text-decoration-none">Inicio</a></li>
-            <li class="list-inline-item"><a href="#productos" class="text-white text-decoration-none">Productos</a></li>
-            <li class="list-inline-item"><a href="#ubicacion" class="text-white text-decoration-none">Ubicación</a></li>
-            <li class="list-inline-item"><a href="#contacto" class="text-white text-decoration-none">Contacto</a></li>
-            <li class="list-inline-item"><a href="login.html" class="text-white text-decoration-none">Login</a></li>
+        <div class="bs-col-md-6 bs-text-md-end">
+          <ul class="cs-footer__links bs-list-inline bs-mb-0">
+            <li class="cs-footer__link-item bs-list-inline-item"><a href="index.html" class="cs-footer__link bs-text-white bs-text-decoration-none">Inicio</a></li>
+            <li class="cs-footer__link-item bs-list-inline-item"><a href="#productos" class="cs-footer__link bs-text-white bs-text-decoration-none">Productos</a></li>
+            <li class="cs-footer__link-item bs-list-inline-item"><a href="#ubicacion" class="cs-footer__link bs-text-white bs-text-decoration-none">Ubicación</a></li>
+            <li class="cs-footer__link-item bs-list-inline-item"><a href="#contacto" class="cs-footer__link bs-text-white bs-text-decoration-none">Contacto</a></li>
+            <li class="cs-footer__link-item bs-list-inline-item"><a href="user/login.html" class="cs-footer__link bs-text-white bs-text-decoration-none">Login</a></li>
           </ul>
         </div>
       </div>
     </div>
   </footer>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/app.js" type="module"></script>
-  <script src="js/catalog.js" type="module"></script>
-  <script src="js/loyalty.js" type="module"></script>
-  <script src="js/weather.js" type="module"></script>
-  <script src="js/notifications.js" type="module"></script>
-  <script src="js/service-worker.js"></script>
-  
-  <script>
-    // Registrar Service Worker
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/js/service-worker.js')
-          .then(registration => {
-            console.log('ServiceWorker registration successful');
-          })
-          .catch(err => {
-            console.log('ServiceWorker registration failed: ', err);
-          });
-      });
-    }
-    
-    // Detectar conexión
-    function updateOnlineStatus() {
-      const offlineAlert = document.querySelector('.offline-alert');
-      if (navigator.onLine) {
-        offlineAlert.classList.add('d-none');
-      } else {
-        offlineAlert.classList.remove('d-none');
-      }
-    }
-    
-    window.addEventListener('online', updateOnlineStatus);
-    window.addEventListener('offline', updateOnlineStatus);
-    updateOnlineStatus();
-  </script>
+  <!-- Shopping Cart Offcanvas -->
+  <div class="cs-cart-offcanvas bs-offcanvas bs-offcanvas-end" id="cartOffcanvas" tabindex="-1">
+    <div class="cs-cart-offcanvas__header bs-offcanvas-header">
+      <h5 class="cs-cart-offcanvas__title bs-offcanvas-title">
+        <i class="bi bi-cart3 bs-me-2"></i>Carrito de Compras
+      </h5>
+      <button type="button" class="cs-cart-offcanvas__close bs-btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="cs-cart-offcanvas__body bs-offcanvas-body">
+      <div id="cartItems" class="cs-cart-offcanvas__items bs-mb-4">
+        <div class="bs-text-center bs-py-5">
+          <i class="cs-cart-offcanvas__empty-icon bi bi-cart-x bs-display-4 bs-text-muted"></i>
+          <p class="cs-cart-offcanvas__empty-text bs-mt-3">Tu carrito está vacío</p>
+          <button class="cs-cart-offcanvas__continue-btn bs-btn bs-btn-primary" data-bs-dismiss="offcanvas">Seguir Comprando</button>
+        </div>
+      </div>
+      
+      <!-- Opciones de Entrega -->
+      <div class="cs-delivery-options bs-card bs-mb-3">
+        <div class="cs-delivery-options__body bs-card-body">
+          <h6 class="cs-delivery-options__title bs-card-title bs-mb-3">Método de entrega:</h6>
+          <div class="cs-delivery-options__btn-group bs-btn-group bs-w-100" role="group">
+            <input type="radio" class="cs-delivery-options__radio bs-btn-check" name="deliveryType" id="pickup" value="pickup" checked>
+            <label class="cs-delivery-options__label bs-btn bs-btn-outline-primary" for="pickup">
+              <i class="bi bi-shop bs-me-2"></i>Recoger en tienda
+            </label>
+            
+            <input type="radio" class="cs-delivery-options__radio bs-btn-check" name="deliveryType" id="delivery" value="delivery">
+            <label class="cs-delivery-options__label bs-btn bs-btn-outline-primary" for="delivery">
+              <i class="bi bi-truck bs-me-2"></i>Delivery
+            </label>
+          </div>
+
+          <!-- Opciones de Recogida -->
+          <div id="pickupOptions" class="cs-delivery-options__pickup bs-mt-3">
+            <label class="cs-delivery-options__label bs-form-label">Hora de recogida:</label>
+            <input type="time" class="cs-delivery-options__input bs-form-control" id="pickupTime" min="09:00" max="20:00" required>
+            <small class="cs-delivery-options__help bs-text-muted">Horario de atención: 9:00 AM - 8:00 PM</small>
+          </div>
+
+          <!-- Opciones de Delivery -->
+          <div id="deliveryOptions" class="cs-delivery-options__delivery bs-mt-3" style="display: none;">
+            <div class="bs-mb-3">
+              <label class="cs-delivery-options__label bs-form-label">Dirección de entrega:</label>
+              <input type="text" class="cs-delivery-options__input bs-form-control" id="deliveryAddress" 
+                     placeholder="Ej: Tehuacan 247, Agua Marina 118"
+                     maxlength="200">
+              <div class="cs-delivery-options__help bs-form-text">Solo entregas en San Luis Potosí</div>
+            </div>
+            <div class="bs-mb-3">
+              <label class="cs-delivery-options__label bs-form-label">Referencias:</label>
+              <input type="text" class="cs-delivery-options__input bs-form-control" id="deliveryReferences" 
+                     placeholder="Ej: Casa blanca, portón negro"
+                     maxlength="200">
+            </div>
+            <div class="cs-delivery-options__fee bs-alert bs-alert-info">
+              <i class="bi bi-info-circle bs-me-2"></i>
+              Costo de envío: $50.00 MXN
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Resumen del Carrito -->
+      <div class="cs-cart-summary bs-card">
+        <div class="cs-cart-summary__body bs-card-body">
+          <div class="bs-d-flex bs-justify-content-between bs-mb-2">
+            <span class="cs-cart-summary__label">Subtotal:</span>
+            <span class="cs-cart-summary__value" id="cartSubtotal">$0.00</span>
+          </div>
+          <div class="bs-d-flex bs-justify-content-between bs-mb-2">
+            <span class="cs-cart-summary__label">Envío:</span>
+            <span class="cs-cart-summary__value" id="deliveryFee">$0.00</span>
+          </div>
+          <div class="bs-d-flex bs-justify-content-between bs-mb-3">
+            <span class="cs-cart-summary__total-label bs-fw-bold">Total:</span>
+            <span class="cs-cart-summary__total-value bs-fw-bold bs-text-primary" id="cartTotal">$0.00</span>
+          </div>
+          <div class="bs-d-grid bs-gap-2">
+            <button class="cs-cart-summary__checkout-btn bs-btn bs-btn-primary" id="checkoutBtn">
+              <i class="bi bi-bag-check bs-me-2"></i>Proceder al Pago
+            </button>
+            <button class="cs-cart-summary__clear-btn bs-btn bs-btn-outline-danger" id="clearCartBtn">
+              <i class="bi bi-trash bs-me-2"></i>Vaciar Carrito
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

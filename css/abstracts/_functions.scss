@@ -1,0 +1,16 @@
+// Funciones SCSS personalizadas
+@function spacing($multiplier: 1) {
+    @return $spacer * $multiplier;
+  }
+  
+  @function color-level($color, $level: 0) {
+    $base: $color;
+    
+    @if $level > 0 {
+      @return lighten($base, $level * 8%);
+    } @else if $level < 0 {
+      @return darken($base, abs($level) * 8%);
+    } @else {
+      @return $base;
+    }
+  }

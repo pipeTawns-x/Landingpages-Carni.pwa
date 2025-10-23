@@ -1,4 +1,4 @@
-import { supabase } from './app.js';
+import { supabase } from '../app.js';
 
 // Configurar formulario de login de administrador
 document.addEventListener('DOMContentLoaded', () => {
