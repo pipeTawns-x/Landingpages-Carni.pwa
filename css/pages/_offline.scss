@@ -1,0 +1,262 @@
+// scss/pages/_offline.scss
+// 🎯 Estilos específicos para la página offline PWA
+
+.cs-offline-page {
+  background: linear-gradient(135deg, $body-bg 0%, darken($body-bg, 5%) 100%);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cs-offline-container {
+  @include flex-center;
+  flex-direction: column;
+  text-align: center;
+  padding: map-get($spacers, 5);
+  max-width: 1200px;
+  margin: 0 auto;
+  
+  @include media-breakpoint-down(md) {
+    padding: map-get($spacers, 4);
+  }
+  
+  @include media-breakpoint-down(sm) {
+    padding: map-get($spacers, 3);
+  }
+}
+
+.cs-offline-icon {
+  margin-bottom: map-get($spacers, 5);
+  
+  &__symbol {
+    font-size: 5rem;
+    color: $primary-color;
+    
+    @include media-breakpoint-down(md) {
+      font-size: 4rem;
+    }
+    
+    @include media-breakpoint-down(sm) {
+      font-size: 3rem;
+    }
+  }
+}
+
+.cs-offline-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: $color-text;
+  margin-bottom: map-get($spacers, 4);
+  line-height: 1.2;
+  
+  @include media-breakpoint-down(md) {
+    font-size: 2rem;
+  }
+  
+  @include media-breakpoint-down(sm) {
+    font-size: 1.75rem;
+  }
+}
+
+.cs-offline-message {
+  font-size: 1.2rem;
+  color: $color-text-light;
+  margin-bottom: map-get($spacers, 5);
+  max-width: 600px;
+  line-height: 1.6;
+  
+  @include media-breakpoint-down(md) {
+    font-size: 1.1rem;
+  }
+  
+  @include media-breakpoint-down(sm) {
+    font-size: 1rem;
+  }
+}
+
+.cs-offline-retry-btn {
+  margin-bottom: map-get($spacers, 5);
+  @include transition(all, 0.3s, ease);
+  
+  &:hover {
+    transform: translateY(-2px);
+    @include box-shadow(2);
+  }
+  
+  &__icon {
+    font-size: 1.1rem;
+  }
+}
+
+.cs-offline-features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: map-get($spacers, 4);
+  width: 100%;
+  max-width: 1200px;
+  margin-bottom: map-get($spacers, 5);
+  
+  @include media-breakpoint-down(sm) {
+    grid-template-columns: 1fr;
+    gap: map-get($spacers, 3);
+  }
+}
+
+.cs-offline-feature {
+  @include transition(all, 0.3s, ease);
+  border: 1px solid $color-border;
+  
+  &:hover {
+    transform: translateY(-5px);
+    @include box-shadow(3);
+  }
+  
+  &__body {
+    padding: map-get($spacers, 4);
+    
+    @include media-breakpoint-down(md) {
+      padding: map-get($spacers, 3);
+    }
+  }
+  
+  &__icon {
+    display: block;
+    margin: 0 auto map-get($spacers, 3);
+  }
+  
+  &__title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: $color-text;
+    margin-bottom: map-get($spacers, 3);
+  }
+  
+  &__description {
+    color: $color-text-light;
+    line-height: 1.6;
+    margin-bottom: 0;
+  }
+}
+
+.cs-offline-info {
+  max-width: 800px;
+  width: 100%;
+  
+  &__content {
+    padding: map-get($spacers, 3);
+  }
+  
+  &__icon {
+    flex-shrink: 0;
+  }
+  
+  &__title {
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+  
+  &__text {
+    line-height: 1.5;
+  }
+}
+
+// Animaciones para la página offline
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.cs-offline-container > * {
+  animation: fadeInUp 0.6s ease forwards;
+  
+  &:nth-child(1) { animation-delay: 0.1s; }
+  &:nth-child(2) { animation-delay: 0.2s; }
+  &:nth-child(3) { animation-delay: 0.3s; }
+  &:nth-child(4) { animation-delay: 0.4s; }
+  &:nth-child(5) { animation-delay: 0.5s; }
+  &:nth-child(6) { animation-delay: 0.6s; }
+}
+
+// Estados de carga offline
+.cs-offline-loading {
+  .cs-offline-icon__symbol {
+    animation: pulse 2s infinite;
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+// Responsive adicional
+@media (max-width: 480px) {
+  .cs-offline-container {
+    padding: map-get($spacers, 2);
+  }
+  
+  .cs-offline-title {
+    font-size: 1.5rem;
+  }
+  
+  .cs-offline-message {
+    font-size: 0.95rem;
+  }
+  
+  .cs-offline-feature {
+    &__body {
+      padding: map-get($spacers, 2);
+    }
+    
+    &__title {
+      font-size: 1.1rem;
+    }
+    
+    &__description {
+      font-size: 0.9rem;
+    }
+  }
+}
+
+// Modo de alto contraste
+@media (prefers-contrast: high) {
+  .cs-offline-feature {
+    border: 2px solid $color-text;
+  }
+  
+  .cs-offline-info {
+    border: 2px solid $color-info;
+  }
+}
+
+// Reducción de movimiento
+@media (prefers-reduced-motion: reduce) {
+  .cs-offline-container > * {
+    animation: none;
+  }
+  
+  .cs-offline-feature:hover {
+    transform: none;
+  }
+  
+  .cs-offline-retry-btn:hover {
+    transform: none;
+  }
+}

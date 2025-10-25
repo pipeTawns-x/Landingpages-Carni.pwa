@@ -1,137 +1,173 @@
 <!DOCTYPE html>
-<html lang="es">
-
+<html lang="es" data-bs-theme="dark">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="bg-dark" content="#363432" />
-  <title>Ingresar - Carnicería El Señor de La Misericordia</title>
-  <meta name="description" content="Inicia sesión en tu cuenta de Carnicería El Señor de La Misericordia">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#d32f2f">
+  <title>Iniciar Sesión - Carnicería El Señor de La Misericordia</title>
+  <meta name="description" content="Accede a tu cuenta de cliente">
   
-  <link rel="manifest" href="manifest.json">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
+  <link rel="manifest" href="../manifest.json">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-  <link rel="stylesheet" href="css/main.css">
-  <link rel="icon" href="img/logo-user.png" type="image/png">
-  <link rel="apple-touch-icon" href="img/logo-user.png">
+  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="icon" href="../img/logo-user.png" type="image/png">
+  <link rel="apple-touch-icon" href="../img/logo-user.png">
 </head>
 
-<body class="login-page">
-  <div class="offline-alert alert alert-warning d-none" role="alert">
+<body class="cs-auth-layout">
+  <!-- Alerta Offline -->
+  <div class="cs-offline-alert alert alert-warning d-none" role="alert">
     <i class="bi bi-wifi-off me-2"></i> Estás en modo offline. Algunas funciones pueden estar limitadas.
   </div>
-  
-  <!-- Mini Header -->
-  <div class="mini-header py-2 text-center text-black">
-    <div class="container">
-      <p class="mb-0"><i class="bi bi-bag-heart"></i>Forma parte de nuestra familia y disfruta cortes de calidad, atención personalizada y beneficios exclusivos.<i class="bi bi-bag-heart"></i></p>
-    </div>
-  </div>
 
-  <!-- Main Header -->
-  <header class="main-header bg-dark text-white py-3">
-    <div class="container">
-      <div class="d-flex justify-content-between align-items-center">
-        <a class="navbar-brand fs-4 text-white" href="index.html">
-          <img src="img/logo-user.png" alt="Logo" class="me-2" style="height: 40px;">
+  <!-- Header de Autenticación -->
+  <header class="cs-auth-header bs-bg-dark bs-text-white bs-py-3">
+    <div class="bs-container">
+      <div class="bs-d-flex bs-justify-content-between bs-align-items-center">
+        <a class="cs-auth-header__brand bs-navbar-brand bs-fs-4 bs-text-white" href="../index.html">
+          <img src="../img/logo-user.png" alt="Logo Carnicería" class="cs-auth-header__logo bs-me-2">
           Carnicería El Señor de La Misericordia
         </a>
-        <div class="header-icons d-flex align-items-center">
-          <a href="login.html" class="btn icon-btn me-2">
-            <i class="bi bi-person-heart"></i>
-          </a>
+        <div class="cs-auth-header__badge bs-badge bs-bg-primary">
+          <i class="bi bi-person-circle bs-me-1"></i>Área de Clientes
         </div>
       </div>
     </div>
   </header>
 
-  <!-- Main Content -->
-  <main class="login-main">
-    <div class="container">
-      <div class="row justify-content-center">
-        <div class="col-lg-6 col-md-8 col-10">
-          <div class="login-card p-4 p-md-5">
-            <div class="text-center mb-4">
-              <img src="img/logo-user.png" alt="Logo" class="mb-3" style="height: 80px;">
-              <h2 class="mt-3">INICIAR SESIÓN</h2>
-              <p class="text-muted">Accede a tu cuenta para disfrutar de beneficios exclusivos</p>
-              
-              <!-- Admin Login Alert -->
-              <div id="adminLoginAlert" class="alert alert-warning mt-3 d-none">
-                <i class="bi bi-shield-lock me-2"></i> Estás accediendo al panel administrativo
-              </div>
+  <!-- Contenido Principal -->
+  <main class="cs-auth-main">
+    <div class="bs-container">
+      <div class="bs-row bs-justify-content-center">
+        <div class="bs-col-lg-5 bs-col-md-7">
+          <div class="cs-auth-card bs-card bs-border-0">
+            <div class="cs-auth-card__header bs-card-header bs-bg-primary bs-text-white bs-text-center bs-py-4">
+              <i class="cs-auth-card__icon bi bi-person-circle bs-fs-1 bs-mb-3"></i>
+              <h1 class="cs-auth-card__title bs-card-title bs-h4 bs-mb-0">Iniciar Sesión</h1>
+              <p class="cs-auth-card__subtitle bs-opacity-75 bs-mb-0">Accede a tu cuenta personal</p>
             </div>
             
-            <form class="login-form" id="loginForm">
-              <!-- Email Input -->
-              <div class="mb-3">
-                <label for="email" class="form-label">Correo electrónico</label>
-                <div class="input-group">
-                  <span class="input-group-text"><i class="bi bi-envelope-fill"></i></span>
-                  <input type="email" class="form-control" id="loginEmail" placeholder="tucorreo@ejemplo.com" required>
+            <div class="cs-auth-card__body bs-card-body bs-p-4 bs-p-md-5">
+              <!-- Beneficios para Clientes -->
+              <div class="cs-auth-benefits bs-mb-4">
+                <div class="cs-auth-benefit bs-alert bs-alert-info">
+                  <i class="bi bi-stars bs-me-2"></i>
+                  <strong>Beneficios exclusivos:</strong> Accede a tu programa de fidelidad, historial de pedidos y ofertas personalizadas.
                 </div>
               </div>
-              
-              <!-- Password Input -->
-              <div class="mb-3">
-                <label for="password" class="form-label">Contraseña</label>
-                <div class="input-group">
-                  <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
-                  <input type="password" class="form-control" id="loginPassword" placeholder="Ingresa tu contraseña" required>
-                </div>
-                <div class="text-end mt-2">
-                  <a href="#" class="text-primary small">¿Olvidaste tu contraseña?</a>
-                </div>
-              </div>
-              
-              <!-- Remember Me & Submit -->
-              <div class="d-flex justify-content-between align-items-center mb-4">
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" id="remember">
-                  <label class="form-check-label" for="remember">Recordar sesión</label>
-                </div>
-                <button type="submit" class="btn btn-primary px-4">
-                  <i class="bi bi-box-arrow-in-right me-2"></i>Ingresar
-                </button>
-              </div>
-              
-              <!-- Social Login -->
-              <div class="text-center mb-4">
-                <p class="text-muted mb-3">O ingresa con</p>
-                <div class="d-flex justify-content-center gap-3">
-                  <button type="button" class="btn btn-outline-primary btn-sm" id="googleLogin">
-                    <i class="bi bi-google"></i> Google
-                  </button>
-                  <button type="button" class="btn btn-outline-primary btn-sm" id="facebookLogin">
-                    <i class="bi bi-facebook"></i> Facebook
-                  </button>
-                </div>
-              </div>
-              
-              <!-- Register Link -->
-              <div class="text-center mt-4 pt-3 border-top">
-                <p>¿No tienes una cuenta? <a href="register.html" class="text-primary fw-bold">Regístrate aquí</a></p>
-                <p class="mt-2">¿Eres administrador? <a href="login.html?admin=true" class="text-warning fw-bold">Acceso administrativo</a></p>
-              </div>
-            </form>
 
-            <!-- Footer -->
-            <div class="login-footer text-center mt-4 pt-3">
-              <div class="contact-info mb-3">
-                <h6 class="fw-bold">LLÁMANOS</h6>
-                <p class="mb-0">444 271 5470</p>
+              <form class="cs-auth-form" id="userLoginForm" novalidate>
+                <!-- Campo Email -->
+                <div class="cs-auth-field bs-mb-3">
+                  <label for="userEmail" class="cs-auth-field__label bs-form-label">
+                    <i class="bi bi-envelope-fill bs-me-2"></i>Correo Electrónico
+                  </label>
+                  <input type="email" 
+                         class="cs-auth-field__input bs-form-control" 
+                         id="userEmail" 
+                         placeholder="tucorreo@ejemplo.com"
+                         pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
+                         maxlength="100"
+                         required>
+                  <div class="cs-auth-field__invalid-feedback bs-invalid-feedback">
+                    Por favor ingresa un correo electrónico válido.
+                  </div>
+                </div>
+
+                <!-- Campo Contraseña -->
+                <div class="cs-auth-field bs-mb-4">
+                  <label for="userPassword" class="cs-auth-field__label bs-form-label">
+                    <i class="bi bi-lock-fill bs-me-2"></i>Contraseña
+                  </label>
+                  <input type="password" 
+                         class="cs-auth-field__input bs-form-control" 
+                         id="userPassword" 
+                         placeholder="Ingresa tu contraseña"
+                         minlength="8"
+                         maxlength="128"
+                         pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$"
+                         required>
+                  <div class="cs-auth-field__invalid-feedback bs-invalid-feedback">
+                    La contraseña debe tener al menos 8 caracteres, incluyendo mayúsculas, minúsculas y números.
+                  </div>
+                  <div class="cs-auth-field__help bs-form-text bs-text-end">
+                    <a href="#" class="cs-auth-forgot bs-text-primary bs-text-decoration-none">
+                      ¿Olvidaste tu contraseña?
+                    </a>
+                  </div>
+                </div>
+
+                <!-- Opciones de Recordatorio -->
+                <div class="cs-auth-options bs-d-flex bs-justify-content-between bs-align-items-center bs-mb-4">
+                  <div class="cs-auth-remember bs-form-check">
+                    <input class="cs-auth-remember__input bs-form-check-input" type="checkbox" id="userRemember">
+                    <label class="cs-auth-remember__label bs-form-check-label" for="userRemember">
+                      Recordar sesión
+                    </label>
+                  </div>
+                </div>
+
+                <!-- Botón de Envío -->
+                <div class="cs-auth-submit bs-d-grid">
+                  <button type="submit" class="cs-auth-submit__btn bs-btn bs-btn-primary bs-btn-lg">
+                    <i class="bi bi-box-arrow-in-right bs-me-2"></i>
+                    Iniciar Sesión
+                  </button>
+                </div>
+
+                <!-- Login Social -->
+                <div class="cs-auth-social bs-mt-4 bs-pt-3 bs-border-top">
+                  <p class="cs-auth-social__text bs-text-center bs-text-muted bs-mb-3">O inicia sesión con</p>
+                  <div class="cs-auth-social__buttons bs-d-flex bs-justify-content-center bs-gap-3">
+                    <button type="button" class="cs-auth-social__btn bs-btn bs-btn-outline-primary">
+                      <i class="bi bi-google bs-me-2"></i>Google
+                    </button>
+                    <button type="button" class="cs-auth-social__btn bs-btn bs-btn-outline-primary">
+                      <i class="bi bi-facebook bs-me-2"></i>Facebook
+                    </button>
+                  </div>
+                </div>
+              </form>
+
+              <!-- Enlaces de Navegación -->
+              <div class="cs-auth-links bs-text-center bs-mt-4 bs-pt-3 bs-border-top">
+                <p class="cs-auth-links__text bs-mb-2">
+                  ¿No tienes cuenta? 
+                  <a href="register.html" class="cs-auth-links__link bs-text-primary bs-text-decoration-none">
+                    Regístrate aquí
+                  </a>
+                </p>
+                <p class="cs-auth-links__text bs-mb-0">
+                  ¿Eres administrador? 
+                  <a href="../admin/login.html" class="cs-auth-links__link bs-text-warning bs-text-decoration-none">
+                    Acceso administrativo
+                  </a>
+                </p>
               </div>
-              
-              <div class="social-links mb-3">
-                <h6 class="fw-bold">SÍGUENOS</h6>
-                <div class="social-icons">
-                  <a href="#" class="text-dark me-3"><i class="bi bi-facebook fs-5"></i></a>
-                  <a href="#" class="text-dark me-3"><i class="bi bi-instagram fs-5"></i></a>
-                  <a href="#" class="text-dark"><i class="bi bi-whatsapp fs-5"></i></a>
+            </div>
+          </div>
+
+          <!-- Información de Contacto -->
+          <div class="cs-auth-contact bs-mt-4">
+            <div class="cs-auth-contact__content bs-card">
+              <div class="cs-auth-contact__body bs-card-body bs-text-center">
+                <h6 class="cs-auth-contact__title bs-card-title bs-mb-3">¿Necesitas ayuda?</h6>
+                <div class="cs-auth-contact__methods bs-d-flex bs-justify-content-center bs-gap-4">
+                  <a href="tel:+524442715470" class="cs-auth-contact__method bs-text-decoration-none">
+                    <i class="bi bi-telephone bs-fs-4 bs-text-primary bs-d-block bs-mb-1"></i>
+                    <small class="cs-auth-contact__text bs-text-muted">Llamar</small>
+                  </a>
+                  <a href="https://wa.me/524442715470" class="cs-auth-contact__method bs-text-decoration-none" target="_blank">
+                    <i class="bi bi-whatsapp bs-fs-4 bs-text-success bs-d-block bs-mb-1"></i>
+                    <small class="cs-auth-contact__text bs-text-muted">WhatsApp</small>
+                  </a>
+                  <a href="mailto:soporte@carniceriasenormisericordia.com" class="cs-auth-contact__method bs-text-decoration-none">
+                    <i class="bi bi-envelope bs-fs-4 bs-text-info bs-d-block bs-mb-1"></i>
+                    <small class="cs-auth-contact__text bs-text-muted">Email</small>
+                  </a>
                 </div>
               </div>
-              
-              <p class="copyright small mt-3">© 2025, Carnicería El Señor de La Misericordia</p>
             </div>
           </div>
         </div>
@@ -139,66 +175,38 @@
     </div>
   </main>
 
-  <!-- Main Footer -->
-  <footer class="main-footer bg-dark text-white py-3 mt-auto">
-    <div class="container">
-      <div class="row">
-        <div class="col-md-6">
-          <p class="mb-0">&copy; 2025 Carnicería El Señor de La Misericordia</p>
+  <!-- Footer de Autenticación -->
+  <footer class="cs-auth-footer bs-bg-dark bs-text-white bs-py-4 bs-mt-5">
+    <div class="bs-container">
+      <div class="bs-row">
+        <div class="bs-col-md-6">
+          <p class="cs-auth-footer__copyright bs-mb-0">
+            &copy; 2025 Carnicería El Señor de La Misericordia
+          </p>
         </div>
-        <div class="col-md-6 text-md-end">
-          <ul class="list-inline mb-0">
-            <li class="list-inline-item"><a href="index.html" class="text-white text-decoration-none">Inicio</a></li>
-            <li class="list-inline-item"><a href="#productos" class="text-white text-decoration-none">Productos</a></li>
-            <li class="list-inline-item"><a href="#ubicacion" class="text-white text-decoration-none">Ubicación</a></li>
-            <li class="list-inline-item"><a href="#contacto" class="text-white text-decoration-none">Contacto</a></li>
+        <div class="bs-col-md-6 bs-text-md-end">
+          <ul class="cs-auth-footer__links bs-list-inline bs-mb-0">
+            <li class="cs-auth-footer__link-item bs-list-inline-item">
+              <a href="../index.html" class="cs-auth-footer__link bs-text-white bs-text-decoration-none">
+                Inicio
+              </a>
+            </li>
+            <li class="cs-auth-footer__link-item bs-list-inline-item">
+              <a href="../products.html" class="cs-auth-footer__link bs-text-white bs-text-decoration-none">
+                Productos
+              </a>
+            </li>
+            <li class="cs-auth-footer__link-item bs-list-inline-item">
+              <a href="register.html" class="cs-auth-footer__link bs-text-white bs-text-decoration-none">
+                Registrarse
+              </a>
+            </li>
           </ul>
         </div>
       </div>
     </div>
   </footer>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/auth.js" type="module"></script>
-  <script src="js/service-worker.js"></script>
-  
-  <script>
-    // Verificar si es acceso administrativo
-    const urlParams = new URLSearchParams(window.location.search);
-    const isAdminLogin = urlParams.get('admin') === 'true';
-    
-    if (isAdminLogin) {
-      document.getElementById('adminLoginAlert').classList.remove('d-none');
-      document.title = "Acceso Administrativo - Carnicería";
-    }
-    
-    // Registrar Service Worker
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/js/service-worker.js')
-          .then(registration => {
-            console.log('ServiceWorker registration successful');
-          })
-          .catch(err => {
-            console.log('ServiceWorker registration failed: ', err);
-          });
-      });
-    }
-    
-    // Detectar conexión
-    function updateOnlineStatus() {
-      const offlineAlert = document.querySelector('.offline-alert');
-      if (navigator.onLine) {
-        offlineAlert.classList.add('d-none');
-      } else {
-        offlineAlert.classList.remove('d-none');
-      }
-    }
-    
-    window.addEventListener('online', updateOnlineStatus);
-    window.addEventListener('offline', updateOnlineStatus);
-    updateOnlineStatus();
-  </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

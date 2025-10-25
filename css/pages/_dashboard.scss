@@ -1,4 +1,79 @@
-// Dashboard styles (additional styles if needed)
+// scss/pages/_dashboard.scss
+
+// Dashboard specific styles
+.admin-dashboard {
+  background-color: #f8f9fa;
+  
+  .admin-sidebar {
+    width: 250px;
+    min-height: 100vh;
+    @include transition(all);
+    background-color: $primary-color;
+    color: $color-white;
+    
+    .sidebar-header {
+      border-bottom: 1px solid rgba($color-white, 0.1);
+      padding: map-get($spacers, 3) map-get($spacers, 4);
+    }
+    
+    .nav-link {
+      color: rgba($color-white, 0.8);
+      padding: map-get($spacers, 2) map-get($spacers, 3);
+      @include transition(all);
+      border-left: 3px solid transparent;
+      
+      &:hover, &.active {
+        color: $color-white;
+        background-color: rgba($color-white, 0.1);
+        border-left-color: $color-white;
+      }
+      
+      i {
+        width: 20px;
+        text-align: center;
+        margin-right: map-get($spacers, 2);
+      }
+    }
+  }
+  
+  .admin-content {
+    @include transition(all);
+    flex: 1;
+    
+    .admin-navbar {
+      box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+      background-color: $color-white;
+      padding: map-get($spacers, 2) map-get($spacers, 3);
+    }
+    
+    .card {
+      border: none;
+      @include box-shadow(1);
+      @include transition(all);
+      
+      &:hover {
+        @include box-shadow(2);
+      }
+      
+      .card-header {
+        background-color: #f8f9fc;
+        border-bottom: 1px solid #e3e6f0;
+        padding: map-get($spacers, 3) map-get($spacers, 4);
+        
+        h5 {
+          margin-bottom: 0;
+          color: $primary-color;
+        }
+      }
+      
+      .card-body {
+        padding: map-get($spacers, 4);
+      }
+    }
+  }
+}
+
+// Border utilities for dashboard cards
 .border-left-primary {
   border-left: 0.25rem solid #4e73df !important;
 }
@@ -15,6 +90,48 @@
   border-left: 0.25rem solid #f6c23e !important;
 }
 
+// Admin login specific styles
+.admin-login-brand {
+  color: #1a237e;
+  font-weight: 700;
+  font-size: 1.5rem;
+}
+
+.admin-login-card {
+  border-top: 4px solid #1a237e;
+  @include box-shadow(3);
+}
+
+.admin-login-btn {
+  background-color: #1a237e;
+  border-color: #1a237e;
+  padding: 0.75rem 1.5rem;
+  font-weight: 500;
+  
+  &:hover {
+    background-color: #303f9f;
+    border-color: #303f9f;
+  }
+}
+
+.admin-navbar {
+  background-color: #1a237e !important;
+}
+
+.admin-sidebar {
+  .nav-link {
+    &.active {
+      background-color: rgba(26, 35, 126, 0.2);
+      border-left: 3px solid #1a237e;
+    }
+    
+    &:hover {
+      background-color: rgba(26, 35, 126, 0.1);
+    }
+  }
+}
+
+// Stats cards for dashboard
 .stats-card {
   .card-body {
     display: flex;
@@ -58,6 +175,269 @@
       .stats-content {
         .stats-value {
           font-size: 1.25rem;
+        }
+      }
+    }
+  }
+}
+
+// Dashboard metrics grid
+.cs-dashboard-metrics {
+  .cs-dashboard-metric {
+    .card-body {
+      display: flex;
+      align-items: center;
+      
+      .cs-dashboard-metric__icon {
+        margin-right: map-get($spacers, 3);
+        
+        i {
+          font-size: 2.5rem;
+          opacity: 0.7;
+        }
+      }
+      
+      .cs-dashboard-metric__content {
+        flex: 1;
+        
+        .cs-dashboard-metric__value {
+          font-size: 1.75rem;
+          font-weight: 700;
+          margin-bottom: 0.25rem;
+        }
+        
+        .cs-dashboard-metric__label {
+          color: $color-text-light;
+          text-transform: uppercase;
+          font-size: 0.8rem;
+          letter-spacing: 0.5px;
+          margin-bottom: 0.5rem;
+        }
+        
+        .cs-dashboard-metric__change {
+          font-size: 0.8rem;
+          font-weight: 600;
+          
+          i {
+            margin-right: map-get($spacers, 1);
+          }
+        }
+      }
+    }
+  }
+}
+
+// Top products list
+.cs-dashboard-top-products {
+  .cs-dashboard-top-products__list {
+    .cs-dashboard-top-products__item {
+      display: flex;
+      align-items: center;
+      padding: map-get($spacers, 2) 0;
+      border-bottom: 1px solid $color-border;
+      
+      &:last-child {
+        border-bottom: none;
+      }
+      
+      .cs-dashboard-top-products__rank {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.8rem;
+        font-weight: 700;
+        margin-right: map-get($spacers, 3);
+      }
+      
+      .cs-dashboard-top-products__info {
+        flex: 1;
+        
+        .cs-dashboard-top-products__name {
+          font-weight: 600;
+          margin-bottom: map-get($spacers, 1);
+          font-size: 0.9rem;
+        }
+        
+        .cs-dashboard-top-products__sales {
+          font-size: 0.8rem;
+          color: $color-text-light;
+        }
+      }
+      
+      .cs-dashboard-top-products__revenue {
+        font-weight: 700;
+        font-size: 0.9rem;
+        color: $color-success;
+      }
+    }
+  }
+}
+
+// Stock alerts table
+.cs-dashboard-stock-alerts {
+  .table {
+    margin-bottom: 0;
+    
+    thead {
+      th {
+        border-bottom: none;
+        font-weight: 600;
+        font-size: 0.875rem;
+        padding: map-get($spacers, 3) map-get($spacers, 4);
+      }
+    }
+    
+    tbody {
+      tr {
+        td {
+          padding: map-get($spacers, 3) map-get($spacers, 4);
+          vertical-align: middle;
+          border-bottom: 1px solid $color-border;
+        }
+        
+        &:last-child {
+          td {
+            border-bottom: none;
+          }
+        }
+      }
+    }
+  }
+  
+  .cs-dashboard-stock-alerts__status {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+  }
+  
+  .cs-dashboard-stock-alerts__action {
+    font-size: 0.8rem;
+    padding: 0.25rem 0.75rem;
+  }
+}
+
+// Responsive dashboard styles
+@include media-breakpoint-down(lg) {
+  .admin-dashboard {
+    .admin-sidebar {
+      width: 220px;
+    }
+    
+    .admin-content {
+      margin-left: 220px;
+    }
+  }
+}
+
+@include media-breakpoint-down(md) {
+  .admin-dashboard {
+    .admin-sidebar {
+      width: 70px;
+      overflow: hidden;
+      
+      .sidebar-header {
+        padding: map-get($spacers, 2);
+      }
+      
+      .nav-link {
+        padding: map-get($spacers, 3);
+        justify-content: center;
+        
+        i {
+          margin-right: 0;
+          font-size: 1.25rem;
+        }
+        
+        span {
+          display: none;
+        }
+      }
+    }
+    
+    .admin-content {
+      margin-left: 70px;
+    }
+  }
+  
+  .cs-dashboard-metrics {
+    .cs-dashboard-metric {
+      .card-body {
+        .cs-dashboard-metric__icon {
+          i {
+            font-size: 2rem;
+          }
+        }
+        
+        .cs-dashboard-metric__content {
+          .cs-dashboard-metric__value {
+            font-size: 1.5rem;
+          }
+        }
+      }
+    }
+  }
+}
+
+@include media-breakpoint-down(sm) {
+  .admin-dashboard {
+    .admin-sidebar {
+      width: 0;
+      
+      &.show {
+        width: 250px;
+      }
+    }
+    
+    .admin-content {
+      margin-left: 0;
+    }
+  }
+  
+  .cs-dashboard-metrics {
+    .cs-dashboard-metric {
+      .card-body {
+        padding: map-get($spacers, 2);
+        
+        .cs-dashboard-metric__icon {
+          margin-right: map-get($spacers, 2);
+          
+          i {
+            font-size: 1.5rem;
+          }
+        }
+        
+        .cs-dashboard-metric__content {
+          .cs-dashboard-metric__value {
+            font-size: 1.25rem;
+          }
+          
+          .cs-dashboard-metric__label {
+            font-size: 0.75rem;
+          }
+        }
+      }
+    }
+  }
+  
+  .cs-dashboard-top-products {
+    .cs-dashboard-top-products__list {
+      .cs-dashboard-top-products__item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: map-get($spacers, 2);
+        
+        .cs-dashboard-top-products__rank {
+          margin-right: 0;
+        }
+        
+        .cs-dashboard-top-products__info {
+          width: 100%;
+        }
+        
+        .cs-dashboard-top-products__revenue {
+          align-self: flex-end;
         }
       }
     }

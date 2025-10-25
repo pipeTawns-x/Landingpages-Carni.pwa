@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="es" data-bs-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#d32f2f">
+  <title>Dashboard - Carnicería El Señor de La Misericordia</title>
+  <meta name="description" content="Panel de control administrativo - Monitoreo y gestión">
+  
+  <link rel="manifest" href="../manifest.json">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="icon" href="../img/logo-user.png" type="image/png">
+  <link rel="apple-touch-icon" href="../img/logo-user.png">
+</head>
+
+<body class="cs-dashboard-layout">
+  <!-- Alerta Offline -->
+  <div class="cs-offline-alert alert alert-warning d-none" role="alert">
+    <i class="bi bi-wifi-off me-2"></i> Estás en modo offline. Algunas funciones pueden estar limitadas.
+  </div>
+
+  <!-- Sidebar de Navegación -->
+  <nav class="cs-dashboard-sidebar bs-bg-dark bs-text-white">
+    <div class="cs-dashboard-sidebar__header bs-p-3 bs-border-bottom bs-border-secondary">
+      <div class="cs-dashboard-sidebar__brand bs-d-flex bs-align-items-center">
+        <img src="../img/logo-user.png" alt="Logo" class="cs-dashboard-sidebar__logo bs-me-2" style="height: 40px;">
+        <div>
+          <h5 class="cs-dashboard-sidebar__title bs-mb-0">Carnicería</h5>
+          <small class="cs-dashboard-sidebar__subtitle bs-text-muted">Panel Administrativo</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="cs-dashboard-sidebar__nav bs-p-3">
+      <ul class="cs-dashboard-sidebar__list bs-nav bs-flex-column">
+        <li class="cs-dashboard-sidebar__item bs-nav-item">
+          <a class="cs-dashboard-sidebar__link bs-nav-link bs-active" href="#">
+            <i class="bi bi-speedometer2 bs-me-2"></i>Dashboard
+          </a>
+        </li>
+        <li class="cs-dashboard-sidebar__item bs-nav-item">
+          <a class="cs-dashboard-sidebar__link bs-nav-link" href="#">
+            <i class="bi bi-cart bs-me-2"></i>Pedidos
+            <span class="cs-dashboard-sidebar__badge bs-badge bs-bg-primary bs-ms-auto">12</span>
+          </a>
+        </li>
+        <li class="cs-dashboard-sidebar__item bs-nav-item">
+          <a class="cs-dashboard-sidebar__link bs-nav-link" href="#">
+            <i class="bi bi-box-seam bs-me-2"></i>Inventario
+            <span class="cs-dashboard-sidebar__badge bs-badge bs-bg-warning bs-text-dark bs-ms-auto">3</span>
+          </a>
+        </li>
+        <li class="cs-dashboard-sidebar__item bs-nav-item">
+          <a class="cs-dashboard-sidebar__link bs-nav-link" href="#">
+            <i class="bi bi-people bs-me-2"></i>Clientes
+          </a>
+        </li>
+        <li class="cs-dashboard-sidebar__item bs-nav-item">
+          <a class="cs-dashboard-sidebar__link bs-nav-link" href="#">
+            <i class="bi bi-graph-up bs-me-2"></i>Reportes
+          </a>
+        </li>
+        <li class="cs-dashboard-sidebar__item bs-nav-item">
+          <a class="cs-dashboard-sidebar__link bs-nav-link" href="#">
+            <i class="bi bi-gear bs-me-2"></i>Configuración
+          </a>
+        </li>
+        
+        <li class="cs-dashboard-sidebar__divider bs-my-3"></li>
+        
+        <li class="cs-dashboard-sidebar__item bs-nav-item">
+          <a class="cs-dashboard-sidebar__link bs-nav-link bs-text-warning" href="../index.html">
+            <i class="bi bi-house bs-me-2"></i>Volver al Sitio
+          </a>
+        </li>
+        <li class="cs-dashboard-sidebar__item bs-nav-item">
+          <a class="cs-dashboard-sidebar__link bs-nav-link bs-text-danger" href="login.html">
+            <i class="bi bi-box-arrow-right bs-me-2"></i>Cerrar Sesión
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <div class="cs-dashboard-sidebar__footer bs-p-3 bs-border-top bs-border-secondary bs-text-center">
+      <small class="cs-dashboard-sidebar__version bs-text-muted">v2.1.0</small>
+    </div>
+  </nav>
+
+  <!-- Contenido Principal -->
+  <main class="cs-dashboard-main">
+    <!-- Header del Dashboard -->
+    <header class="cs-dashboard-header bs-bg-dark bs-text-white bs-p-3 bs-border-bottom bs-border-secondary">
+      <div class="bs-container-fluid">
+        <div class="bs-d-flex bs-justify-content-between bs-align-items-center">
+          <div class="cs-dashboard-header__title">
+            <h1 class="cs-dashboard-header__heading bs-h4 bs-mb-0">
+              <i class="bi bi-speedometer2 bs-me-2 bs-text-primary"></i>Dashboard
+            </h1>
+            <small class="cs-dashboard-header__subtitle bs-text-muted">Resumen general del negocio</small>
+          </div>
+          
+          <div class="cs-dashboard-header__actions bs-d-flex bs-align-items-center bs-gap-3">
+            <div class="cs-dashboard-header__user bs-d-flex bs-align-items-center">
+              <div class="cs-dashboard-header__user-avatar bs-me-2">
+                <i class="bi bi-person-circle bs-fs-4 bs-text-primary"></i>
+              </div>
+              <div class="cs-dashboard-header__user-info">
+                <div class="cs-dashboard-header__user-name bs-text-white">Admin Principal</div>
+                <small class="cs-dashboard-header__user-role bs-text-muted">Administrador</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Contenido del Dashboard -->
+    <div class="cs-dashboard-content bs-p-4">
+      <div class="bs-container-fluid">
+        <!-- Alertas del Sistema -->
+        <div class="cs-dashboard-alerts bs-mb-4">
+          <div class="cs-dashboard-alert bs-alert bs-alert-warning bs-d-flex bs-align-items-center">
+            <i class="bi bi-exclamation-triangle bs-fs-4 bs-me-3"></i>
+            <div>
+              <h6 class="cs-dashboard-alert__title bs-alert-heading bs-mb-1">Alertas Activas</h6>
+              <p class="cs-dashboard-alert__text bs-mb-0">
+                <strong>3 productos</strong> con stock bajo y <strong>2 pedidos</strong> pendientes de preparación.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Métricas Principales BI -->
+        <div class="cs-dashboard-metrics bs-row bs-g-4 bs-mb-4">
+          <!-- Ventas Hoy -->
+          <div class="bs-col-xl-3 bs-col-md-6">
+            <div class="cs-dashboard-metric bs-card bs-border-primary bs-h-100">
+              <div class="cs-dashboard-metric__body bs-card-body">
+                <div class="bs-d-flex bs-align-items-center">
+                  <div class="cs-dashboard-metric__icon bs-me-3">
+                    <i class="bi bi-currency-dollar bs-fs-1 bs-text-primary"></i>
+                  </div>
+                  <div class="cs-dashboard-metric__content">
+                    <h3 class="cs-dashboard-metric__value bs-text-primary bs-mb-0">$24,580</h3>
+                    <p class="cs-dashboard-metric__label bs-text-muted bs-mb-0">Ventas Hoy</p>
+                    <small class="cs-dashboard-metric__change bs-text-success">
+                      <i class="bi bi-arrow-up-right bs-me-1"></i>12.5%
+                    </small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pedidos Pendientes -->
+          <div class="bs-col-xl-3 bs-col-md-6">
+            <div class="cs-dashboard-metric bs-card bs-border-warning bs-h-100">
+              <div class="cs-dashboard-metric__body bs-card-body">
+                <div class="bs-d-flex bs-align-items-center">
+                  <div class="cs-dashboard-metric__icon bs-me-3">
+                    <i class="bi bi-cart-check bs-fs-1 bs-text-warning"></i>
+                  </div>
+                  <div class="cs-dashboard-metric__content">
+                    <h3 class="cs-dashboard-metric__value bs-text-warning bs-mb-0">18</h3>
+                    <p class="cs-dashboard-metric__label bs-text-muted bs-mb-0">Pedidos Pendientes</p>
+                    <small class="cs-dashboard-metric__change bs-text-danger">
+                      <i class="bi bi-clock-history bs-me-1"></i>Por preparar
+                    </small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Productos Stock Bajo -->
+          <div class="bs-col-xl-3 bs-col-md-6">
+            <div class="cs-dashboard-metric bs-card bs-border-danger bs-h-100">
+              <div class="cs-dashboard-metric__body bs-card-body">
+                <div class="bs-d-flex bs-align-items-center">
+                  <div class="cs-dashboard-metric__icon bs-me-3">
+                    <i class="bi bi-exclamation-triangle bs-fs-1 bs-text-danger"></i>
+                  </div>
+                  <div class="cs-dashboard-metric__content">
+                    <h3 class="cs-dashboard-metric__value bs-text-danger bs-mb-0">7</h3>
+                    <p class="cs-dashboard-metric__label bs-text-muted bs-mb-0">Stock Bajo</p>
+                    <small class="cs-dashboard-metric__change bs-text-warning">
+                      <i class="bi bi-arrow-down-right bs-me-1"></i>Requiere atención
+                    </small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Clientes Nuevos -->
+          <div class="bs-col-xl-3 bs-col-md-6">
+            <div class="cs-dashboard-metric bs-card bs-border-success bs-h-100">
+              <div class="cs-dashboard-metric__body bs-card-body">
+                <div class="bs-d-flex bs-align-items-center">
+                  <div class="cs-dashboard-metric__icon bs-me-3">
+                    <i class="bi bi-person-plus bs-fs-1 bs-text-success"></i>
+                  </div>
+                  <div class="cs-dashboard-metric__content">
+                    <h3 class="cs-dashboard-metric__value bs-text-success bs-mb-0">42</h3>
+                    <p class="cs-dashboard-metric__label bs-text-muted bs-mb-0">Clientes Nuevos</p>
+                    <small class="cs-dashboard-metric__change bs-text-success">
+                      <i class="bi bi-arrow-up-right bs-me-1"></i>Este mes
+                    </small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sección de Gráficos y Análisis BI -->
+        <div class="cs-dashboard-analytics bs-row bs-g-4 bs-mb-4">
+          <!-- Gráfico de Ventas - Chart.js Ready -->
+          <div class="bs-col-xl-8">
+            <div class="cs-dashboard-chart bs-card bs-h-100">
+              <div class="cs-dashboard-chart__header bs-card-header bs-bg-dark bs-text-white">
+                <h5 class="cs-dashboard-chart__title bs-card-title bs-mb-0">
+                  <i class="bi bi-graph-up bs-me-2"></i>Tendencia de Ventas - Últimos 7 Días
+                </h5>
+              </div>
+              <div class="cs-dashboard-chart__body bs-card-body">
+                <div class="cs-dashboard-chart__container" style="position: relative; height: 300px;">
+                  <canvas id="salesChart" class="cs-dashboard-chart__canvas"></canvas>
+                </div>
+                <div class="cs-dashboard-chart__legend bs-mt-3 bs-text-center">
+                  <small class="cs-dashboard-chart__legend-text bs-text-muted">
+                    Integración Chart.js lista - Mostrando datos simulados para desarrollo
+                  </small>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Productos Más Vendidos -->
+          <div class="bs-col-xl-4">
+            <div class="cs-dashboard-top-products bs-card bs-h-100">
+              <div class="cs-dashboard-top-products__header bs-card-header bs-bg-dark bs-text-white">
+                <h5 class="cs-dashboard-top-products__title bs-card-title bs-mb-0">
+                  <i class="bi bi-trophy bs-me-2"></i>Productos Más Vendidos
+                </h5>
+              </div>
+              <div class="cs-dashboard-top-products__body bs-card-body">
+                <div class="cs-dashboard-top-products__list">
+                  <div class="cs-dashboard-top-products__item bs-d-flex bs-align-items-center bs-mb-3">
+                    <div class="cs-dashboard-top-products__rank bs-badge bs-bg-primary bs-me-3">1</div>
+                    <div class="cs-dashboard-top-products__info bs-flex-grow-1">
+                      <h6 class="cs-dashboard-top-products__name bs-mb-0">Rib Eye Premium</h6>
+                      <small class="cs-dashboard-top-products__sales bs-text-muted">48 ventas</small>
+                    </div>
+                    <div class="cs-dashboard-top-products__revenue bs-text-success">$15,360</div>
+                  </div>
+                  
+                  <div class="cs-dashboard-top-products__item bs-d-flex bs-align-items-center bs-mb-3">
+                    <div class="cs-dashboard-top-products__rank bs-badge bs-bg-success bs-me-3">2</div>
+                    <div class="cs-dashboard-top-products__info bs-flex-grow-1">
+                      <h6 class="cs-dashboard-top-products__name bs-mb-0">Filet Mignon</h6>
+                      <small class="cs-dashboard-top-products__sales bs-text-muted">32 ventas</small>
+                    </div>
+                    <div class="cs-dashboard-top-products__revenue bs-text-success">$12,800</div>
+                  </div>
+                  
+                  <div class="cs-dashboard-top-products__item bs-d-flex bs-align-items-center bs-mb-3">
+                    <div class="cs-dashboard-top-products__rank bs-badge bs-bg-warning bs-text-dark bs-me-3">3</div>
+                    <div class="cs-dashboard-top-products__info bs-flex-grow-1">
+                      <h6 class="cs-dashboard-top-products__name bs-mb-0">Pollo Entero</h6>
+                      <small class="cs-dashboard-top-products__sales bs-text-muted">65 ventas</small>
+                    </div>
+                    <div class="cs-dashboard-top-products__revenue bs-text-success">$6,175</div>
+                  </div>
+                  
+                  <div class="cs-dashboard-top-products__item bs-d-flex bs-align-items-center">
+                    <div class="cs-dashboard-top-products__rank bs-badge bs-bg-info bs-me-3">4</div>
+                    <div class="cs-dashboard-top-products__info bs-flex-grow-1">
+                      <h6 class="cs-dashboard-top-products__name bs-mb-0">Chorizo Artesanal</h6>
+                      <small class="cs-dashboard-top-products__sales bs-text-muted">41 ventas</small>
+                    </div>
+                    <div class="cs-dashboard-top-products__revenue bs-text-success">$4,920</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Alertas de Stock Bajo -->
+        <div class="cs-dashboard-alerts-detailed bs-row bs-g-4">
+          <div class="bs-col-12">
+            <div class="cs-dashboard-stock-alerts bs-card bs-border-danger">
+              <div class="cs-dashboard-stock-alerts__header bs-card-header bs-bg-danger bs-text-white">
+                <h5 class="cs-dashboard-stock-alerts__title bs-card-title bs-mb-0">
+                  <i class="bi bi-exclamation-triangle-fill bs-me-2"></i>Alertas de Stock Crítico
+                </h5>
+              </div>
+              <div class="cs-dashboard-stock-alerts__body bs-card-body">
+                <div class="cs-dashboard-stock-alerts__table bs-table-responsive">
+                  <table class="cs-dashboard-stock-alerts__table bs-table bs-table-borderless bs-table-hover bs-align-middle">
+                    <thead class="cs-dashboard-stock-alerts__thead bs-table-dark">
+                      <tr>
+                        <th>Producto</th>
+                        <th>Categoría</th>
+                        <th>Stock Actual</th>
+                        <th>Stock Mínimo</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr class="cs-dashboard-stock-alerts__row bs-table-warning">
+                        <td>
+                          <strong>Rib Eye Premium</strong>
+                        </td>
+                        <td>Carne de Res</td>
+                        <td>8 kg</td>
+                        <td>15 kg</td>
+                        <td>
+                          <span class="cs-dashboard-stock-alerts__status bs-badge bs-bg-warning bs-text-dark">
+                            Bajo Stock
+                          </span>
+                        </td>
+                        <td>
+                          <button class="cs-dashboard-stock-alerts__action bs-btn bs-btn-sm bs-btn-outline-primary">
+                            Reabastecer
+                          </button>
+                        </td>
+                      </tr>
+                      <tr class="cs-dashboard-stock-alerts__row bs-table-danger">
+                        <td>
+                          <strong>Filet Mignon</strong>
+                        </td>
+                        <td>Carne de Res</td>
+                        <td>3 kg</td>
+                        <td>10 kg</td>
+                        <td>
+                          <span class="cs-dashboard-stock-alerts__status bs-badge bs-bg-danger">
+                            Stock Crítico
+                          </span>
+                        </td>
+                        <td>
+                          <button class="cs-dashboard-stock-alerts__action bs-btn bs-btn-sm bs-btn-danger">
+                            Urgente
+                          </button>
+                        </td>
+                      </tr>
+                      <tr class="cs-dashboard-stock-alerts__row bs-table-warning">
+                        <td>
+                          <strong>Chorizo Artesanal</strong>
+                        </td>
+                        <td>Embutidos</td>
+                        <td>12 kg</td>
+                        <td>20 kg</td>
+                        <td>
+                          <span class="cs-dashboard-stock-alerts__status bs-badge bs-bg-warning bs-text-dark">
+                            Bajo Stock
+                          </span>
+                        </td>
+                        <td>
+                          <button class="cs-dashboard-stock-alerts__action bs-btn bs-btn-sm bs-btn-outline-primary">
+                            Reabastecer
+                          </button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

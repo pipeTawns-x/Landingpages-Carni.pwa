@@ -1,142 +1,165 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-bs-theme="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sin conexión | Carnicería El Señor de La Misericordia</title>
-    <link rel="manifest" href="/manifest.json">
-    <link rel="stylesheet" href="/css/styles.css">
-    <style>
-        .offline-container {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 2rem;
-            background-color: var(--background-color);
-        }
-
-        .offline-icon {
-            font-size: 5rem;
-            margin-bottom: 2rem;
-            color: var(--primary-color);
-        }
-
-        .offline-title {
-            font-size: 2rem;
-            margin-bottom: 1rem;
-            color: var(--text-color);
-        }
-
-        .offline-message {
-            font-size: 1.2rem;
-            margin-bottom: 2rem;
-            color: var(--text-color);
-            max-width: 600px;
-        }
-
-        .retry-button {
-            padding: 1rem 2rem;
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: var(--border-radius);
-            cursor: pointer;
-            transition: var(--transition);
-            font-size: 1.1rem;
-        }
-
-        .retry-button:hover {
-            background-color: #a01830;
-            transform: translateY(-2px);
-        }
-
-        .offline-features {
-            margin-top: 3rem;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-            width: 100%;
-            max-width: 1200px;
-        }
-
-        .offline-feature {
-            background-color: white;
-            padding: 1.5rem;
-            border-radius: var(--border-radius);
-            box-shadow: var(--box-shadow);
-        }
-
-        .offline-feature h3 {
-            color: var(--primary-color);
-            margin-bottom: 1rem;
-        }
-
-        .offline-feature p {
-            color: var(--text-color);
-            line-height: 1.6;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#d32f2f">
+  <title>Sin conexión | Carnicería El Señor de La Misericordia</title>
+  <meta name="description" content="Página offline de la carnicería premium">
+  
+  <link rel="manifest" href="manifest.json">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="icon" href="img/logo-user.png" type="image/png">
+  <link rel="apple-touch-icon" href="img/logo-user.png">
 </head>
-<body>
-    <div class="offline-container">
-        <div class="offline-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="1" y1="1" x2="23" y2="23"></line>
-                <path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"></path>
-                <path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"></path>
-                <path d="M10.71 5.05A16 16 0 0 1 22.58 9"></path>
-                <path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"></path>
-                <path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
-                <line x1="12" y1="20" x2="12.01" y2="20"></line>
-            </svg>
+
+<body class="cs-offline-layout">
+  <!-- Contenido Offline -->
+  <main class="cs-offline-main">
+    <div class="cs-offline-container bs-container">
+      <div class="cs-offline-content bs-text-center">
+        <!-- Icono Offline -->
+        <div class="cs-offline-icon bs-mb-4">
+          <i class="bi bi-wifi-off bs-fs-1 bs-text-primary"></i>
         </div>
         
-        <h1 class="offline-title">¡Sin conexión!</h1>
-        <p class="offline-message">
-            Parece que no tienes conexión a internet en este momento. No te preocupes, 
-            puedes seguir accediendo a algunas funciones que hemos guardado para ti.
+        <!-- Título -->
+        <h1 class="cs-offline-title bs-h2 bs-text-primary bs-mb-3">
+          ¡Sin conexión!
+        </h1>
+        
+        <!-- Mensaje -->
+        <p class="cs-offline-message bs-text-muted bs-mb-4 bs-fs-5">
+          Parece que no tienes conexión a internet en este momento. <br>
+          No te preocupes, puedes seguir accediendo a algunas funciones que hemos guardado para ti.
         </p>
         
-        <button class="retry-button" onclick="window.location.reload()">
-            Reintentar conexión
+        <!-- Botón de Reintento -->
+        <button class="cs-offline-retry-btn bs-btn bs-btn-primary bs-btn-lg bs-mb-5" onclick="window.location.reload()">
+          <i class="bi bi-arrow-clockwise bs-me-2"></i>Reintentar conexión
         </button>
 
-        <div class="offline-features">
-            <div class="offline-feature">
-                <h3>Catálogo Guardado</h3>
-                <p>Puedes ver los productos que ya habías consultado anteriormente.</p>
+        <!-- Funcionalidades Disponibles -->
+        <div class="cs-offline-features bs-row bs-g-4">
+          <div class="bs-col-md-4">
+            <div class="cs-offline-feature bs-card bs-h-100 bs-border-0 bs-shadow-sm">
+              <div class="cs-offline-feature__body bs-card-body">
+                <div class="cs-offline-feature__icon bs-mb-3">
+                  <i class="bi bi-box-seam bs-fs-2 bs-text-primary"></i>
+                </div>
+                <h3 class="cs-offline-feature__title bs-h5 bs-card-title bs-mb-2">
+                  Catálogo Guardado
+                </h3>
+                <p class="cs-offline-feature__description bs-card-text bs-text-muted">
+                  Puedes ver los productos que ya habías consultado anteriormente.
+                </p>
+              </div>
             </div>
+          </div>
 
-            <div class="offline-feature">
-                <h3>Carrito de Compras</h3>
-                <p>Tu carrito se mantiene intacto y podrás completar tu pedido cuando vuelvas a tener conexión.</p>
+          <div class="bs-col-md-4">
+            <div class="cs-offline-feature bs-card bs-h-100 bs-border-0 bs-shadow-sm">
+              <div class="cs-offline-feature__body bs-card-body">
+                <div class="cs-offline-feature__icon bs-mb-3">
+                  <i class="bi bi-cart3 bs-fs-2 bs-text-success"></i>
+                </div>
+                <h3 class="cs-offline-feature__title bs-h5 bs-card-title bs-mb-2">
+                  Carrito de Compras
+                </h3>
+                <p class="cs-offline-feature__description bs-card-text bs-text-muted">
+                  Tu carrito se mantiene intacto y podrás completar tu pedido cuando vuelvas a tener conexión.
+                </p>
+              </div>
             </div>
+          </div>
 
-            <div class="offline-feature">
-                <h3>Pedidos Pendientes</h3>
-                <p>Los pedidos que realices se sincronizarán automáticamente cuando recuperes la conexión.</p>
+          <div class="bs-col-md-4">
+            <div class="cs-offline-feature bs-card bs-h-100 bs-border-0 bs-shadow-sm">
+              <div class="cs-offline-feature__body bs-card-body">
+                <div class="cs-offline-feature__icon bs-mb-3">
+                  <i class="bi bi-clock-history bs-fs-2 bs-text-warning"></i>
+                </div>
+                <h3 class="cs-offline-feature__title bs-h5 bs-card-title bs-mb-2">
+                  Pedidos Pendientes
+                </h3>
+                <p class="cs-offline-feature__description bs-card-text bs-text-muted">
+                  Los pedidos que realices se sincronizarán automáticamente cuando recuperes la conexión.
+                </p>
+              </div>
             </div>
+          </div>
         </div>
+
+        <!-- Información Adicional -->
+        <div class="cs-offline-info bs-mt-5 bs-pt-4 bs-border-top">
+          <div class="cs-offline-info__content bs-alert bs-alert-info">
+            <div class="bs-d-flex bs-align-items-center">
+              <i class="bi bi-info-circle bs-fs-4 bs-me-3"></i>
+              <div>
+                <h6 class="cs-offline-info__title bs-alert-heading bs-mb-1">
+                  Aplicación Web Progresiva (PWA)
+                </h6>
+                <p class="cs-offline-info__text bs-mb-0">
+                  Esta página funciona sin conexión gracias a la tecnología PWA. 
+                  Los datos se sincronizarán automáticamente cuando recuperes internet.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+  </main>
 
-    <script>
-        // Check connection status periodically
-        function checkConnection() {
-            if (navigator.onLine) {
-                window.location.reload();
-            }
-        }
+  <!-- Footer Offline -->
+  <footer class="cs-offline-footer bs-bg-dark bs-text-white bs-py-4 bs-mt-5">
+    <div class="bs-container">
+      <div class="bs-row">
+        <div class="bs-col-md-6">
+          <p class="cs-offline-footer__copyright bs-mb-0">
+            &copy; 2025 Carnicería El Señor de La Misericordia
+          </p>
+        </div>
+        <div class="bs-col-md-6 bs-text-md-end">
+          <ul class="cs-offline-footer__links bs-list-inline bs-mb-0">
+            <li class="cs-offline-footer__link-item bs-list-inline-item">
+              <a href="index.html" class="cs-offline-footer__link bs-text-white bs-text-decoration-none">
+                Inicio
+              </a>
+            </li>
+            <li class="cs-offline-footer__link-item bs-list-inline-item">
+              <a href="products.html" class="cs-offline-footer__link bs-text-white bs-text-decoration-none">
+                Productos
+              </a>
+            </li>
+            <li class="cs-offline-footer__link-item bs-list-inline-item">
+              <a href="#contacto" class="cs-offline-footer__link bs-text-white bs-text-decoration-none">
+                Contacto
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </footer>
 
-        // Listen for online event
-        window.addEventListener('online', () => {
-            window.location.reload();
-        });
+  <script>
+    // Check connection status periodically
+    function checkConnection() {
+      if (navigator.onLine) {
+        window.location.reload();
+      }
+    }
 
-        // Check connection every 30 seconds
-        setInterval(checkConnection, 30000);
-    </script>
+    // Listen for online event
+    window.addEventListener('online', () => {
+      window.location.reload();
+    });
+
+    // Check connection every 30 seconds
+    setInterval(checkConnection, 30000);
+  </script>
 </body>
 </html>

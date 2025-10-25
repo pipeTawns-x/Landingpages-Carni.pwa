@@ -1,18 +1,78 @@
-// Utilidades BEM
-@mixin element($name) {
-    &__#{$name} {
+// abstracts/_bem-utilities.scss
+// Mixins BEM obligatorios para evitar conflictos con Bootstrap
+
+// Block Element Mixin
+@mixin element($element) {
+  &__#{$element} {
+    @content;
+  }
+}
+
+// Block Modifier Mixin
+@mixin modifier($modifier) {
+  &--#{$modifier} {
+    @content;
+  }
+}
+
+// BEM Block with optional modifier
+@mixin block($block, $modifier: null) {
+  .#{$block} {
+    @content;
+    
+    @if $modifier {
+      &--#{$modifier} {
+        @content;
+      }
+    }
+  }
+}
+
+// Utility para crear componentes BEM sin conflictos
+@mixin bem-component($block-name) {
+  .#{$block-name} {
+    @content;
+    
+    // Elements
+    @at-root {
+      @each $element in & {
+        @each $selector in & {
+          $element-selector: nth($selector, 1);
+          @if str-index($element-selector, $block-name) {
+            @content;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Mixin para evitar conflictos de especificidad
+@mixin no-bootstrap-conflict {
+  &:not(.btn):not(.form-control):not(.card):not(.modal) {
+    @content;
+  }
+}
+
+// Helper para componentes que deben anular Bootstrap
+@mixin override-bootstrap($component) {
+  .#{$component} {
+    @include no-bootstrap-conflict {
       @content;
     }
   }
-  
-  @mixin modifier($name) {
-    &--#{$name} {
-      @content;
-    }
+}
+
+// Utility para componentes de layout específicos
+@mixin layout-component($name) {
+  .cs-#{$name} {
+    @content;
   }
-  
-  @mixin when($state) {
-    &.#{$state} {
-      @content;
-    }
+}
+
+// Utility para componentes de página específicos
+@mixin page-component($name) {
+  .pg-#{$name} {
+    @content;
   }
+}

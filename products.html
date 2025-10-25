@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="es" data-bs-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#d32f2f">
+  <title>Productos - Carnicería El Señor de La Misericordia</title>
+  <meta name="description" content="Catálogo completo de productos de carnicería premium">
+  
+  <link rel="manifest" href="manifest.json">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="icon" href="img/logo-user.png" type="image/png">
+  <link rel="apple-touch-icon" href="img/logo-user.png">
+</head>
+
+<body class="cs-body">
+  <!-- Alerta Offline -->
+  <div class="cs-offline-alert alert alert-warning d-none" role="alert">
+    <i class="bi bi-wifi-off me-2"></i> Estás en modo offline. Algunas funciones pueden estar limitadas.
+  </div>
+  
+  <!-- Header Principal -->
+  <header class="cs-header bs-bg-dark bs-text-white bs-py-3">
+    <div class="bs-container">
+      <div class="bs-d-flex bs-justify-content-between bs-align-items-center">
+        <a class="cs-header__brand bs-navbar-brand bs-fs-4 bs-text-white" href="index.html">
+          <img src="img/logo-user.png" alt="Logo Carnicería" class="cs-header__logo bs-me-2">
+          Carnicería El Señor de La Misericordia
+        </a>
+        
+        <div class="cs-header__icons bs-d-flex bs-align-items-center">
+          <button class="cs-header__icon-btn bs-btn bs-me-2" aria-label="Buscar" id="searchBtn">
+            <i class="bi bi-search"></i>
+          </button>
+          <button class="cs-header__icon-btn bs-btn bs-me-2 bs-position-relative" aria-label="Carrito" id="cartBtn" data-bs-toggle="offcanvas" data-bs-target="#cartOffcanvas">
+            <i class="bi bi-cart"></i>
+            <span class="cs-header__cart-counter bs-badge bs-bg-danger bs-position-absolute bs-top-0 bs-start-100 bs-translate-middle bs-p-1 bs-rounded-circle">0</span>
+          </button>
+          <a href="user/login.html" class="cs-header__icon-btn bs-btn bs-me-2" id="userBtn">
+            <i class="bi bi-person"></i>
+          </a>
+          <button class="cs-header__icon-btn bs-btn" aria-label="Categorías" id="categoriesBtn" data-bs-toggle="offcanvas" data-bs-target="#categoriesOffcanvas">
+            <i class="bi bi-filter-left"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Navegación Principal -->
+      <div class="bs-d-flex bs-justify-content-center bs-mt-3">
+        <ul class="cs-header__nav bs-nav bs-flex-wrap bs-justify-content-center">
+          <li class="cs-header__nav-item bs-nav-item">
+            <a class="cs-header__nav-link bs-nav-link bs-text-white" href="index.html">Inicio</a>
+          </li>
+          <li class="cs-header__nav-item bs-nav-item">
+            <a class="cs-header__nav-link bs-nav-link bs-text-white bs-active" href="products.html">Productos</a>
+          </li>
+          <li class="cs-header__nav-item bs-nav-item">
+            <a class="cs-header__nav-link bs-nav-link bs-text-white" href="#horario">Horario</a>
+          </li>
+          <li class="cs-header__nav-item bs-nav-item">
+            <a class="cs-header__nav-link bs-nav-link bs-text-white" href="#ubicacion">Ubicación</a>
+          </li>
+          <li class="cs-header__nav-item bs-nav-item">
+            <a class="cs-header__nav-link bs-nav-link bs-text-white" href="#contacto">Contacto</a>
+          </li>
+        </ul>
+      </div>
+      
+      <!-- Barra de Búsqueda -->
+      <div class="cs-header__search bs-mt-3 bs-d-none" id="searchBar">
+        <div class="bs-input-group">
+          <input type="text" class="cs-header__search-input bs-form-control" placeholder="Buscar productos..." id="searchInput" maxlength="100">
+          <button class="cs-header__search-btn bs-btn bs-btn-primary" type="button" id="searchSubmit">
+            <i class="bi bi-search"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Sidebar de Categorías Móvil -->
+  <div class="cs-categories-offcanvas bs-offcanvas bs-offcanvas-start" id="categoriesOffcanvas" tabindex="-1">
+    <div class="cs-categories-offcanvas__header bs-offcanvas-header">
+      <h5 class="cs-categories-offcanvas__title bs-offcanvas-title">
+        <i class="bi bi-filter-left bs-me-2"></i>Categorías
+      </h5>
+      <button type="button" class="cs-categories-offcanvas__close bs-btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="cs-categories-offcanvas__body bs-offcanvas-body">
+      <nav class="cs-categories-nav">
+        <ul class="cs-categories-nav__list bs-nav bs-flex-column">
+          <li class="cs-categories-nav__item bs-nav-item">
+            <a class="cs-categories-nav__link bs-nav-link bs-active" href="#res" data-category="res">
+              <i class="bi bi-droplet bs-me-2"></i>Carne de Res
+            </a>
+          </li>
+          <li class="cs-categories-nav__item bs-nav-item">
+            <a class="cs-categories-nav__link bs-nav-link" href="#cerdo" data-category="cerdo">
+              <i class="bi bi-droplet-half bs-me-2"></i>Carne de Cerdo
+            </a>
+          </li>
+          <li class="cs-categories-nav__item bs-nav-item">
+            <a class="cs-categories-nav__link bs-nav-link" href="#pollo" data-category="pollo">
+              <i class="bi bi-egg-fried bs-me-2"></i>Pollo
+            </a>
+          </li>
+          <li class="cs-categories-nav__item bs-nav-item">
+            <a class="cs-categories-nav__link bs-nav-link" href="#embutidos" data-category="embutidos">
+              <i class="bi bi-sausage bs-me-2"></i>Embutidos
+            </a>
+          </li>
+          <li class="cs-categories-nav__item bs-nav-item">
+            <a class="cs-categories-nav__link bs-nav-link" href="#especiales" data-category="especiales">
+              <i class="bi bi-star-fill bs-me-2"></i>Cortes Especiales
+            </a>
+          </li>
+          <li class="cs-categories-nav__item bs-nav-item">
+            <a class="cs-categories-nav__link bs-nav-link" href="#preparados" data-category="preparados">
+              <i class="bi bi-clock-history bs-me-2"></i>Productos Preparados
+            </a>
+          </li>
+          <li class="cs-categories-nav__item bs-nav-item">
+            <a class="cs-categories-nav__link bs-nav-link" href="#merch" data-category="merch">
+              <i class="bi bi-bag-heart bs-me-2"></i>Merchandising
+            </a>
+          </li>
+          <li class="cs-categories-nav__item bs-nav-item">
+            <a class="cs-categories-nav__link bs-nav-link" href="#frutas-verduras" data-category="frutas-verduras">
+              <i class="bi bi-flower1 bs-me-2"></i>Frutas y Verduras
+            </a>
+          </li>
+          <li class="cs-categories-nav__item bs-nav-item">
+            <a class="cs-categories-nav__link bs-nav-link" href="#otros" data-category="otros">
+              <i class="bi bi-box-seam bs-me-2"></i>Otros Productos
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+
+  <!-- Contenido Principal -->
+  <main class="cs-main">
+    <!-- Breadcrumb -->
+    <nav class="cs-breadcrumb bs-container bs-mt-3">
+      <ol class="cs-breadcrumb__list bs-breadcrumb">
+        <li class="cs-breadcrumb__item bs-breadcrumb-item">
+          <a href="index.html" class="cs-breadcrumb__link">Inicio</a>
+        </li>
+        <li class="cs-breadcrumb__item bs-breadcrumb-item bs-active">Productos</li>
+      </ol>
+    </nav>
+
+    <!-- Sección de Productos -->
+    <section class="cs-products-section bs-py-4">
+      <div class="bs-container">
+        <!-- Filtros y Ordenamiento -->
+        <div class="cs-products-filters bs-row bs-align-items-center bs-mb-4">
+          <div class="bs-col-md-6">
+            <div class="cs-products-filters__sort bs-d-flex bs-align-items-center">
+              <label for="sortSelect" class="cs-products-filters__label bs-form-label bs-mb-0 bs-me-2">Ordenar por:</label>
+              <select class="cs-products-filters__select bs-form-select" id="sortSelect">
+                <option value="popular">Más populares</option>
+                <option value="price-asc">Precio: Menor a Mayor</option>
+                <option value="price-desc">Precio: Mayor a Menor</option>
+                <option value="name">Nombre A-Z</option>
+                <option value="newest">Más recientes</option>
+              </select>
+            </div>
+          </div>
+          <div class="bs-col-md-6 bs-text-md-end">
+            <button class="cs-products-filters__mobile-btn bs-btn bs-btn-outline-primary bs-d-md-none" data-bs-toggle="offcanvas" data-bs-target="#categoriesOffcanvas">
+              <i class="bi bi-filter-left bs-me-2"></i>Filtrar
+            </button>
+          </div>
+        </div>
+
+        <!-- Grid de Productos -->
+        <div class="cs-products-grid">
+          <div id="loading-state" class="cs-loading-state bs-d-none">
+            <div class="bs-text-center bs-py-5">
+              <div class="cs-loading-state__spinner bs-spinner-border bs-text-primary" role="status">
+                <span class="bs-visually-hidden">Cargando...</span>
+              </div>
+              <p class="cs-loading-state__text bs-mt-3">Cargando productos...</p>
+            </div>
+          </div>
+
+          <div id="no-results" class="cs-no-results bs-d-none">
+            <div class="bs-text-center bs-py-5">
+              <i class="cs-no-results__icon bi bi-search bs-fs-1 bs-text-muted"></i>
+              <h3 class="cs-no-results__title bs-mt-3">No se encontraron productos</h3>
+              <p class="cs-no-results__text bs-text-muted">Intenta con otros filtros o términos de búsqueda.</p>
+            </div>
+          </div>
+
+          <!-- Productos se cargarán dinámicamente aquí -->
+          <div id="productsContainer" class="bs-row bs-g-4">
+            <!-- Los productos se cargarán aquí mediante JavaScript -->
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="cs-footer bs-bg-dark bs-text-white bs-py-4">
+    <div class="bs-container">
+      <div class="bs-row">
+        <div class="bs-col-md-4 bs-mb-3 bs-mb-md-0">
+          <h5 class="cs-footer__title">Carnicería El Señor de La Misericordia</h5>
+          <p class="cs-footer__description bs-mb-0">Productos cárnicos frescos y de la más alta calidad.</p>
+        </div>
+        <div class="bs-col-md-4 bs-mb-3 bs-mb-md-0">
+          <h5 class="cs-footer__title">Horario</h5>
+          <p class="cs-footer__schedule bs-mb-0">Lunes a Sábado: 8:00 - 17:00</p>
+          <p class="cs-footer__schedule bs-mb-0">Domingos: Cerrado</p>
+        </div>
+        <div class="bs-col-md-4">
+          <h5 class="cs-footer__title">Síguenos</h5>
+          <div class="cs-footer__social-icons">
+            <a href="#" class="cs-footer__social-link bs-text-white bs-me-3" aria-label="Facebook"><i class="bi bi-facebook bs-fs-5"></i></a>
+            <a href="#" class="cs-footer__social-link bs-text-white bs-me-3" aria-label="Instagram"><i class="bi bi-instagram bs-fs-5"></i></a>
+            <a href="#" class="cs-footer__social-link bs-text-white" aria-label="WhatsApp"><i class="bi bi-whatsapp bs-fs-5"></i></a>
+          </div>
+        </div>
+      </div>
+      <hr class="cs-footer__divider bs-my-4">
+      <div class="bs-row">
+        <div class="bs-col-md-6">
+          <p class="cs-footer__copyright bs-mb-0">&copy; 2025 Carnicería El Señor de La Misericordia. Todos los derechos reservados.</p>
+        </div>
+        <div class="bs-col-md-6 bs-text-md-end">
+          <ul class="cs-footer__links bs-list-inline bs-mb-0">
+            <li class="cs-footer__link-item bs-list-inline-item"><a href="index.html" class="cs-footer__link bs-text-white bs-text-decoration-none">Inicio</a></li>
+            <li class="cs-footer__link-item bs-list-inline-item"><a href="products.html" class="cs-footer__link bs-text-white bs-text-decoration-none">Productos</a></li>
+            <li class="cs-footer__link-item bs-list-inline-item"><a href="#ubicacion" class="cs-footer__link bs-text-white bs-text-decoration-none">Ubicación</a></li>
+            <li class="cs-footer__link-item bs-list-inline-item"><a href="#contacto" class="cs-footer__link bs-text-white bs-text-decoration-none">Contacto</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Modal de Personalización de Producto -->
+  <div class="cs-product-modal bs-modal bs-fade" id="productModal" tabindex="-1" aria-labelledby="productModalLabel" aria-hidden="true">
+    <div class="cs-product-modal__dialog bs-modal-dialog bs-modal-lg">
+      <div class="cs-product-modal__content bs-modal-content">
+        <div class="cs-product-modal__header bs-modal-header">
+          <h5 class="cs-product-modal__title bs-modal-title" id="productModalLabel">Personalizar Producto</h5>
+          <button type="button" class="cs-product-modal__close bs-btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="cs-product-modal__body bs-modal-body">
+          <div class="bs-row">
+            <!-- Imagen del Producto -->
+            <div class="bs-col-md-6">
+              <div class="cs-product-modal__image-container">
+                <img id="modalProductImage" src="" alt="" class="cs-product-modal__image bs-img-fluid bs-rounded">
+                <span id="modalProductBadge" class="cs-product-modal__badge bs-badge bs-bg-danger bs-position-absolute bs-top-0 bs-start-0 bs-m-2"></span>
+              </div>
+            </div>
+            
+            <!-- Información del Producto -->
+            <div class="bs-col-md-6">
+              <div class="cs-product-modal__info">
+                <h4 id="modalProductName" class="cs-product-modal__name"></h4>
+                <div class="cs-product-modal__prices bs-mb-3">
+                  <span id="modalProductPrice" class="cs-product-modal__price bs-fs-3 bs-fw-bold bs-text-primary"></span>
+                  <span id="modalProductPriceLb" class="cs-product-modal__price-lb bs-text-muted"></span>
+                </div>
+                <p id="modalProductDescription" class="cs-product-modal__description"></p>
+                
+                <!-- Opciones de Pedido -->
+                <div class="cs-product-modal__options">
+                  <h6 class="cs-product-modal__options-title bs-mb-3">Opciones de pedido:</h6>
+                  
+                  <!-- Selección de Tipo de Pedido -->
+                  <div class="cs-product-modal__order-type bs-mb-4">
+                    <div class="cs-product-modal__btn-group bs-btn-group bs-w-100" role="group">
+                      <input type="radio" class="cs-product-modal__radio bs-btn-check" name="orderType" id="orderByWeight" value="weight" checked>
+                      <label class="cs-product-modal__label bs-btn bs-btn-outline-primary" for="orderByWeight">
+                        <i class="bi bi-scale bs-me-2"></i>Por Peso
+                      </label>
+                      
+                      <input type="radio" class="cs-product-modal__radio bs-btn-check" name="orderType" id="orderByPrice" value="price">
+                      <label class="cs-product-modal__label bs-btn bs-btn-outline-primary" for="orderByPrice">
+                        <i class="bi bi-currency-dollar bs-me-2"></i>Por Precio
+                      </label>
+                      
+                      <input type="radio" class="cs-product-modal__radio bs-btn-check" name="orderType" id="orderByPieces" value="pieces">
+                      <label class="cs-product-modal__label bs-btn bs-btn-outline-primary" for="orderByPieces">
+                        <i class="bi bi-hash bs-me-2"></i>Por Piezas
+                      </label>
+                    </div>
+                  </div>
+
+                  <!-- Controles de Cantidad -->
+                  <div class="cs-product-modal__quantity bs-mb-4">
+                    <label class="cs-product-modal__quantity-label bs-form-label" id="quantityLabel">Cantidad (kg):</label>
+                    <div class="cs-product-modal__quantity-controls bs-input-group">
+                      <button class="cs-product-modal__quantity-btn bs-btn bs-btn-outline-secondary" type="button" id="decreaseQuantity">
+                        <i class="bi bi-dash"></i>
+                      </button>
+                      <input type="number" class="cs-product-modal__quantity-input bs-form-control bs-text-center" id="quantityInput" value="1" min="0.1" max="10" step="0.1">
+                      <button class="cs-product-modal__quantity-btn bs-btn bs-btn-outline-secondary" type="button" id="increaseQuantity">
+                        <i class="bi bi-plus"></i>
+                      </button>
+                    </div>
+                    <div class="cs-product-modal__quantity-help bs-form-text">
+                      <span id="quantityHelp">Mínimo 0.1 kg, máximo 10 kg</span>
+                    </div>
+                  </div>
+
+                  <!-- Opciones de Corte (solo para productos premium) -->
+                  <div id="cutOptions" class="cs-product-modal__cut-options bs-mb-4 bs-d-none">
+                    <label class="cs-product-modal__cut-label bs-form-label">Tipo de Corte:</label>
+                    <div class="cs-product-modal__cut-btns bs-d-flex bs-flex-wrap bs-gap-2">
+                      <input type="radio" class="cs-product-modal__cut-radio bs-btn-check" name="cutType" id="cutThin" value="thin">
+                      <label class="cs-product-modal__cut-label-btn bs-btn bs-btn-outline-secondary" for="cutThin">Fino</label>
+                      
+                      <input type="radio" class="cs-product-modal__cut-radio bs-btn-check" name="cutType" id="cutMedium" value="medium" checked>
+                      <label class="cs-product-modal__cut-label-btn bs-btn bs-btn-outline-secondary" for="cutMedium">Medio</label>
+                      
+                      <input type="radio" class="cs-product-modal__cut-radio bs-btn-check" name="cutType" id="cutThick" value="thick">
+                      <label class="cs-product-modal__cut-label-btn bs-btn bs-btn-outline-secondary" for="cutThick">Grueso</label>
+                    </div>
+                  </div>
+
+                  <!-- Resumen del Pedido -->
+                  <div class="cs-product-modal__summary bs-card">
+                    <div class="cs-product-modal__summary-body bs-card-body">
+                      <h6 class="cs-product-modal__summary-title bs-card-title">Resumen del Pedido</h6>
+                      <div id="orderSummary" class="cs-product-modal__summary-content">
+                        <p class="cs-product-modal__summary-text bs-mb-1">Producto: <span id="summaryProduct"></span></p>
+                        <p class="cs-product-modal__summary-text bs-mb-1">Cantidad: <span id="summaryQuantity">1 kg</span></p>
+                        <p class="cs-product-modal__summary-text bs-mb-1">Tipo de corte: <span id="summaryCut">Medio</span></p>
+                        <hr class="cs-product-modal__summary-divider">
+                        <p class="cs-product-modal__summary-total bs-fw-bold bs-fs-5 bs-text-primary">
+                          Total: <span id="summaryTotal">$320.00</span>
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="cs-product-modal__footer bs-modal-footer">
+          <button type="button" class="cs-product-modal__cancel-btn bs-btn bs-btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" class="cs-product-modal__add-btn bs-btn bs-btn-primary" id="addToCartBtn">
+            <i class="bi bi-cart-plus bs-me-2"></i>Agregar al Carrito
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Shopping Cart Offcanvas -->
+  <div class="cs-cart-offcanvas bs-offcanvas bs-offcanvas-end" id="cartOffcanvas" tabindex="-1">
+    <div class="cs-cart-offcanvas__header bs-offcanvas-header">
+      <h5 class="cs-cart-offcanvas__title bs-offcanvas-title">
+        <i class="bi bi-cart3 bs-me-2"></i>Carrito de Compras
+      </h5>
+      <button type="button" class="cs-cart-offcanvas__close bs-btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="cs-cart-offcanvas__body bs-offcanvas-body">
+      <div id="cartItems" class="cs-cart-offcanvas__items bs-mb-4">
+        <div class="bs-text-center bs-py-5">
+          <i class="cs-cart-offcanvas__empty-icon bi bi-cart-x bs-display-4 bs-text-muted"></i>
+          <p class="cs-cart-offcanvas__empty-text bs-mt-3">Tu carrito está vacío</p>
+          <button class="cs-cart-offcanvas__continue-btn bs-btn bs-btn-primary" data-bs-dismiss="offcanvas">Seguir Comprando</button>
+        </div>
+      </div>
+      
+      <!-- Opciones de Entrega -->
+      <div class="cs-delivery-options bs-card bs-mb-3">
+        <div class="cs-delivery-options__body bs-card-body">
+          <h6 class="cs-delivery-options__title bs-card-title bs-mb-3">Método de entrega:</h6>
+          <div class="cs-delivery-options__btn-group bs-btn-group bs-w-100" role="group">
+            <input type="radio" class="cs-delivery-options__radio bs-btn-check" name="deliveryType" id="pickup" value="pickup" checked>
+            <label class="cs-delivery-options__label bs-btn bs-btn-outline-primary" for="pickup">
+              <i class="bi bi-shop bs-me-2"></i>Recoger en tienda
+            </label>
+            
+            <input type="radio" class="cs-delivery-options__radio bs-btn-check" name="deliveryType" id="delivery" value="delivery">
+            <label class="cs-delivery-options__label bs-btn bs-btn-outline-primary" for="delivery">
+              <i class="bi bi-truck bs-me-2"></i>Delivery
+            </label>
+          </div>
+
+          <!-- Opciones de Recogida -->
+          <div id="pickupOptions" class="cs-delivery-options__pickup bs-mt-3">
+            <label class="cs-delivery-options__label bs-form-label">Hora de recogida:</label>
+            <input type="time" class="cs-delivery-options__input bs-form-control" id="pickupTime" min="09:00" max="20:00" required>
+            <small class="cs-delivery-options__help bs-text-muted">Horario de atención: 9:00 AM - 8:00 PM</small>
+          </div>
+
+          <!-- Opciones de Delivery -->
+          <div id="deliveryOptions" class="cs-delivery-options__delivery bs-mt-3" style="display: none;">
+            <div class="bs-mb-3">
+              <label class="cs-delivery-options__label bs-form-label">Dirección de entrega:</label>
+              <input type="text" class="cs-delivery-options__input bs-form-control" id="deliveryAddress" 
+                     placeholder="Ej: Tehuacan 247, Agua Marina 118"
+                     maxlength="200">
+              <div class="cs-delivery-options__help bs-form-text">Solo entregas en San Luis Potosí</div>
+            </div>
+            <div class="bs-mb-3">
+              <label class="cs-delivery-options__label bs-form-label">Referencias:</label>
+              <input type="text" class="cs-delivery-options__input bs-form-control" id="deliveryReferences" 
+                     placeholder="Ej: Casa blanca, portón negro"
+                     maxlength="200">
+            </div>
+            <div class="cs-delivery-options__fee bs-alert bs-alert-info">
+              <i class="bi bi-info-circle bs-me-2"></i>
+              Costo de envío: $50.00 MXN
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Resumen del Carrito -->
+      <div class="cs-cart-summary bs-card">
+        <div class="cs-cart-summary__body bs-card-body">
+          <div class="bs-d-flex bs-justify-content-between bs-mb-2">
+            <span class="cs-cart-summary__label">Subtotal:</span>
+            <span class="cs-cart-summary__value" id="cartSubtotal">$0.00</span>
+          </div>
+          <div class="bs-d-flex bs-justify-content-between bs-mb-2">
+            <span class="cs-cart-summary__label">Envío:</span>
+            <span class="cs-cart-summary__value" id="deliveryFee">$0.00</span>
+          </div>
+          <div class="bs-d-flex bs-justify-content-between bs-mb-3">
+            <span class="cs-cart-summary__total-label bs-fw-bold">Total:</span>
+            <span class="cs-cart-summary__total-value bs-fw-bold bs-text-primary" id="cartTotal">$0.00</span>
+          </div>
+          <div class="bs-d-grid bs-gap-2">
+            <button class="cs-cart-summary__checkout-btn bs-btn bs-btn-primary" id="checkoutBtn">
+              <i class="bi bi-bag-check bs-me-2"></i>Proceder al Pago
+            </button>
+            <button class="cs-cart-summary__clear-btn bs-btn bs-btn-outline-danger" id="clearCartBtn">
+              <i class="bi bi-trash bs-me-2"></i>Vaciar Carrito
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+  <script type="module" src="js/modules/ui/header.js"></script>
+  <script type="module" src="js/modules/pages/catalog.js"></script>
+  <script type="module" src="js/modules/core/cart.js"></script>
+</body>
+</html>

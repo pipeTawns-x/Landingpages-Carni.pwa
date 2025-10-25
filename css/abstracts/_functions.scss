@@ -1,16 +1,86 @@
-// Funciones SCSS personalizadas
-@function spacing($multiplier: 1) {
-    @return $spacer * $multiplier;
+// abstracts/_functions.scss
+// Funciones SCSS avanzadas para cálculos y utilidades
+
+// Función para calcular contraste de color
+@function color-contrast($color) {
+  $r: red($color);
+  $g: green($color);
+  $b: blue($color);
+  $yiq: (($r * 299) + ($g * 587) + ($b * 114)) / 1000;
+  
+  @if ($yiq >= 128) {
+    @return #000000;
+  } @else {
+    @return #ffffff;
+  }
+}
+
+// Función para calcular luminosidad
+@function luminance($color) {
+  $r: red($color) / 255;
+  $g: green($color) / 255;
+  $b: blue($color) / 255;
+  
+  $r: if($r <= 0.03928, $r / 12.92, pow(($r + 0.055) / 1.055, 2.4));
+  $g: if($g <= 0.03928, $g / 12.92, pow(($g + 0.055) / 1.055, 2.4));
+  $b: if($b <= 0.03928, $b / 12.92, pow(($b + 0.055) / 1.055, 2.4));
+  
+  @return 0.2126 * $r + 0.7152 * $g + 0.0722 * $b;
+}
+
+// Función para calcular contraste WCAG
+@function contrast-ratio($background, $foreground) {
+  $l1: luminance($background);
+  $l2: luminance($foreground);
+  
+  @if $l1 > $l2 {
+    @return ($l1 + 0.05) / ($l2 + 0.05);
+  } @else {
+    @return ($l2 + 0.05) / ($l1 + 0.05);
+  }
+}
+
+// Función para generar escalas de color
+@function tint($color, $percentage) {
+  @return mix(white, $color, $percentage);
+}
+
+@function shade($color, $percentage) {
+  @return mix(black, $color, $percentage);
+}
+
+// Función para calcular espaciado responsive
+@function responsive-spacing($base, $multiplier: 1) {
+  @return calc(#{$base} * #{$multiplier});
+}
+
+// Función para calcular tamaños de fuente responsive
+@function responsive-font($min-size, $max-size, $min-width: 320px, $max-width: 1200px) {
+  @return clamp(#{$min-size}, #{$min-size} + (#{$max-size} - #{$min-size}) * ((100vw - #{$min-width}) / (#{$max-width} - #{$min-width})), #{$max-size});
+}
+
+// Función para calcular grid columns
+@function grid-columns($columns, $total-columns: 12) {
+  @return percentage($columns / $total-columns);
+}
+
+// Función para calcular aspect ratio
+@function aspect-ratio($width, $height) {
+  @return percentage($height / $width);
+}
+
+// Función para validar colores accesibles
+@function accessible-color($background, $text-color: null) {
+  @if $text-color == null {
+    $text-color: color-contrast($background);
   }
   
-  @function color-level($color, $level: 0) {
-    $base: $color;
-    
-    @if $level > 0 {
-      @return lighten($base, $level * 8%);
-    } @else if $level < 0 {
-      @return darken($base, abs($level) * 8%);
-    } @else {
-      @return $base;
-    }
+  $ratio: contrast-ratio($background, $text-color);
+  
+  @if $ratio >= 4.5 {
+    @return $text-color;
+  } @else {
+    @warn "El contraste entre #{$background} y #{$text-color} es #{$ratio}, que es menor que 4.5:1";
+    @return color-contrast($background);
   }
+}

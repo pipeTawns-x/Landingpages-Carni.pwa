@@ -1,89 +1,73 @@
-// Variables de colores principales
+// components/_variables.scss
+
+// Colores principales
 $primary-color: #d32f2f;
 $secondary-color: #f5f5f5;
-$accent-color: #ff9800;
-$success-color: #28a745;
-$warning-color: #ffc107;
-$danger-color: #dc3545;
-$info-color: #17a2b8;
+$accent-color: #388e3c;
+$color-primary: $primary-color;
+$color-secondary: $secondary-color;
+$color-accent: $accent-color;
+$color-white: #fff;
+$color-light: #f8f9fa;
+$color-text: #333;
+$color-text-light: #666;
+$color-border: #dee2e6;
+$color-success: #28a745;
+$color-warning: #ffc107;
+$color-danger: #dc3545;
+$color-info: #17a2b8;
 
-// Escala de grises
-$white: #ffffff;
-$black: #000000;
-$gray-50: #f8f9fa;
-$gray-100: #f8f9fa;
-$gray-200: #e9ecef;
-$gray-300: #dee2e6;
-$gray-400: #ced4da;
-$gray-500: #adb5bd;
-$gray-600: #6c757d;
-$gray-700: #495057;
-$gray-800: #343a40;
-$gray-900: #212529;
+// Colores adicionales
+$body-bg: #f9f9f9;
+$header-bg: linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%);
 
-// Colores semánticos
-$color-text: $gray-800;
-$color-text-light: $gray-600;
-$color-border: $gray-300;
-$color-light: $gray-100;
-$color-dark: $gray-900;
-$color-background: $white;
+// Bordes
+$border-radius: 0.5rem;
+$border-radius-sm: 0.375rem;
+$border-radius-lg: 0.75rem;
 
-// Colores del tema específicos
-$body-bg: $white;
-$blue-header: #1a237e;
-$card-bg: $white;
-$footer-bg: $gray-900;
-
-// Espaciados (basados en Bootstrap)
-$spacer: 1rem;
+// Espaciado
 $spacers: (
   0: 0,
-  1: $spacer * 0.25,
-  2: $spacer * 0.5,
-  3: $spacer,
-  4: $spacer * 1.5,
-  5: $spacer * 3,
-  6: $spacer * 4
+  1: 0.25rem,
+  2: 0.5rem,
+  3: 1rem,
+  4: 1.5rem,
+  5: 3rem
 );
 
-// Border radius
-$border-radius: 0.375rem;
-$border-radius-sm: 0.25rem;
-$border-radius-lg: 0.5rem;
-$border-radius-xl: 1rem;
-$border-radius-pill: 50rem;
+// Breakpoints
+$breakpoint-sm: 576px;
+$breakpoint-md: 768px;
+$breakpoint-lg: 992px;
+$breakpoint-xl: 1200px;
+
+// Sombras
+$shadow-sm: 0 2px 10px rgba(0,0,0,0.05);
+$shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+$shadow-lg: 0 8px 20px rgba(0,0,0,0.12);
+$shadow-xl: 0 10px 25px rgba(0,0,0,0.15);
+
+// Transiciones
+$transition-base: all 0.3s ease;
+$transition-slow: all 0.5s ease;
+$transition-fast: all 0.15s ease;
+
+// Variables para temas
+$dark-bg: #1a1a1a;
+$dark-text: #ffffff;
+$dark-border: #333333;
+$dark-card-bg: #2d2d2d;
 
 // Tipografía
-$font-family-base: 'Segoe UI', system-ui, -apple-system, 'Roboto', 'Helvetica Neue', Arial, sans-serif;
-$font-family-heading: 'Georgia', 'Times New Roman', serif;
-$font-size-base: 1rem;
+$font-family-base: 'Roboto', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 $font-weight-light: 300;
 $font-weight-normal: 400;
 $font-weight-medium: 500;
 $font-weight-semibold: 600;
 $font-weight-bold: 700;
-$line-height-base: 1.5;
 
-// Breakpoints (compatibles con Bootstrap)
-$breakpoint-xs: 0;
-$breakpoint-sm: 576px;
-$breakpoint-md: 768px;
-$breakpoint-lg: 992px;
-$breakpoint-xl: 1200px;
-$breakpoint-xxl: 1400px;
-
-// Shadows
-$box-shadow-sm: 0 0.125rem 0.25rem rgba($black, 0.075);
-$box-shadow: 0 0.5rem 1rem rgba($black, 0.15);
-$box-shadow-lg: 0 1rem 3rem rgba($black, 0.175);
-
-// Transitions
-$transition-base: all 0.3s ease-in-out;
-$transition-fast: all 0.15s ease-in-out;
-$transition-slow: all 0.5s ease-in-out;
-
-// Z-index scale
+// Z-index escala
 $z-index-dropdown: 1000;
 $z-index-sticky: 1020;
 $z-index-fixed: 1030;

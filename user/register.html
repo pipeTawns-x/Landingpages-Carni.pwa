@@ -4,13 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#d32f2f">
-  <title>Registro Administrativo - Carnicería El Señor de La Misericordia</title>
-  <meta name="description" content="Registro de nuevo personal administrativo">
+  <title>Registro de Cliente - Carnicería El Señor de La Misericordia</title>
+  <meta name="description" content="Regístrate como cliente y accede a beneficios exclusivos">
   
   <link rel="manifest" href="../manifest.json">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="../css/styles.css">
   <link rel="icon" href="../img/logo-user.png" type="image/png">
   <link rel="apple-touch-icon" href="../img/logo-user.png">
 </head>
@@ -26,11 +26,11 @@
     <div class="bs-container">
       <div class="bs-d-flex bs-justify-content-between bs-align-items-center">
         <a class="cs-auth-header__brand bs-navbar-brand bs-fs-4 bs-text-white" href="../index.html">
-          <img src="../img/logo-user.png" alt="Logo Carnicería" class="cs-auth-header__logo bs-me-2" style="height: 40px;">
+          <img src="../img/logo-user.png" alt="Logo Carnicería" class="cs-auth-header__logo bs-me-2">
           Carnicería El Señor de La Misericordia
         </a>
-        <div class="cs-auth-header__badge bs-badge bs-bg-warning bs-text-dark">
-          <i class="bi bi-person-gear bs-me-1"></i>Registro Administrativo
+        <div class="cs-auth-header__badge bs-badge bs-bg-success">
+          <i class="bi bi-person-plus bs-me-1"></i>Nuevo Cliente
         </div>
       </div>
     </div>
@@ -41,23 +41,23 @@
     <div class="bs-container">
       <div class="bs-row bs-justify-content-center">
         <div class="bs-col-lg-6 bs-col-md-8">
-          <div class="cs-auth-card bs-card bs-border-0 bs-shadow-lg">
+          <div class="cs-auth-card bs-card bs-border-0">
             <div class="cs-auth-card__header bs-card-header bs-bg-primary bs-text-white bs-text-center bs-py-4">
-              <i class="cs-auth-card__icon bi bi-person-gear bs-fs-1 bs-mb-3"></i>
-              <h1 class="cs-auth-card__title bs-card-title bs-h4 bs-mb-0">Registro Administrativo</h1>
-              <p class="cs-auth-card__subtitle bs-opacity-75 bs-mb-0">Crear nueva cuenta de personal autorizado</p>
+              <i class="cs-auth-card__icon bi bi-person-plus-fill bs-fs-1 bs-mb-3"></i>
+              <h1 class="cs-auth-card__title bs-card-title bs-h4 bs-mb-0">Crear Cuenta</h1>
+              <p class="cs-auth-card__subtitle bs-opacity-75 bs-mb-0">Únete a nuestra familia de clientes</p>
             </div>
             
             <div class="cs-auth-card__body bs-card-body bs-p-4 bs-p-md-5">
-              <!-- Advertencia de Seguridad -->
-              <div class="cs-auth-alerts bs-mb-4">
-                <div class="cs-auth-alert bs-alert bs-alert-danger">
-                  <i class="bi bi-shield-exclamation bs-me-2"></i>
-                  <strong>Acceso Restringido:</strong> Solo personal autorizado puede completar este registro.
+              <!-- Beneficios de Registro -->
+              <div class="cs-auth-benefits bs-mb-4">
+                <div class="cs-auth-benefit bs-alert bs-alert-success">
+                  <i class="bi bi-gift bs-me-2"></i>
+                  <strong>¡Regístrate y obtén beneficios!</strong> Programa de fidelidad, ofertas exclusivas y historial de pedidos.
                 </div>
               </div>
 
-              <form class="cs-auth-form" id="adminRegisterForm" novalidate>
+              <form class="cs-auth-form" id="userRegisterForm" novalidate>
                 <!-- Información Personal -->
                 <div class="cs-auth-section bs-mb-4">
                   <h5 class="cs-auth-section__title bs-text-primary bs-mb-3">
@@ -66,11 +66,10 @@
                   
                   <div class="bs-row">
                     <div class="bs-col-md-6 bs-mb-3">
-                      <label for="adminFirstName" class="cs-auth-field__label bs-form-label">Nombre(s) *</label>
+                      <label for="userFirstName" class="cs-auth-field__label bs-form-label">Nombre(s) *</label>
                       <input type="text" 
                              class="cs-auth-field__input bs-form-control" 
-                             id="adminFirstName" 
-                             name="adminFirstName"
+                             id="userFirstName" 
                              placeholder="Ingresa tu nombre"
                              pattern="^[A-Za-záéíóúñÁÉÍÓÚÑ\s]{2,30}$"
                              maxlength="30"
@@ -81,11 +80,10 @@
                     </div>
                     
                     <div class="bs-col-md-6 bs-mb-3">
-                      <label for="adminLastName" class="cs-auth-field__label bs-form-label">Apellidos *</label>
+                      <label for="userLastName" class="cs-auth-field__label bs-form-label">Apellidos *</label>
                       <input type="text" 
                              class="cs-auth-field__input bs-form-control" 
-                             id="adminLastName" 
-                             name="adminLastName"
+                             id="userLastName" 
                              placeholder="Ingresa tus apellidos"
                              pattern="^[A-Za-záéíóúñÁÉÍÓÚÑ\s]{2,50}$"
                              maxlength="50"
@@ -97,26 +95,24 @@
                   </div>
 
                   <div class="bs-mb-3">
-                    <label for="adminEmail" class="cs-auth-field__label bs-form-label">Correo Electrónico Corporativo *</label>
+                    <label for="userEmail" class="cs-auth-field__label bs-form-label">Correo Electrónico *</label>
                     <input type="email" 
                            class="cs-auth-field__input bs-form-control" 
-                           id="adminEmail" 
-                           name="adminEmail"
-                           placeholder="usuario@carniceriasenormisericordia.com"
+                           id="userEmail" 
+                           placeholder="tucorreo@ejemplo.com"
                            pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
                            maxlength="100"
                            required>
                     <div class="cs-auth-field__invalid-feedback bs-invalid-feedback">
-                      Por favor ingresa un correo electrónico corporativo válido.
+                      Por favor ingresa un correo electrónico válido.
                     </div>
                   </div>
 
                   <div class="bs-mb-3">
-                    <label for="adminPhone" class="cs-auth-field__label bs-form-label">Teléfono de Contacto *</label>
+                    <label for="userPhone" class="cs-auth-field__label bs-form-label">Teléfono *</label>
                     <input type="tel" 
                            class="cs-auth-field__input bs-form-control" 
-                           id="adminPhone" 
-                           name="adminPhone"
+                           id="userPhone" 
                            placeholder="4442715470"
                            pattern="^\d{10}$"
                            maxlength="10"
@@ -124,78 +120,70 @@
                     <div class="cs-auth-field__invalid-feedback bs-invalid-feedback">
                       El teléfono debe tener exactamente 10 dígitos.
                     </div>
+                    <div class="cs-auth-field__help bs-form-text">
+                      <i class="bi bi-info-circle bs-me-1"></i>
+                      Usaremos este número para notificaciones importantes y verificación.
+                    </div>
                   </div>
                 </div>
 
                 <!-- Credenciales de Seguridad -->
                 <div class="cs-auth-section bs-mb-4">
                   <h5 class="cs-auth-section__title bs-text-primary bs-mb-3">
-                    <i class="bi bi-shield-lock bs-me-2"></i>Credenciales de Seguridad
+                    <i class="bi bi-shield-lock bs-me-2"></i>Seguridad de la Cuenta
                   </h5>
 
                   <div class="bs-mb-3">
-                    <label for="adminPassword" class="cs-auth-field__label bs-form-label">Contraseña de Administrador *</label>
+                    <label for="userPassword" class="cs-auth-field__label bs-form-label">Contraseña *</label>
                     <input type="password" 
                            class="cs-auth-field__input bs-form-control" 
-                           id="adminPassword" 
-                           name="adminPassword"
+                           id="userPassword" 
                            placeholder="Crea una contraseña segura"
-                           minlength="12"
+                           minlength="8"
                            maxlength="128"
-                           pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{12,}$"
+                           pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$"
                            required>
                     <div class="cs-auth-field__invalid-feedback bs-invalid-feedback">
-                      La contraseña debe tener al menos 12 caracteres, incluyendo mayúsculas, minúsculas y números.
+                      La contraseña debe tener al menos 8 caracteres, incluyendo mayúsculas, minúsculas y números.
                     </div>
                     <div class="cs-auth-field__help bs-form-text">
-                      <i class="bi bi-info-circle bs-me-1"></i>
-                      <strong>Requisitos de seguridad:</strong> Mínimo 12 caracteres, 1 mayúscula, 1 minúscula, 1 número.
+                      <i class="bi bi-shield-check bs-me-1"></i>
+                      <strong>Requisitos de seguridad:</strong> Mínimo 8 caracteres, 1 mayúscula, 1 minúscula, 1 número.
                     </div>
                   </div>
 
                   <div class="bs-mb-3">
-                    <label for="adminConfirmPassword" class="cs-auth-field__label bs-form-label">Confirmar Contraseña *</label>
+                    <label for="userConfirmPassword" class="cs-auth-field__label bs-form-label">Confirmar Contraseña *</label>
                     <input type="password" 
                            class="cs-auth-field__input bs-form-control" 
-                           id="adminConfirmPassword" 
-                           name="adminConfirmPassword"
+                           id="userConfirmPassword" 
                            placeholder="Repite tu contraseña"
-                           minlength="12"
+                           minlength="8"
                            maxlength="128"
                            required>
                     <div class="cs-auth-field__invalid-feedback bs-invalid-feedback">
                       Las contraseñas deben coincidir.
                     </div>
                   </div>
-
-                  <!-- DOCUMENTACIÓN CRÍTICA DE HASHING -->
-                  <!-- 
-                    CRÍTICO PARA EL EQUIPO DE BACKEND:
-                    Las contraseñas NUNCA deben almacenarse en texto plano.
-                    Implementar hashing robusto (Argon2 o Bcrypt) con salt único por usuario.
-                    Incluir políticas de rotación de contraseñas y monitoreo de intentos fallidos.
-                    Considerar implementación de pepper key adicional para protección extra.
-                  -->
                 </div>
 
                 <!-- Verificación OTP -->
                 <div class="cs-auth-section bs-mb-4">
                   <h5 class="cs-auth-section__title bs-text-primary bs-mb-3">
-                    <i class="bi bi-phone-vibrate bs-me-2"></i>Verificación de Identidad
+                    <i class="bi bi-phone-vibrate bs-me-2"></i>Verificación de Teléfono
                   </h5>
 
                   <div class="bs-mb-3">
-                    <label for="adminOTP" class="cs-auth-field__label bs-form-label">Código de Verificación OTP *</label>
+                    <label for="userOTP" class="cs-auth-field__label bs-form-label">Código de Verificación OTP *</label>
                     <div class="bs-input-group">
                       <input type="text" 
                              class="cs-auth-field__input bs-form-control" 
-                             id="adminOTP" 
-                             name="adminOTP"
+                             id="userOTP" 
                              placeholder="Ingresa el código de 6 dígitos"
                              pattern="^\d{6}$"
                              maxlength="6"
                              required>
-                      <button type="button" class="cs-auth-otp__btn bs-btn bs-btn-outline-primary" id="requestOTP">
+                      <button type="button" class="cs-auth-otp__btn bs-btn bs-btn-outline-primary" id="requestUserOTP">
                         <i class="bi bi-send bs-me-1"></i>Enviar Código
                       </button>
                     </div>
@@ -203,8 +191,31 @@
                       El código OTP debe tener exactamente 6 dígitos.
                     </div>
                     <div class="cs-auth-field__help bs-form-text">
-                      <i class="bi bi-shield-check bs-me-1"></i>
-                      Se enviará un código de verificación a tu teléfono registrado.
+                      <i class="bi bi-chat-square-text bs-me-1"></i>
+                      Te enviaremos un código de verificación por SMS para validar tu número.
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Preferencias -->
+                <div class="cs-auth-section bs-mb-4">
+                  <h5 class="cs-auth-section__title bs-text-primary bs-mb-3">
+                    <i class="bi bi-heart bs-me-2"></i>Preferencias
+                  </h5>
+
+                  <div class="cs-auth-preferences">
+                    <div class="cs-auth-preference bs-form-check bs-mb-2">
+                      <input class="cs-auth-preference__input bs-form-check-input" type="checkbox" id="newsletterOptIn">
+                      <label class="cs-auth-preference__label bs-form-check-label" for="newsletterOptIn">
+                        Deseo recibir ofertas exclusivas y novedades por correo electrónico
+                      </label>
+                    </div>
+                    
+                    <div class="cs-auth-preference bs-form-check">
+                      <input class="cs-auth-preference__input bs-form-check-input" type="checkbox" id="smsNotifications">
+                      <label class="cs-auth-preference__label bs-form-check-label" for="smsNotifications">
+                        Deseo recibir notificaciones importantes por SMS
+                      </label>
                     </div>
                   </div>
                 </div>
@@ -212,11 +223,10 @@
                 <!-- Términos y Condiciones -->
                 <div class="cs-auth-agreement bs-mb-4">
                   <div class="cs-auth-agreement__check bs-form-check">
-                    <input class="cs-auth-agreement__input bs-form-check-input" type="checkbox" id="adminAgreement" name="adminAgreement" required>
-                    <label class="cs-auth-agreement__label bs-form-check-label" for="adminAgreement">
-                      Acepto los <a href="#" class="bs-text-primary bs-text-decoration-none">Términos de Servicio Administrativo</a>, 
-                      la <a href="#" class="bs-text-primary bs-text-decoration-none">Política de Privacidad</a> y 
-                      el <a href="#" class="bs-text-primary bs-text-decoration-none">Acuerdo de Confidencialidad</a>.
+                    <input class="cs-auth-agreement__input bs-form-check-input" type="checkbox" id="userAgreement" required>
+                    <label class="cs-auth-agreement__label bs-form-check-label" for="userAgreement">
+                      He leído y acepto los <a href="#" class="bs-text-primary bs-text-decoration-none">Términos de Servicio</a> 
+                      y la <a href="#" class="bs-text-primary bs-text-decoration-none">Política de Privacidad</a>.
                     </label>
                     <div class="cs-auth-agreement__invalid-feedback bs-invalid-feedback">
                       Debes aceptar los términos y condiciones para continuar.
@@ -224,11 +234,29 @@
                   </div>
                 </div>
 
+                <!-- IMPORTANTE: Comentario de Seguridad para Backend -->
+                <!-- 
+                  CRÍTICO PARA EL EQUIPO DE BACKEND - SEGURIDAD DE CONTRASEÑAS:
+                  =============================================================
+                  NUNCA almacenar contraseñas en texto plano.
+                  
+                  REQUERIMIENTOS DE SEGURIDAD:
+                  - Implementar hashing robusto (Argon2id o Bcrypt con factor de costo 12+)
+                  - Utilizar salt único por usuario
+                  - Incluir pepper adicional a nivel de aplicación
+                  - Implementar políticas de rotación de contraseñas
+                  - Monitorear intentos fallidos de autenticación
+                  - Considerar autenticación multi-factor (MFA) para cuentas privilegiadas
+                  
+                  EJEMPLO DE IMPLEMENTACIÓN SEGURA:
+                  const hashedPassword = await bcrypt.hash(password, 12);
+                -->
+
                 <!-- Botón de Envío -->
                 <div class="cs-auth-submit bs-d-grid">
                   <button type="submit" class="cs-auth-submit__btn bs-btn bs-btn-primary bs-btn-lg">
                     <i class="bi bi-person-check-fill bs-me-2"></i>
-                    Completar Registro Administrativo
+                    Crear Mi Cuenta
                   </button>
                 </div>
               </form>
@@ -236,33 +264,44 @@
               <!-- Enlaces de Navegación -->
               <div class="cs-auth-links bs-text-center bs-mt-4 bs-pt-3 bs-border-top">
                 <p class="cs-auth-links__text bs-mb-2">
-                  ¿Ya tienes cuenta administrativa? 
+                  ¿Ya tienes cuenta? 
                   <a href="login.html" class="cs-auth-links__link bs-text-primary bs-text-decoration-none">
-                    Iniciar sesión administrativa
+                    Iniciar sesión
                   </a>
                 </p>
                 <p class="cs-auth-links__text bs-mb-0">
-                  ¿Eres cliente? 
-                  <a href="../user/register.html" class="cs-auth-links__link bs-text-warning bs-text-decoration-none">
-                    Registrarse como cliente
+                  ¿Eres administrador? 
+                  <a href="../admin/register.html" class="cs-auth-links__link bs-text-warning bs-text-decoration-none">
+                    Registro administrativo
                   </a>
                 </p>
               </div>
             </div>
           </div>
 
-          <!-- Información de Seguridad -->
-          <div class="cs-auth-security-notice bs-mt-4">
-            <div class="cs-auth-security-notice__content bs-alert bs-alert-info">
-              <div class="bs-d-flex bs-align-items-center">
-                <i class="bi bi-database-fill-lock bs-fs-4 bs-me-3"></i>
-                <div>
-                  <h6 class="cs-auth-security-notice__title bs-alert-heading bs-mb-1">Protección de Datos</h6>
-                  <p class="cs-auth-security-notice__text bs-mb-0">
-                    Toda la información administrativa está protegida con encriptación de grado empresarial 
-                    y controles de acceso basados en roles (RBAC).
-                  </p>
-                </div>
+          <!-- Información de Programa de Fidelidad -->
+          <div class="cs-auth-loyalty-info bs-mt-4">
+            <div class="cs-auth-loyalty-info__content bs-card bs-border-success">
+              <div class="cs-auth-loyalty-info__header bs-card-header bs-bg-success bs-text-white">
+                <h6 class="cs-auth-loyalty-info__title bs-card-title bs-mb-0">
+                  <i class="bi bi-award bs-me-2"></i>Programa de Fidelidad
+                </h6>
+              </div>
+              <div class="cs-auth-loyalty-info__body bs-card-body">
+                <ul class="cs-auth-loyalty-info__list bs-list-unstyled bs-mb-0">
+                  <li class="cs-auth-loyalty-info__item bs-mb-2">
+                    <i class="bi bi-star-fill bs-text-warning bs-me-2"></i>
+                    Acumula puntos en cada compra
+                  </li>
+                  <li class="cs-auth-loyalty-info__item bs-mb-2">
+                    <i class="bi bi-gift-fill bs-text-primary bs-me-2"></i>
+                    Canjea puntos por productos gratuitos
+                  </li>
+                  <li class="cs-auth-loyalty-info__item">
+                    <i class="bi bi-lightning-fill bs-text-info bs-me-2"></i>
+                    Acceso prioritario a ofertas especiales
+                  </li>
+                </ul>
               </div>
             </div>
           </div>
@@ -288,13 +327,13 @@
               </a>
             </li>
             <li class="cs-auth-footer__link-item bs-list-inline-item">
-              <a href="login.html" class="cs-auth-footer__link bs-text-white bs-text-decoration-none">
-                Acceso Admin
+              <a href="../products.html" class="cs-auth-footer__link bs-text-white bs-text-decoration-none">
+                Productos
               </a>
             </li>
             <li class="cs-auth-footer__link-item bs-list-inline-item">
-              <a href="mailto:soporte@carniceriasenormisericordia.com" class="cs-auth-footer__link bs-text-white bs-text-decoration-none">
-                Soporte Técnico
+              <a href="login.html" class="cs-auth-footer__link bs-text-white bs-text-decoration-none">
+                Iniciar Sesión
               </a>
             </li>
           </ul>

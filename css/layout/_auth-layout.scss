@@ -1,0 +1,502 @@
+// layout/_auth-layout.scss
+// Layout específico para páginas de autenticación
+
+.cs-auth-layout {
+  min-height: 100vh;
+  background: linear-gradient(135deg, rgba($primary-color, 0.1) 0%, rgba($accent-color, 0.05) 100%);
+  display: flex;
+  flex-direction: column;
+  
+  &::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('../img/pattern.svg') repeat;
+    opacity: 0.1;
+    z-index: 0;
+  }
+}
+
+.cs-auth-header {
+  position: relative;
+  z-index: 1;
+  box-shadow: $shadow-sm;
+  
+  &__brand {
+    font-weight: $font-weight-bold;
+    
+    &:hover {
+      color: rgba($color-white, 0.9) !important;
+    }
+  }
+  
+  &__logo {
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid rgba($color-white, 0.2);
+  }
+  
+  &__badge {
+    font-size: 0.75rem;
+    font-weight: $font-weight-semibold;
+    letter-spacing: 0.5px;
+  }
+}
+
+.cs-auth-main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: map-get($spacers, 5) 0;
+  position: relative;
+  z-index: 1;
+  
+  @include media-breakpoint-down(md) {
+    padding: map-get($spacers, 4) 0;
+  }
+  
+  @include media-breakpoint-down(sm) {
+    padding: map-get($spacers, 3) 0;
+  }
+}
+
+.cs-auth-card {
+  backdrop-filter: blur(10px);
+  background: rgba($color-white, 0.95);
+  border: 1px solid rgba($primary-color, 0.1);
+  
+  @include media-breakpoint-down(sm) {
+    margin: 0 map-get($spacers, 2);
+  }
+  
+  &__header {
+    border-bottom: none;
+    
+    .cs-auth-card__icon {
+      opacity: 0.9;
+    }
+    
+    .cs-auth-card__title {
+      font-weight: $font-weight-bold;
+    }
+    
+    .cs-auth-card__subtitle {
+      font-size: 0.9rem;
+    }
+  }
+  
+  &__body {
+    @include media-breakpoint-down(sm) {
+      padding: map-get($spacers, 3) !important;
+    }
+  }
+}
+
+.cs-auth-alerts {
+  .cs-auth-alert {
+    border-left: 4px solid;
+    border-radius: 0 $border-radius $border-radius 0;
+    
+    i {
+      font-size: 1.1rem;
+    }
+  }
+}
+
+.cs-auth-field {
+  &__label {
+    font-weight: $font-weight-medium;
+    color: $color-text;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    
+    i {
+      opacity: 0.8;
+    }
+  }
+  
+  &__input {
+    @extend %form-control-base;
+    border-color: $color-border;
+    
+    &:focus {
+      border-color: $primary-color;
+      box-shadow: 0 0 0 0.2rem rgba($primary-color, 0.1);
+    }
+    
+    &.is-invalid {
+      border-color: $color-danger;
+      box-shadow: 0 0 0 0.2rem rgba($color-danger, 0.1);
+    }
+  }
+  
+  &__invalid-feedback {
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+  }
+  
+  &__help {
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+    
+    i {
+      opacity: 0.7;
+    }
+  }
+}
+
+.cs-auth-options {
+  .cs-auth-remember {
+    &__input {
+      margin-right: 0.5rem;
+      
+      &:checked {
+        background-color: $primary-color;
+        border-color: $primary-color;
+      }
+    }
+    
+    &__label {
+      font-size: 0.9rem;
+      color: $color-text-light;
+      user-select: none;
+    }
+  }
+  
+  .cs-auth-forgot {
+    font-size: 0.9rem;
+    
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.cs-auth-submit {
+  &__btn {
+    @extend %btn-primary-base;
+    font-weight: $font-weight-semibold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: $shadow-md;
+    }
+    
+    &:active {
+      transform: translateY(0);
+    }
+  }
+}
+
+.cs-auth-social {
+  &__text {
+    font-size: 0.9rem;
+  }
+  
+  &__buttons {
+    .cs-auth-social__btn {
+      flex: 1;
+      border-width: 2px;
+      font-weight: $font-weight-medium;
+      
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: $shadow-sm;
+      }
+    }
+  }
+}
+
+.cs-auth-section {
+  &__title {
+    font-size: 1.1rem;
+    font-weight: $font-weight-semibold;
+    display: flex;
+    align-items: center;
+    
+    i {
+      opacity: 0.8;
+    }
+  }
+}
+
+.cs-auth-preferences {
+  .cs-auth-preference {
+    &__input {
+      margin-right: 0.5rem;
+      
+      &:checked {
+        background-color: $primary-color;
+        border-color: $primary-color;
+      }
+    }
+    
+    &__label {
+      font-size: 0.9rem;
+      color: $color-text;
+      line-height: 1.4;
+      user-select: none;
+    }
+  }
+}
+
+.cs-auth-agreement {
+  &__check {
+    .cs-auth-agreement__input {
+      margin-right: 0.5rem;
+      
+      &:checked {
+        background-color: $primary-color;
+        border-color: $primary-color;
+      }
+      
+      &:required:invalid {
+        border-color: $color-danger;
+      }
+    }
+    
+    .cs-auth-agreement__label {
+      font-size: 0.9rem;
+      color: $color-text;
+      line-height: 1.4;
+      user-select: none;
+      
+      a {
+        font-weight: $font-weight-medium;
+        
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
+    
+    .cs-auth-agreement__invalid-feedback {
+      font-size: 0.875rem;
+      margin-top: 0.25rem;
+    }
+  }
+}
+
+.cs-auth-otp {
+  &__btn {
+    white-space: nowrap;
+    font-weight: $font-weight-medium;
+    
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+}
+
+.cs-auth-security {
+  &__info {
+    .cs-auth-security__text {
+      font-size: 0.8rem;
+      opacity: 0.8;
+    }
+  }
+}
+
+.cs-auth-links {
+  &__text {
+    font-size: 0.9rem;
+    color: $color-text-light;
+    
+    .cs-auth-links__link {
+      font-weight: $font-weight-medium;
+      
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+}
+
+.cs-auth-contact {
+  &__content {
+    background: rgba($color-white, 0.8);
+    backdrop-filter: blur(5px);
+  }
+  
+  &__body {
+    .cs-auth-contact__title {
+      font-size: 1rem;
+      font-weight: $font-weight-semibold;
+      color: $color-text;
+    }
+    
+    .cs-auth-contact__methods {
+      .cs-auth-contact__method {
+        transition: all 0.3s ease;
+        
+        &:hover {
+          transform: translateY(-2px);
+          
+          .cs-auth-contact__text {
+            color: $color-text;
+          }
+        }
+        
+        .cs-auth-contact__text {
+          font-size: 0.8rem;
+          transition: color 0.3s ease;
+        }
+      }
+    }
+  }
+}
+
+.cs-auth-security-notice {
+  &__content {
+    border: none;
+    background: rgba($color-info, 0.1);
+    
+    .cs-auth-security-notice__title {
+      font-size: 0.9rem;
+      font-weight: $font-weight-semibold;
+    }
+    
+    .cs-auth-security-notice__text {
+      font-size: 0.85rem;
+      margin-bottom: 0;
+    }
+  }
+}
+
+.cs-auth-loyalty-info {
+  &__content {
+    border-width: 2px;
+    
+    .cs-auth-loyalty-info__header {
+      border-bottom: none;
+    }
+    
+    .cs-auth-loyalty-info__body {
+      .cs-auth-loyalty-info__list {
+        .cs-auth-loyalty-info__item {
+          display: flex;
+          align-items: center;
+          font-size: 0.9rem;
+          
+          i {
+            font-size: 0.8rem;
+          }
+        }
+      }
+    }
+  }
+}
+
+.cs-auth-footer {
+  position: relative;
+  z-index: 1;
+  margin-top: auto;
+  
+  &__copyright {
+    font-size: 0.9rem;
+    opacity: 0.8;
+  }
+  
+  &__links {
+    .cs-auth-footer__link-item {
+      &:not(:last-child) {
+        margin-right: map-get($spacers, 3);
+      }
+    }
+    
+    .cs-auth-footer__link {
+      font-size: 0.9rem;
+      opacity: 0.8;
+      transition: opacity 0.3s ease;
+      
+      &:hover {
+        opacity: 1;
+        text-decoration: underline;
+      }
+    }
+  }
+}
+
+// Modo oscuro para auth layout
+[data-bs-theme="dark"] {
+  .cs-auth-layout {
+    background: linear-gradient(135deg, rgba($primary-color, 0.15) 0%, rgba($accent-color, 0.08) 100%);
+  }
+  
+  .cs-auth-card {
+    background: rgba($dark-card-bg, 0.95);
+    border-color: rgba($primary-color, 0.2);
+  }
+  
+  .cs-auth-field {
+    &__label {
+      color: $dark-text;
+    }
+    
+    &__input {
+      background: lighten($dark-bg, 5%);
+      border-color: $dark-border;
+      color: $dark-text;
+      
+      &:focus {
+        background: lighten($dark-bg, 8%);
+        border-color: $primary-color;
+        color: $dark-text;
+      }
+    }
+  }
+  
+  .cs-auth-contact {
+    &__content {
+      background: rgba($dark-card-bg, 0.8);
+    }
+    
+    &__body {
+      .cs-auth-contact__title {
+        color: $dark-text;
+      }
+    }
+  }
+}
+
+// Responsive
+@include media-breakpoint-down(sm) {
+  .cs-auth-header {
+    &__brand {
+      font-size: 1.1rem !important;
+    }
+    
+    &__logo {
+      height: 32px;
+    }
+  }
+  
+  .cs-auth-card {
+    &__header {
+      padding: map-get($spacers, 3) !important;
+      
+      .cs-auth-card__icon {
+        font-size: 2rem !important;
+      }
+      
+      .cs-auth-card__title {
+        font-size: 1.1rem !important;
+      }
+    }
+  }
+  
+  .cs-auth-social {
+    &__buttons {
+      flex-direction: column;
+      gap: map-get($spacers, 2) !important;
+    }
+  }
+}

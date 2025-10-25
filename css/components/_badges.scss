@@ -1,0 +1,305 @@
+// components/_badges.scss
+// Badges y etiquetas de estado (.badge--)
+
+.cs-badge {
+  @extend %badge-base;
+  font-weight: $font-weight-semibold;
+  letter-spacing: 0.5px;
+  
+  // Variantes de color
+  &--primary {
+    background: $primary-color;
+    color: $color-white;
+  }
+  
+  &--secondary {
+    background: $secondary-color;
+    color: $color-text;
+  }
+  
+  &--success {
+    background: $color-success;
+    color: $color-white;
+  }
+  
+  &--warning {
+    background: $color-warning;
+    color: $color-text;
+  }
+  
+  &--danger {
+    background: $color-danger;
+    color: $color-white;
+  }
+  
+  &--info {
+    background: $color-info;
+    color: $color-white;
+  }
+  
+  &--light {
+    background: $color-light;
+    color: $color-text;
+  }
+  
+  &--dark {
+    background: $color-text;
+    color: $color-white;
+  }
+  
+  // Tamaños de badge
+  &--sm {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.4rem;
+  }
+  
+  &--lg {
+    font-size: 0.9rem;
+    padding: 0.4rem 0.75rem;
+  }
+  
+  // Badges con icono
+  &--with-icon {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    
+    .cs-badge__icon {
+      font-size: 0.8em;
+    }
+  }
+  
+  // Badges outline
+  &--outline {
+    background: transparent;
+    border: 1px solid currentColor;
+    
+    &.cs-badge--primary {
+      color: $primary-color;
+    }
+    
+    &.cs-badge--secondary {
+      color: $color-text-light;
+    }
+    
+    &.cs-badge--success {
+      color: $color-success;
+    }
+    
+    &.cs-badge--warning {
+      color: $color-warning;
+    }
+    
+    &.cs-badge--danger {
+      color: $color-danger;
+    }
+    
+    &.cs-badge--info {
+      color: $color-info;
+    }
+    
+    &.cs-badge--light {
+      color: $color-text-light;
+    }
+    
+    &.cs-badge--dark {
+      color: $color-text;
+    }
+  }
+  
+  // Badges con efecto de pulso
+  &--pulse {
+    position: relative;
+    
+    &::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 100%;
+      height: 100%;
+      border-radius: inherit;
+      background: inherit;
+      animation: pulse 2s infinite;
+      transform: translate(-50%, -50%);
+      z-index: -1;
+    }
+  }
+  
+  // Badges en elementos de lista
+  &--list-item {
+    margin-left: auto;
+  }
+}
+
+// Badges para estado de producto
+.cs-product-badge {
+  @extend .cs-badge;
+  position: absolute;
+  top: map-get($spacers, 2);
+  right: map-get($spacers, 2);
+  z-index: 2;
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  @include box-shadow(1);
+  
+  &--new {
+    @extend .cs-badge--success;
+  }
+  
+  &--sale {
+    @extend .cs-badge--danger;
+  }
+  
+  &--featured {
+    @extend .cs-badge--primary;
+  }
+  
+  &--out-of-stock {
+    @extend .cs-badge--secondary;
+  }
+  
+  &--limited {
+    @extend .cs-badge--warning;
+  }
+}
+
+// Badges para estado de pedido
+.cs-order-badge {
+  @extend .cs-badge;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  
+  &--pending {
+    @extend .cs-badge--warning;
+  }
+  
+  &--confirmed {
+    @extend .cs-badge--info;
+  }
+  
+  &--processing {
+    @extend .cs-badge--primary;
+  }
+  
+  &--shipped {
+    @extend .cs-badge--success;
+  }
+  
+  &--delivered {
+    @extend .cs-badge--success;
+    @extend .cs-badge--pulse;
+  }
+  
+  &--cancelled {
+    @extend .cs-badge--danger;
+  }
+}
+
+// Badges para estado de usuario
+.cs-user-badge {
+  @extend .cs-badge;
+  font-size: 0.75rem;
+  
+  &--premium {
+    @extend .cs-badge--primary;
+    @extend .cs-badge--pulse;
+  }
+  
+  &--vip {
+    @extend .cs-badge--warning;
+    @extend .cs-badge--pulse;
+  }
+  
+  &--new {
+    @extend .cs-badge--success;
+  }
+  
+  &--inactive {
+    @extend .cs-badge--secondary;
+  }
+}
+
+// Badges para inventario
+.cs-stock-badge {
+  @extend .cs-badge;
+  font-size: 0.75rem;
+  
+  &--high {
+    @extend .cs-badge--success;
+  }
+  
+  &--medium {
+    @extend .cs-badge--warning;
+  }
+  
+  &--low {
+    @extend .cs-badge--danger;
+    @extend .cs-badge--pulse;
+  }
+  
+  &--out {
+    @extend .cs-badge--secondary;
+  }
+}
+
+// Animación de pulso
+@keyframes pulse {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+  70% {
+    transform: translate(-50%, -50%) scale(1.5);
+    opacity: 0;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1.5);
+    opacity: 0;
+  }
+}
+
+// Modo oscuro para badges
+[data-bs-theme="dark"] {
+  .cs-badge {
+    &--secondary {
+      background: lighten($dark-bg, 20%);
+      color: $dark-text;
+    }
+    
+    &--light {
+      background: lighten($dark-bg, 10%);
+      color: $dark-text;
+    }
+    
+    &--outline {
+      &.cs-badge--secondary {
+        color: rgba($dark-text, 0.7);
+      }
+      
+      &.cs-badge--light {
+        color: rgba($dark-text, 0.7);
+      }
+      
+      &.cs-badge--dark {
+        color: $dark-text;
+      }
+    }
+  }
+}
+
+// Responsive
+@include media-breakpoint-down(sm) {
+  .cs-badge {
+    &--lg {
+      font-size: 0.8rem;
+      padding: 0.3rem 0.6rem;
+    }
+  }
+  
+  .cs-product-badge {
+    top: map-get($spacers, 1);
+    right: map-get($spacers, 1);
+    font-size: 0.65rem;
+  }
+}

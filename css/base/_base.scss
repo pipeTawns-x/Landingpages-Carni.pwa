@@ -1,0 +1,341 @@
+// base/_base.scss
+// Estilos base para elementos HTML (global)
+
+// Estilos base del documento
+html {
+  scroll-behavior: smooth;
+  font-size: 16px; // Base para rem units
+  
+  @include media-breakpoint-down(lg) {
+    font-size: 15px;
+  }
+  
+  @include media-breakpoint-down(md) {
+    font-size: 14px;
+  }
+}
+
+body {
+  background-color: $body-bg;
+  color: $color-text;
+  font-family: $font-family-base;
+  font-weight: $font-weight-normal;
+  line-height: $line-height-base;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  
+  // Mejorar rendering de fuentes
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeSpeed;
+}
+
+// Enfoque en accesibilidad para focus
+:focus {
+  outline: 2px solid $primary-color;
+  outline-offset: 2px;
+}
+
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+// Mejoras para elementos semánticos
+main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+section {
+  padding: map-get($spacers, 5) 0;
+  
+  @include media-breakpoint-down(md) {
+    padding: map-get($spacers, 4) 0;
+  }
+}
+
+// Mejoras para imágenes
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+// Mejoras para enlaces
+a {
+  color: $primary-color;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    color: darken($primary-color, 15%);
+  }
+  
+  &:focus-visible {
+    outline: 2px solid $primary-color;
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+}
+
+// Mejoras para botones
+button {
+  cursor: pointer;
+  font-family: inherit;
+  
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+}
+
+// Mejoras para formularios
+input,
+textarea,
+select {
+  font-family: inherit;
+  font-size: inherit;
+  
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+}
+
+// Mejoras para tablas
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+// Mejoras para citas
+blockquote {
+  border-left: 4px solid $primary-color;
+  padding-left: map-get($spacers, 3);
+  margin-left: 0;
+  font-style: italic;
+}
+
+// Mejoras para código
+code {
+  background: $color-light;
+  padding: 0.125rem 0.25rem;
+  border-radius: $border-radius-sm;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.875em;
+}
+
+pre {
+  background: $color-light;
+  padding: map-get($spacers, 3);
+  border-radius: $border-radius;
+  overflow-x: auto;
+  
+  code {
+    background: none;
+    padding: 0;
+  }
+}
+
+// Mejoras para elementos interactivos
+details {
+  margin-bottom: map-get($spacers, 3);
+  
+  &[open] summary {
+    margin-bottom: map-get($spacers, 2);
+  }
+}
+
+summary {
+  cursor: pointer;
+  font-weight: $font-weight-semibold;
+  
+  &:focus-visible {
+    outline: 2px solid $primary-color;
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+}
+
+// Mejoras para elementos de lista
+li {
+  margin-bottom: map-get($spacers, 2);
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+// Utilidades de contenedor
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 map-get($spacers, 3);
+  
+  @include media-breakpoint-down(sm) {
+    padding: 0 map-get($spacers, 2);
+  }
+}
+
+.container-fluid {
+  width: 100%;
+  padding: 0 map-get($spacers, 3);
+  
+  @include media-breakpoint-down(sm) {
+    padding: 0 map-get($spacers, 2);
+  }
+}
+
+// Utilidades de sección
+.section {
+  padding: map-get($spacers, 5) 0;
+  
+  &--condensed {
+    padding: map-get($spacers, 3) 0;
+  }
+  
+  &--expanded {
+    padding: map-get($spacers, 6) 0;
+  }
+}
+
+// Estados de carga
+.loading {
+  opacity: 0.6;
+  pointer-events: none;
+  position: relative;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 1.5rem;
+    height: 1.5rem;
+    border: 2px solid transparent;
+    border-top: 2px solid $primary-color;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    transform: translate(-50%, -50%);
+  }
+}
+
+// Estados de error
+.error {
+  border-color: $color-danger !important;
+  background-color: rgba($color-danger, 0.05) !important;
+}
+
+// Estados de éxito
+.success {
+  border-color: $color-success !important;
+  background-color: rgba($color-success, 0.05) !important;
+}
+
+// Estados de advertencia
+.warning {
+  border-color: $color-warning !important;
+  background-color: rgba($color-warning, 0.05) !important;
+}
+
+// Modo oscuro
+[data-bs-theme="dark"] {
+  background-color: $dark-bg;
+  color: $dark-text;
+  
+  code {
+    background: lighten($dark-bg, 10%);
+    color: $dark-text;
+  }
+  
+  pre {
+    background: lighten($dark-bg, 10%);
+    color: $dark-text;
+  }
+  
+  blockquote {
+    border-left-color: $primary-color;
+    color: rgba($dark-text, 0.8);
+  }
+}
+
+// Soporte para alta visibilidad
+@media (prefers-contrast: high) {
+  :root {
+    --border-width: 2px;
+  }
+  
+  .border {
+    border-width: 2px !important;
+  }
+  
+  button, 
+  .btn {
+    border-width: 2px !important;
+  }
+}
+
+// Soporte para movimiento reducido
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+// Impresión
+@media print {
+  * {
+    background: transparent !important;
+    color: black !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+  
+  a,
+  a:visited {
+    text-decoration: underline;
+  }
+  
+  pre,
+  blockquote {
+    border: 1px solid #999;
+    page-break-inside: avoid;
+  }
+  
+  thead {
+    display: table-header-group;
+  }
+  
+  tr,
+  img {
+    page-break-inside: avoid;
+  }
+  
+  img {
+    max-width: 100% !important;
+  }
+  
+  @page {
+    margin: 0.5cm;
+  }
+  
+  p,
+  h2,
+  h3 {
+    orphans: 3;
+    widows: 3;
+  }
+  
+  h2,
+  h3 {
+    page-break-after: avoid;
+  }
+}

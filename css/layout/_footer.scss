@@ -1,0 +1,248 @@
+// layout/_footer.scss
+// Footer e información de contacto
+
+.cs-footer {
+  background: $dark-bg;
+  color: $color-white;
+  margin-top: auto;
+  position: relative;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, $primary-color, transparent);
+  }
+  
+  &__title {
+    font-weight: $font-weight-semibold;
+    font-size: 1.1rem;
+    margin-bottom: map-get($spacers, 3);
+    color: $color-white;
+  }
+  
+  &__description {
+    font-size: 0.9rem;
+    line-height: 1.5;
+    opacity: 0.8;
+  }
+  
+  &__schedule {
+    font-size: 0.9rem;
+    opacity: 0.8;
+    
+    &:not(:last-child) {
+      margin-bottom: 0.25rem;
+    }
+  }
+  
+  &__social-icons {
+    display: flex;
+    gap: map-get($spacers, 3);
+    
+    @include media-breakpoint-down(sm) {
+      justify-content: center;
+    }
+    
+    .cs-footer__social-link {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba($color-white, 0.1);
+      transition: all 0.3s ease;
+      text-decoration: none;
+      
+      &:hover {
+        background: rgba($color-white, 0.2);
+        transform: translateY(-2px);
+        text-decoration: none;
+        
+        i {
+          transform: scale(1.1);
+        }
+      }
+      
+      i {
+        transition: transform 0.3s ease;
+      }
+    }
+  }
+  
+  &__divider {
+    border-color: rgba($color-white, 0.1);
+    margin: map-get($spacers, 4) 0;
+    opacity: 1;
+  }
+  
+  &__copyright {
+    font-size: 0.9rem;
+    opacity: 0.7;
+    
+    @include media-breakpoint-down(md) {
+      text-align: center;
+    }
+  }
+  
+  &__links {
+    @include media-breakpoint-down(md) {
+      text-align: center !important;
+    }
+    
+    .cs-footer__link-item {
+      &:not(:last-child) {
+        margin-right: map-get($spacers, 3);
+        
+        @include media-breakpoint-down(sm) {
+          margin-right: map-get($spacers, 2);
+        }
+      }
+    }
+    
+    .cs-footer__link {
+      font-size: 0.9rem;
+      opacity: 0.8;
+      transition: all 0.3s ease;
+      
+      &:hover {
+        opacity: 1;
+        text-decoration: underline;
+      }
+    }
+  }
+}
+
+// Footer para páginas de autenticación
+.cs-auth-footer {
+  background: $dark-bg;
+  color: $color-white;
+  margin-top: auto;
+  
+  &__copyright {
+    font-size: 0.9rem;
+    opacity: 0.7;
+  }
+  
+  &__links {
+    .cs-auth-footer__link-item {
+      &:not(:last-child) {
+        margin-right: map-get($spacers, 3);
+      }
+    }
+    
+    .cs-auth-footer__link {
+      font-size: 0.9rem;
+      opacity: 0.8;
+      transition: opacity 0.3s ease;
+      
+      &:hover {
+        opacity: 1;
+        text-decoration: underline;
+      }
+    }
+  }
+}
+
+// Footer para páginas offline
+.cs-offline-footer {
+  background: $dark-bg;
+  color: $color-white;
+  margin-top: auto;
+  
+  &__copyright {
+    font-size: 0.9rem;
+    opacity: 0.7;
+  }
+  
+  &__links {
+    .cs-offline-footer__link-item {
+      &:not(:last-child) {
+        margin-right: map-get($spacers, 3);
+      }
+    }
+    
+    .cs-offline-footer__link {
+      font-size: 0.9rem;
+      opacity: 0.8;
+      transition: opacity 0.3s ease;
+      
+      &:hover {
+        opacity: 1;
+        text-decoration: underline;
+      }
+    }
+  }
+}
+
+// Modo oscuro para footer
+[data-bs-theme="dark"] {
+  .cs-footer,
+  .cs-auth-footer,
+  .cs-offline-footer {
+    background: lighten($dark-bg, 5%);
+    
+    &::before {
+      background: linear-gradient(90deg, transparent, $primary-color, transparent);
+    }
+  }
+}
+
+// Responsive
+@include media-breakpoint-down(md) {
+  .cs-footer {
+    text-align: center;
+    
+    .bs-row > .bs-col-md-4 {
+      margin-bottom: map-get($spacers, 4);
+      
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+    
+    &__social-icons {
+      justify-content: center;
+    }
+  }
+}
+
+@include media-breakpoint-down(sm) {
+  .cs-footer {
+    padding: map-get($spacers, 4) 0 !important;
+    
+    &__title {
+      font-size: 1rem;
+      margin-bottom: map-get($spacers, 2);
+    }
+    
+    &__social-icons {
+      gap: map-get($spacers, 2);
+      
+      .cs-footer__social-link {
+        width: 36px;
+        height: 36px;
+        
+        i {
+          font-size: 1rem;
+        }
+      }
+    }
+    
+    &__links {
+      .cs-footer__link-item {
+        display: block;
+        margin-right: 0 !important;
+        margin-bottom: map-get($spacers, 1);
+        
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
+    }
+  }
+}

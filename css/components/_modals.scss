@@ -1,30 +1,679 @@
-// Modal styles
-.modal-content {
-  border-radius: $border-radius-sm;
-  @include box-shadow(4);
-  border: none;
-  
-  .modal-header {
-    border-bottom: 1px solid rgba($primary-color, 0.1);
+// scss/components/_modals.scss
+
+// Modal base styles
+.cs-product-modal,
+.cs-loyalty-modal {
+  .bs-modal-content {
+    border: none;
+    border-radius: $border-radius-lg;
+    @include box-shadow(4);
+    overflow: hidden;
+  }
+
+  &__dialog {
+    max-width: 900px;
+    
+    @include media-breakpoint-down(lg) {
+      max-width: 95%;
+    }
+  }
+
+  &__header {
+    background: $primary-color;
+    color: $color-white;
+    border-bottom: none;
+    padding: map-get($spacers, 4);
+    
+    @include media-breakpoint-down(md) {
+      padding: map-get($spacers, 3);
+    }
+  }
+
+  &__title {
+    font-weight: 700;
+    font-size: 1.25rem;
+    margin-bottom: 0;
+    display: flex;
+    align-items: center;
+    
+    i {
+      margin-right: map-get($spacers, 2);
+    }
+  }
+
+  &__close {
+    filter: invert(1);
+    opacity: 0.8;
+    
+    &:hover {
+      opacity: 1;
+    }
+  }
+
+  &__body {
+    padding: map-get($spacers, 4);
+    
+    @include media-breakpoint-down(md) {
+      padding: map-get($spacers, 3);
+    }
+  }
+
+  &__footer {
+    border-top: 1px solid $color-border;
     padding: map-get($spacers, 3) map-get($spacers, 4);
     
-    .modal-title {
-      font-weight: 600;
+    @include media-breakpoint-down(md) {
+      padding: map-get($spacers, 3);
+    }
+  }
+}
+
+// Product modal specific styles
+.cs-product-modal {
+  &__image-container {
+    position: relative;
+    border-radius: $border-radius;
+    overflow: hidden;
+    @include box-shadow(2);
+  }
+
+  &__image {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+    
+    @include media-breakpoint-down(md) {
+      height: 250px;
+    }
+  }
+
+  &__badge {
+    position: absolute;
+    top: map-get($spacers, 2);
+    left: map-get($spacers, 2);
+    font-size: 0.75rem;
+    padding: 0.35rem 0.75rem;
+    border-radius: 20px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  &__info {
+    .cs-product-modal__name {
+      font-weight: 700;
+      color: $color-text;
+      margin-bottom: map-get($spacers, 3);
+      font-size: 1.5rem;
+      line-height: 1.3;
+    }
+  }
+
+  &__prices {
+    margin-bottom: map-get($spacers, 3);
+    
+    .cs-product-modal__price {
+      font-weight: 800;
       color: $primary-color;
     }
-    
-    .btn-close {
-      padding: map-get($spacers, 2);
-      margin: calc(-1 * #{map-get($spacers, 2)}) calc(-1 * #{map-get($spacers, 3)}) calc(-1 * #{map-get($spacers, 2)}) auto;
+
+    .cs-product-modal__price-lb {
+      font-size: 0.9rem;
+      color: $color-text-light;
+      margin-left: map-get($spacers, 2);
     }
   }
-  
-  .modal-body {
-    padding: map-get($spacers, 4);
+
+  &__description {
+    color: $color-text-light;
+    line-height: 1.6;
+    margin-bottom: map-get($spacers, 4);
   }
-  
-  .modal-footer {
-    border-top: 1px solid rgba($primary-color, 0.1);
+
+  &__options {
+    .cs-product-modal__options-title {
+      font-weight: 600;
+      color: $color-text;
+      margin-bottom: map-get($spacers, 3);
+      font-size: 1.1rem;
+    }
+  }
+
+  &__order-type {
+    margin-bottom: map-get($spacers, 4);
+    
+    .cs-product-modal__btn-group {
+      .cs-product-modal__radio {
+        display: none;
+        
+        &:checked + .cs-product-modal__label {
+          background-color: $primary-color;
+          border-color: $primary-color;
+          color: $color-white;
+        }
+      }
+
+      .cs-product-modal__label {
+        flex: 1;
+        padding: map-get($spacers, 2) map-get($spacers, 3);
+        border: 2px solid $color-border;
+        background-color: $color-white;
+        color: $color-text;
+        font-weight: 500;
+        @include transition(all);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        
+        &:first-of-type {
+          border-radius: $border-radius 0 0 $border-radius;
+        }
+        
+        &:last-of-type {
+          border-radius: 0 $border-radius $border-radius 0;
+        }
+        
+        &:hover {
+          background-color: $color-light;
+        }
+        
+        i {
+          margin-right: map-get($spacers, 2);
+        }
+      }
+    }
+  }
+
+  &__quantity {
+    margin-bottom: map-get($spacers, 4);
+    
+    .cs-product-modal__quantity-label {
+      font-weight: 600;
+      margin-bottom: map-get($spacers, 2);
+      color: $color-text;
+    }
+
+    .cs-product-modal__quantity-controls {
+      max-width: 200px;
+      
+      .cs-product-modal__quantity-btn {
+        width: 45px;
+        height: 45px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 2px solid $color-border;
+        background-color: $color-white;
+        @include transition(all);
+        
+        &:hover {
+          background-color: $color-light;
+        }
+        
+        &:first-of-type {
+          border-radius: $border-radius 0 0 $border-radius;
+        }
+        
+        &:last-of-type {
+          border-radius: 0 $border-radius $border-radius 0;
+        }
+      }
+
+      .cs-product-modal__quantity-input {
+        border: 2px solid $color-border;
+        border-left: none;
+        border-right: none;
+        padding: map-get($spacers, 2);
+        font-weight: 600;
+        text-align: center;
+        
+        &:focus {
+          box-shadow: none;
+          border-color: $color-border;
+        }
+      }
+    }
+
+    .cs-product-modal__quantity-help {
+      font-size: 0.875rem;
+      color: $color-text-light;
+      margin-top: map-get($spacers, 1);
+    }
+  }
+
+  &__cut-options {
+    margin-bottom: map-get($spacers, 4);
+    
+    .cs-product-modal__cut-label {
+      font-weight: 600;
+      margin-bottom: map-get($spacers, 2);
+      color: $color-text;
+    }
+
+    .cs-product-modal__cut-btns {
+      .cs-product-modal__cut-radio {
+        display: none;
+        
+        &:checked + .cs-product-modal__cut-label-btn {
+          background-color: $primary-color;
+          border-color: $primary-color;
+          color: $color-white;
+        }
+      }
+
+      .cs-product-modal__cut-label-btn {
+        padding: map-get($spacers, 2) map-get($spacers, 3);
+        border: 2px solid $color-border;
+        background-color: $color-white;
+        color: $color-text;
+        font-weight: 500;
+        border-radius: $border-radius;
+        @include transition(all);
+        
+        &:hover {
+          background-color: $color-light;
+        }
+      }
+    }
+  }
+
+  &__summary {
+    border: none;
+    @include gradient-bg(lighten($primary-color, 45%), lighten($accent-color, 45%));
+    border-left: 4px solid $primary-color;
+    
+    .cs-product-modal__summary-body {
+      padding: map-get($spacers, 3);
+    }
+
+    .cs-product-modal__summary-title {
+      font-weight: 600;
+      color: $color-text;
+      margin-bottom: map-get($spacers, 2);
+      font-size: 1rem;
+    }
+
+    .cs-product-modal__summary-content {
+      .cs-product-modal__summary-text {
+        font-size: 0.9rem;
+        margin-bottom: map-get($spacers, 1);
+        color: $color-text;
+      }
+    }
+
+    .cs-product-modal__summary-divider {
+      margin: map-get($spacers, 2) 0;
+      border-color: rgba($primary-color, 0.3);
+    }
+
+    .cs-product-modal__summary-total {
+      color: $primary-color;
+      margin-bottom: 0;
+    }
+  }
+
+  &__cancel-btn {
+    padding: map-get($spacers, 2) map-get($spacers, 4);
+    font-weight: 500;
+    border-radius: $border-radius;
+    @include transition(all);
+    
+    &:hover {
+      transform: translateY(-2px);
+      @include box-shadow(1);
+    }
+  }
+
+  &__add-btn {
+    padding: map-get($spacers, 2) map-get($spacers, 4);
+    font-weight: 600;
+    border-radius: $border-radius;
+    @include transition(all);
+    
+    i {
+      margin-right: map-get($spacers, 2);
+    }
+    
+    &:hover {
+      transform: translateY(-2px);
+      @include box-shadow(2);
+    }
+  }
+}
+
+// Loyalty modal specific styles
+.cs-loyalty-modal {
+  &__spinner {
+    width: 3rem;
+    height: 3rem;
+    color: $primary-color;
+  }
+
+  &__close-btn {
+    padding: map-get($spacers, 2) map-get($spacers, 4);
+    font-weight: 500;
+    border-radius: $border-radius;
+    @include transition(all);
+    
+    &:hover {
+      transform: translateY(-2px);
+      @include box-shadow(1);
+    }
+  }
+}
+
+// Cart offcanvas styles
+.cs-cart-offcanvas {
+  &.bs-offcanvas-end {
+    width: 400px;
+    border-radius: $border-radius-lg 0 0 $border-radius-lg;
+    @include box-shadow(4);
+    
+    @include media-breakpoint-down(sm) {
+      width: 100%;
+    }
+  }
+
+  &__header {
+    background: $primary-color;
+    color: $color-white;
+    border-bottom: 1px solid rgba($color-white, 0.1);
     padding: map-get($spacers, 3) map-get($spacers, 4);
+  }
+
+  &__title {
+    font-weight: 700;
+    margin-bottom: 0;
+    display: flex;
+    align-items: center;
+    
+    i {
+      margin-right: map-get($spacers, 2);
+    }
+  }
+
+  &__close {
+    filter: invert(1);
+    opacity: 0.8;
+    
+    &:hover {
+      opacity: 1;
+    }
+  }
+
+  &__body {
+    padding: map-get($spacers, 3);
+    background: $body-bg;
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 73px);
+  }
+
+  &__items {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: map-get($spacers, 3);
+    
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+      background-color: $color-border;
+      border-radius: 3px;
+    }
+  }
+
+  &__empty-icon {
+    color: $color-text-light;
+  }
+
+  &__empty-text {
+    color: $color-text-light;
+    margin-bottom: map-get($spacers, 3);
+  }
+
+  &__continue-btn {
+    padding: map-get($spacers, 2) map-get($spacers, 4);
+    font-weight: 500;
+    border-radius: $border-radius;
+    @include transition(all);
+    
+    &:hover {
+      transform: translateY(-2px);
+      @include box-shadow(1);
+    }
+  }
+}
+
+// Delivery options styles
+.cs-delivery-options {
+  border: none;
+  border-radius: $border-radius;
+  @include box-shadow(2);
+  margin-bottom: map-get($spacers, 3);
+
+  &__body {
+    padding: map-get($spacers, 3);
+  }
+
+  &__title {
+    font-weight: 600;
+    color: $color-text;
+    margin-bottom: map-get($spacers, 3);
+    font-size: 1rem;
+  }
+
+  &__btn-group {
+    .cs-delivery-options__radio {
+      display: none;
+      
+      &:checked + .cs-delivery-options__label {
+        background-color: $primary-color;
+        border-color: $primary-color;
+        color: $color-white;
+      }
+    }
+
+    .cs-delivery-options__label {
+      flex: 1;
+      padding: map-get($spacers, 2) map-get($spacers, 3);
+      border: 2px solid $color-border;
+      background-color: $color-white;
+      color: $color-text;
+      font-weight: 500;
+      @include transition(all);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      
+      &:first-of-type {
+        border-radius: $border-radius 0 0 $border-radius;
+      }
+      
+      &:last-of-type {
+        border-radius: 0 $border-radius $border-radius 0;
+      }
+      
+      &:hover {
+        background-color: $color-light;
+      }
+      
+      i {
+        margin-right: map-get($spacers, 2);
+      }
+    }
+  }
+
+  &__pickup,
+  &__delivery {
+    .cs-delivery-options__label {
+      font-weight: 600;
+      margin-bottom: map-get($spacers, 2);
+      color: $color-text;
+      font-size: 0.9rem;
+    }
+
+    .cs-delivery-options__input {
+      border: 2px solid $color-border;
+      border-radius: $border-radius;
+      padding: map-get($spacers, 2);
+      @include transition(all);
+      
+      &:focus {
+        border-color: $primary-color;
+        box-shadow: 0 0 0 0.2rem rgba($primary-color, 0.1);
+      }
+    }
+
+    .cs-delivery-options__help {
+      font-size: 0.8rem;
+      color: $color-text-light;
+      margin-top: map-get($spacers, 1);
+    }
+  }
+
+  &__fee {
+    border: none;
+    border-radius: $border-radius;
+    padding: map-get($spacers, 2) map-get($spacers, 3);
+    background-color: rgba($color-info, 0.1);
+    border: 1px solid rgba($color-info, 0.2);
+    
+    i {
+      color: $color-info;
+      margin-right: map-get($spacers, 2);
+    }
+  }
+}
+
+// Cart summary styles
+.cs-cart-summary {
+  border: none;
+  border-radius: $border-radius;
+  @include box-shadow(2);
+
+  &__body {
+    padding: map-get($spacers, 3);
+  }
+
+  &__label,
+  &__value {
+    font-size: 0.9rem;
+    color: $color-text;
+  }
+
+  &__total-label,
+  &__total-value {
+    font-size: 1.1rem;
+  }
+
+  &__checkout-btn {
+    padding: map-get($spacers, 2) map-get($spacers, 3);
+    font-weight: 600;
+    border-radius: $border-radius;
+    @include transition(all);
+    
+    i {
+      margin-right: map-get($spacers, 2);
+    }
+    
+    &:hover {
+      transform: translateY(-2px);
+      @include box-shadow(2);
+    }
+  }
+
+  &__clear-btn {
+    padding: map-get($spacers, 2) map-get($spacers, 3);
+    font-weight: 500;
+    border-radius: $border-radius;
+    @include transition(all);
+    
+    i {
+      margin-right: map-get($spacers, 2);
+    }
+    
+    &:hover {
+      transform: translateY(-2px);
+      @include box-shadow(1);
+    }
+  }
+}
+
+// Responsive styles
+@include media-breakpoint-down(md) {
+  .cs-product-modal {
+    &__dialog {
+      margin: map-get($spacers, 2);
+    }
+
+    &__body {
+      padding: map-get($spacers, 3);
+    }
+
+    &__image {
+      height: 200px;
+    }
+
+    &__name {
+      font-size: 1.25rem;
+    }
+  }
+
+  .cs-cart-offcanvas {
+    &.bs-offcanvas-end {
+      width: 100%;
+    }
+  }
+}
+
+@include media-breakpoint-down(sm) {
+  .cs-product-modal {
+    &__header {
+      padding: map-get($spacers, 3);
+    }
+
+    &__body {
+      padding: map-get($spacers, 2);
+    }
+
+    &__footer {
+      padding: map-get($spacers, 2);
+    }
+
+    &__order-type {
+      .cs-product-modal__btn-group {
+        flex-direction: column;
+        
+        .cs-product-modal__label {
+          border-radius: $border-radius !important;
+          margin-bottom: map-get($spacers, 1);
+          
+          &:last-child {
+            margin-bottom: 0;
+          }
+        }
+      }
+    }
+  }
+
+  .cs-delivery-options {
+    &__btn-group {
+      flex-direction: column;
+      
+      .cs-delivery-options__label {
+        border-radius: $border-radius !important;
+        margin-bottom: map-get($spacers, 1);
+        
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
+    }
   }
 }

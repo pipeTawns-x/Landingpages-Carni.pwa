@@ -1,0 +1,294 @@
+// components/_alerts.scss
+// Alertas y notificaciones del sistema (.alert--)
+
+.cs-alert {
+  @extend %alert-base;
+  display: flex;
+  align-items: flex-start;
+  gap: map-get($spacers, 2);
+  
+  &__icon {
+    font-size: 1.25rem;
+    flex-shrink: 0;
+    margin-top: 0.125rem;
+  }
+  
+  &__content {
+    flex: 1;
+  }
+  
+  &__title {
+    font-weight: $font-weight-semibold;
+    margin-bottom: 0.25rem;
+    font-size: 0.9rem;
+  }
+  
+  &__message {
+    margin-bottom: 0;
+    font-size: 0.875rem;
+    line-height: 1.4;
+  }
+  
+  &__close {
+    background: none;
+    border: none;
+    font-size: 1rem;
+    opacity: 0.7;
+    padding: 0.25rem;
+    border-radius: $border-radius-sm;
+    @include transition(all, 0.3s, ease);
+    flex-shrink: 0;
+    margin-top: -0.25rem;
+    
+    &:hover {
+      opacity: 1;
+      background: rgba(0, 0, 0, 0.1);
+    }
+  }
+  
+  // Variantes de alerta
+  &--primary {
+    background: rgba($primary-color, 0.1);
+    border-left-color: $primary-color;
+    color: darken($primary-color, 10%);
+    
+    .cs-alert__icon {
+      color: $primary-color;
+    }
+  }
+  
+  &--success {
+    background: rgba($color-success, 0.1);
+    border-left-color: $color-success;
+    color: darken($color-success, 10%);
+    
+    .cs-alert__icon {
+      color: $color-success;
+    }
+  }
+  
+  &--warning {
+    background: rgba($color-warning, 0.1);
+    border-left-color: $color-warning;
+    color: darken($color-warning, 20%);
+    
+    .cs-alert__icon {
+      color: $color-warning;
+    }
+  }
+  
+  &--danger {
+    background: rgba($color-danger, 0.1);
+    border-left-color: $color-danger;
+    color: darken($color-danger, 10%);
+    
+    .cs-alert__icon {
+      color: $color-danger;
+    }
+  }
+  
+  &--info {
+    background: rgba($color-info, 0.1);
+    border-left-color: $color-info;
+    color: darken($color-info, 10%);
+    
+    .cs-alert__icon {
+      color: $color-info;
+    }
+  }
+  
+  // Alertas con acción
+  &--action {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: map-get($spacers, 2);
+    
+    .cs-alert__actions {
+      display: flex;
+      gap: map-get($spacers, 2);
+      flex-shrink: 0;
+      
+      .cs-alert__btn {
+        padding: 0.375rem 0.75rem;
+        font-size: 0.875rem;
+        border-radius: $border-radius-sm;
+        font-weight: $font-weight-medium;
+        @include transition(all, 0.3s, ease);
+        
+        &--primary {
+          background: $primary-color;
+          color: $color-white;
+          border: 1px solid $primary-color;
+          
+          &:hover {
+            background: darken($primary-color, 10%);
+            border-color: darken($primary-color, 10%);
+          }
+        }
+        
+        &--outline {
+          background: transparent;
+          color: inherit;
+          border: 1px solid currentColor;
+          
+          &:hover {
+            background: currentColor;
+            color: $color-white;
+          }
+        }
+      }
+    }
+  }
+  
+  // Alertas toast
+  &--toast {
+    position: fixed;
+    top: map-get($spacers, 4);
+    right: map-get($spacers, 4);
+    z-index: $z-index-toast;
+    min-width: 300px;
+    max-width: 400px;
+    @include box-shadow(3);
+    border-radius: $border-radius;
+    border-left: none;
+    animation: slideInRight 0.3s ease;
+    
+    @include media-breakpoint-down(sm) {
+      top: map-get($spacers, 2);
+      right: map-get($spacers, 2);
+      left: map-get($spacers, 2);
+      min-width: auto;
+      max-width: none;
+    }
+  }
+  
+  // Alertas inline
+  &--inline {
+    display: inline-flex;
+    max-width: 100%;
+  }
+}
+
+// Sistema de notificaciones
+.cs-notifications {
+  position: fixed;
+  top: map-get($spacers, 4);
+  right: map-get($spacers, 4);
+  z-index: $z-index-toast;
+  display: flex;
+  flex-direction: column;
+  gap: map-get($spacers, 2);
+  max-width: 400px;
+  
+  @include media-breakpoint-down(sm) {
+    top: map-get($spacers, 2);
+    right: map-get($spacers, 2);
+    left: map-get($spacers, 2);
+    max-width: none;
+  }
+}
+
+// Alertas offline
+.cs-offline-alert {
+  position: fixed;
+  bottom: map-get($spacers, 4);
+  right: map-get($spacers, 4);
+  z-index: $z-index-toast;
+  @include box-shadow(3);
+  animation: slideInRight 0.3s ease;
+  border-left: 4px solid $color-warning;
+  
+  @include media-breakpoint-down(sm) {
+    bottom: map-get($spacers, 2);
+    right: map-get($spacers, 2);
+    left: map-get($spacers, 2);
+  }
+}
+
+// Animaciones para alertas
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideOutRight {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+}
+
+// Modo oscuro para alertas
+[data-bs-theme="dark"] {
+  .cs-alert {
+    &--primary {
+      background: rgba($primary-color, 0.2);
+      color: lighten($primary-color, 10%);
+    }
+    
+    &--success {
+      background: rgba($color-success, 0.2);
+      color: lighten($color-success, 10%);
+    }
+    
+    &--warning {
+      background: rgba($color-warning, 0.2);
+      color: lighten($color-warning, 10%);
+    }
+    
+    &--danger {
+      background: rgba($color-danger, 0.2);
+      color: lighten($color-danger, 10%);
+    }
+    
+    &--info {
+      background: rgba($color-info, 0.2);
+      color: lighten($color-info, 10%);
+    }
+    
+    &__close {
+      color: $dark-text;
+      
+      &:hover {
+        background: rgba($color-white, 0.1);
+      }
+    }
+  }
+}
+
+// Responsive
+@include media-breakpoint-down(sm) {
+  .cs-alert {
+    padding: map-get($spacers, 3);
+    
+    &--action {
+      flex-direction: column;
+      align-items: stretch;
+      
+      .cs-alert__actions {
+        justify-content: stretch;
+        
+        .cs-alert__btn {
+          flex: 1;
+          text-align: center;
+        }
+      }
+    }
+    
+    &--toast {
+      padding: map-get($spacers, 3);
+    }
+  }
+}

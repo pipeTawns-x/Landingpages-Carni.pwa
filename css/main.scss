@@ -1,48 +1,48 @@
-// main.scss - Archivo principal que importa todos los módulos SCSS
+// scss/main.scss - ARCHIVO MAESTRO ACTUALIZADO
 
-// Abstracts (utilidades y configuraciones)
+// Import abstracts
 @import 'abstracts/variables';
-@import 'abstracts/functions';
 @import 'abstracts/mixins';
-@import 'abstracts/placeholders';
 @import 'abstracts/bem-utilities';
+@import 'abstracts/functions';
+@import 'abstracts/placeholders';
 
-// Vendors (librerías externas)
-@import 'vendors/bootstrap';
-@import 'vendors/custom-vendors';
-
-// Base (estilos base y reset)
+// Import base
 @import 'base/reset';
 @import 'base/typography';
-@import 'base/base';
 @import 'base/utilities';
+@import 'base/base';
 
-// Layout (estructura principal)
-@import 'layout/grid';
-@import 'layout/header';
-@import 'layout/navigation';
-@import 'layout/sidebar';
-@import 'layout/forms';
+// Import layout
+@import 'layout/auth-layout';
+@import 'layout/dashboard-layout';
 @import 'layout/footer';
+@import 'layout/header';
+@import 'layout/sidebar';
 
-// Components (componentes reutilizables)
+// Import components
+@import 'components/alerts';
+@import 'components/badges';
 @import 'components/buttons';
 @import 'components/cards';
 @import 'components/carousel';
-@import 'components/alerts';
-@import 'components/badges';
 @import 'components/loading';
 @import 'components/modals';
 
-// Pages (estilos específicos de páginas)
-@import 'pages/home';
-@import 'pages/products';
-@import 'pages/catalog';
-@import 'pages/cart';
-@import 'pages/login';
+// Import pages
 @import 'pages/admin';
+@import 'pages/cart';
+@import 'pages/catalog';
 @import 'pages/dashboard';
+@import 'pages/home';
+@import 'pages/login';
+@import 'pages/offline'; // ✅ NUEVA PÁGINA OFFLINE AÑADIDA
+@import 'pages/products';
 
-// Themes (temas y variantes)
-@import 'themes/theme';
+// Import themes
 @import 'themes/dark-mode';
+@import 'themes/theme';
+
+// Import vendors
+@import 'vendors/bootstrap';
+@import 'vendors/custom-vendors';

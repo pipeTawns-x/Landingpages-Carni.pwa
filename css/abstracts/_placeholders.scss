@@ -1,33 +1,175 @@
-// Placeholders SCSS
-%sr-only {
+// abstracts/_placeholders.scss
+// Placeholders y extends comunes para reutilización
+
+// Placeholder para reset de botones
+%button-reset {
+  border: none;
+  background: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  cursor: pointer;
+  outline: inherit;
+}
+
+// Placeholder para reset de listas
+%list-reset {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+// Placeholder para contenedores flex centrados
+%flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+// Placeholder para contenedores flex entre
+%flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+// Placeholder para contenedores flex columna
+%flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+// Placeholder para texto truncado
+%text-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// Placeholder para texto multilínea truncado
+%multiline-truncate {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+// Placeholder para elementos de tarjeta
+%card-base {
+  background: $color-white;
+  border-radius: $border-radius-lg;
+  box-shadow: $shadow-sm;
+  transition: all 0.3s ease;
+}
+
+// Placeholder para elementos de botón primario
+%btn-primary-base {
+  @include primary-button;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-weight: $font-weight-semibold;
+}
+
+// Placeholder para elementos de formulario
+%form-control-base {
+  border: 1px solid $color-border;
+  border-radius: $border-radius-sm;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  
+  &:focus {
+    border-color: $primary-color;
+    box-shadow: 0 0 0 0.2rem rgba($primary-color, 0.25);
+    outline: none;
+  }
+}
+
+// Placeholder para elementos de loading
+%loading-base {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid transparent;
+  border-top: 2px solid currentColor;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+// Placeholder para elementos de modal
+%modal-base {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: $z-index-modal;
+}
+
+// Placeholder para elementos de tooltip
+%tooltip-base {
+  position: absolute;
+  background: $dark-bg;
+  color: $color-white;
+  padding: 0.5rem 0.75rem;
+  border-radius: $border-radius-sm;
+  font-size: 0.875rem;
+  white-space: nowrap;
+  z-index: $z-index-tooltip;
+  
+  &::before {
+    content: '';
     position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
+    border: 5px solid transparent;
   }
-  
-  %card-base {
-    background: $white;
-    border-radius: $border-radius-lg;
-    @include box-shadow(1);
-    @include transition(all);
-  }
-  
-  %button-base {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: map-get($spacers, 2);
-    padding: map-get($spacers, 2) map-get($spacers, 4);
-    font-weight: 500;
-    border: 1px solid transparent;
-    border-radius: $border-radius;
-    @include transition(all);
-    cursor: pointer;
-    user-select: none;
-  }
+}
+
+// Placeholder para elementos de badge
+%badge-base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: $font-weight-semibold;
+  border-radius: $border-radius;
+  line-height: 1;
+}
+
+// Placeholder para elementos de alerta
+%alert-base {
+  padding: 1rem 1.5rem;
+  border-radius: $border-radius;
+  border-left: 4px solid transparent;
+  margin-bottom: 1rem;
+}
+
+// Animación de spin para loading
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+// Animación de fade in
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+// Animación de slide in from top
+@keyframes slideInFromTop {
+  from { transform: translateY(-100%); }
+  to { transform: translateY(0); }
+}
+
+// Animación de slide in from bottom
+@keyframes slideInFromBottom {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
