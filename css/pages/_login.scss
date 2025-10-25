@@ -1,140 +1,320 @@
-// Login page styles
-.login-page {
-  background-color: $body-bg;
-  background-image: url('../img/meat-pattern.png');
-  background-size: 300px;
-  background-blend-mode: overlay;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+// pages/_login.scss
+// Estilos para páginas de autenticación - Carnicería PWA
 
-  .mini-header {
-    background-color: $blue-header;
+.login {
+  @extend .auth-layout;
+
+  &__benefits {
+    margin-bottom: spacer(4);
   }
 
-  .login-main {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    padding: map-get($spacers, 5) 0;
-    
-    @include media-breakpoint-down(md) {
-      padding: map-get($spacers, 4) 0;
-    }
+  &__benefit {
+    @extend .auth-layout__alert;
+    @extend .auth-layout__alert--info;
   }
 
-  .login-card {
-    border-radius: $border-radius-sm;
-    background-color: rgba($white, 0.95);
-    @include box-shadow(3);
-    @include transition(all);
-    border: 1px solid rgba($primary-color, 0.1);
-    overflow: hidden;
-    width: 100%;
-    max-width: 450px;
-    margin: 0 auto;
+  &__form {
+    @extend .auth-layout__form;
+  }
 
-    &:hover {
-      @include box-shadow(4);
-    }
+  &__field {
+    @extend .auth-layout__field;
+  }
 
-    h2 {
-      font-weight: 700;
-      color: $primary-color;
-      position: relative;
-      margin-bottom: map-get($spacers, 3);
-      font-size: 1.8rem;
+  &__options {
+    @extend .auth-layout__options;
+  }
+
+  &__remember {
+    @extend .auth-layout__remember;
+  }
+
+  &__forgot {
+    @extend .auth-layout__forgot;
+  }
+
+  &__submit {
+    @extend .auth-layout__submit;
+  }
+
+  &__social {
+    @extend .auth-layout__social;
+  }
+
+  &__links {
+    @extend .auth-layout__links;
+  }
+
+  &__contact {
+    margin-top: spacer(4);
+
+    &-content {
+      @extend .card;
       text-align: center;
-      
-      @include media-breakpoint-down(md) {
-        font-size: 1.5rem;
+    }
+
+    &-title {
+      font-weight: $font-weight-semibold;
+      margin-bottom: spacer(3);
+      color: $color-text;
+    }
+
+    &-methods {
+      display: flex;
+      justify-content: center;
+      gap: spacer(4);
+    }
+
+    &-method {
+      text-decoration: none;
+      color: inherit;
+
+      &:hover {
+        color: inherit;
+        text-decoration: none;
       }
     }
 
-    .text-muted {
-      color: lighten($primary-color, 25%) !important;
-      font-size: 0.95rem;
-      text-align: center;
-      margin-bottom: map-get($spacers, 4);
+    &-icon {
+      display: block;
+      margin-bottom: spacer(1);
     }
 
-    .form-control {
-      border-color: $secondary-color;
-      padding: map-get($spacers, 3);
-      background-color: rgba($white, 0.9);
-      @include transition(all);
-      
+    &-text {
+      font-size: $font-size-sm;
+      color: $color-text-light;
+      margin: 0;
+    }
+  }
+}
+
+// User login specific styles
+.user-login {
+  .login__benefit {
+    background: rgba($color-info, 0.1);
+    border-left-color: $color-info;
+    color: darken($color-info, 20%);
+  }
+}
+
+// Admin login specific styles
+.admin-login {
+  .auth-layout__card-header {
+    background: $color-warning;
+  }
+
+  .login__benefit {
+    background: rgba($color-warning, 0.1);
+    border-left-color: $color-warning;
+    color: darken($color-warning, 30%);
+  }
+}
+
+// Registration page styles
+.register {
+  @extend .auth-layout;
+
+  &__benefits {
+    margin-bottom: spacer(4);
+  }
+
+  &__benefit {
+    @extend .auth-layout__alert;
+    @extend .auth-layout__alert--success;
+  }
+
+  &__form {
+    @extend .auth-layout__form;
+  }
+
+  &__section {
+    margin-bottom: spacer(4);
+
+    &-title {
+      font-size: $font-size-lg;
+      font-weight: $font-weight-semibold;
+      color: $primary-color;
+      margin-bottom: spacer(3);
+      display: flex;
+      align-items: center;
+      gap: spacer(2);
+
+      i {
+        font-size: $font-size-xl;
+      }
+    }
+  }
+
+  &__field {
+    @extend .auth-layout__field;
+  }
+
+  &__preferences {
+    .register__preference {
+      margin-bottom: spacer(2);
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+
+  &__agreement {
+    margin-bottom: spacer(4);
+  }
+
+  &__submit {
+    @extend .auth-layout__submit;
+  }
+
+  &__links {
+    @extend .auth-layout__links;
+  }
+
+  &__loyalty-info {
+    margin-top: spacer(4);
+
+    &-content {
+      @extend .card;
+      border-color: $color-success;
+    }
+
+    &-header {
+      background: $color-success;
+      color: $color-white;
+      border-radius: $border-radius $border-radius 0 0;
+    }
+
+    &-title {
+      margin: 0;
+      font-weight: $font-weight-semibold;
+      display: flex;
+      align-items: center;
+      gap: spacer(2);
+    }
+
+    &-list {
+      @extend %list-reset;
+    }
+
+    &-item {
+      margin-bottom: spacer(2);
+      display: flex;
+      align-items: center;
+      gap: spacer(2);
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      i {
+        width: 1rem;
+        text-align: center;
+      }
+    }
+  }
+}
+
+// OTP verification styles
+.otp-verification {
+  @extend .auth-layout;
+
+  &__instructions {
+    text-align: center;
+    margin-bottom: spacer(4);
+    color: $color-text-light;
+  }
+
+  &__code-inputs {
+    display: flex;
+    gap: spacer(2);
+    justify-content: center;
+    margin-bottom: spacer(4);
+
+    .otp-verification__code-input {
+      width: 3rem;
+      height: 3rem;
+      text-align: center;
+      font-size: $font-size-xl;
+      font-weight: $font-weight-bold;
+      border: 2px solid $color-border;
+      border-radius: $border-radius;
+      @include transition(all, 0.3s, ease);
+
       &:focus {
         border-color: $primary-color;
-        box-shadow: 0 0 0 0.2rem rgba($primary-color, 0.1);
+        @include box-shadow(1);
+      }
+
+      &.filled {
+        border-color: $primary-color;
+        background: rgba($primary-color, 0.1);
       }
     }
-    
-    .form-check-label {
-      font-size: 0.9rem;
-      color: lighten($primary-color, 15%);
+  }
+
+  &__resend {
+    text-align: center;
+    margin-bottom: spacer(4);
+
+    &-text {
+      color: $color-text-light;
+      margin-bottom: spacer(2);
     }
-    
-    .btn-primary {
-      padding: map-get($spacers, 2) map-get($spacers, 4);
-      font-weight: 500;
+
+    &-btn {
+      @extend .btn;
+      @extend .btn--outline;
     }
-    
-    .login-footer {
-      margin-top: map-get($spacers, 4);
-      padding-top: map-get($spacers, 3);
-      border-top: 1px solid rgba($primary-color, 0.1);
-      
-      .contact-info, .social-links {
-        margin-bottom: map-get($spacers, 3);
-        
-        h6 {
-          color: $primary-color;
-          font-weight: 600;
-          font-size: 1rem;
-          margin-bottom: map-get($spacers, 2);
-        }
-      }
-      
-      .social-icons {
-        a {
-          color: $primary-color;
-          @include transition(all);
-          display: inline-block;
-          margin: 0 map-get($spacers, 2);
-          font-size: 1.25rem;
-          
-          &:hover {
-            color: darken($primary-color, 15%);
-            transform: translateY(-2px);
-          }
-        }
-      }
-      
-      .copyright {
-        color: $primary-color;
-        opacity: 0.7;
-        font-size: 0.85rem;
-        margin-top: map-get($spacers, 3);
+  }
+
+  &__submit {
+    @extend .auth-layout__submit;
+  }
+}
+
+// Responsive adjustments
+@include media-breakpoint-down(sm) {
+  .otp-verification {
+    &__code-inputs {
+      gap: spacer(1);
+
+      .otp-verification__code-input {
+        width: 2.5rem;
+        height: 2.5rem;
+        font-size: $font-size-lg;
       }
     }
-    
-    @include media-breakpoint-down(md) {
-      padding: map-get($spacers, 4) !important;
-      margin: 0 map-get($spacers, 2);
+  }
+}
+
+// Dark mode adjustments
+[data-bs-theme="dark"] {
+  .login,
+  .register,
+  .otp-verification {
+    background: linear-gradient(135deg, $dark-bg 0%, lighten($dark-bg, 5%) 100%);
+  }
+
+  .login__contact-content {
+    background: $dark-surface;
+  }
+
+  .register__loyalty-info-content {
+    background: $dark-surface;
+  }
+
+  .otp-verification__code-input {
+    background: $dark-bg;
+    border-color: $dark-border;
+    color: $dark-text;
+
+    &:focus {
+      border-color: $primary-color;
     }
-    
-    @include media-breakpoint-down(sm) {
-      padding: map-get($spacers, 3) !important;
-      
-      h2 {
-        font-size: 1.5rem;
-      }
-      
-      .btn-primary {
-        padding: map-get($spacers, 2) map-get($spacers, 3);
-        font-size: 0.9rem;
-      }
+
+    &.filled {
+      background: rgba($primary-color, 0.2);
     }
   }
 }

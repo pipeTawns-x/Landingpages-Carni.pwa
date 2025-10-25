@@ -1,0 +1,295 @@
+// Sistema de estados de carga BEM
+
+// Spinner base
+.spinner {
+  @extend %loading-spinner;
+  
+  &--sm {
+    width: 1rem;
+    height: 1rem;
+    border-width: 1px;
+  }
+  
+  &--lg {
+    width: 3rem;
+    height: 3rem;
+    border-width: 3px;
+  }
+  
+  &--primary {
+    border-top-color: $primary-color;
+  }
+  
+  &--white {
+    border-top-color: $color-white;
+  }
+  
+  &--success {
+    border-top-color: $color-success;
+  }
+  
+  &--danger {
+    border-top-color: $color-danger;
+  }
+}
+
+// Loading states
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: spacer(5);
+  text-align: center;
+  
+  &__spinner {
+    margin-bottom: spacer(3);
+  }
+  
+  &__text {
+    color: $color-text-light;
+    margin-bottom: 0;
+  }
+  
+  &--inline {
+    flex-direction: row;
+    gap: spacer(2);
+    padding: spacer(3);
+    
+    .loading-state__text {
+      margin-bottom: 0;
+    }
+  }
+  
+  &--overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba($color-white, 0.9);
+    z-index: z(modal-backdrop);
+  }
+}
+
+// Skeleton loading
+.skeleton {
+  background: linear-gradient(90deg, $color-light 25%, $color-border 50%, $color-light 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+  border-radius: $border-radius;
+  
+  &--text {
+    height: 1rem;
+    margin-bottom: spacer(2);
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
+    
+    &--title {
+      height: 1.5rem;
+    }
+    
+    &--subtitle {
+      height: 1.25rem;
+    }
+  }
+  
+  &--circle {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+  }
+  
+  &--image {
+    width: 100%;
+    height: 200px;
+  }
+  
+  &--button {
+    height: 2.5rem;
+  }
+}
+
+// Product skeleton
+.product-skeleton {
+  @extend .card;
+  padding: spacer(3);
+  
+  &__image {
+    @extend .skeleton;
+    @extend .skeleton--image;
+    margin-bottom: spacer(3);
+  }
+  
+  &__content {
+    .skeleton--text {
+      margin-bottom: spacer(2);
+      
+      &:first-child {
+        width: 60%;
+      }
+      
+      &:nth-child(2) {
+        width: 80%;
+      }
+      
+      &:nth-child(3) {
+        width: 40%;
+      }
+    }
+  }
+}
+
+// Progress bars
+.progress {
+  background: $color-light;
+  border-radius: 1rem;
+  overflow: hidden;
+  height: 0.5rem;
+  
+  &__bar {
+    height: 100%;
+    background: $primary-color;
+    border-radius: 1rem;
+    @include transition(width, 0.3s, ease);
+    
+    &--success {
+      background: $color-success;
+    }
+    
+    &--warning {
+      background: $color-warning;
+    }
+    
+    &--danger {
+      background: $color-danger;
+    }
+    
+    &--striped {
+      background-image: linear-gradient(
+        45deg,
+        rgba($color-white, 0.15) 25%,
+        transparent 25%,
+        transparent 50%,
+        rgba($color-white, 0.15) 50%,
+        rgba($color-white, 0.15) 75%,
+        transparent 75%,
+        transparent
+      );
+      background-size: 1rem 1rem;
+    }
+    
+    &--animated {
+      animation: progress-bar-stripes 1s linear infinite;
+    }
+  }
+  
+  &--sm {
+    height: 0.25rem;
+  }
+  
+  &--lg {
+    height: 1rem;
+  }
+}
+
+// Pulse animation
+.pulse {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  background: $primary-color;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+  
+  &--success {
+    background: $color-success;
+  }
+  
+  &--warning {
+    background: $color-warning;
+  }
+  
+  &--danger {
+    background: $color-danger;
+  }
+}
+
+// Animaciones
+@include keyframe(spin) {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@include keyframe(loading) {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@include keyframe(progress-bar-stripes) {
+  0% {
+    background-position: 1rem 0;
+  }
+  100% {
+    background-position: 0 0;
+  }
+}
+
+@include keyframe(pulse) {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba($primary-color, 0.7);
+  }
+  
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 10px rgba($primary-color, 0);
+  }
+  
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba($primary-color, 0);
+  }
+}
+
+// Reduced motion support
+@include reduced-motion {
+  .skeleton {
+    animation: none;
+  }
+  
+  .progress__bar--animated {
+    animation: none;
+  }
+  
+  .pulse {
+    animation: none;
+  }
+}
+
+// Dark mode adjustments
+[data-bs-theme="dark"] {
+  .loading-state {
+    &--overlay {
+      background: rgba($dark-bg, 0.9);
+    }
+  }
+  
+  .skeleton {
+    background: linear-gradient(90deg, $dark-surface 25%, $dark-border 50%, $dark-surface 75%);
+  }
+  
+  .progress {
+    background: $dark-surface;
+  }
+}

@@ -1,0 +1,85 @@
+// themes/_theme.scss
+// Sistema de temas para Carnicería PWA
+
+// Tema principal (light)
+.theme-light {
+  --bs-body-bg: #{$body-bg};
+  --bs-body-color: #{$color-text};
+  --bs-primary: #{$primary-color};
+  --bs-secondary: #{$color-text-light};
+  --bs-success: #{$color-success};
+  --bs-warning: #{$color-warning};
+  --bs-danger: #{$color-danger};
+  --bs-info: #{$color-info};
+  --bs-light: #{$color-light};
+  --bs-dark: #{$color-text};
+  --bs-border-color: #{$color-border};
+}
+
+// Tema oscuro
+.theme-dark {
+  @extend [data-bs-theme="dark"];
+}
+
+// Tema personalizado 1 - Carnicería
+.theme-meat {
+  --bs-primary: #{$primary-color};
+  --bs-secondary: #c44569;
+  --bs-success: #27ae60;
+  --bs-warning: #f39c12;
+  --bs-danger: #e74c3c;
+  --bs-info: #3498db;
+  
+  .btn-primary {
+    background: linear-gradient(135deg, var(--bs-primary) 0%, darken($primary-color, 10%) 100%);
+    border: none;
+  }
+}
+
+// Tema personalizado 2 - Verde
+.theme-green {
+  --bs-primary: #2ecc71;
+  --bs-secondary: #27ae60;
+  --bs-success: #16a085;
+  --bs-warning: #f39c12;
+  --bs-danger: #e74c3c;
+  --bs-info: #3498db;
+}
+
+// Sistema de transición de temas
+.theme-transition {
+  * {
+    transition: background-color 0.3s ease, 
+                color 0.3s ease, 
+                border-color 0.3s ease,
+                box-shadow 0.3s ease !important;
+  }
+}
+
+// Utilidades de tema
+.theme-toggle {
+  @extend .btn;
+  @extend .btn--outline;
+  @extend .btn--icon;
+  position: relative;
+  overflow: hidden;
+  
+  &__icon {
+    transition: transform 0.3s ease;
+  }
+  
+  &--dark &__icon {
+    transform: rotate(180deg);
+  }
+}
+
+// Componentes específicos por tema
+[class*="theme-"] {
+  .card {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .btn {
+    transition: all 0.3s ease;
+  }
+}

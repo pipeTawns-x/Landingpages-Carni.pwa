@@ -1,109 +1,90 @@
-// layout/_sidebar.scss
-// Menú hamburger Off-Canvas (navegación móvil)
+// Sidebar BEM para navegación móvil
 
-.cs-sidebar {
+.sidebar {
   position: fixed;
   top: 0;
   left: -100%;
   width: 280px;
   height: 100vh;
   background: $color-white;
-  @include box-shadow(4);
-  z-index: $z-index-modal;
+  z-index: z(offcanvas);
   @include transition(left, 0.3s, ease);
-  overflow-y: auto;
+  @include box-shadow(4);
+  display: flex;
+  flex-direction: column;
   
-  &.show {
+  &--show {
     left: 0;
-    animation: slideInLeft 0.3s ease;
   }
   
   &__header {
-    padding: map-get($spacers, 4);
+    padding: spacer(4);
     border-bottom: 1px solid $color-border;
     background: $primary-color;
     color: $color-white;
     
-    .cs-sidebar__brand {
+    &-title {
+      margin: 0;
+      font-weight: $font-weight-bold;
+      font-size: $font-size-lg;
       display: flex;
       align-items: center;
-      
-      .cs-sidebar__logo {
-        height: 40px;
-        border-radius: 50%;
-        border: 2px solid rgba($color-white, 0.2);
-        margin-right: map-get($spacers, 2);
-      }
-      
-      .cs-sidebar__title {
-        font-weight: $font-weight-bold;
-        font-size: 1.1rem;
-        margin-bottom: 0;
-      }
+      gap: spacer(2);
     }
     
-    .cs-sidebar__close {
-      background: none;
-      border: none;
-      color: $color-white;
-      font-size: 1.5rem;
-      padding: 0.25rem;
-      border-radius: 50%;
-      @include transition(all, 0.3s, ease);
+    &-close {
+      @extend %btn-reset;
+      color: inherit;
+      padding: spacer(1);
+      border-radius: $border-radius;
+      @include transition(background-color, 0.3s, ease);
       
       &:hover {
         background: rgba($color-white, 0.1);
-        transform: rotate(90deg);
       }
     }
   }
   
+  &__body {
+    flex: 1;
+    padding: spacer(3);
+    overflow-y: auto;
+    @include custom-scroll;
+  }
+  
   &__nav {
-    padding: map-get($spacers, 3);
-  }
-  
-  &__list {
-    gap: 0.25rem;
-  }
-  
-  &__item {
-    .cs-sidebar__link {
+    &-list {
+      @extend %list-reset;
+    }
+    
+    &-item {
+      margin-bottom: spacer(1);
+    }
+    
+    &-link {
       display: flex;
       align-items: center;
-      padding: map-get($spacers, 2) map-get($spacers, 3);
+      gap: spacer(2);
+      padding: spacer(2) spacer(3);
       color: $color-text;
       text-decoration: none;
       border-radius: $border-radius;
       @include transition(all, 0.3s, ease);
-      font-weight: $font-weight-medium;
       
-      i {
-        margin-right: map-get($spacers, 2);
-        font-size: 1.1rem;
-        width: 20px;
-        text-align: center;
-        opacity: 0.8;
-      }
-      
-      &:hover {
+      &:hover,
+      &.active {
         background: rgba($primary-color, 0.1);
         color: $primary-color;
-        transform: translateX(4px);
-        
-        i {
-          opacity: 1;
-        }
       }
       
       &.active {
-        background: rgba($primary-color, 0.15);
-        color: $primary-color;
         font-weight: $font-weight-semibold;
-        border-left: 3px solid $primary-color;
-        
-        i {
-          opacity: 1;
-        }
+      }
+      
+      i {
+        font-size: $font-size-lg;
+        width: 1.5rem;
+        text-align: center;
       }
     }
   }
@@ -111,208 +92,72 @@
   &__divider {
     height: 1px;
     background: $color-border;
-    margin: map-get($spacers, 3) 0;
+    margin: spacer(3) 0;
+    opacity: 0.5;
   }
+}
+
+// Categories sidebar variant
+.categories-sidebar {
+  @extend .sidebar;
   
-  &__footer {
-    padding: map-get($spacers, 3);
-    border-top: 1px solid $color-border;
-    text-align: center;
+  .sidebar__nav-link {
+    padding: spacer(2);
+    border-radius: $border-radius;
     
-    .cs-sidebar__version {
-      font-size: 0.75rem;
-      color: $color-text-light;
+    &.active {
+      background: $primary-color;
+      color: $color-white;
     }
   }
 }
 
-// Sidebar para categorías móvil
-.cs-categories-sidebar {
-  @extend .cs-sidebar;
+// Mobile menu overlay
+.mobile-overlay {
+  @extend %overlay-base;
   
-  &__header {
-    background: $dark-bg;
-    
-    .cs-categories-sidebar__title {
-      font-weight: $font-weight-semibold;
-      font-size: 1rem;
-    }
-  }
-  
-  &__nav {
-    .cs-categories-sidebar__list {
-      .cs-categories-sidebar__item {
-        .cs-categories-sidebar__link {
-          display: flex;
-          align-items: center;
-          padding: map-get($spacers, 2) map-get($spacers, 3);
-          color: $color-text;
-          text-decoration: none;
-          border-radius: $border-radius;
-          @include transition(all, 0.3s, ease);
-          
-          i {
-            margin-right: map-get($spacers, 2);
-            font-size: 1rem;
-            width: 20px;
-            text-align: center;
-            opacity: 0.8;
-          }
-          
-          &:hover {
-            background: rgba($primary-color, 0.1);
-            color: $primary-color;
-            
-            i {
-              opacity: 1;
-            }
-          }
-          
-          &.active {
-            background: rgba($primary-color, 0.15);
-            color: $primary-color;
-            font-weight: $font-weight-semibold;
-            
-            i {
-              opacity: 1;
-            }
-          }
-        }
-      }
-    }
-  }
-}
-
-// Overlay para sidebar
-.cs-sidebar-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: $z-index-modal-backdrop;
-  opacity: 0;
-  visibility: hidden;
-  @include transition(all, 0.3s, ease);
-  
-  &.show {
+  &--show {
     opacity: 1;
     visibility: visible;
   }
 }
 
-// Animaciones para sidebar
-@keyframes slideInLeft {
-  from {
-    transform: translateX(-100%);
-  }
-  to {
-    transform: translateX(0);
+// Responsive adjustments
+@include media-breakpoint-down(sm) {
+  .sidebar {
+    width: 100%;
   }
 }
 
-@keyframes slideOutLeft {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(-100%);
-  }
-}
-
-// Modo oscuro para sidebar
+// Dark mode adjustments
 [data-bs-theme="dark"] {
-  .cs-sidebar {
-    background: $dark-card-bg;
+  .sidebar {
+    background: $dark-surface;
+    color: $dark-text;
     
     &__header {
-      background: lighten($dark-bg, 5%);
-      border-bottom-color: $dark-border;
+      background: $primary-color;
     }
     
-    &__nav {
-      .cs-sidebar__item {
-        .cs-sidebar__link {
-          color: $dark-text;
-          
-          &:hover {
-            background: rgba($primary-color, 0.2);
-            color: $primary-color;
-          }
-          
-          &.active {
-            background: rgba($primary-color, 0.25);
-            color: $primary-color;
-          }
-        }
+    &__nav-link {
+      color: $dark-text;
+      
+      &:hover,
+      &.active {
+        background: rgba($primary-color, 0.2);
+        color: $primary-color;
       }
     }
     
     &__divider {
       background: $dark-border;
     }
-    
-    &__footer {
-      border-top-color: $dark-border;
-    }
   }
   
-  .cs-categories-sidebar {
-    &__header {
-      background: lighten($dark-bg, 5%);
-    }
-    
-    &__nav {
-      .cs-categories-sidebar__list {
-        .cs-categories-sidebar__item {
-          .cs-categories-sidebar__link {
-            color: $dark-text;
-            
-            &:hover {
-              background: rgba($primary-color, 0.2);
-              color: $primary-color;
-            }
-            
-            &.active {
-              background: rgba($primary-color, 0.25);
-              color: $primary-color;
-            }
-          }
-        }
-      }
-    }
-  }
-}
-
-// Responsive
-@include media-breakpoint-down(sm) {
-  .cs-sidebar {
-    width: 100%;
-    
-    &__header {
-      padding: map-get($spacers, 3);
-      
-      .cs-sidebar__brand {
-        .cs-sidebar__logo {
-          height: 32px;
-        }
-        
-        .cs-sidebar__title {
-          font-size: 1rem;
-        }
-      }
-    }
-    
-    &__nav {
-      padding: map-get($spacers, 2);
-    }
-    
-    &__item {
-      .cs-sidebar__link {
-        padding: map-get($spacers, 2);
-        font-size: 0.9rem;
-      }
+  .categories-sidebar {
+    .sidebar__nav-link.active {
+      background: $primary-color;
+      color: $color-white;
     }
   }
 }

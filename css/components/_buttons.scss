@@ -1,69 +1,282 @@
-// Button styles
+// Sistema de botones BEM para Carnicería PWA
+
+// Botón base
 .btn {
-  @include transition(all);
-  border-radius: $border-radius-sm;
-  font-weight: 500;
+  @extend %btn-reset;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: spacer(2);
+  padding: 0.75rem 1.5rem;
+  font-weight: $font-weight-medium;
+  border-radius: $border-radius;
+  @include transition(all, 0.3s, ease);
+  text-decoration: none;
+  cursor: pointer;
   
-  &.btn-primary {
-    background-color: $primary-color;
-    border-color: $primary-color;
-    
-    &:hover, &:focus {
-      background-color: darken($primary-color, 8%);
-      border-color: darken($primary-color, 8%);
-      transform: translateY(-2px);
-      @include box-shadow(2);
-    }
+  &:focus {
+    @include focus-style;
   }
   
-  &.btn-outline-primary {
-    color: $primary-color;
-    border-color: $primary-color;
-    
-    &:hover, &:focus {
-      background-color: $primary-color;
-      color: $white;
-      transform: translateY(-2px);
-      @include box-shadow(2);
-    }
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
   }
   
-  &.btn-product {
+  // Tamaños
+  &--sm {
     padding: 0.5rem 1rem;
-    font-size: 0.9rem;
+    font-size: $font-size-sm;
   }
   
-  &.btn-lg {
-    padding: 0.75rem 1.5rem;
-    font-size: 1.1rem;
+  &--lg {
+    padding: 1rem 2rem;
+    font-size: $font-size-lg;
+  }
+  
+  &--xl {
+    padding: 1.25rem 2.5rem;
+    font-size: $font-size-xl;
+    font-weight: $font-weight-semibold;
+  }
+  
+  // Variantes
+  &--primary {
+    @include primary-button;
+  }
+  
+  &--secondary {
+    @include outline-button($color-text);
+    
+    &:hover {
+      background-color: $color-text;
+      color: $color-white;
+    }
+  }
+  
+  &--success {
+    @include outline-button($color-success);
+    
+    &:hover {
+      background-color: $color-success;
+      color: $color-white;
+    }
+  }
+  
+  &--danger {
+    @include outline-button($color-danger);
+    
+    &:hover {
+      background-color: $color-danger;
+      color: $color-white;
+    }
+  }
+  
+  &--warning {
+    @include outline-button($color-warning);
+    
+    &:hover {
+      background-color: $color-warning;
+      color: $color-text;
+    }
+  }
+  
+  &--info {
+    @include outline-button($color-info);
+    
+    &:hover {
+      background-color: $color-info;
+      color: $color-white;
+    }
+  }
+  
+  // Estados
+  &--loading {
+    position: relative;
+    color: transparent !important;
+    
+    &::after {
+      content: '';
+      @extend %loading-spinner;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+  }
+  
+  &--block {
+    width: 100%;
+  }
+  
+  // Icon buttons
+  &--icon {
+    padding: 0.5rem;
+    border-radius: 50%;
+    width: 2.5rem;
+    height: 2.5rem;
+    
+    &.btn--sm {
+      width: 2rem;
+      height: 2rem;
+      padding: 0.375rem;
+    }
+    
+    &.btn--lg {
+      width: 3rem;
+      height: 3rem;
+      padding: 0.625rem;
+    }
   }
 }
 
-.icon-btn {
-  background-color: transparent;
-  border: none;
-  color: $white;
-  font-size: 1.3rem;
-  @include transition(all);
-  padding: map-get($spacers, 2);
-  margin-left: map-get($spacers, 2);
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  &:hover {
-    color: lighten($white, 15%);
-    background-color: rgba($white, 0.1);
-    transform: translateY(-2px);
+// Button groups
+.btn-group {
+  display: inline-flex;
+  border-radius: $border-radius;
+  overflow: hidden;
+  @include box-shadow(1);
+  
+  .btn {
+    border-radius: 0;
+    margin: 0;
+    
+    &:not(:last-child) {
+      border-right: 1px solid rgba($color-white, 0.2);
+    }
+    
+    &:first-child {
+      border-top-left-radius: $border-radius;
+      border-bottom-left-radius: $border-radius;
+    }
+    
+    &:last-child {
+      border-top-right-radius: $border-radius;
+      border-bottom-right-radius: $border-radius;
+    }
   }
   
+  &--vertical {
+    flex-direction: column;
+    
+    .btn {
+      &:not(:last-child) {
+        border-right: none;
+        border-bottom: 1px solid rgba($color-white, 0.2);
+      }
+      
+      &:first-child {
+        border-top-left-radius: $border-radius;
+        border-top-right-radius: $border-radius;
+        border-bottom-left-radius: 0;
+      }
+      
+      &:last-child {
+        border-bottom-left-radius: $border-radius;
+        border-bottom-right-radius: $border-radius;
+        border-top-right-radius: 0;
+      }
+    }
+  }
+}
+
+// Icon buttons específicos
+.icon-btn {
+  @extend .btn;
+  @extend .btn--icon;
+  background: transparent;
+  color: $color-text;
+  
+  &:hover {
+    background: rgba($primary-color, 0.1);
+    color: $primary-color;
+    transform: scale(1.1);
+  }
+  
+  &--header {
+    color: $color-white;
+    
+    &:hover {
+      background: rgba($color-white, 0.1);
+      color: $color-white;
+    }
+  }
+  
+  &--cart {
+    position: relative;
+    
+    .cart-counter {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: $color-danger;
+      color: $color-white;
+      border-radius: 50%;
+      width: 1.25rem;
+      height: 1.25rem;
+      font-size: $font-size-xs;
+      font-weight: $font-weight-bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid $color-white;
+    }
+  }
+}
+
+// Botones de producto
+.product-btn {
+  @extend .btn;
+  @extend .btn--primary;
+  width: 100%;
+  margin-top: auto;
+  
+  &--outline {
+    @extend .btn;
+    @extend .btn--secondary;
+    width: 100%;
+    margin-top: auto;
+  }
+}
+
+// Botones de acción rápida
+.quick-action-btn {
+  @extend .btn;
+  @extend .btn--icon;
+  @extend .btn--primary;
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  z-index: z(fixed);
+  @include box-shadow(3);
+  
   @include media-breakpoint-down(md) {
-    width: 36px;
-    height: 36px;
-    font-size: 1.1rem;
-    padding: map-get($spacers, 1);
+    bottom: 1rem;
+    right: 1rem;
+  }
+}
+
+// Dark mode adjustments
+[data-bs-theme="dark"] {
+  .btn {
+    &--secondary {
+      border-color: $dark-border;
+      color: $dark-text;
+      
+      &:hover {
+        background-color: $dark-text;
+        color: $dark-bg;
+      }
+    }
+  }
+  
+  .icon-btn {
+    color: $dark-text;
+    
+    &:hover {
+      background: rgba($primary-color, 0.2);
+      color: $primary-color;
+    }
   }
 }

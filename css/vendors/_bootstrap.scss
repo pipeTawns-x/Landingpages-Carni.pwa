@@ -1,57 +1,150 @@
-// Personalizaciones de Bootstrap
-// Estas variables sobrescriben las variables por defecto de Bootstrap
-$primary: $carniceria-red;
-$enable-rounded: true;
-$enable-shadows: true;
-$enable-gradients: true;
-$enable-transitions: true;
+// vendors/_bootstrap.scss
+// Personalización de Bootstrap para Carnicería PWA
 
-// Importar Bootstrap (si decides usar la versión SCSS)
-// @import "~bootstrap/scss/bootstrap";
+// 1. Incluir funciones Bootstrap primero
+@import "~bootstrap/scss/functions";
 
-// Utilidades de Bootstrap que queremos mantener
-.container {
-  width: 100%;
-  padding-right: var(--bs-gutter-x, 0.75rem);
-  padding-left: var(--bs-gutter-x, 0.75rem);
-  margin-right: auto;
-  margin-left: auto;
+// 2. Sobrescribir variables Bootstrap
+$primary: $primary-color;
+$secondary: $color-text-light;
+$success: $color-success;
+$info: $color-info;
+$warning: $color-warning;
+$danger: $color-danger;
+$light: $color-light;
+$dark: $color-text;
+
+// Tipografía
+$font-family-base: $font-family-primary;
+$font-size-base: 1rem;
+$line-height-base: 1.6;
+
+// Espaciado
+$spacer: 1rem;
+$spacers: (
+  0: 0,
+  1: $spacer * 0.25,
+  2: $spacer * 0.5,
+  3: $spacer,
+  4: $spacer * 1.5,
+  5: $spacer * 3,
+  6: $spacer * 4,
+  7: $spacer * 5,
+  8: $spacer * 6
+);
+
+// Bordes
+$border-radius: $border-radius;
+$border-radius-sm: $border-radius-sm;
+$border-radius-lg: $border-radius-lg;
+
+// Breakpoints
+$grid-breakpoints: (
+  xs: 0,
+  sm: 576px,
+  md: 768px,
+  lg: 992px,
+  xl: 1200px,
+  xxl: 1400px
+);
+
+// Container max widths
+$container-max-widths: (
+  sm: 540px,
+  md: 720px,
+  lg: 960px,
+  xl: 1140px,
+  xxl: 1320px
+);
+
+// 3. Importar Bootstrap completo
+@import "~bootstrap/scss/variables";
+@import "~bootstrap/scss/variables-dark";
+@import "~bootstrap/scss/maps";
+@import "~bootstrap/scss/mixins";
+@import "~bootstrap/scss/root";
+@import "~bootstrap/scss/utilities";
+@import "~bootstrap/scss/reboot";
+@import "~bootstrap/scss/type";
+@import "~bootstrap/scss/images";
+@import "~bootstrap/scss/containers";
+@import "~bootstrap/scss/grid";
+
+// 4. Componentes Bootstrap que necesitamos
+@import "~bootstrap/scss/tables";
+@import "~bootstrap/scss/forms";
+@import "~bootstrap/scss/buttons";
+@import "~bootstrap/scss/transitions";
+@import "~bootstrap/scss/dropdown";
+@import "~bootstrap/scss/button-group";
+@import "~bootstrap/scss/nav";
+@import "~bootstrap/scss/navbar";
+@import "~bootstrap/scss/card";
+@import "~bootstrap/scss/accordion";
+@import "~bootstrap/scss/breadcrumb";
+@import "~bootstrap/scss/pagination";
+@import "~bootstrap/scss/badge";
+@import "~bootstrap/scss/alert";
+@import "~bootstrap/scss/progress";
+@import "~bootstrap/scss/list-group";
+@import "~bootstrap/scss/close";
+@import "~bootstrap/scss/toasts";
+@import "~bootstrap/scss/modal";
+@import "~bootstrap/scss/tooltip";
+@import "~bootstrap/scss/popover";
+@import "~bootstrap/scss/carousel";
+@import "~bootstrap/scss/spinners";
+@import "~bootstrap/scss/offcanvas";
+@import "~bootstrap/scss/placeholders";
+@import "~bootstrap/scss/helpers";
+
+// 5. Utilidades Bootstrap
+@import "~bootstrap/scss/utilities/api";
+
+// 6. Sobrescribir estilos Bootstrap específicos
+.btn {
+  @include button-size($btn-padding-y, $btn-padding-x, $btn-font-size, $btn-border-radius);
+  
+  &-primary {
+    @include button-variant($primary, $primary, $color-white, darken($primary, 10%), darken($primary, 10%), $color-white);
+  }
 }
 
-@each $breakpoint, $container-max-width in (sm: 540px, md: 720px, lg: 960px, xl: 1140px, xxl: 1320px) {
-  @include media-breakpoint-up($breakpoint) {
-    .container {
-      max-width: $container-max-width;
+.card {
+  box-shadow: $box-shadow;
+  border: $border-width solid $border-color;
+}
+
+.form-control {
+  &:focus {
+    border-color: $primary;
+    box-shadow: 0 0 0 0.2rem rgba($primary, 0.25);
+  }
+}
+
+// 7. Utilidades personalizadas que extienden Bootstrap
+.bg-gradient-primary {
+  background: linear-gradient(135deg, $primary 0%, darken($primary, 10%) 100%) !important;
+}
+
+.text-primary-gradient {
+  background: linear-gradient(135deg, $primary 0%, darken($primary, 10%) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+// 8. Responsive helpers extendidos
+@each $breakpoint, $value in $grid-breakpoints {
+  .text-#{$breakpoint}-left {
+    @include media-breakpoint-up($breakpoint) {
+      text-align: left !important;
     }
   }
-}
-
-.row {
-  --bs-gutter-x: 1.5rem;
-  --bs-gutter-y: 0;
-  display: flex;
-  flex-wrap: wrap;
-  margin-top: calc(-1 * var(--bs-gutter-y));
-  margin-right: calc(-0.5 * var(--bs-gutter-x));
-  margin-left: calc(-0.5 * var(--bs-gutter-x));
   
-  > * {
-    flex-shrink: 0;
-    width: 100%;
-    max-width: 100%;
-    padding-right: calc(var(--bs-gutter-x) * 0.5);
-    padding-left: calc(var(--bs-gutter-x) * 0.5);
-    margin-top: var(--bs-gutter-y);
-  }
-}
-
-@each $breakpoint, $infix in (sm: "sm", md: "md", lg: "lg", xl: "xl", xxl: "xxl") {
-  @include media-breakpoint-up($breakpoint) {
-    @for $i from 1 through 12 {
-      .col-#{$infix}-#{$i} {
-        flex: 0 0 auto;
-        width: percentage(divide($i, 12));
-      }
+  .border-#{$breakpoint}-none {
+    @include media-breakpoint-up($breakpoint) {
+      border: none !important;
     }
   }
 }

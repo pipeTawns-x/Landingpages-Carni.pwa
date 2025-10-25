@@ -1,5 +1,6 @@
-// components/_mixins.scss
+// Mixins para el sistema de diseño
 
+// Media Queries
 @mixin media-breakpoint-up($breakpoint) {
   @if $breakpoint == sm {
     @media (min-width: 576px) { @content; }
@@ -9,6 +10,8 @@
     @media (min-width: 992px) { @content; }
   } @else if $breakpoint == xl {
     @media (min-width: 1200px) { @content; }
+  } @else if $breakpoint == xxl {
+    @media (min-width: 1400px) { @content; }
   }
 }
 
@@ -21,9 +24,24 @@
     @media (max-width: 991.98px) { @content; }
   } @else if $breakpoint == xl {
     @media (max-width: 1199.98px) { @content; }
+  } @else if $breakpoint == xxl {
+    @media (max-width: 1399.98px) { @content; }
   }
 }
 
+@mixin media-breakpoint-only($breakpoint) {
+  @if $breakpoint == sm {
+    @media (min-width: 576px) and (max-width: 767.98px) { @content; }
+  } @else if $breakpoint == md {
+    @media (min-width: 768px) and (max-width: 991.98px) { @content; }
+  } @else if $breakpoint == lg {
+    @media (min-width: 992px) and (max-width: 1199.98px) { @content; }
+  } @else if $breakpoint == xl {
+    @media (min-width: 1200px) and (max-width: 1399.98px) { @content; }
+  }
+}
+
+// Sombras
 @mixin box-shadow($level) {
   @if $level == 1 {
     box-shadow: 0 2px 10px rgba(0,0,0,0.05);
@@ -33,36 +51,35 @@
     box-shadow: 0 8px 20px rgba(0,0,0,0.12);
   } @else if $level == 4 {
     box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+  } @else if $level == 5 {
+    box-shadow: 0 15px 35px rgba(0,0,0,0.2);
   }
 }
 
+// Transiciones
 @mixin transition($property: all, $duration: 0.3s, $timing: ease) {
   transition: $property $duration $timing;
 }
 
+// Gradientes
 @mixin gradient-bg($start-color, $end-color) {
   background: linear-gradient(135deg, $start-color 0%, $end-color 100%);
 }
 
+@mixin gradient-text($start-color, $end-color) {
+  background: linear-gradient(135deg, $start-color, $end-color);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+// Utilidades de texto
 @mixin text-ellipsis {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-@mixin flex-center {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-@mixin flex-between {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-// Mixin para truncar texto multilínea
 @mixin multiline-truncate($lines: 2, $min-height: null) {
   display: -webkit-box;
   -webkit-line-clamp: $lines;
@@ -75,7 +92,25 @@
   }
 }
 
-// Mixin para botones con estilo primario
+// Flexbox
+@mixin flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@mixin flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+@mixin flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+// Botones
 @mixin primary-button($bg-color: $primary-color, $text-color: $color-white) {
   border-radius: 2rem;
   padding: 0.75rem 1.5rem;
@@ -99,7 +134,23 @@
   }
 }
 
-// Mixin para títulos de sección con subrayado
+@mixin outline-button($color: $primary-color) {
+  border: 2px solid $color;
+  background: transparent;
+  color: $color;
+  border-radius: $border-radius;
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  @include transition(all, 0.3s, ease);
+  
+  &:hover {
+    background-color: $color;
+    color: $color-white;
+    transform: translateY(-2px);
+  }
+}
+
+// Títulos de sección
 @mixin section-title($color: $primary-color) {
   color: $color;
   font-weight: 700;
@@ -117,9 +168,18 @@
     background: linear-gradient(90deg, $color, lighten($color, 20%));
     border-radius: 2px;
   }
+  
+  &.center {
+    text-align: center;
+    
+    &::after {
+      left: 50%;
+      transform: translateX(-50%);
+    }
+  }
 }
 
-// Mixin para cards de producto
+// Cards
 @mixin product-card-style {
   background: $color-white;
   border: none;
@@ -135,21 +195,105 @@
   }
 }
 
-// Mixin para scroll personalizado
+@mixin stats-card-style {
+  background: $color-white;
+  border: none;
+  border-radius: $border-radius;
+  @include box-shadow(1);
+  @include transition(all, 0.3s, ease);
+  
+  &:hover {
+    transform: translateY(-2px);
+    @include box-shadow(2);
+  }
+}
+
+// Scroll personalizado
 @mixin custom-scroll($thumb-color: $primary-color) {
   scrollbar-width: thin;
   scrollbar-color: $thumb-color transparent;
   
   &::-webkit-scrollbar {
-    height: 4px;
+    width: 6px;
+    height: 6px;
   }
   
   &::-webkit-scrollbar-track {
     background: transparent;
+    border-radius: 3px;
   }
   
   &::-webkit-scrollbar-thumb {
     background-color: $thumb-color;
-    border-radius: 2px;
+    border-radius: 3px;
+    
+    &:hover {
+      background-color: darken($thumb-color, 10%);
+    }
+  }
+}
+
+// Overlay
+@mixin overlay($z-index: 1000, $bg-color: rgba(0, 0, 0, 0.5)) {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: $bg-color;
+  z-index: $z-index;
+  opacity: 0;
+  visibility: hidden;
+  @include transition(all, 0.3s, ease);
+  
+  &.show {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+// Animaciones
+@mixin keyframe($animation-name) {
+  @keyframes #{$animation-name} {
+    @content;
+  }
+}
+
+@mixin animation($str) {
+  animation: #{$str};
+}
+
+// Responsive helpers
+@mixin mobile-first {
+  @content;
+  
+  @include media-breakpoint-up(md) {
+    @content;
+  }
+}
+
+@mixin print-styles {
+  @media print {
+    @content;
+  }
+}
+
+// Focus styles para accesibilidad
+@mixin focus-style($color: $primary-color) {
+  outline: 2px solid $color;
+  outline-offset: 2px;
+}
+
+// High contrast mode
+@mixin high-contrast {
+  @media (prefers-contrast: high) {
+    @content;
+  }
+}
+
+// Reduced motion
+@mixin reduced-motion {
+  @media (prefers-reduced-motion: reduce) {
+    @content;
   }
 }

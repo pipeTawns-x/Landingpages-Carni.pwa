@@ -1,0 +1,98 @@
+// themes/_dark-mode.scss (completo)
+[data-bs-theme="dark"] {
+  // Variables CSS personalizadas para tema oscuro
+  --bs-body-bg: #{$dark-bg};
+  --bs-body-color: #{$dark-text};
+  --bs-border-color: #{$dark-border};
+  --bs-card-bg: #{$dark-surface};
+  --bs-modal-bg: #{$dark-surface};
+
+  // Componentes base
+  background-color: $dark-bg;
+  color: $dark-text;
+
+  // Cards
+  .card {
+    background-color: $dark-surface;
+    border-color: $dark-border;
+    
+    &-header {
+      background-color: rgba($dark-bg, 0.5);
+      border-bottom-color: $dark-border;
+    }
+  }
+
+  // Formularios
+  .form-control {
+    background-color: $dark-bg;
+    border-color: $dark-border;
+    color: $dark-text;
+
+    &:focus {
+      background-color: $dark-bg;
+      border-color: $primary-color;
+      color: $dark-text;
+    }
+  }
+
+  .form-select {
+    background-color: $dark-bg;
+    border-color: $dark-border;
+    color: $dark-text;
+  }
+
+  // Tablas
+  .table {
+    --bs-table-bg: #{$dark-surface};
+    --bs-table-color: #{$dark-text};
+    --bs-table-border-color: #{$dark-border};
+  }
+
+  // Modals
+  .modal-content {
+    background-color: $dark-surface;
+    border-color: $dark-border;
+  }
+
+  // Navbars
+  .navbar {
+    background-color: $dark-surface !important;
+    
+    &-brand, &-nav .nav-link {
+      color: $dark-text;
+      
+      &:hover {
+        color: $primary-color;
+      }
+    }
+  }
+
+  // Dropdowns
+  .dropdown-menu {
+    background-color: $dark-surface;
+    border-color: $dark-border;
+    
+    .dropdown-item {
+      color: $dark-text;
+      
+      &:hover {
+        background-color: rgba($primary-color, 0.1);
+        color: $primary-color;
+      }
+    }
+  }
+
+  // Utilidades de texto
+  .text-dark { color: $dark-text !important; }
+  .text-muted { color: rgba($dark-text, 0.6) !important; }
+  
+  // Utilidades de fondo
+  .bg-light { background-color: $dark-surface !important; }
+  .bg-white { background-color: $dark-surface !important; }
+  .bg-dark { background-color: $color-white !important; }
+}
+
+// Transición suave entre temas
+[data-bs-theme] {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}

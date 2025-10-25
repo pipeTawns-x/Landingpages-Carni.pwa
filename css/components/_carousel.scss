@@ -1,0 +1,374 @@
+// Sistema de carruseles BEM para productos
+
+// Carrusel base
+.carousel {
+  position: relative;
+  
+  &__inner {
+    position: relative;
+    overflow: hidden;
+    border-radius: $border-radius-lg;
+  }
+  
+  &__item {
+    position: relative;
+    display: none;
+    @include transition(opacity, 0.6s, ease);
+    
+    &--active {
+      display: block;
+    }
+    
+    &.carousel-item-next,
+    &.carousel-item-prev,
+    &.carousel-item-active {
+      display: block;
+    }
+  }
+  
+  &__img {
+    width: 100%;
+    height: 400px;
+    object-fit: cover;
+    
+    @include media-breakpoint-down(md) {
+      height: 300px;
+    }
+    
+    @include media-breakpoint-down(sm) {
+      height: 250px;
+    }
+  }
+  
+  &__caption {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: spacer(4);
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+    color: $color-white;
+    
+    @include media-breakpoint-down(md) {
+      padding: spacer(3);
+    }
+    
+    h5 {
+      font-size: $font-size-lg;
+      font-weight: $font-weight-semibold;
+      margin-bottom: spacer(1);
+      
+      @include media-breakpoint-down(sm) {
+        font-size: $font-size-base;
+      }
+    }
+    
+    p {
+      margin: 0;
+      opacity: 0.9;
+      font-size: $font-size-sm;
+      
+      @include media-breakpoint-down(sm) {
+        font-size: $font-size-xs;
+      }
+    }
+  }
+  
+  // Controles
+  &__control {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3rem;
+    height: 3rem;
+    background: rgba($color-white, 0.9);
+    border: none;
+    border-radius: 50%;
+    @include box-shadow(2);
+    @include transition(all, 0.3s, ease);
+    z-index: 1;
+    
+    &:hover {
+      background: $color-white;
+      transform: translateY(-50%) scale(1.1);
+    }
+    
+    &--prev {
+      left: spacer(3);
+    }
+    
+    &--next {
+      right: spacer(3);
+    }
+    
+    &-icon {
+      width: 1.5rem;
+      height: 1.5rem;
+      color: $primary-color;
+    }
+    
+    @include media-breakpoint-down(md) {
+      width: 2.5rem;
+      height: 2.5rem;
+      
+      &-icon {
+        width: 1.25rem;
+        height: 1.25rem;
+      }
+    }
+  }
+  
+  // Indicadores
+  &__indicators {
+    position: absolute;
+    bottom: spacer(3);
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: spacer(1);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    z-index: 1;
+    
+    button {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      border: 2px solid $color-white;
+      background: transparent;
+      @include transition(all, 0.3s, ease);
+      cursor: pointer;
+      
+      &.active {
+        background: $color-white;
+      }
+      
+      &:hover:not(.active) {
+        background: rgba($color-white, 0.5);
+      }
+    }
+  }
+}
+
+// Carrusel de productos específico
+.products-carousel {
+  @extend .carousel;
+  margin-bottom: spacer(5);
+  
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: spacer(4);
+    
+    @include media-breakpoint-down(sm) {
+      flex-direction: column;
+      gap: spacer(2);
+      text-align: center;
+    }
+  }
+  
+  &__title {
+    @include section-title;
+    margin-bottom: 0;
+  }
+  
+  &__nav {
+    display: flex;
+    gap: spacer(2);
+    
+    .products-carousel__nav-btn {
+      @extend .btn;
+      @extend .btn--icon;
+      background: $color-light;
+      
+      &:hover {
+        background: $primary-color;
+        color: $color-white;
+      }
+      
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        
+        &:hover {
+          background: $color-light;
+          color: inherit;
+        }
+      }
+    }
+  }
+  
+  &__container {
+    position: relative;
+  }
+  
+  &__track {
+    display: flex;
+    gap: spacer(3);
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding: spacer(1);
+    
+    &::-webkit-scrollbar {
+      display: none;
+    }
+    
+    @include media-breakpoint-down(md) {
+      gap: spacer(2);
+    }
+  }
+  
+  &__item {
+    flex: 0 0 auto;
+    width: 280px;
+    
+    @include media-breakpoint-down(md) {
+      width: 250px;
+    }
+    
+    @include media-breakpoint-down(sm) {
+      width: 200px;
+    }
+  }
+}
+
+// Mini carrusel para thumbnails
+.thumbnail-carousel {
+  display: flex;
+  gap: spacer(2);
+  margin-top: spacer(3);
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  
+  &__item {
+    flex: 0 0 auto;
+    width: 80px;
+    height: 80px;
+    border-radius: $border-radius;
+    overflow: hidden;
+    cursor: pointer;
+    border: 2px solid transparent;
+    @include transition(all, 0.3s, ease);
+    
+    &.active {
+      border-color: $primary-color;
+    }
+    
+    &:hover:not(.active) {
+      border-color: $color-border;
+    }
+    
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+}
+
+// Carrusel automático para banners
+.auto-carousel {
+  @extend .carousel;
+  
+  &__item {
+    animation: slideIn 0.6s ease;
+  }
+}
+
+// Animaciones
+@include keyframe(slideIn) {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@include keyframe(fadeIn) {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+// Responsive adjustments
+@include media-breakpoint-down(lg) {
+  .products-carousel {
+    &__item {
+      width: 260px;
+    }
+  }
+}
+
+@include media-breakpoint-down(md) {
+  .carousel {
+    &__control {
+      &--prev {
+        left: spacer(2);
+      }
+      
+      &--next {
+        right: spacer(2);
+      }
+    }
+    
+    &__indicators {
+      bottom: spacer(2);
+    }
+  }
+  
+  .products-carousel {
+    &__item {
+      width: 220px;
+    }
+  }
+}
+
+@include media-breakpoint-down(sm) {
+  .products-carousel {
+    &__item {
+      width: 180px;
+    }
+  }
+}
+
+// Dark mode adjustments
+[data-bs-theme="dark"] {
+  .carousel {
+    &__control {
+      background: rgba($dark-surface, 0.9);
+      
+      &:hover {
+        background: $dark-surface;
+      }
+      
+      &-icon {
+        color: $primary-color;
+      }
+    }
+  }
+  
+  .products-carousel {
+    &__nav-btn {
+      background: $dark-surface;
+      
+      &:hover {
+        background: $primary-color;
+      }
+    }
+  }
+}

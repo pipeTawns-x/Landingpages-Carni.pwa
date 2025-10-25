@@ -1,26 +1,45 @@
-// abstracts/_bem-utilities.scss
-// Mixins BEM obligatorios para evitar conflictos con Bootstrap
+// Utilidades BEM (Block Element Modifier) para metodología estricta
 
-// Block Element Mixin
-@mixin element($element) {
-  &__#{$element} {
+// Block - Define un bloque BEM
+@mixin block($name) {
+  .#{$name} {
     @content;
   }
 }
 
-// Block Modifier Mixin
-@mixin modifier($modifier) {
-  &--#{$modifier} {
-    @content;
+// Element - Define un elemento dentro de un bloque
+@mixin element($elements...) {
+  @each $element in $elements {
+    &__#{$element} {
+      @content;
+    }
   }
 }
 
-// BEM Block with optional modifier
-@mixin block($block, $modifier: null) {
-  .#{$block} {
+// Modifier - Define un modificador para un bloque o elemento
+@mixin modifier($modifiers...) {
+  @each $modifier in $modifiers {
+    &--#{$modifier} {
+      @content;
+    }
+  }
+}
+
+// Utility para generar componentes BEM completos
+@mixin bem-component($block-name, $elements: (), $modifiers: ()) {
+  // Bloque principal
+  .#{$block-name} {
     @content;
     
-    @if $modifier {
+    // Elementos
+    @each $element in $elements {
+      &__#{$element} {
+        @content;
+      }
+    }
+    
+    // Modificadores
+    @each $modifier in $modifiers {
       &--#{$modifier} {
         @content;
       }
@@ -28,51 +47,57 @@
   }
 }
 
-// Utility para crear componentes BEM sin conflictos
-@mixin bem-component($block-name) {
-  .#{$block-name} {
-    @content;
-    
-    // Elements
-    @at-root {
-      @each $element in & {
-        @each $selector in & {
-          $element-selector: nth($selector, 1);
-          @if str-index($element-selector, $block-name) {
-            @content;
-          }
+// Mixin para estados de componentes
+@mixin state($state) {
+  @if $state == 'hover' {
+    &:hover {
+      @content;
+    }
+  } @else if $state == 'focus' {
+    &:focus {
+      @content;
+    }
+  } @else if $state == 'active' {
+    &:active {
+      @content;
+    }
+  } @else if $state == 'disabled' {
+    &:disabled {
+      @content;
+    }
+  }
+}
+
+// Utility para responsive BEM
+@mixin bem-responsive($breakpoint, $block-name, $elements: (), $modifiers: ()) {
+  @include media-breakpoint-up($breakpoint) {
+    .#{$block-name} {
+      @content;
+      
+      @each $element in $elements {
+        &__#{$element} {
+          @content;
+        }
+      }
+      
+      @each $modifier in $modifiers {
+        &--#{$modifier} {
+          @content;
         }
       }
     }
   }
 }
 
-// Mixin para evitar conflictos de especificidad
-@mixin no-bootstrap-conflict {
-  &:not(.btn):not(.form-control):not(.card):not(.modal) {
-    @content;
-  }
-}
-
-// Helper para componentes que deben anular Bootstrap
-@mixin override-bootstrap($component) {
-  .#{$component} {
-    @include no-bootstrap-conflict {
-      @content;
-    }
-  }
-}
-
-// Utility para componentes de layout específicos
-@mixin layout-component($name) {
-  .cs-#{$name} {
-    @content;
-  }
-}
-
-// Utility para componentes de página específicos
-@mixin page-component($name) {
-  .pg-#{$name} {
-    @content;
-  }
-}
+// Ejemplo de uso:
+// @include block('product-card') {
+//   padding: 1rem;
+//   
+//   @include element('image', 'title', 'price') {
+//     margin-bottom: 0.5rem;
+//   }
+//   
+//   @include modifier('featured', 'discounted') {
+//     border: 2px solid $primary-color;
+//   }
+// }

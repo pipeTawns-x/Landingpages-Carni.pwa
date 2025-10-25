@@ -1,86 +1,91 @@
-// abstracts/_functions.scss
-// Funciones SCSS avanzadas para cálculos y utilidades
+// Funciones SCSS utilitarias
 
-// Función para calcular contraste de color
-@function color-contrast($color) {
-  $r: red($color);
-  $g: green($color);
-  $b: blue($color);
-  $yiq: (($r * 299) + ($g * 587) + ($b * 114)) / 1000;
-  
-  @if ($yiq >= 128) {
-    @return #000000;
-  } @else {
-    @return #ffffff;
-  }
+// Convertir px a rem
+@function rem($pixels, $context: 16) {
+  @return calc($pixels / $context) * 1rem;
 }
 
-// Función para calcular luminosidad
+// Convertir px a em
+@function em($pixels, $context: 16) {
+  @return calc($pixels / $context) * 1em;
+}
+
+// Calcular luminosidad del color
 @function luminance($color) {
-  $r: red($color) / 255;
-  $g: green($color) / 255;
-  $b: blue($color) / 255;
-  
-  $r: if($r <= 0.03928, $r / 12.92, pow(($r + 0.055) / 1.055, 2.4));
-  $g: if($g <= 0.03928, $g / 12.92, pow(($g + 0.055) / 1.055, 2.4));
-  $b: if($b <= 0.03928, $b / 12.92, pow(($b + 0.055) / 1.055, 2.4));
-  
-  @return 0.2126 * $r + 0.7152 * $g + 0.0722 * $b;
+  $red: red($color) / 255;
+  $green: green($color) / 255;
+  $blue: blue($color) / 255;
+
+  $red: if($red < 0.03928, $red / 12.92, pow(($red + 0.055) / 1.055, 2.4));
+  $green: if($green < 0.03928, $green / 12.92, pow(($green + 0.055) / 1.055, 2.4));
+  $blue: if($blue < 0.03928, $blue / 12.92, pow(($blue + 0.055) / 1.055, 2.4));
+
+  @return 0.2126 * $red + 0.7152 * $green + 0.0722 * $blue;
 }
 
-// Función para calcular contraste WCAG
+// Calcular contraste entre colores (WCAG)
 @function contrast-ratio($background, $foreground) {
-  $l1: luminance($background);
-  $l2: luminance($foreground);
+  $luminance1: luminance($background) + 0.05;
+  $luminance2: luminance($foreground) + 0.05;
   
-  @if $l1 > $l2 {
-    @return ($l1 + 0.05) / ($l2 + 0.05);
+  @return max($luminance1, $luminance2) / min($luminance1, $luminance2);
+}
+
+// Determinar color de texto basado en fondo (accesibilidad)
+@function text-color($background) {
+  @if (contrast-ratio($background, #000) > 4.5) {
+    @return #000;
   } @else {
-    @return ($l2 + 0.05) / ($l1 + 0.05);
+    @return #fff;
   }
 }
 
-// Función para generar escalas de color
-@function tint($color, $percentage) {
-  @return mix(white, $color, $percentage);
-}
-
-@function shade($color, $percentage) {
-  @return mix(black, $color, $percentage);
-}
-
-// Función para calcular espaciado responsive
-@function responsive-spacing($base, $multiplier: 1) {
-  @return calc(#{$base} * #{$multiplier});
-}
-
-// Función para calcular tamaños de fuente responsive
-@function responsive-font($min-size, $max-size, $min-width: 320px, $max-width: 1200px) {
-  @return clamp(#{$min-size}, #{$min-size} + (#{$max-size} - #{$min-size}) * ((100vw - #{$min-width}) / (#{$max-width} - #{$min-width})), #{$max-size});
-}
-
-// Función para calcular grid columns
-@function grid-columns($columns, $total-columns: 12) {
-  @return percentage($columns / $total-columns);
-}
-
-// Función para calcular aspect ratio
-@function aspect-ratio($width, $height) {
-  @return percentage($height / $width);
-}
-
-// Función para validar colores accesibles
-@function accessible-color($background, $text-color: null) {
-  @if $text-color == null {
-    $text-color: color-contrast($background);
-  }
-  
-  $ratio: contrast-ratio($background, $text-color);
-  
-  @if $ratio >= 4.5 {
-    @return $text-color;
+// Generar paleta de colores
+@function color-shade($color, $percentage) {
+  @if lightness($color) > 50% {
+    @return darken($color, $percentage);
   } @else {
-    @warn "El contraste entre #{$background} y #{$text-color} es #{$ratio}, que es menor que 4.5:1";
-    @return color-contrast($background);
+    @return lighten($color, $percentage);
   }
+}
+
+// Obtener valor de espaciado
+@function spacer($index) {
+  @return map-get($spacers, $index);
+}
+
+// Obtener breakpoint
+@function breakpoint($name) {
+  @return map-get((
+    sm: $breakpoint-sm,
+    md: $breakpoint-md,
+    lg: $breakpoint-lg,
+    xl: $breakpoint-xl,
+    xxl: $breakpoint-xxl
+  ), $name);
+}
+
+// Calcular ancho de columna grid
+@function grid-column($columns) {
+  @return percentage(calc($columns / $grid-columns));
+}
+
+// Función para z-index
+@function z($layer) {
+  @return map-get((
+    dropdown: $z-index-dropdown,
+    sticky: $z-index-sticky,
+    fixed: $z-index-fixed,
+    modal-backdrop: $z-index-modal-backdrop,
+    modal: $z-index-modal,
+    popover: $z-index-popover,
+    tooltip: $z-index-tooltip,
+    offcanvas: $z-index-offcanvas,
+    toast: $z-index-toast
+  ), $layer);
+}
+
+// Función para transiciones suaves
+@function transition($property: all, $duration: 0.3s, $timing: ease) {
+  @return #{$property} #{$duration} #{$timing};
 }

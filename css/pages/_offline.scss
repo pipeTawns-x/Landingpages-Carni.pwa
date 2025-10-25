@@ -1,262 +1,407 @@
-// scss/pages/_offline.scss
-// 🎯 Estilos específicos para la página offline PWA
+// pages/_offline.scss
+// Estilos para la página offline - Carnicería PWA
 
-.cs-offline-page {
-  background: linear-gradient(135deg, $body-bg 0%, darken($body-bg, 5%) 100%);
+.offline {
   min-height: 100vh;
   display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.cs-offline-container {
-  @include flex-center;
   flex-direction: column;
-  text-align: center;
-  padding: map-get($spacers, 5);
-  max-width: 1200px;
-  margin: 0 auto;
-  
-  @include media-breakpoint-down(md) {
-    padding: map-get($spacers, 4);
-  }
-  
-  @include media-breakpoint-down(sm) {
-    padding: map-get($spacers, 3);
-  }
-}
+  background: linear-gradient(135deg, $color-light 0%, $color-white 100%);
 
-.cs-offline-icon {
-  margin-bottom: map-get($spacers, 5);
-  
-  &__symbol {
-    font-size: 5rem;
-    color: $primary-color;
-    
-    @include media-breakpoint-down(md) {
-      font-size: 4rem;
-    }
-    
-    @include media-breakpoint-down(sm) {
-      font-size: 3rem;
-    }
+  &__main {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: spacer(4);
   }
-}
 
-.cs-offline-title {
-  font-size: 2.5rem;
-  font-weight: 700;
-  color: $color-text;
-  margin-bottom: map-get($spacers, 4);
-  line-height: 1.2;
-  
-  @include media-breakpoint-down(md) {
-    font-size: 2rem;
+  &__container {
+    text-align: center;
+    max-width: 800px;
+    width: 100%;
   }
-  
-  @include media-breakpoint-down(sm) {
-    font-size: 1.75rem;
-  }
-}
 
-.cs-offline-message {
-  font-size: 1.2rem;
-  color: $color-text-light;
-  margin-bottom: map-get($spacers, 5);
-  max-width: 600px;
-  line-height: 1.6;
-  
-  @include media-breakpoint-down(md) {
-    font-size: 1.1rem;
-  }
-  
-  @include media-breakpoint-down(sm) {
-    font-size: 1rem;
-  }
-}
-
-.cs-offline-retry-btn {
-  margin-bottom: map-get($spacers, 5);
-  @include transition(all, 0.3s, ease);
-  
-  &:hover {
-    transform: translateY(-2px);
-    @include box-shadow(2);
-  }
-  
-  &__icon {
-    font-size: 1.1rem;
-  }
-}
-
-.cs-offline-features {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: map-get($spacers, 4);
-  width: 100%;
-  max-width: 1200px;
-  margin-bottom: map-get($spacers, 5);
-  
-  @include media-breakpoint-down(sm) {
-    grid-template-columns: 1fr;
-    gap: map-get($spacers, 3);
-  }
-}
-
-.cs-offline-feature {
-  @include transition(all, 0.3s, ease);
-  border: 1px solid $color-border;
-  
-  &:hover {
-    transform: translateY(-5px);
-    @include box-shadow(3);
-  }
-  
-  &__body {
-    padding: map-get($spacers, 4);
-    
-    @include media-breakpoint-down(md) {
-      padding: map-get($spacers, 3);
-    }
-  }
-  
-  &__icon {
-    display: block;
-    margin: 0 auto map-get($spacers, 3);
-  }
-  
-  &__title {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: $color-text;
-    margin-bottom: map-get($spacers, 3);
-  }
-  
-  &__description {
-    color: $color-text-light;
-    line-height: 1.6;
-    margin-bottom: 0;
-  }
-}
-
-.cs-offline-info {
-  max-width: 800px;
-  width: 100%;
-  
   &__content {
-    padding: map-get($spacers, 3);
+    background: $color-white;
+    border-radius: $border-radius-xl;
+    padding: spacer(6);
+    @include box-shadow(4);
+    margin-bottom: spacer(4);
   }
-  
+
   &__icon {
-    flex-shrink: 0;
+    color: $primary-color;
+    margin-bottom: spacer(4);
+
+    i {
+      font-size: 5rem;
+    }
   }
-  
+
   &__title {
-    font-size: 1.1rem;
-    font-weight: 600;
+    font-size: $font-size-3xl;
+    font-weight: $font-weight-bold;
+    color: $primary-color;
+    margin-bottom: spacer(3);
+    line-height: 1.2;
+
+    @include media-breakpoint-down(sm) {
+      font-size: $font-size-2xl;
+    }
   }
-  
-  &__text {
-    line-height: 1.5;
+
+  &__message {
+    font-size: $font-size-lg;
+    color: $color-text-light;
+    margin-bottom: spacer(5);
+    line-height: 1.6;
+
+    @include media-breakpoint-down(sm) {
+      font-size: $font-size-base;
+    }
+  }
+
+  &__retry-btn {
+    @extend .btn;
+    @extend .btn--primary;
+    @extend .btn--lg;
+    margin-bottom: spacer(5);
+  }
+
+  &__features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: spacer(4);
+    margin-top: spacer(5);
+  }
+
+  &__feature {
+    @extend .card;
+    text-align: center;
+    padding: spacer(4);
+    border: none;
+    @include box-shadow(2);
+    @include transition(all, 0.3s, ease);
+
+    &:hover {
+      transform: translateY(-4px);
+      @include box-shadow(3);
+    }
+
+    &-icon {
+      font-size: 2.5rem;
+      color: $primary-color;
+      margin-bottom: spacer(3);
+    }
+
+    &-title {
+      font-size: $font-size-lg;
+      font-weight: $font-weight-semibold;
+      margin-bottom: spacer(2);
+      color: $color-text;
+    }
+
+    &-description {
+      color: $color-text-light;
+      line-height: 1.6;
+      margin: 0;
+    }
+  }
+
+  &__info {
+    margin-top: spacer(5);
+
+    &-content {
+      @extend .alert;
+      @extend .alert--info;
+      text-align: left;
+      display: flex;
+      align-items: center;
+      gap: spacer(3);
+    }
+
+    &-icon {
+      font-size: $font-size-2xl;
+      flex-shrink: 0;
+    }
+
+    &-title {
+      font-weight: $font-weight-semibold;
+      margin-bottom: spacer(1);
+    }
+
+    &-text {
+      margin: 0;
+      line-height: 1.5;
+    }
+  }
+
+  &__footer {
+    background: $dark-bg;
+    color: $color-white;
+    padding: spacer(4) 0;
+    margin-top: auto;
+
+    &-copyright {
+      color: rgba($color-white, 0.7);
+      margin-bottom: 0;
+    }
+
+    &-links {
+      @extend %list-reset;
+      display: flex;
+      justify-content: center;
+      gap: spacer(3);
+      flex-wrap: wrap;
+    }
+
+    &-link-item {
+      margin: 0;
+    }
+
+    &-link {
+      color: rgba($color-white, 0.7);
+      text-decoration: none;
+      @include transition(color, 0.3s, ease);
+
+      &:hover {
+        color: $color-white;
+        text-decoration: underline;
+      }
+    }
   }
 }
 
-// Animaciones para la página offline
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
+// Offline notification
+.offline-notification {
+  @extend .alert;
+  @extend .alert--warning;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: z(toast);
+  border-radius: 0;
+  border-left: none;
+  border-top: 3px solid $color-warning;
+  text-align: center;
+  animation: slideInDown 0.3s ease;
+  margin: 0;
+
+  &__icon {
+    margin-right: spacer(2);
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+
+  &__message {
+    margin: 0;
+    font-weight: $font-weight-medium;
   }
 }
 
-.cs-offline-container > * {
-  animation: fadeInUp 0.6s ease forwards;
-  
-  &:nth-child(1) { animation-delay: 0.1s; }
-  &:nth-child(2) { animation-delay: 0.2s; }
-  &:nth-child(3) { animation-delay: 0.3s; }
-  &:nth-child(4) { animation-delay: 0.4s; }
-  &:nth-child(5) { animation-delay: 0.5s; }
-  &:nth-child(6) { animation-delay: 0.6s; }
-}
+// Offline functionality indicators
+.offline-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: spacer(1);
+  padding: spacer(1) spacer(2);
+  background: rgba($color-warning, 0.1);
+  border: 1px solid rgba($color-warning, 0.2);
+  border-radius: $border-radius;
+  color: darken($color-warning, 20%);
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
 
-// Estados de carga offline
-.cs-offline-loading {
-  .cs-offline-icon__symbol {
+  &::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: $color-warning;
     animation: pulse 2s infinite;
   }
-}
 
-@keyframes pulse {
-  0% {
-    transform: scale(1);
-    opacity: 1;
-  }
-  50% {
-    transform: scale(1.1);
-    opacity: 0.7;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
+  &--online {
+    background: rgba($color-success, 0.1);
+    border-color: rgba($color-success, 0.2);
+    color: darken($color-success, 20%);
 
-// Responsive adicional
-@media (max-width: 480px) {
-  .cs-offline-container {
-    padding: map-get($spacers, 2);
-  }
-  
-  .cs-offline-title {
-    font-size: 1.5rem;
-  }
-  
-  .cs-offline-message {
-    font-size: 0.95rem;
-  }
-  
-  .cs-offline-feature {
-    &__body {
-      padding: map-get($spacers, 2);
+    &::before {
+      background: $color-success;
     }
-    
+  }
+}
+
+// Offline sync status
+.sync-status {
+  display: flex;
+  align-items: center;
+  gap: spacer(2);
+  padding: spacer(2);
+  background: $color-light;
+  border-radius: $border-radius;
+  margin-bottom: spacer(3);
+
+  &__icon {
+    font-size: $font-size-lg;
+    color: $color-text-light;
+  }
+
+  &__text {
+    flex: 1;
+    color: $color-text-light;
+    font-size: $font-size-sm;
+    margin: 0;
+  }
+
+  &__progress {
+    width: 100px;
+    height: 4px;
+    background: $color-border;
+    border-radius: 2px;
+    overflow: hidden;
+
+    &-bar {
+      height: 100%;
+      background: $primary-color;
+      @include transition(width, 0.3s, ease);
+    }
+  }
+
+  &--syncing {
+    .sync-status__icon {
+      color: $primary-color;
+      animation: spin 1s linear infinite;
+    }
+  }
+
+  &--complete {
+    background: rgba($color-success, 0.1);
+
+    .sync-status__icon {
+      color: $color-success;
+    }
+
+    .sync-status__text {
+      color: darken($color-success, 20%);
+    }
+  }
+
+  &--error {
+    background: rgba($color-danger, 0.1);
+
+    .sync-status__icon {
+      color: $color-danger;
+    }
+
+    .sync-status__text {
+      color: darken($color-danger, 20%);
+    }
+  }
+}
+
+// Cached content indicators
+.cached-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: spacer(1);
+  padding: spacer(1) spacer(2);
+  background: rgba($color-info, 0.1);
+  border: 1px solid rgba($color-info, 0.2);
+  border-radius: $border-radius;
+  color: darken($color-info, 20%);
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+
+  i {
+    font-size: $font-size-sm;
+  }
+}
+
+// Responsive adjustments
+@include media-breakpoint-down(lg) {
+  .offline {
+    &__features {
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: spacer(3);
+    }
+  }
+}
+
+@include media-breakpoint-down(md) {
+  .offline {
+    &__main {
+      padding: spacer(3);
+    }
+
+    &__content {
+      padding: spacer(5);
+    }
+
+    &__features {
+      grid-template-columns: 1fr;
+    }
+
+    &__info {
+      &-content {
+        flex-direction: column;
+        text-align: center;
+        gap: spacer(2);
+      }
+    }
+  }
+}
+
+@include media-breakpoint-down(sm) {
+  .offline {
+    &__content {
+      padding: spacer(4);
+    }
+
     &__title {
-      font-size: 1.1rem;
+      font-size: $font-size-2xl;
     }
-    
-    &__description {
-      font-size: 0.9rem;
+
+    &__message {
+      font-size: $font-size-base;
     }
   }
 }
 
-// Modo de alto contraste
-@media (prefers-contrast: high) {
-  .cs-offline-feature {
-    border: 2px solid $color-text;
-  }
-  
-  .cs-offline-info {
-    border: 2px solid $color-info;
-  }
-}
+// Dark mode adjustments
+[data-bs-theme="dark"] {
+  .offline {
+    background: linear-gradient(135deg, $dark-bg 0%, lighten($dark-bg, 5%) 100%);
 
-// Reducción de movimiento
-@media (prefers-reduced-motion: reduce) {
-  .cs-offline-container > * {
-    animation: none;
+    &__content {
+      background: $dark-surface;
+    }
+
+    &__feature {
+      background: $dark-surface;
+    }
+
+    &__info-content {
+      background: rgba($color-info, 0.1);
+      border-left-color: $color-info;
+      color: $color-info;
+    }
   }
-  
-  .cs-offline-feature:hover {
-    transform: none;
+
+  .sync-status {
+    background: $dark-bg;
+
+    &--complete {
+      background: rgba($color-success, 0.1);
+    }
+
+    &--error {
+      background: rgba($color-danger, 0.1);
+    }
   }
-  
-  .cs-offline-retry-btn:hover {
-    transform: none;
+
+  .cached-indicator {
+    background: rgba($color-info, 0.1);
+    border-color: rgba($color-info, 0.2);
+    color: $color-info;
   }
 }

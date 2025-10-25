@@ -1,48 +1,81 @@
-// scss/main.scss - ARCHIVO MAESTRO ACTUALIZADO
+// main.scss
+// Archivo principal SCSS - Carnicería PWA
+// Patrón 7-1 Architecture
 
-// Import abstracts
+// 1. Abstracts - Variables, mixins, funciones
 @import 'abstracts/variables';
 @import 'abstracts/mixins';
-@import 'abstracts/bem-utilities';
 @import 'abstracts/functions';
 @import 'abstracts/placeholders';
+@import 'abstracts/bem-utilities';
 
-// Import base
+// 2. Vendors - Librerías externas
+@import 'vendors/bootstrap';
+@import 'vendors/custom-vendors';
+
+// 3. Base - Estilos base y reset
 @import 'base/reset';
 @import 'base/typography';
 @import 'base/utilities';
 @import 'base/base';
 
-// Import layout
+// 4. Layout - Estructuras principales
+@import 'layout/header';
+@import 'layout/footer';
+@import 'layout/sidebar';
 @import 'layout/auth-layout';
 @import 'layout/dashboard-layout';
-@import 'layout/footer';
-@import 'layout/header';
-@import 'layout/sidebar';
 
-// Import components
-@import 'components/alerts';
-@import 'components/badges';
+// 5. Components - Componentes reutilizables
 @import 'components/buttons';
 @import 'components/cards';
-@import 'components/carousel';
-@import 'components/loading';
 @import 'components/modals';
+@import 'components/loading';
+@import 'components/alerts';
+@import 'components/badges';
+@import 'components/carousel';
 
-// Import pages
-@import 'pages/admin';
-@import 'pages/cart';
-@import 'pages/catalog';
-@import 'pages/dashboard';
+// 6. Pages - Estilos específicos por página
 @import 'pages/home';
+@import 'pages/catalog';
+@import 'pages/cart';
 @import 'pages/login';
-@import 'pages/offline'; // ✅ NUEVA PÁGINA OFFLINE AÑADIDA
+@import 'pages/admin';
 @import 'pages/products';
+@import 'pages/dashboard';
+@import 'pages/offline';
 
-// Import themes
-@import 'themes/dark-mode';
+// 7. Themes - Temas y variantes
 @import 'themes/theme';
+@import 'themes/dark-mode';
 
-// Import vendors
-@import 'vendors/bootstrap';
-@import 'vendors/custom-vendors';
+// 8. Utilidades globales finales
+// Asegurar que las utilidades tengan la última palabra
+@include generate-utility-classes;
+
+// 9. Estilos de impresión
+@media print {
+  @import 'base/print';
+}
+
+// 10. Estilos de alta prioridad (prefers-reduced-motion)
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+// 11. Soporte para navegadores antiguos
+@supports not (display: grid) {
+  .grid-fallback {
+    display: flex;
+    flex-wrap: wrap;
+    
+    > * {
+      flex: 1 1 300px;
+      margin: 1rem;
+    }
+  }
+}

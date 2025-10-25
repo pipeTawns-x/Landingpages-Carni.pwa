@@ -1,20 +1,14 @@
-// Página de inicio BEM
+// pages/_home.scss
+// Estilos para la página de inicio - Carnicería PWA
+
 .home {
-  // Hero Section BEM
   &__hero {
-    background: linear-gradient(135deg, rgba($primary, 0.1) 0%, rgba($secondary, 0.05) 100%);
-    padding: map-get($spacers, 6) 0;
+    background: linear-gradient(135deg, $primary-color 0%, darken($primary-color, 15%) 100%);
+    color: $color-white;
+    padding: spacer(8) 0;
     position: relative;
     overflow: hidden;
-    
-    @include media-breakpoint-down(lg) {
-      padding: map-get($spacers, 5) 0;
-    }
-    
-    @include media-breakpoint-down(md) {
-      padding: map-get($spacers, 4) 0;
-    }
-    
+
     &::before {
       content: '';
       position: absolute;
@@ -22,356 +16,407 @@
       left: 0;
       right: 0;
       bottom: 0;
-      background: url('../img/pattern.svg') repeat;
-      opacity: 0.1;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000" opacity="0.1"><path fill="%23ffffff" d="M500,250c138.1,0,250-111.9,250-250S638.1-250,500-250S250-138.1,250,0S361.9,250,500,250z M500,750c-138.1,0-250,111.9-250,250s111.9,250,250,250s250-111.9,250-250S638.1,750,500,750z M250,500c0-138.1-111.9-250-250-250S-250,361.9-250,500s111.9,250,250,250S250,638.1,250,500z M750,500c0,138.1,111.9,250,250,250s250-111.9,250-250s-111.9-250-250-250S750,361.9,750,500z"/></svg>');
+      background-size: 300px;
+    }
+
+    &-container {
+      position: relative;
       z-index: 1;
     }
-    
-    &__container {
-      position: relative;
-      z-index: 2;
-    }
-    
-    &__content {
-      @include media-breakpoint-up(lg) {
-        padding-right: map-get($spacers, 5);
-      }
-    }
-    
-    &__title {
-      @extend .typography__title--primary;
-      margin-bottom: map-get($spacers, 4);
-    }
-    
-    &__subtitle {
-      @extend .typography__body--primary;
-      font-size: 1.25rem;
-      margin-bottom: map-get($spacers, 5);
-      
+
+    &-title {
+      font-size: $font-size-4xl;
+      font-weight: $font-weight-extrabold;
+      margin-bottom: spacer(3);
+      line-height: 1.2;
+
       @include media-breakpoint-down(md) {
-        font-size: 1.1rem;
+        font-size: $font-size-3xl;
+      }
+
+      @include media-breakpoint-down(sm) {
+        font-size: $font-size-2xl;
       }
     }
-    
-    &__weather {
-      background: linear-gradient(135deg, $white 0%, $light 100%);
-      border-radius: $border-radius-lg;
-      padding: map-get($spacers, 3);
-      @include box-shadow(1);
-      border: 1px solid $color-border;
-      max-width: 250px;
-      margin-bottom: map-get($spacers, 4);
-      
-      &-content {
-        display: flex;
-        align-items: center;
-        gap: map-get($spacers, 2);
-      }
-      
-      &-icon {
-        font-size: 2rem;
-        color: $primary;
-      }
-      
-      &-temp {
-        font-size: 1.25rem;
-        font-weight: 600;
-        color: $dark;
-      }
-      
-      &-desc {
-        font-size: 0.875rem;
-        color: $color-text-light;
+
+    &-subtitle {
+      font-size: $font-size-lg;
+      margin-bottom: spacer(4);
+      opacity: 0.9;
+      line-height: 1.6;
+
+      @include media-breakpoint-down(sm) {
+        font-size: $font-size-base;
       }
     }
-    
-    &__actions {
+
+    &-buttons {
       display: flex;
-      gap: map-get($spacers, 3);
+      gap: spacer(3);
       flex-wrap: wrap;
-      
+
       @include media-breakpoint-down(sm) {
         flex-direction: column;
-        gap: map-get($spacers, 2);
       }
     }
-    
-    &__carousel {
-      border-radius: $border-radius-xl;
-      overflow: hidden;
-      @include box-shadow(3);
-      
-      .carousel-item img {
-        height: 400px;
-        object-fit: cover;
-        
-        @include media-breakpoint-down(md) {
-          height: 300px;
+
+    &-btn {
+      @extend .btn;
+      @extend .btn--primary;
+      @extend .btn--lg;
+
+      &--outline {
+        @extend .btn;
+        @extend .btn--outline;
+        @extend .btn--lg;
+        background: rgba($color-white, 0.1);
+        border-color: $color-white;
+        color: $color-white;
+
+        &:hover {
+          background: $color-white;
+          color: $primary-color;
         }
       }
     }
   }
-  
-  // Products Section BEM
+
+  &__weather {
+    background: rgba($color-white, 0.1);
+    border-radius: $border-radius-lg;
+    padding: spacer(3);
+    margin-bottom: spacer(4);
+    backdrop-filter: blur(10px);
+
+    &-icon {
+      font-size: 2.5rem;
+      margin-right: spacer(2);
+    }
+
+    &-temp {
+      font-size: $font-size-xl;
+      font-weight: $font-weight-bold;
+      margin-bottom: spacer(1);
+    }
+
+    &-desc {
+      font-size: $font-size-sm;
+      opacity: 0.8;
+      margin: 0;
+    }
+  }
+
   &__products {
-    padding: map-get($spacers, 6) 0;
-    background-color: $white;
-    
-    @include media-breakpoint-down(lg) {
-      padding: map-get($spacers, 5) 0;
-    }
-    
-    &__title {
-      @extend .typography__title--section;
-    }
-    
-    &__grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: map-get($spacers, 4);
-      margin-bottom: map-get($spacers, 5);
-      
-      @include media-breakpoint-down(sm) {
-        grid-template-columns: 1fr;
-        gap: map-get($spacers, 3);
-      }
-    }
-  }
-  
-  // Schedule Section BEM
-  &__schedule {
-    padding: map-get($spacers, 6) 0;
-    background: linear-gradient(135deg, $light 0%, $white 100%);
-    
-    @include media-breakpoint-down(lg) {
-      padding: map-get($spacers, 5) 0;
-    }
-    
-    &__container {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: map-get($spacers, 5);
-      align-items: start;
-      
-      @include media-breakpoint-down(md) {
-        grid-template-columns: 1fr;
-        gap: map-get($spacers, 4);
-      }
-    }
-    
-    &__title {
-      @extend .typography__title--secondary;
-      margin-bottom: map-get($spacers, 4);
-    }
-    
-    &__box {
-      background: $white;
-      border-radius: $border-radius-xl;
-      padding: map-get($spacers, 4);
-      @include box-shadow(2);
-      border: 1px solid $color-border;
-      height: 100%;
-      @include transition(transform box-shadow);
-      
-      &:hover {
-        transform: translateY(-5px);
-        @include box-shadow(3);
-      }
-      
-      &--hours {
-        .home__schedule__time {
-          display: flex;
-          align-items: center;
-          gap: map-get($spacers, 3);
-          margin-bottom: map-get($spacers, 3);
-          
-          &-icon {
-            font-size: 1.5rem;
-            color: $primary;
-          }
-          
-          &-info {
-            flex: 1;
-          }
-          
-          &-main {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: $dark;
-            margin-bottom: map-get($spacers, 1);
-          }
-          
-          &-days {
-            color: $color-text-light;
-          }
-        }
-      }
-    }
-    
-    &__about {
-      &-title {
-        @extend .typography__title--secondary;
-        margin-bottom: map-get($spacers, 3);
-      }
-      
-      &-text {
-        @extend .typography__body--primary;
-        
-        & + & {
-          margin-top: map-get($spacers, 3);
-        }
-      }
-    }
-  }
-  
-  // Location Section BEM
-  &__location {
-    padding: map-get($spacers, 6) 0;
-    background: linear-gradient(135deg, $white 0%, $light 100%);
-    
-    @include media-breakpoint-down(lg) {
-      padding: map-get($spacers, 5) 0;
-    }
-    
-    &__title {
-      @extend .typography__title--section;
-      margin-bottom: map-get($spacers, 5);
-    }
-    
-    &__grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: map-get($spacers, 4);
-    }
-    
-    &__card {
-      background: $white;
-      border-radius: $border-radius-xl;
-      padding: map-get($spacers, 4);
-      @include box-shadow(2);
-      border: none;
-      height: 100%;
-      @include transition(transform box-shadow);
-      
-      &:hover {
-        transform: translateY(-5px);
-        @include box-shadow(3);
-      }
-      
-      &-title {
-        @extend .typography__title--secondary;
-        font-size: 1.5rem;
-        margin-bottom: map-get($spacers, 3);
-      }
-      
-      &-address {
-        @extend .typography__body--primary;
-        margin-bottom: map-get($spacers, 3);
-        
-        i {
-          color: $primary;
-          margin-right: map-get($spacers, 2);
-        }
-      }
-      
-      &-contact {
-        @extend .typography__body--primary;
-        margin-bottom: map-get($spacers, 2);
-        
-        i {
-          color: $primary;
-          margin-right: map-get($spacers, 2);
-          width: 20px;
-        }
-        
-        a {
-          @extend .typography__link;
-        }
-      }
-    }
-  }
-  
-  // Contact Section BEM
-  &__contact {
-    padding: map-get($spacers, 6) 0;
-    background: linear-gradient(135deg, $light 0%, $white 100%);
-    
-    @include media-breakpoint-down(lg) {
-      padding: map-get($spacers, 5) 0;
-    }
-    
-    &__title {
-      @extend .typography__title--section;
-      margin-bottom: map-get($spacers, 5);
-    }
-    
-    &__form-container {
-      max-width: 800px;
-      margin: 0 auto;
-    }
-    
-    &__form {
-      background: $white;
-      border-radius: $border-radius-xl;
-      padding: map-get($spacers, 5);
-      @include box-shadow(2);
-      border: 1px solid $color-border;
-      
-      @include media-breakpoint-down(md) {
-        padding: map-get($spacers, 4);
-      }
-      
-      &-header {
-        text-align: center;
-        margin-bottom: map-get($spacers, 4);
-        
-        i {
-          font-size: 3rem;
-          color: $primary;
-          margin-bottom: map-get($spacers, 3);
-        }
-      }
-      
-      &-title {
-        @extend .typography__title--secondary;
-        margin-bottom: map-get($spacers, 2);
-      }
-      
-      &-subtitle {
-        @extend .typography__body--muted;
-      }
-    }
-    
-    &__direct {
-      margin-top: map-get($spacers, 4);
+    padding: spacer(8) 0;
+
+    &-title {
+      @include section-title;
       text-align: center;
-      
-      &-title {
-        @extend .typography__body--primary;
-        margin-bottom: map-get($spacers, 3);
+    }
+
+    &-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: spacer(4);
+      margin-top: spacer(5);
+    }
+
+    &-card {
+      @extend .product-card;
+      text-decoration: none;
+      color: inherit;
+
+      &:hover {
+        color: inherit;
+        text-decoration: none;
       }
-      
-      &-actions {
-        display: flex;
-        justify-content: center;
-        gap: map-get($spacers, 3);
-        flex-wrap: wrap;
+
+      &-link {
+        text-decoration: none;
+        color: inherit;
+
+        &:hover {
+          color: inherit;
+          text-decoration: none;
+        }
+      }
+    }
+  }
+
+  &__schedule {
+    background: $color-light;
+    padding: spacer(8) 0;
+
+    &-title {
+      @include section-title;
+      margin-bottom: spacer(4);
+    }
+
+    &-box {
+      background: $color-white;
+      border-radius: $border-radius-lg;
+      padding: spacer(5);
+      @include box-shadow(2);
+    }
+
+    &-icon {
+      color: $primary-color;
+    }
+
+    &-time {
+      font-size: $font-size-2xl;
+      font-weight: $font-weight-bold;
+      color: $primary-color;
+      margin-bottom: spacer(1);
+    }
+
+    &-days {
+      font-size: $font-size-lg;
+      color: $color-text;
+      margin-bottom: spacer(3);
+    }
+
+    &-note {
+      color: $color-text-light;
+      font-size: $font-size-sm;
+      margin: 0;
+    }
+  }
+
+  &__about {
+    &-box {
+      background: $color-white;
+      border-radius: $border-radius-lg;
+      padding: spacer(5);
+      @include box-shadow(2);
+      height: 100%;
+    }
+
+    &-title {
+      font-size: $font-size-xl;
+      font-weight: $font-weight-bold;
+      margin-bottom: spacer(3);
+      color: $primary-color;
+    }
+
+    &-text {
+      color: $color-text-light;
+      line-height: 1.7;
+      margin-bottom: spacer(3);
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+
+  &__location {
+    padding: spacer(8) 0;
+
+    &-title {
+      @include section-title;
+      text-align: center;
+      margin-bottom: spacer(5);
+    }
+
+    &-card {
+      @extend .card;
+      height: 100%;
+      border: none;
+      @include box-shadow(2);
+
+      &-body {
+        padding: spacer(4);
+      }
+
+      &-title {
+        font-size: $font-size-lg;
+        font-weight: $font-weight-semibold;
+        margin-bottom: spacer(3);
+        color: $primary-color;
+      }
+
+      &-address {
+        font-style: normal;
+        line-height: 1.6;
+        margin-bottom: spacer(3);
+
+        i {
+          color: $primary-color;
+          margin-right: spacer(2);
+        }
+      }
+
+      &-contact {
+        margin-bottom: spacer(2);
+        color: $color-text;
+
+        i {
+          color: $primary-color;
+          margin-right: spacer(2);
+          width: 1rem;
+          text-align: center;
+        }
+
+        a {
+          color: inherit;
+          text-decoration: none;
+
+          &:hover {
+            color: $primary-color;
+          }
+        }
+      }
+
+      &-btn {
+        @extend .btn;
+        @extend .btn--outline;
+        @extend .btn--primary;
+        margin-top: spacer(2);
+      }
+    }
+  }
+
+  &__contact {
+    padding: spacer(8) 0;
+    background: linear-gradient(135deg, $color-light 0%, $color-white 100%);
+
+    &-title {
+      @include section-title;
+      text-align: center;
+      margin-bottom: spacer(5);
+    }
+
+    &-form {
+      background: $color-white;
+      border-radius: $border-radius-lg;
+      padding: spacer(5);
+      @include box-shadow(3);
+
+      &-icon {
+        color: $primary-color;
+        display: block;
+        margin: 0 auto spacer(3);
+      }
+
+      &-heading {
+        text-align: center;
+        font-weight: $font-weight-bold;
+        margin-bottom: spacer(2);
+        color: $primary-color;
+      }
+
+      &-subtitle {
+        text-align: center;
+        color: $color-text-light;
+        margin-bottom: spacer(4);
+      }
+
+      &-label {
+        font-weight: $font-weight-medium;
+        margin-bottom: spacer(2);
+        color: $color-text;
+      }
+
+      &-input-group {
+        position: relative;
+      }
+
+      &-input-icon {
+        background: transparent;
+        border: none;
+        color: $primary-color;
+        position: absolute;
+        left: spacer(2);
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 2;
+      }
+
+      &-input {
+        @extend %form-control-base;
+        padding-left: spacer(6);
+
+        &:focus {
+          border-color: $primary-color;
+          @include box-shadow(1);
+        }
+      }
+
+      &-textarea {
+        @extend %form-control-base;
+        min-height: 120px;
+        resize: vertical;
+        padding-left: spacer(6);
+
+        &:focus {
+          border-color: $primary-color;
+          @include box-shadow(1);
+        }
+      }
+
+      &-char-count {
+        text-align: right;
+        font-size: $font-size-sm;
+        color: $color-text-light;
+        margin-top: spacer(1);
+      }
+
+      &-submit-btn {
+        @extend .btn;
+        @extend .btn--primary;
+        @extend .btn--lg;
+        @extend .btn--block;
+      }
+
+      &-direct-contact {
+        margin-top: spacer(4);
+        text-align: center;
+      }
+
+      &-direct-text {
+        color: $color-text-light;
+        margin-bottom: spacer(3);
+      }
+
+      &-direct-btn {
+        @extend .btn;
+        @extend .btn--outline;
+
+        &--call {
+          @extend .btn--primary;
+        }
+
+        &--whatsapp {
+          @extend .btn--success;
+        }
       }
     }
   }
 }
 
-// Utilidades responsive
-@include media-breakpoint-down(xl) {
+// Responsive adjustments
+@include media-breakpoint-down(lg) {
   .home {
     &__hero {
-      &__container {
-        > .row {
-          > [class*="col-"] {
-            margin-bottom: map-get($spacers, 4);
-          }
-        }
-      }
+      padding: spacer(6) 0;
+    }
+
+    &__products {
+      padding: spacer(6) 0;
+    }
+
+    &__schedule {
+      padding: spacer(6) 0;
+    }
+
+    &__location {
+      padding: spacer(6) 0;
+    }
+
+    &__contact {
+      padding: spacer(6) 0;
     }
   }
 }
@@ -379,39 +424,53 @@
 @include media-breakpoint-down(md) {
   .home {
     &__hero {
-      &__title {
-        text-align: center;
-      }
-      
-      &__subtitle {
-        text-align: center;
-      }
-      
-      &__weather {
-        margin-left: auto;
-        margin-right: auto;
-      }
-      
-      &__actions {
+      text-align: center;
+      padding: spacer(5) 0;
+
+      &-buttons {
         justify-content: center;
       }
     }
-    
-    &__products {
-      &__title {
-        text-align: center;
+
+    &__products-grid {
+      grid-template-columns: 1fr;
+      gap: spacer(3);
+    }
+  }
+}
+
+// Dark mode adjustments
+[data-bs-theme="dark"] {
+  .home {
+    &__hero {
+      background: linear-gradient(135deg, $dark-surface 0%, lighten($dark-surface, 5%) 100%);
+    }
+
+    &__weather {
+      background: rgba($dark-bg, 0.3);
+    }
+
+    &__schedule {
+      background: $dark-bg;
+
+      &-box {
+        background: $dark-surface;
       }
     }
-    
-    &__location {
-      &__title {
-        text-align: center;
-      }
+
+    &__about-box {
+      background: $dark-surface;
     }
-    
+
+    &__location-card {
+      background: $dark-surface;
+    }
+
     &__contact {
-      &__title {
-        text-align: center;
+      background: linear-gradient(135deg, $dark-bg 0%, lighten($dark-bg, 5%) 100%);
+
+      &-form {
+        background: $dark-surface;
       }
     }
   }

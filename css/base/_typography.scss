@@ -1,88 +1,81 @@
-// base/_typography.scss
-// Sistema tipográfico escalable (Mobile First)
+// Sistema tipográfico escalable
 
-// Variables de tipografía
-$font-size-base: 1rem;
-$font-size-sm: $font-size-base * 0.875;
-$font-size-lg: $font-size-base * 1.125;
-$font-size-xl: $font-size-base * 1.25;
-$font-size-2xl: $font-size-base * 1.5;
-$font-size-3xl: $font-size-base * 1.875;
-$font-size-4xl: $font-size-base * 2.25;
-$font-size-5xl: $font-size-base * 3;
-
-$line-height-base: 1.6;
-$line-height-sm: 1.25;
-$line-height-lg: 1.75;
-
-// Estilos base de tipografía
+// Configuración base de tipografía
 body {
   font-family: $font-family-base;
   font-size: $font-size-base;
-  line-height: $line-height-base;
+  font-weight: $font-weight-normal;
+  line-height: 1.6;
   color: $color-text;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 // Encabezados
-h1, .h1 {
-  font-size: $font-size-3xl;
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6 {
+  font-family: $font-family-heading;
   font-weight: $font-weight-bold;
-  line-height: $line-height-sm;
-  margin-bottom: 1rem;
+  line-height: 1.2;
+  margin-bottom: spacer(3);
+  color: $color-text;
+}
+
+h1, .h1 {
+  font-size: $font-size-4xl;
+  font-weight: $font-weight-extrabold;
   
   @include media-breakpoint-down(md) {
+    font-size: $font-size-3xl;
+  }
+  
+  @include media-breakpoint-down(sm) {
     font-size: $font-size-2xl;
   }
 }
 
 h2, .h2 {
-  font-size: $font-size-2xl;
+  font-size: $font-size-3xl;
   font-weight: $font-weight-bold;
-  line-height: $line-height-sm;
-  margin-bottom: 0.875rem;
+  
+  @include media-breakpoint-down(md) {
+    font-size: $font-size-2xl;
+  }
+  
+  @include media-breakpoint-down(sm) {
+    font-size: $font-size-xl;
+  }
+}
+
+h3, .h3 {
+  font-size: $font-size-2xl;
+  font-weight: $font-weight-semibold;
   
   @include media-breakpoint-down(md) {
     font-size: $font-size-xl;
   }
 }
 
-h3, .h3 {
+h4, .h4 {
   font-size: $font-size-xl;
   font-weight: $font-weight-semibold;
-  line-height: $line-height-sm;
-  margin-bottom: 0.75rem;
-  
-  @include media-breakpoint-down(md) {
-    font-size: $font-size-lg;
-  }
-}
-
-h4, .h4 {
-  font-size: $font-size-lg;
-  font-weight: $font-weight-semibold;
-  line-height: $line-height-base;
-  margin-bottom: 0.625rem;
 }
 
 h5, .h5 {
-  font-size: $font-size-base;
+  font-size: $font-size-lg;
   font-weight: $font-weight-medium;
-  line-height: $line-height-base;
-  margin-bottom: 0.5rem;
 }
 
 h6, .h6 {
-  font-size: $font-size-sm;
+  font-size: $font-size-base;
   font-weight: $font-weight-medium;
-  line-height: $line-height-base;
-  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-// Párrafos
+// Párrafos y texto
 p {
-  margin-bottom: 1rem;
+  margin-bottom: spacer(3);
   
   &:last-child {
     margin-bottom: 0;
@@ -92,127 +85,190 @@ p {
 .lead {
   font-size: $font-size-lg;
   font-weight: $font-weight-normal;
-  line-height: $line-height-lg;
+  line-height: 1.7;
+}
+
+.small {
+  font-size: $font-size-sm;
+}
+
+.x-small {
+  font-size: $font-size-xs;
 }
 
 // Enlaces
 a {
   color: $primary-color;
   text-decoration: none;
-  transition: color 0.3s ease;
+  @include transition(color, 0.3s, ease);
   
   &:hover,
   &:focus {
     color: darken($primary-color, 15%);
     text-decoration: underline;
   }
+  
+  &.text-muted {
+    color: $color-text-light !important;
+    
+    &:hover {
+      color: $color-text !important;
+    }
+  }
 }
 
 // Listas
 ul, ol {
-  margin-bottom: 1rem;
-  padding-left: 1.5rem;
-}
-
-ul {
-  list-style-type: disc;
-}
-
-ol {
-  list-style-type: decimal;
+  margin-bottom: spacer(3);
+  padding-left: spacer(4);
+  
+  ul, ol {
+    margin-bottom: 0;
+  }
 }
 
 li {
-  margin-bottom: 0.5rem;
-  line-height: $line-height-base;
+  margin-bottom: spacer(1);
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
 }
 
-// Texto utilitario
-.text-sm { font-size: $font-size-sm; }
-.text-lg { font-size: $font-size-lg; }
-.text-xl { font-size: $font-size-xl; }
+// Listas sin estilo
+.list-unstyled {
+  @extend %list-reset;
+}
 
-.text-light { font-weight: $font-weight-light; }
-.text-normal { font-weight: $font-weight-normal; }
-.text-medium { font-weight: $font-weight-medium; }
-.text-semibold { font-weight: $font-weight-semibold; }
-.text-bold { font-weight: $font-weight-bold; }
+.list-inline {
+  @extend %list-reset;
+  
+  li {
+    display: inline-block;
+    margin-bottom: 0;
+    margin-right: spacer(2);
+    
+    &:last-child {
+      margin-right: 0;
+    }
+  }
+}
 
-.text-left { text-align: left; }
-.text-center { text-align: center; }
-.text-right { text-align: right; }
+// Citas
+blockquote {
+  border-left: 4px solid $primary-color;
+  padding-left: spacer(3);
+  margin-bottom: spacer(4);
+  font-style: italic;
+  
+  footer {
+    font-style: normal;
+    font-size: $font-size-sm;
+    color: $color-text-light;
+    margin-top: spacer(2);
+    
+    &::before {
+      content: '— ';
+    }
+  }
+}
 
-.text-primary { color: $primary-color; }
-.text-success { color: $color-success; }
-.text-warning { color: $color-warning; }
-.text-danger { color: $color-danger; }
-.text-info { color: $color-info; }
-.text-muted { color: $color-text-light; }
+// Código
+code {
+  background: $color-light;
+  padding: 0.125rem 0.25rem;
+  border-radius: $border-radius-sm;
+  font-size: 0.875em;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+}
 
-// Truncado de texto
+pre {
+  background: $color-light;
+  padding: spacer(3);
+  border-radius: $border-radius;
+  overflow-x: auto;
+  margin-bottom: spacer(4);
+  
+  code {
+    background: none;
+    padding: 0;
+  }
+}
+
+// Text utilities
+.text-primary { color: $primary-color !important; }
+.text-success { color: $color-success !important; }
+.text-warning { color: $color-warning !important; }
+.text-danger { color: $color-danger !important; }
+.text-info { color: $color-info !important; }
+.text-muted { color: $color-text-light !important; }
+.text-white { color: $color-white !important; }
+
+.text-left { text-align: left !important; }
+.text-center { text-align: center !important; }
+.text-right { text-align: right !important; }
+.text-justify { text-align: justify !important; }
+
+.text-lowercase { text-transform: lowercase !important; }
+.text-uppercase { text-transform: uppercase !important; }
+.text-capitalize { text-transform: capitalize !important; }
+
 .text-truncate {
   @extend %text-truncate;
 }
 
-.text-truncate-2 {
-  @include multiline-truncate(2);
+.text-nowrap {
+  white-space: nowrap !important;
 }
 
-.text-truncate-3 {
-  @include multiline-truncate(3);
+.text-break {
+  word-wrap: break-word !important;
+  word-break: break-word !important;
 }
 
-// Altura de línea
-.lh-1 { line-height: 1; }
-.lh-sm { line-height: $line-height-sm; }
-.lh-base { line-height: $line-height-base; }
-.lh-lg { line-height: $line-height-lg; }
+// Font weights
+.font-weight-light { font-weight: $font-weight-light !important; }
+.font-weight-normal { font-weight: $font-weight-normal !important; }
+.font-weight-medium { font-weight: $font-weight-medium !important; }
+.font-weight-semibold { font-weight: $font-weight-semibold !important; }
+.font-weight-bold { font-weight: $font-weight-bold !important; }
+.font-weight-extrabold { font-weight: $font-weight-extrabold !important; }
 
-// Transformación de texto
-.text-uppercase { text-transform: uppercase; }
-.text-lowercase { text-transform: lowercase; }
-.text-capitalize { text-transform: capitalize; }
-
-// Decoración de texto
-.text-underline { text-decoration: underline; }
-.text-line-through { text-decoration: line-through; }
-.text-no-underline { text-decoration: none; }
-
-// Whitespace
-.text-nowrap { white-space: nowrap; }
-.text-pre { white-space: pre; }
-.text-pre-line { white-space: pre-line; }
-.text-pre-wrap { white-space: pre-wrap; }
+// Line heights
+.line-height-1 { line-height: 1 !important; }
+.line-height-1-2 { line-height: 1.2 !important; }
+.line-height-1-5 { line-height: 1.5 !important; }
+.line-height-1-7 { line-height: 1.7 !important; }
+.line-height-2 { line-height: 2 !important; }
 
 // Responsive typography
-@include media-breakpoint-down(sm) {
-  body {
-    font-size: $font-size-sm;
-  }
-  
-  h1, .h1 { font-size: $font-size-2xl; }
-  h2, .h2 { font-size: $font-size-xl; }
-  h3, .h3 { font-size: $font-size-lg; }
-  
-  .lead {
-    font-size: $font-size-base;
-  }
+@include media-breakpoint-down(md) {
+  .display-1 { font-size: calc(1.625rem + 4.5vw) !important; }
+  .display-2 { font-size: calc(1.575rem + 3.9vw) !important; }
+  .display-3 { font-size: calc(1.525rem + 3.3vw) !important; }
+  .display-4 { font-size: calc(1.475rem + 2.7vw) !important; }
 }
 
-// Tipografía para modo oscuro
+// Dark mode typography
 [data-bs-theme="dark"] {
   color: $dark-text;
   
-  a {
-    color: lighten($primary-color, 10%);
-    
-    &:hover,
-    &:focus {
-      color: lighten($primary-color, 20%);
-    }
+  h1, h2, h3, h4, h5, h6,
+  .h1, .h2, .h3, .h4, .h5, .h6 {
+    color: $dark-text;
   }
   
   .text-muted {
-    color: rgba($dark-text, 0.7);
+    color: lighten($dark-text, 20%) !important;
+  }
+  
+  code {
+    background: $dark-surface;
+    color: $dark-text;
+  }
+  
+  pre {
+    background: $dark-surface;
+    color: $dark-text;
   }
 }

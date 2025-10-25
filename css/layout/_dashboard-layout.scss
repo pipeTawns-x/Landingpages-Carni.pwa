@@ -1,637 +1,331 @@
-// layout/_dashboard-layout.scss
-// Layout para dashboard administrativo (grid BI)
+// Layout del dashboard BEM
 
-.cs-dashboard-layout {
+.dashboard-layout {
   min-height: 100vh;
-  background-color: $body-bg;
   display: flex;
+  background: $body-bg;
   
-  @include media-breakpoint-down(lg) {
+  &__sidebar {
+    width: $sidebar-width;
+    background: $dark-bg;
+    color: $color-white;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    z-index: z(fixed);
+    @include transition(width, 0.3s, ease);
+    @include box-shadow(2);
+    display: flex;
     flex-direction: column;
+    
+    &--collapsed {
+      width: $sidebar-width-collapsed;
+      
+      .dashboard-layout__sidebar-brand-title,
+      .dashboard-layout__sidebar-nav-link-text,
+      .dashboard-layout__sidebar-footer-version {
+        opacity: 0;
+        visibility: hidden;
+      }
+    }
+    
+    &-header {
+      padding: spacer(4);
+      border-bottom: 1px solid rgba($color-white, 0.1);
+    }
+    
+    &-brand {
+      display: flex;
+      align-items: center;
+      gap: spacer(2);
+      text-decoration: none;
+      color: inherit;
+      
+      &-logo {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+        flex-shrink: 0;
+      }
+      
+      &-title {
+        font-weight: $font-weight-bold;
+        font-size: $font-size-lg;
+        margin: 0;
+        @include transition(all, 0.3s, ease);
+      }
+      
+      &-subtitle {
+        font-size: $font-size-xs;
+        color: rgba($color-white, 0.7);
+        margin: 0;
+      }
+    }
+    
+    &-nav {
+      flex: 1;
+      padding: spacer(3);
+      overflow-y: auto;
+      @include custom-scroll($color-white);
+    }
+    
+    &-list {
+      @extend %list-reset;
+    }
+    
+    &-item {
+      margin-bottom: spacer(1);
+    }
+    
+    &-link {
+      display: flex;
+      align-items: center;
+      gap: spacer(2);
+      padding: spacer(2) spacer(3);
+      color: rgba($color-white, 0.7);
+      text-decoration: none;
+      border-radius: $border-radius;
+      @include transition(all, 0.3s, ease);
+      
+      &:hover,
+      &.active {
+        background: rgba($primary-color, 0.2);
+        color: $color-white;
+      }
+      
+      &.active {
+        font-weight: $font-weight-semibold;
+      }
+      
+      &-icon {
+        font-size: $font-size-lg;
+        width: 1.5rem;
+        text-align: center;
+        flex-shrink: 0;
+      }
+      
+      &-text {
+        flex: 1;
+        @include transition(all, 0.3s, ease);
+      }
+      
+      &-badge {
+        @extend %badge-base;
+        background: $primary-color;
+        color: $color-white;
+        font-size: $font-size-xs;
+        padding: 0.125rem 0.5rem;
+        margin-left: auto;
+      }
+    }
+    
+    &-divider {
+      height: 1px;
+      background: rgba($color-white, 0.1);
+      margin: spacer(3) 0;
+    }
+    
+    &-footer {
+      padding: spacer(3);
+      border-top: 1px solid rgba($color-white, 0.1);
+      text-align: center;
+      
+      &-version {
+        color: rgba($color-white, 0.5);
+        font-size: $font-size-xs;
+        @include transition(all, 0.3s, ease);
+      }
+    }
   }
-}
-
-.cs-dashboard-sidebar {
-  width: 280px;
-  min-height: 100vh;
-  background: $dark-bg;
-  color: $color-white;
-  transition: all 0.3s ease;
-  position: fixed;
-  left: 0;
-  top: 0;
-  z-index: $z-index-fixed;
-  display: flex;
-  flex-direction: column;
   
-  @include media-breakpoint-down(lg) {
-    position: static;
-    width: 100%;
-    min-height: auto;
+  &__main {
+    flex: 1;
+    margin-left: $sidebar-width;
+    @include transition(margin-left, 0.3s, ease);
+    
+    &--expanded {
+      margin-left: $sidebar-width-collapsed;
+    }
   }
   
   &__header {
-    padding: map-get($spacers, 4);
-    border-bottom: 1px solid rgba($color-white, 0.1);
+    background: $color-white;
+    border-bottom: 1px solid $color-border;
+    padding: spacer(3) spacer(4);
+    position: sticky;
+    top: 0;
+    z-index: z(sticky);
+    @include box-shadow(1);
     
-    @include media-breakpoint-down(lg) {
-      padding: map-get($spacers, 3);
-    }
-  }
-  
-  &__brand {
-    .cs-dashboard-sidebar__logo {
-      border-radius: 50%;
-      border: 2px solid rgba($color-white, 0.2);
-    }
-    
-    .cs-dashboard-sidebar__title {
-      font-weight: $font-weight-bold;
-      font-size: 1.1rem;
-    }
-    
-    .cs-dashboard-sidebar__subtitle {
-      font-size: 0.75rem;
-      opacity: 0.7;
-    }
-  }
-  
-  &__nav {
-    flex: 1;
-    padding: map-get($spacers, 3);
-    overflow-y: auto;
-    
-    @include media-breakpoint-down(lg) {
-      padding: map-get($spacers, 2);
-    }
-  }
-  
-  &__list {
-    gap: 0.25rem;
-  }
-  
-  &__item {
-    .cs-dashboard-sidebar__link {
-      color: rgba($color-white, 0.8);
-      padding: map-get($spacers, 2) map-get($spacers, 3);
-      border-radius: $border-radius;
-      transition: all 0.3s ease;
+    &-title {
       display: flex;
       align-items: center;
-      text-decoration: none;
-      position: relative;
+      gap: spacer(2);
       
-      @include media-breakpoint-down(lg) {
-        padding: map-get($spacers, 2);
+      &-heading {
+        margin: 0;
+        font-weight: $font-weight-semibold;
+        font-size: $font-size-xl;
+        color: $color-text;
       }
       
-      i {
-        margin-right: map-get($spacers, 2);
-        font-size: 1.1rem;
-        opacity: 0.8;
-        width: 20px;
-        text-align: center;
+      &-subtitle {
+        margin: spacer(1) 0 0;
+        color: $color-text-light;
+        font-size: $font-size-sm;
       }
+    }
+    
+    &-actions {
+      display: flex;
+      align-items: center;
+      gap: spacer(3);
+    }
+    
+    &-user {
+      display: flex;
+      align-items: center;
+      gap: spacer(2);
       
-      &:hover {
+      &-avatar {
+        width: 2.5rem;
+        height: 2.5rem;
+        border-radius: 50%;
+        background: $primary-color;
         color: $color-white;
-        background: rgba($color-white, 0.1);
-        transform: translateX(4px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: $font-size-lg;
       }
       
-      &.bs-active {
-        color: $color-white;
-        background: rgba($primary-color, 0.2);
-        border-left: 3px solid $primary-color;
+      &-info {
+        text-align: right;
+      }
+      
+      &-name {
         font-weight: $font-weight-semibold;
-        
-        i {
-          opacity: 1;
-        }
+        color: $color-text;
+        margin: 0;
+      }
+      
+      &-role {
+        color: $color-text-light;
+        font-size: $font-size-sm;
+        margin: 0;
       }
     }
-    
-    .cs-dashboard-sidebar__badge {
-      font-size: 0.7rem;
-      padding: 0.2rem 0.4rem;
-      margin-left: auto;
-    }
   }
   
-  &__divider {
-    border-color: rgba($color-white, 0.1);
-    margin: map-get($spacers, 3) 0;
-  }
-  
-  &__footer {
-    border-top: 1px solid rgba($color-white, 0.1);
-    
-    .cs-dashboard-sidebar__version {
-      font-size: 0.75rem;
-      opacity: 0.6;
-    }
+  &__content {
+    padding: spacer(4);
+    min-height: calc(100vh - 80px);
   }
 }
 
-.cs-dashboard-main {
-  flex: 1;
-  margin-left: 280px;
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
+// Dashboard grid system
+.dashboard-grid {
+  display: grid;
+  gap: spacer(4);
   
-  @include media-breakpoint-down(lg) {
-    margin-left: 0;
+  &--2 {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  }
+  
+  &--3 {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  }
+  
+  &--4 {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   }
 }
 
-.cs-dashboard-header {
-  background: $color-white;
-  border-bottom: 1px solid $color-border;
-  box-shadow: $shadow-sm;
-  position: sticky;
-  top: 0;
-  z-index: $z-index-sticky;
-  
-  @include media-breakpoint-down(lg) {
-    position: static;
-  }
-  
-  &__title {
-    .cs-dashboard-header__heading {
-      font-weight: $font-weight-bold;
-      color: $color-text;
-      
-      i {
-        color: $primary-color;
-      }
-    }
-    
-    .cs-dashboard-header__subtitle {
-      font-size: 0.875rem;
-      color: $color-text-light;
-    }
-  }
-  
-  &__actions {
-    .cs-dashboard-header__user {
-      .cs-dashboard-header__user-avatar {
-        i {
-          color: $primary-color;
-        }
-      }
-      
-      .cs-dashboard-header__user-info {
-        .cs-dashboard-header__user-name {
-          font-weight: $font-weight-semibold;
-          font-size: 0.9rem;
-        }
-        
-        .cs-dashboard-header__user-role {
-          font-size: 0.75rem;
-          color: $color-text-light;
-        }
-      }
-    }
-  }
-}
-
-.cs-dashboard-content {
-  flex: 1;
-  background: $body-bg;
-  overflow-x: hidden;
-}
-
-.cs-dashboard-alerts {
-  .cs-dashboard-alert {
-    border-left: 4px solid $color-warning;
-    border-radius: 0 $border-radius $border-radius 0;
-    
-    i {
-      color: $color-warning;
-    }
-    
-    .cs-dashboard-alert__title {
-      font-weight: $font-weight-semibold;
-      font-size: 0.9rem;
-    }
-    
-    .cs-dashboard-alert__text {
-      font-size: 0.875rem;
-      margin-bottom: 0;
-    }
-  }
-}
-
-.cs-dashboard-metrics {
-  .cs-dashboard-metric {
-    border: 1px solid transparent;
-    transition: all 0.3s ease;
-    
-    &:hover {
-      transform: translateY(-2px);
-      box-shadow: $shadow-md;
-    }
-    
-    &.bs-border-primary {
-      border-color: $primary-color;
-    }
-    
-    &.bs-border-success {
-      border-color: $color-success;
-    }
-    
-    &.bs-border-warning {
-      border-color: $color-warning;
-    }
-    
-    &.bs-border-danger {
-      border-color: $color-danger;
-    }
-    
-    &__body {
-      .cs-dashboard-metric__icon {
-        i {
-          opacity: 0.8;
-        }
-      }
-      
-      .cs-dashboard-metric__content {
-        .cs-dashboard-metric__value {
-          font-weight: $font-weight-bold;
-          margin-bottom: 0.25rem;
-        }
-        
-        .cs-dashboard-metric__label {
-          font-size: 0.875rem;
-          font-weight: $font-weight-medium;
-        }
-        
-        .cs-dashboard-metric__change {
-          font-size: 0.75rem;
-          font-weight: $font-weight-medium;
-          
-          &.bs-text-success {
-            color: $color-success !important;
-          }
-          
-          &.bs-text-danger {
-            color: $color-danger !important;
-          }
-          
-          &.bs-text-warning {
-            color: $color-warning !important;
-          }
-        }
-      }
-    }
-  }
-}
-
-.cs-dashboard-analytics {
-  .cs-dashboard-chart {
-    &__header {
-      border-bottom: none;
-      
-      .cs-dashboard-chart__title {
-        font-weight: $font-weight-semibold;
-        font-size: 1rem;
-        
-        i {
-          opacity: 0.8;
-        }
-      }
-    }
-    
-    &__body {
-      .cs-dashboard-chart__container {
-        position: relative;
-        
-        .cs-dashboard-chart__canvas {
-          width: 100% !important;
-          height: 100% !important;
-        }
-      }
-      
-      .cs-dashboard-chart__legend {
-        .cs-dashboard-chart__legend-text {
-          font-size: 0.8rem;
-        }
-      }
-    }
-  }
-  
-  .cs-dashboard-top-products {
-    &__header {
-      border-bottom: none;
-      
-      .cs-dashboard-top-products__title {
-        font-weight: $font-weight-semibold;
-        font-size: 1rem;
-        
-        i {
-          color: $color-warning;
-        }
-      }
-    }
-    
-    &__body {
-      .cs-dashboard-top-products__list {
-        .cs-dashboard-top-products__item {
-          padding: map-get($spacers, 2) 0;
-          border-bottom: 1px solid $color-border;
-          
-          &:last-child {
-            border-bottom: none;
-          }
-          
-          .cs-dashboard-top-products__rank {
-            font-size: 0.7rem;
-            min-width: 24px;
-            height: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-          }
-          
-          .cs-dashboard-top-products__info {
-            .cs-dashboard-top-products__name {
-              font-weight: $font-weight-semibold;
-              font-size: 0.9rem;
-              margin-bottom: 0.125rem;
-            }
-            
-            .cs-dashboard-top-products__sales {
-              font-size: 0.75rem;
-            }
-          }
-          
-          .cs-dashboard-top-products__revenue {
-            font-weight: $font-weight-semibold;
-            font-size: 0.9rem;
-          }
-        }
-      }
-    }
-  }
-}
-
-.cs-dashboard-alerts-detailed {
-  .cs-dashboard-stock-alerts {
-    border: 1px solid transparent;
-    
-    &.bs-border-danger {
-      border-color: $color-danger;
-    }
-    
-    &__header {
-      border-bottom: none;
-      
-      .cs-dashboard-stock-alerts__title {
-        font-weight: $font-weight-semibold;
-        font-size: 1rem;
-        
-        i {
-          opacity: 0.9;
-        }
-      }
-    }
-    
-    &__body {
-      .cs-dashboard-stock-alerts__table {
-        .cs-dashboard-stock-alerts__table {
-          font-size: 0.875rem;
-          
-          .cs-dashboard-stock-alerts__thead {
-            th {
-              font-weight: $font-weight-semibold;
-              font-size: 0.8rem;
-              text-transform: uppercase;
-              letter-spacing: 0.5px;
-              border-bottom: 2px solid $dark-border;
-            }
-          }
-          
-          .cs-dashboard-stock-alerts__row {
-            td {
-              vertical-align: middle;
-              padding: map-get($spacers, 2) map-get($spacers, 3);
-              
-              strong {
-                font-weight: $font-weight-semibold;
-              }
-            }
-            
-            .cs-dashboard-stock-alerts__status {
-              font-size: 0.7rem;
-              padding: 0.2rem 0.5rem;
-            }
-            
-            .cs-dashboard-stock-alerts__action {
-              font-size: 0.8rem;
-              font-weight: $font-weight-medium;
-              
-              &.bs-btn-danger {
-                background: $color-danger;
-                border-color: $color-danger;
-                color: $color-white;
-                
-                &:hover {
-                  background: darken($color-danger, 10%);
-                  border-color: darken($color-danger, 10%);
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-}
-
-// Modo oscuro para dashboard
-[data-bs-theme="dark"] {
-  .cs-dashboard-layout {
-    background-color: $dark-bg;
-  }
-  
-  .cs-dashboard-main {
-    background: $dark-bg;
-  }
-  
-  .cs-dashboard-header {
-    background: $dark-card-bg;
-    border-bottom-color: $dark-border;
-    
-    &__title {
-      .cs-dashboard-header__heading {
-        color: $dark-text;
-      }
-      
-      .cs-dashboard-header__subtitle {
-        color: rgba($dark-text, 0.7);
-      }
-    }
-    
-    &__actions {
-      .cs-dashboard-header__user {
-        .cs-dashboard-header__user-info {
-          .cs-dashboard-header__user-name {
-            color: $dark-text;
-          }
-          
-          .cs-dashboard-header__user-role {
-            color: rgba($dark-text, 0.7);
-          }
-        }
-      }
-    }
-  }
-  
-  .cs-dashboard-content {
-    background: $dark-bg;
-  }
-  
-  .cs-dashboard-metrics {
-    .cs-dashboard-metric {
-      background: $dark-card-bg;
-      border-color: $dark-border;
-      
-      &__body {
-        .cs-dashboard-metric__content {
-          .cs-dashboard-metric__value {
-            color: $dark-text;
-          }
-          
-          .cs-dashboard-metric__label {
-            color: rgba($dark-text, 0.7);
-          }
-        }
-      }
-    }
-  }
-  
-  .cs-dashboard-chart,
-  .cs-dashboard-top-products {
-    background: $dark-card-bg;
-    border-color: $dark-border;
-    
-    &__header {
-      background: lighten($dark-card-bg, 5%) !important;
-      border-bottom-color: $dark-border;
-    }
-  }
-  
-  .cs-dashboard-top-products {
-    &__body {
-      .cs-dashboard-top-products__list {
-        .cs-dashboard-top-products__item {
-          border-bottom-color: $dark-border;
-          
-          .cs-dashboard-top-products__info {
-            .cs-dashboard-top-products__name {
-              color: $dark-text;
-            }
-            
-            .cs-dashboard-top-products__sales {
-              color: rgba($dark-text, 0.7);
-            }
-          }
-        }
-      }
-    }
-  }
-  
-  .cs-dashboard-stock-alerts {
-    background: $dark-card-bg;
-    
-    &__header {
-      background: lighten($dark-card-bg, 5%) !important;
-    }
-    
-    &__body {
-      .cs-dashboard-stock-alerts__table {
-        .cs-dashboard-stock-alerts__table {
-          color: $dark-text;
-          
-          .cs-dashboard-stock-alerts__thead {
-            background: lighten($dark-card-bg, 5%) !important;
-            
-            th {
-              color: $dark-text;
-              border-bottom-color: $dark-border;
-            }
-          }
-        }
-      }
-    }
-  }
-}
-
-// Responsive
+// Responsive adjustments
 @include media-breakpoint-down(lg) {
-  .cs-dashboard-sidebar {
-    position: static;
-    width: 100%;
-    min-height: auto;
-    
-    &__nav {
-      max-height: 300px;
+  .dashboard-layout {
+    &__sidebar {
+      width: $sidebar-width-collapsed;
+      
+      .dashboard-layout__sidebar-brand-title,
+      .dashboard-layout__sidebar-nav-link-text,
+      .dashboard-layout__sidebar-footer-version {
+        opacity: 0;
+        visibility: hidden;
+      }
     }
-  }
-  
-  .cs-dashboard-main {
-    margin-left: 0;
+    
+    &__main {
+      margin-left: $sidebar-width-collapsed;
+    }
   }
 }
 
 @include media-breakpoint-down(md) {
-  .cs-dashboard-metrics {
-    .bs-col-md-6 {
-      margin-bottom: map-get($spacers, 3);
+  .dashboard-layout {
+    flex-direction: column;
+    
+    &__sidebar {
+      width: 100%;
+      height: auto;
+      position: static;
+      
+      .dashboard-layout__sidebar-brand-title,
+      .dashboard-layout__sidebar-nav-link-text,
+      .dashboard-layout__sidebar-footer-version {
+        opacity: 1;
+        visibility: visible;
+      }
+      
+      &-nav {
+        display: none;
+        
+        &--mobile-open {
+          display: block;
+        }
+      }
     }
-  }
-  
-  .cs-dashboard-analytics {
-    .bs-col-xl-8,
-    .bs-col-xl-4 {
-      margin-bottom: map-get($spacers, 4);
+    
+    &__main {
+      margin-left: 0;
     }
   }
 }
 
-@include media-breakpoint-down(sm) {
-  .cs-dashboard-header {
-    &__title {
-      .cs-dashboard-header__heading {
-        font-size: 1.1rem !important;
+// Dark mode adjustments
+[data-bs-theme="dark"] {
+  .dashboard-layout {
+    background: $dark-bg;
+    
+    &__main {
+      background: $dark-bg;
+    }
+    
+    &__header {
+      background: $dark-surface;
+      border-bottom-color: $dark-border;
+      
+      &-title-heading {
+        color: $dark-text;
+      }
+      
+      &-title-subtitle {
+        color: lighten($dark-text, 20%);
+      }
+      
+      &-user-name {
+        color: $dark-text;
+      }
+      
+      &-user-role {
+        color: lighten($dark-text, 20%);
       }
     }
     
-    &__actions {
-      .cs-dashboard-header__user {
-        .cs-dashboard-header__user-info {
-          display: none;
-        }
-      }
-    }
-  }
-  
-  .cs-dashboard-metrics {
-    .cs-dashboard-metric {
-      &__body {
-        .cs-dashboard-metric__icon {
-          i {
-            font-size: 1.5rem !important;
-          }
-        }
-        
-        .cs-dashboard-metric__content {
-          .cs-dashboard-metric__value {
-            font-size: 1.25rem !important;
-          }
-        }
-      }
+    &__content {
+      background: $dark-bg;
     }
   }
 }

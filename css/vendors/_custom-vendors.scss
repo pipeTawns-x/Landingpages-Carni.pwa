@@ -1,0 +1,287 @@
+// vendors/_custom-vendors.scss
+// Integración de librerías externas para Carnicería PWA
+
+// 1. Swiper Carousel
+@import '~swiper/swiper-bundle.css';
+
+.swiper {
+  &-container {
+    position: relative;
+  }
+
+  &-button {
+    &-prev,
+    &-next {
+      background: rgba($color-white, 0.9);
+      border-radius: 50%;
+      width: 3rem;
+      height: 3rem;
+      @include box-shadow(2);
+      @include transition(all, 0.3s, ease);
+
+      &:hover {
+        background: $color-white;
+        transform: scale(1.1);
+      }
+
+      &::after {
+        font-size: 1.25rem;
+        color: $primary-color;
+        font-weight: bold;
+      }
+    }
+
+    &-prev {
+      left: 1rem;
+    }
+
+    &-next {
+      right: 1rem;
+    }
+  }
+
+  &-pagination {
+    &-bullet {
+      width: 0.75rem;
+      height: 0.75rem;
+      background: rgba($color-white, 0.5);
+      opacity: 1;
+
+      &-active {
+        background: $primary-color;
+        transform: scale(1.2);
+      }
+    }
+  }
+}
+
+// 2. Toastify
+@import '~react-toastify/dist/ReactToastify.css';
+
+.Toastify {
+  &__toast {
+    &--success {
+      background: $color-success;
+    }
+
+    &--error {
+      background: $color-danger;
+    }
+
+    &--warning {
+      background: $color-warning;
+      color: $color-text;
+    }
+
+    &--info {
+      background: $color-info;
+    }
+  }
+
+  &__close-button {
+    color: $color-white;
+    opacity: 0.7;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+}
+
+// 3. React Loading Skeleton
+.skeleton {
+  background: linear-gradient(90deg, $color-light 25%, $color-white 50%, $color-light 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+
+  &-text {
+    height: 1rem;
+    border-radius: $border-radius;
+    margin-bottom: 0.5rem;
+
+    &:last-child {
+      margin-bottom: 0;
+      width: 80%;
+    }
+  }
+
+  &-title {
+    height: 2rem;
+    border-radius: $border-radius;
+    margin-bottom: 1rem;
+  }
+
+  &-image {
+    height: 200px;
+    border-radius: $border-radius;
+    margin-bottom: 1rem;
+  }
+
+  &-button {
+    height: 2.5rem;
+    border-radius: $border-radius;
+    width: 100%;
+  }
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+// 4. React Modal
+.ReactModal {
+  &__Overlay {
+    background: rgba($color-text, 0.5) !important;
+    backdrop-filter: blur(4px);
+    z-index: z(modal);
+
+    &--after-open {
+      opacity: 1;
+    }
+
+    &--before-close {
+      opacity: 0;
+    }
+  }
+
+  &__Content {
+    border: none !important;
+    border-radius: $border-radius-lg !important;
+    @include box-shadow(4);
+    padding: 0 !important;
+    transform: translate(-50%, -50%) scale(0.9);
+    transition: all 0.3s ease;
+
+    &--after-open {
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    &--before-close {
+      transform: translate(-50%, -50%) scale(0.9);
+    }
+  }
+}
+
+// 5. React Select
+.react-select {
+  &__control {
+    background: $color-white;
+    border: 1px solid $color-border;
+    border-radius: $border-radius;
+    min-height: 2.5rem;
+    @include transition(all, 0.3s, ease);
+
+    &:hover {
+      border-color: $primary-color;
+    }
+
+    &--is-focused {
+      border-color: $primary-color;
+      box-shadow: 0 0 0 0.2rem rgba($primary-color, 0.25);
+    }
+  }
+
+  &__menu {
+    background: $color-white;
+    border: 1px solid $color-border;
+    border-radius: $border-radius;
+    @include box-shadow(2);
+    z-index: z(dropdown);
+  }
+
+  &__option {
+    &--is-focused {
+      background: rgba($primary-color, 0.1);
+    }
+
+    &--is-selected {
+      background: $primary-color;
+      color: $color-white;
+    }
+  }
+}
+
+// 6. PWA Install Prompt
+.pwa-install-prompt {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  background: $color-white;
+  border-radius: $border-radius-lg;
+  padding: 1.5rem;
+  @include box-shadow(4);
+  z-index: z(toast);
+  max-width: 300px;
+  animation: slideInUp 0.3s ease;
+
+  &__title {
+    font-weight: $font-weight-semibold;
+    margin-bottom: 0.5rem;
+    color: $color-text;
+  }
+
+  &__description {
+    color: $color-text-light;
+    font-size: $font-size-sm;
+    margin-bottom: 1rem;
+    line-height: 1.4;
+  }
+
+  &__buttons {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  &__button {
+    @extend .btn;
+    @extend .btn--sm;
+    flex: 1;
+
+    &--install {
+      @extend .btn--primary;
+    }
+
+    &--dismiss {
+      @extend .btn--outline;
+    }
+  }
+}
+
+// 7. Dark mode adjustments for vendors
+[data-bs-theme="dark"] {
+  .swiper-button-prev,
+  .swiper-button-next {
+    background: rgba($dark-surface, 0.9);
+
+    &:hover {
+      background: $dark-surface;
+    }
+  }
+
+  .skeleton {
+    background: linear-gradient(90deg, $dark-border 25%, $dark-surface 50%, $dark-border 75%);
+  }
+
+  .react-select {
+    &__control {
+      background: $dark-bg;
+      border-color: $dark-border;
+      color: $dark-text;
+    }
+
+    &__menu {
+      background: $dark-surface;
+      border-color: $dark-border;
+    }
+  }
+
+  .pwa-install-prompt {
+    background: $dark-surface;
+    color: $dark-text;
+  }
+}
