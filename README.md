@@ -1,10 +1,3 @@
-readme1
-Captura de pantalla 2025-10-21 a la(s) 11.19.15 p.m..png
-PNG 91.33KB
-Captura de pantalla 2025-10-21 a la(s) 11.19.32 p.m..png
-PNG 87.92KB
-Captura de pantalla 2025-10-21 a la(s) 11.19.40 p.m..png
-PNG 76.82KB
 README.md
 
 # 🥩 Carnicería El Señor de La Misericordia - E-commerce PWA
