@@ -57,14 +57,19 @@ La aplicación ha sido completamente rediseñada bajo el paradigma Mobile First:
 Implementamos el Patrón 7-1 para máxima mantenibilidad y escalabilidad:
 
 text
-scss/
-├── abstracts/ # Variables, mixins, funciones
-├── base/ # Reset, tipografía, estilos base
-├── layout/ # Estructura de layout (Grid, Header, Sidebar)
-├── components/ # Componentes UI reutilizables (BEM)
-├── pages/ # Estilos específicos por página
-├── themes/ # Sistema de temas (Light/Dark)
-└── vendors/ # Integración con librerías externas
+assets/
+├── scss/ # 🎨 Código Fuente SCSS (Patrón 7-1)
+│ ├── abstracts/ # Variables, mixins, funciones
+│ ├── base/ # Reset, tipografía, estilos base  
+│ ├── layout/ # Estructura de layout
+│ ├── components/ # Componentes UI reutilizables (BEM)
+│ ├── pages/ # Estilos específicos por página
+│ ├── themes/ # Sistema de temas (Light/Dark)
+│ ├── vendors/ # Integración con librerías externas
+│ └── main.scss # Archivo maestro de orquestación
+└── css/ # 🎯 Salida CSS Compilado
+├── main.css # CSS optimizado para producción
+└── main.css.map # Source maps para desarrollo
 🛠️ Stack Tecnológico
 🔧 Tecnologías Principales
 Capa Tecnología Versión Propósito
@@ -92,14 +97,19 @@ json
 text
 Landingpages-Carni.pwa/
 │
-├── admin/ # 👨‍💼 Panel Administración
+├── admin/ # 👨‍💼 Panel Administración (Rutas Protegidas)
 │ ├── dashboard.html # 📊 Dashboard con Chart.js
 │ ├── login.html # 🔐 Login Administradores
 │ └── register.html # 📝 Registro Administradores
 │
 ├── AGENTS/ # 🤖 Configuración Agentes IA
 │
-├── CSS/ # 🎨 Sistema de Diseño SCSS 7-1
+├── assets/ # 🎨 RECURSOS DE ESTILOS CENTRALIZADO
+│ ├── css/ # 🎯 Salida de CSS Compilado
+│ │ ├── main.css # 🎨 CSS Compilado (NO MODIFICAR)
+│ │ └── main.css.map # 🗺️ Source Maps (NO MODIFICAR)
+│ │
+│ └── scss/ # 🎨 Archivos Fuente SCSS (Patrón 7-1)
 │ ├── abstracts/ # 🛠️ Herramientas y Definiciones
 │ │ ├── \_bem-utilities.scss # 📐 Mixins BEM Obligatorios
 │ │ ├── \_functions.scss # 🧮 Funciones SCSS Avanzadas
@@ -147,8 +157,6 @@ Landingpages-Carni.pwa/
 │ │ ├── \_bootstrap.scss # 🎀 Overrides y Customización Bootstrap
 │ │ └── \_custom-vendors.scss # 🔧 Integración Otras Librerías
 │ │
-│ ├── main.css # 🎨 CSS Compilado (NO MODIFICAR)
-│ ├── main.css.map # 🗺️ Source Maps (NO MODIFICAR)
 │ └── main.scss # 🎛️ Archivo Maestro - Orquestación
 │
 ├── dist/ # 🏗️ Build Producción (NO MODIFICAR)
@@ -213,12 +221,12 @@ Landingpages-Carni.pwa/
 │
 ├── node_modules/ # 📚 Dependencias (NO MODIFICAR)
 │
-├── user/ # 👤 Área Usuarios
+├── user/ # 👤 Módulos de Cliente
 │ ├── login.html # 🔐 Login Usuarios
 │ └── register.html # 📝 Registro Usuarios
 │
-├── GOB.md # 📋 Guía de Operaciones (Agentes IA)
-├── README.md # 📖 Documentación Desarrolladores
+├── GOB.md # 📋 Guía de Operaciones (PM / Agentes IA)
+├── README.md # 📖 Documentación Detallada para Desarrolladores
 ├── .env # 🗝️ Variables de Entorno
 ├── .gitignore # 🙈 Archivos Ignorados por Git
 ├── index.html # 🏠 Landing Page - SEO Optimizado
@@ -374,6 +382,6 @@ Impacto Seguridad: Mitigación OWASP A01:2021, prevención de elevación de priv
 <div align="center">
 ✨ Estado del Proyecto: ✅ IMPLEMENTACIÓN COMPLETADA
 🔄 Última Actualización: 2025-10-25
-📄 Versión Documento: README.md v6.0 - Estructura Final Completa
+📄 Versión Documento: README.md v8.0 - Documentación Final Completa
 
 </div>
