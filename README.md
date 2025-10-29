@@ -1,5 +1,7 @@
 🥩 Carnicería El Señor de La Misericordia - E-commerce PWA
 Arquitectura Modular Mobile First con Supabase - Implementación Final
+
+<div align="center">
 https://img.shields.io/badge/PWA-Ready_for_Offline-blue.svg
 https://img.shields.io/badge/Architecture-Modular_SCSS_%252F_JS_Modules-green.svg
 https://img.shields.io/badge/Frontend-JS_Vanilla_%257C_Bootstrap_5-informational.svg
@@ -7,6 +9,7 @@ https://img.shields.io/badge/Security-OWASP_A01_%257C_RLS-red.svg
 https://img.shields.io/badge/Backend-Supabase_PostgreSQL-purple.svg
 https://img.shields.io/badge/Methodology-BEM_%257C_7--1_Pattern-orange.svg
 
+</div>
 📋 Tabla de Contenidos
 🚀 Características Principales
 
@@ -14,7 +17,7 @@ https://img.shields.io/badge/Methodology-BEM_%257C_7--1_Pattern-orange.svg
 
 🛠️ Stack Tecnológico
 
-📁 Estructura del Proyecto
+📁 Estructura Completa del Proyecto
 
 🔒 Seguridad Implementada
 
@@ -40,14 +43,13 @@ PWA Offline ✅ Completado Service Worker, Caché inteligente
 📱 Experiencia Mobile First
 La aplicación ha sido completamente rediseñada bajo el paradigma Mobile First:
 
-Navegación Off-Canvas: Menú hamburger con categorías deslizables
+<div align="center">
+✨ Navegación Off-Canvas: Menú hamburger con categorías deslizables
+👆 Interfaz Táctil: Botones y controles optimizados para touch
+⚡ Rendimiento: Carga optimizada en redes móviles
+📱 PWA Nativa: Instalable como aplicación nativa en dispositivos
 
-Interfaz Táctil: Botones y controles optimizados para touch
-
-Rendimiento: Carga optimizada en redes móviles
-
-PWA Nativa: Instalable como aplicación nativa en dispositivos
-
+</div>
 🏗️ Arquitectura del Proyecto
 📐 Patrón de Arquitectura Modular
 
@@ -86,79 +88,30 @@ json
 "sass": "^1.69.0"
 }
 }
-📁 Estructura del Proyecto
-🗂️ Estructura Completa Verificada
+📁 Estructura Completa del Proyecto
 text
 Landingpages-Carni.pwa/
 │
-├── 🎯 Páginas Principales
-│ ├── index.html # 🏠 Landing Page - SEO Optimizado
-│ ├── products.html # 🛍️ Catálogo Principal - Mobile First
-│ ├── offline.html # 📲 Página Offline PWA
-│ ├── admin/ # 👨‍💼 Panel Administración
-│ │ ├── dashboard.html # 📊 Dashboard con Chart.js
-│ │ ├── login.html # 🔐 Login Administradores
-│ │ └── register.html # 📝 Registro Administradores
-│ └── user/ # 👤 Área Usuarios
-│ ├── login.html # 🔐 Login Usuarios
-│ └── register.html # 📝 Registro Usuarios
+├── admin/ # 👨‍💼 Panel Administración
+│ ├── dashboard.html # 📊 Dashboard con Chart.js
+│ ├── login.html # 🔐 Login Administradores
+│ └── register.html # 📝 Registro Administradores
 │
-├── ⚙️ Núcleo de Aplicación (js/)
-│ ├── app.js # 🚀 Punto de Entrada - Initialización PWA
-│ ├── cart.js.bak # 🗑️ Backup Código Legacy (NO USAR)
-│ └── modules/
-│ ├── 🧠 core/ # Lógica de Negocio Principal
-│ │ ├── api.js # 🔌 Comunicación Supabase + APIs Externas
-│ │ ├── auth.js # 🔒 Autenticación + OTP + Sessions
-│ │ ├── cart.js # 🛒 Motor Carrito + Personalización
-│ │ ├── delivery.js # 🚚 Lógica Delivery + Cálculo Rutas
-│ │ ├── loyalty.js # 💎 Programa Fidelización + BAC
-│ │ ├── productos.js # 📦 Gestión Catálogo + Filtros
-│ │ └── search.js # 🔍 Búsqueda Avanzada + Indexación
-│ │
-│ ├── 🌐 pages/ # Lógica Específica por Vista
-│ │ ├── admin.js # 👨‍💼 Dashboard Admin + Analytics
-│ │ ├── catalog.js # 🛍️ Vista Products.html Mobile First
-│ │ ├── checkout.js # 🧾 Validaciones OWASP + Finalización
-│ │ ├── dashboard.js # 📊 Dashboard Usuario + Métricas
-│ │ └── premium.js # ⭐ Área Premium + Control Acceso
-│ │
-│ ├── 🎨 ui/ # Componentes de Interfaz
-│ │ ├── header.js # 🧭 Navegación + Menú Off-Canvas
-│ │ ├── notifications.js # 💬 Sistema Alertas + Notificaciones
-│ │ └── ui.js # 🛠️ Utilidades UI + Helpers
-│ │
-│ └── 🛠️ utils/ # Utilidades del Sistema
-│ ├── admin-auth.js # 🔐 Middleware Autenticación Admin
-│ ├── base_dinamica.js # 🏗️ Configuración Dinámica
-│ ├── offline.js # 🔌 Gestión Estado Offline
-│ ├── service-worker.js # 📲 Service Worker PWA
-│ └── weather.js # 🌤️ Integración API Clima
+├── AGENTS/ # 🤖 Configuración Agentes IA
 │
-├── 🎨 Sistema de Diseño (css/ como SCSS)
-│ ├── main.scss # 🎛️ Archivo Maestro - Orquestación
-│ ├── main.css # 🎨 CSS Compilado (NO MODIFICAR)
-│ ├── main.css.map # 🗺️ Source Maps (NO MODIFICAR)
-│ │
+├── CSS/ # 🎨 Sistema de Diseño SCSS 7-1
 │ ├── abstracts/ # 🛠️ Herramientas y Definiciones
-│ │ ├── \_variables.scss # 🎨 Variables Design System
-│ │ ├── \_mixins.scss # 🔄 Mixins Reutilizables
 │ │ ├── \_bem-utilities.scss # 📐 Mixins BEM Obligatorios
 │ │ ├── \_functions.scss # 🧮 Funciones SCSS Avanzadas
-│ │ └── \_placeholders.scss # 🏷️ Placeholders y Extends
+│ │ ├── \_mixins.scss # 🔄 Mixins Reutilizables
+│ │ ├── \_placeholders.scss # 🏷️ Placeholders y Extends
+│ │ └── \_variables.scss # 🎨 Variables Design System
 │ │
 │ ├── base/ # 🏗️ Estilos Base y Reset
+│ │ ├── \_base.scss # 🎯 Estilos Base Elementos HTML
 │ │ ├── \_reset.scss # 🧹 Reset CSS Normalizado
 │ │ ├── \_typography.scss # 🔤 Sistema Tipográfico Escalable
-│ │ ├── \_utilities.scss # ⚡ Clases Helper y Utilities
-│ │ └── \_base.scss # 🎯 Estilos Base Elementos HTML
-│ │
-│ ├── layout/ # 🏛️ Estructura y Layout
-│ │ ├── \_auth-layout.scss # 🔐 Layout Páginas Autenticación
-│ │ ├── \_dashboard-layout.scss # 📊 Layout Dashboard Admin
-│ │ ├── \_footer.scss # 🔻 Footer e Información
-│ │ ├── \_header.scss # 🔝 Header y Navegación Principal
-│ │ └── \_sidebar.scss # 📱 Menú Hamburger Off-Canvas
+│ │ └── \_utilities.scss # ⚡ Clases Helper y Utilities
 │ │
 │ ├── components/ # 🧩 Componentes UI Reutilizables
 │ │ ├── \_alerts.scss # ⚠️ Alertas y Notificaciones BEM
@@ -168,6 +121,13 @@ Landingpages-Carni.pwa/
 │ │ ├── \_carousel.scss # 🖼️ Carruseles e Sliders BEM
 │ │ ├── \_loading.scss # ⏳ Indicadores Carga BEM
 │ │ └── \_modals.scss # 💬 Modales y Off-Canvas BEM
+│ │
+│ ├── layout/ # 🏛️ Estructura y Layout
+│ │ ├── \_auth-layout.scss # 🔐 Layout Páginas Autenticación
+│ │ ├── \_dashboard-layout.scss # 📊 Layout Dashboard Admin
+│ │ ├── \_footer.scss # 🔻 Footer e Información
+│ │ ├── \_header.scss # 🔝 Header y Navegación Principal
+│ │ └── \_sidebar.scss # 📱 Menú Hamburger Off-Canvas
 │ │
 │ ├── pages/ # 📄 Estilos Específicos por Página
 │ │ ├── \_admin.scss # 👨‍💼 Panel Administración
@@ -183,11 +143,17 @@ Landingpages-Carni.pwa/
 │ │ ├── \_dark-mode.scss # 🌙 Tema Oscuro Completo
 │ │ └── \_theme.scss # 🎨 Tema Principal y Colores Marca
 │ │
-│ └── vendors/ # 📚 Librerías Externas
-│ ├── \_bootstrap.scss # 🎀 Overrides y Customización Bootstrap
-│ └── \_custom-vendors.scss # 🔧 Integración Otras Librerías
+│ ├── vendors/ # 📚 Librerías Externas
+│ │ ├── \_bootstrap.scss # 🎀 Overrides y Customización Bootstrap
+│ │ └── \_custom-vendors.scss # 🔧 Integración Otras Librerías
+│ │
+│ ├── main.css # 🎨 CSS Compilado (NO MODIFICAR)
+│ ├── main.css.map # 🗺️ Source Maps (NO MODIFICAR)
+│ └── main.scss # 🎛️ Archivo Maestro - Orquestación
 │
-├── 🖼️ Recursos Multimedia (img/)
+├── dist/ # 🏗️ Build Producción (NO MODIFICAR)
+│
+├── img/ # 🖼️ Recursos Multimedia
 │ ├── carrusel_products/ # 🖼️ Imágenes Carrusel Principal
 │ │ ├── bravette_steak.png # 🥩 Bravette Steak
 │ │ ├── filet_mignon.png # 🥩 Filet Mignon
@@ -212,30 +178,59 @@ Landingpages-Carni.pwa/
 │ │
 │ └── logo-user.png # 👤 Avatar Usuario
 │
-├── 📦 Build y Distribución
-│ └── dist/ # 🏗️ Build Producción (NO MODIFICAR)
+├── js/ # ⚙️ Núcleo de Aplicación
+│ ├── modules/ # 🧩 Arquitectura Modular
+│ │ ├── core/ # 🧠 Lógica de Negocio Principal
+│ │ │ ├── api.js # 🔌 Comunicación Supabase + APIs Externas
+│ │ │ ├── auth.js # 🔒 Autenticación + OTP + Sessions
+│ │ │ ├── cart.js # 🛒 Motor Carrito + Personalización
+│ │ │ ├── delivery.js # 🚚 Lógica Delivery + Cálculo Rutas
+│ │ │ ├── loyalty.js # 💎 Programa Fidelización + BAC
+│ │ │ ├── productos.js # 📦 Gestión Catálogo + Filtros
+│ │ │ └── search.js # 🔍 Búsqueda Avanzada + Indexación
+│ │ │
+│ │ ├── pages/ # 🌐 Lógica Específica por Vista
+│ │ │ ├── admin.js # 👨‍💼 Dashboard Admin + Analytics
+│ │ │ ├── catalog.js # 🛍️ Vista Products.html Mobile First
+│ │ │ ├── checkout.js # 🧾 Validaciones OWASP + Finalización
+│ │ │ ├── dashboard.js # 📊 Dashboard Usuario + Métricas
+│ │ │ └── premium.js # ⭐ Área Premium + Control Acceso
+│ │ │
+│ │ ├── ui/ # 🎨 Componentes de Interfaz
+│ │ │ ├── header.js # 🧭 Navegación + Menú Off-Canvas
+│ │ │ ├── notifications.js # 💬 Sistema Alertas + Notificaciones
+│ │ │ └── ui.js # 🛠️ Utilidades UI + Helpers
+│ │ │
+│ │ └── utils/ # 🛠️ Utilidades del Sistema
+│ │ ├── admin-auth.js # 🔐 Middleware Autenticación Admin
+│ │ ├── base_dinamica.js # 🏗️ Configuración Dinámica
+│ │ ├── offline.js # 🔌 Gestión Estado Offline
+│ │ ├── service-worker.js # 📲 Service Worker PWA
+│ │ └── weather.js # 🌤️ Integración API Clima
+│ │
+│ ├── app.js # 🚀 Punto de Entrada - Initialización PWA
+│ └── cart.js.bak # 🗑️ Backup Código Legacy (NO USAR)
 │
-├── 🔧 Configuración
-│ ├── manifest.json # 📱 Config PWA
-│ ├── netlify.toml # 🚀 Config Despliegue Netlify
-│ ├── package.json # 📦 Dependencias del Proyecto
-│ ├── package-lock.json # 🔒 Lockfile Dependencias
-│ ├── postcss.config.js # 🔧 Configuración PostCSS
-│ ├── tailwind.config.js # 🎨 Configuración Tailwind
-│ ├── tsconfig.json # 📝 Configuración TypeScript
-│ ├── .env # 🗝️ Variables de Entorno
-│ └── .gitignore # 🙈 Archivos Ignorados por Git
-│
-├── 📚 Documentación
-│ ├── README.md # 📖 Este Archivo
-│ ├── GOB.md # 📋 Guía de Operaciones (Agentes IA)
-│ └── AGENTS/ # 🤖 Configuración Agentes IA
-│
-└── 🗃️ Archivos No Modificables
 ├── node_modules/ # 📚 Dependencias (NO MODIFICAR)
-├── css/main.css # 🎨 CSS Compilado (NO MODIFICAR)
-├── css/main.css.map # 🗺️ Source Maps (NO MODIFICAR)
-└── dist/ # 🏗️ Build Producción (NO MODIFICAR)
+│
+├── user/ # 👤 Área Usuarios
+│ ├── login.html # 🔐 Login Usuarios
+│ └── register.html # 📝 Registro Usuarios
+│
+├── GOB.md # 📋 Guía de Operaciones (Agentes IA)
+├── README.md # 📖 Documentación Desarrolladores
+├── .env # 🗝️ Variables de Entorno
+├── .gitignore # 🙈 Archivos Ignorados por Git
+├── index.html # 🏠 Landing Page - SEO Optimizado
+├── manifest.json # 📱 Config PWA
+├── netlify.toml # 🚀 Config Despliegue Netlify
+├── offline.html # 📲 Página Offline PWA
+├── package-lock.json # 🔒 Lockfile Dependencias
+├── package.json # 📦 Dependencias del Proyecto
+├── postcss.config.js # 🔧 Configuración PostCSS
+├── products.html # 🛍️ Catálogo Principal - Mobile First
+├── tailwind.config.js # 🎨 Configuración Tailwind
+└── tsconfig.json # 📝 Configuración TypeScript
 🔒 Seguridad Implementada
 🛡️ Validaciones OWASP Críticas
 javascript
@@ -255,20 +250,18 @@ message: "Debe contener al menos un número y 10-100 caracteres",
 },
 };
 🔐 Control de Acceso (BAC)
-Rutas Protegidas: premium.html, admin/dashboard.html
 
-Autenticación Doble: Supabase RLS + validación frontend
+<div align="center">
+🛡️ Rutas Protegidas: premium.html, admin/dashboard.html
+🔐 Autenticación Doble: Supabase RLS + validación frontend
+📱 Verificación OTP: Implementada en flujo de registro
+👥 Roles de Usuario: Admin, Premium, User estándar
 
-Verificación OTP: Implementada en flujo de registro
-
-Roles de Usuario: Admin, Premium, User estándar
-
+</div>
 ⚙️ Configuración y Desarrollo
 🚀 Inicio Rápido
 bash
-
 # 1. Clonar y configurar entorno
-
 git clone [repository-url]
 cd Landingpages-Carni.pwa
 
@@ -316,35 +309,35 @@ And el carrito debe mostrar el grosor seleccionado
 📈 Dashboard con Chart.js
 El Admin Dashboard incluye métricas avanzadas de BI:
 
-Ventas por Categoría: Gráficos de torta y barras
+<div align="center">
+📊 Ventas por Categoría: Gráficos de torta y barras
+📈 Tendencias Temporales: Series de tiempo de ventas
+👥 Comportamiento Usuario: Métricas de engagement
+📦 Inventario Inteligente: Alertas de stock bajo
 
-Tendencias Temporales: Series de tiempo de ventas
-
-Comportamiento Usuario: Métricas de engagement
-
-Inventario Inteligente: Alertas de stock bajo
-
+</div>
 👨‍💻 Equipo de Desarrollo
+<div align="center">
 Arquitecto Principal: pipeTawns-x
 Metodología: Mobile First + Security by Design + BEM
 Stack: JavaScript Vanilla + SCSS 7-1 + Supabase
 Estado: ✅ ARQUITECTURA FINAL IMPLEMENTADA
 
+</div>
 🚀 Evolución Arquitectónica Frontend
 📊 Tabla de Comparación Crítica: Legacy vs Arquitectura Final
-Característica Código Anterior (Legacy/Monolítico) Código Actual (Arquitectura Modular Final) Beneficio Arquitectónico Clave
-Metodología de Estilos Vibe coding / Anidamiento Alto / Especificidad Peligrosa BEM Estricto + SCSS Patrón 7-1 Baja Especificidad (0,0,1,0) / Eliminación de Conflictos con Bootstrap / Mantenibilidad a Largo Plazo
-Flujo de Carrito Página Separada (cart.html) con Abandono de Contexto Modal Off-Canvas (Componente BEM) Retención de Contexto de Compra / Mejor Conversión (+15-20%) / UX Mobile First
-Navegación de Categorías Pestañas Internas con Recarga Completa Sidebar Off-Canvas con Navegación Fluida UX Mobile First / Transiciones Suaves / Navegación por Gestos
-Dashboard Admin Vista Básica / Métricas Estáticas Estructura BI Ready con Layout Fijo Listo para Chart.js / Análisis de Negocio en Tiempo Real / Escalabilidad de Métricas
-Arquitectura de Seguridad Validaciones Frontend Únicas Defensa en Profundidad (RLS + Frontend + Middleware) Mitigación OWASP A01:2021 / Control de Acceso Roto (BAC) / Auditoría Completa
-Gestión de Estado Variables Globales / Acoplamiento Alto Módulos Encapsulados + Service Worker Offline Estado Predictivo / Sincronización Inteligente / Experiencia Offline
-Sistema de Build Procesamiento Manual / Sin Optimización Vite + Workbox + PWA Optimizada Builds Rápidos (≤2s) / Caché Inteligente / Core Web Vitals ≥90
-Mantenibilidad Refactorización Costosa / Deuda Técnica Alta Arquitectura Modular + BEM + Documentación Onboarding Rápido (≤1 día) / Extensibilidad Sin Deuda
+Característica	Código Anterior (Legacy/Monolítico)	Código Actual (Arquitectura Modular Final)	Beneficio Arquitectónico Clave
+Metodología de Estilos	Vibe coding / Anidamiento Alto / Especificidad Peligrosa	BEM Estricto + SCSS Patrón 7-1	Baja Especificidad (0,0,1,0) / Eliminación de Conflictos con Bootstrap / Mantenibilidad a Largo Plazo
+Flujo de Carrito	Página Separada (cart.html) con Abandono de Contexto	Modal Off-Canvas (Componente BEM)	Retención de Contexto de Compra / Mejor Conversión (+15-20%) / UX Mobile First
+Navegación de Categorías	Pestañas Internas con Recarga Completa	Sidebar Off-Canvas con Navegación Fluida	UX Mobile First / Transiciones Suaves / Navegación por Gestos
+Dashboard Admin	Vista Básica / Métricas Estáticas	Estructura BI Ready con Layout Fijo	Listo para Chart.js / Análisis de Negocio en Tiempo Real / Escalabilidad de Métricas
+Arquitectura de Seguridad	Validaciones Frontend Únicas	Defensa en Profundidad (RLS + Frontend + Middleware)	Mitigación OWASP A01:2021 / Control de Acceso Roto (BAC) / Auditoría Completa
+Gestión de Estado	Variables Globales / Acoplamiento Alto	Módulos Encapsulados + Service Worker Offline	Estado Predictivo / Sincronización Inteligente / Experiencia Offline
+Sistema de Build	Procesamiento Manual / Sin Optimización	Vite + Workbox + PWA Optimizada	Builds Rápidos (≤2s) / Caché Inteligente / Core Web Vitals ≥90
+Mantenibilidad	Refactorización Costosa / Deuda Técnica Alta	Arquitectura Modular + BEM + Documentación	Onboarding Rápido (≤1 día) / Extensibilidad Sin Deuda
 🎯 Justificación de Decisiones Arquitectónicas Clave
-
 1. BEM Estricto + SCSS 7-1 Pattern
-   Problema Legacy: Especificidad CSS inmanejable (>.container .row .col .card .title), conflictos con Bootstrap, imposibilidad de reutilización.
+Problema Legacy: Especificidad CSS inmanejable (>.container .row .col .card .title), conflictos con Bootstrap, imposibilidad de reutilización.
 
 Solución Arquitectónica: Implementación rigurosa de BEM que garantiza especificidad constante (0,0,1,0) y organización mediante Patrón 7-1.
 
@@ -364,6 +357,13 @@ Solución Arquitectónica: Modal Off-Canvas que mantiene el contexto visual comp
 
 Impacto Business: Aumento del 18% en conversión, reducción del 30% en abandono del carrito.
 
+4. Separación de Rutas de Autenticación
+   Problema Legacy: Ruta única /login.html sin separación de roles, vulnerabilidad BAC.
+
+Solución Arquitectónica: Separación física /admin/login.html vs /user/login.html con validaciones independientes.
+
+Impacto Seguridad: Mitigación OWASP A01:2021, prevención de elevación de privilegios.
+
 <div align="center">
 📞 ¿Preguntas o Contribuciones?
 ¡Nos encanta recibir feedback! Consulta la documentación técnica completa en GOB.md para desarrolladores y agentes IA.
@@ -371,6 +371,9 @@ Impacto Business: Aumento del 18% en conversión, reducción del 30% en abandono
 📚 Documentación Detallada: GOB.md • 🐛 Reportar Bug: Issues • 💡 Sugerir Feature: Discussions
 
 </div>
-Última Actualización: 2025-10-23
-Versión Documento: README.md v5.0 - Estructura Final
-Estado Proyecto: ✅ IMPLEMENTACIÓN COMPLETADA
+<div align="center">
+✨ Estado del Proyecto: ✅ IMPLEMENTACIÓN COMPLETADA
+🔄 Última Actualización: 2025-10-25
+📄 Versión Documento: README.md v6.0 - Estructura Final Completa
+
+</div>
