@@ -1,85 +1,123 @@
 // themes/_theme.scss
-// Sistema de temas para Carnicería PWA
-
-// Tema principal (light)
-.theme-light {
-  --bs-body-bg: #{$body-bg};
-  --bs-body-color: #{$color-text};
-  --bs-primary: #{$primary-color};
-  --bs-secondary: #{$color-text-light};
-  --bs-success: #{$color-success};
-  --bs-warning: #{$color-warning};
-  --bs-danger: #{$color-danger};
-  --bs-info: #{$color-info};
-  --bs-light: #{$color-light};
-  --bs-dark: #{$color-text};
-  --bs-border-color: #{$color-border};
-}
-
-// Tema oscuro
-.theme-dark {
-  @extend [data-bs-theme="dark"];
-}
-
-// Tema personalizado 1 - Carnicería
-.theme-meat {
-  --bs-primary: #{$primary-color};
-  --bs-secondary: #c44569;
-  --bs-success: #27ae60;
-  --bs-warning: #f39c12;
-  --bs-danger: #e74c3c;
-  --bs-info: #3498db;
+// Tema principal y sistema de personalización
+:root {
+  // Colores primarios
+  --primary-color: #d32f2f;
+  --primary-color-light: #ff6659;
+  --primary-color-dark: #9a0007;
   
-  .btn-primary {
-    background: linear-gradient(135deg, var(--bs-primary) 0%, darken($primary-color, 10%) 100%);
-    border: none;
-  }
-}
-
-// Tema personalizado 2 - Verde
-.theme-green {
-  --bs-primary: #2ecc71;
-  --bs-secondary: #27ae60;
-  --bs-success: #16a085;
-  --bs-warning: #f39c12;
-  --bs-danger: #e74c3c;
-  --bs-info: #3498db;
-}
-
-// Sistema de transición de temas
-.theme-transition {
-  * {
-    transition: background-color 0.3s ease, 
-                color 0.3s ease, 
-                border-color 0.3s ease,
-                box-shadow 0.3s ease !important;
-  }
-}
-
-// Utilidades de tema
-.theme-toggle {
-  @extend .btn;
-  @extend .btn--outline;
-  @extend .btn--icon;
-  position: relative;
-  overflow: hidden;
+  // Colores secundarios
+  --secondary-color: #f5f5f5;
+  --secondary-color-light: #ffffff;
+  --secondary-color-dark: #c2c2c2;
   
-  &__icon {
-    transition: transform 0.3s ease;
-  }
+  // Colores de acento
+  --accent-color: #388e3c;
+  --accent-color-light: #6abf69;
+  --accent-color-dark: #00600f;
   
-  &--dark &__icon {
-    transform: rotate(180deg);
-  }
+  // Colores semánticos
+  --success-color: #28a745;
+  --warning-color: #ffc107;
+  --danger-color: #dc3545;
+  --info-color: #17a2b8;
+  
+  // Colores neutros
+  --white: #ffffff;
+  --light: #f8f9fa;
+  --dark: #343a40;
+  --text-color: #333333;
+  --text-color-light: #666666;
+  --border-color: #dee2e6;
+  
+  // Colores de fondo
+  --body-bg: #f9f9f9;
+  --header-bg: linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%);
+  --card-bg: #ffffff;
+  
+  // Espaciado
+  --spacer-0: 0;
+  --spacer-1: 0.25rem;
+  --spacer-2: 0.5rem;
+  --spacer-3: 1rem;
+  --spacer-4: 1.5rem;
+  --spacer-5: 3rem;
+  
+  // Border radius
+  --border-radius: 0.5rem;
+  --border-radius-sm: 0.375rem;
+  --border-radius-lg: 0.75rem;
+  --border-radius-pill: 50rem;
+  
+  // Breakpoints
+  --breakpoint-sm: 576px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 992px;
+  --breakpoint-xl: 1200px;
+  
+  // Sombras
+  --shadow-sm: 0 2px 10px rgba(0,0,0,0.05);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+  --shadow-lg: 0 8px 20px rgba(0,0,0,0.12);
+  --shadow-xl: 0 10px 25px rgba(0,0,0,0.15);
+  
+  // Transiciones
+  --transition-base: all 0.3s ease;
+  --transition-slow: all 0.5s ease;
+  --transition-fast: all 0.15s ease;
 }
 
-// Componentes específicos por tema
-[class*="theme-"] {
-  .card {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+// Clases de utilidad para el tema
+.theme-primary {
+  color: var(--primary-color);
+}
+
+.theme-bg-primary {
+  background-color: var(--primary-color);
+}
+
+.theme-border-primary {
+  border-color: var(--primary-color);
+}
+
+.theme-success {
+  color: var(--success-color);
+}
+
+.theme-bg-success {
+  background-color: var(--success-color);
+}
+
+// Variables CSS para componentes específicos
+.cs-product-card {
+  --product-card-bg: var(--card-bg);
+  --product-card-shadow: var(--shadow-md);
+  --product-card-border-radius: var(--border-radius-lg);
+}
+
+.cs-auth-card {
+  --auth-card-bg: var(--card-bg);
+  --auth-card-shadow: var(--shadow-lg);
+  --auth-card-border-radius: var(--border-radius-lg);
+}
+
+// Modificadores de tema
+@include bem(cs, theme) {
+  @include modifier(modern) {
+    --border-radius: 0.75rem;
+    --border-radius-sm: 0.5rem;
+    --border-radius-lg: 1rem;
+    --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
   }
   
-  .btn {
-    transition: all 0.3s ease;
+  @include modifier(minimal) {
+    --border-radius: 0.25rem;
+    --border-radius-sm: 0.125rem;
+    --border-radius-lg: 0.5rem;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   }
 }

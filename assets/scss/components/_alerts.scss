@@ -1,257 +1,216 @@
-// Sistema de alertas BEM
-
-.alert {
-  @extend %alert-base;
+// components/_alerts.scss
+// Sistema de alertas y notificaciones BEM
+@include bem(cs, alert) {
+  padding: spacer(3);
+  margin-bottom: spacer(3);
+  border: 1px solid transparent;
+  border-radius: $border-radius;
+  position: relative;
   
-  &--primary {
-    background: rgba($primary-color, 0.1);
-    border-left-color: $primary-color;
-    color: darken($primary-color, 20%);
+  @include element(title) {
+    font-weight: 600;
+    margin-bottom: spacer(1);
   }
   
-  &--success {
-    background: rgba($color-success, 0.1);
-    border-left-color: $color-success;
-    color: darken($color-success, 20%);
+  @include element(text) {
+    margin: 0;
+    line-height: var(--line-height-normal);
   }
   
-  &--warning {
-    background: rgba($color-warning, 0.1);
-    border-left-color: $color-warning;
-    color: darken($color-warning, 30%);
-  }
-  
-  &--danger {
-    background: rgba($color-danger, 0.1);
-    border-left-color: $color-danger;
-    color: darken($color-danger, 20%);
-  }
-  
-  &--info {
-    background: rgba($color-info, 0.1);
-    border-left-color: $color-info;
-    color: darken($color-info, 20%);
-  }
-  
-  &--dismissible {
-    position: relative;
-    padding-right: spacer(6);
-  }
-  
-  &__close {
-    @extend %btn-reset;
+  @include element(close) {
     position: absolute;
     top: spacer(2);
     right: spacer(2);
-    color: inherit;
+    background: none;
+    border: none;
+    font-size: var(--font-size-lg);
     opacity: 0.7;
-    @include transition(all, 0.3s, ease);
+    cursor: pointer;
+    padding: spacer(1);
+    line-height: 1;
     
     &:hover {
       opacity: 1;
     }
   }
   
-  &__title {
-    font-weight: $font-weight-semibold;
-    margin-bottom: spacer(1);
+  // Variantes de alerta
+  @include modifier(primary) {
+    background-color: rgba($primary-color, 0.1);
+    border-color: rgba($primary-color, 0.2);
+    color: shade($primary-color, 20%);
+    
+    @include element(title) {
+      color: $primary-color;
+    }
   }
   
-  &__text {
-    margin: 0;
-    line-height: 1.5;
+  @include modifier(success) {
+    background-color: rgba($color-success, 0.1);
+    border-color: rgba($color-success, 0.2);
+    color: shade($color-success, 20%);
+    
+    @include element(title) {
+      color: $color-success;
+    }
+  }
+  
+  @include modifier(warning) {
+    background-color: rgba($color-warning, 0.1);
+    border-color: rgba($color-warning, 0.2);
+    color: shade($color-warning, 20%);
+    
+    @include element(title) {
+      color: $color-warning;
+    }
+  }
+  
+  @include modifier(danger) {
+    background-color: rgba($color-danger, 0.1);
+    border-color: rgba($color-danger, 0.2);
+    color: shade($color-danger, 20%);
+    
+    @include element(title) {
+      color: $color-danger;
+    }
+  }
+  
+  @include modifier(info) {
+    background-color: rgba($color-info, 0.1);
+    border-color: rgba($color-info, 0.2);
+    color: shade($color-info, 20%);
+    
+    @include element(title) {
+      color: $color-info;
+    }
+  }
+  
+  // Alertas con íconos
+  @include modifier(with-icon) {
+    display: flex;
+    align-items: flex-start;
+    
+    @include element(icon) {
+      font-size: var(--font-size-xl);
+      margin-right: spacer(2);
+      flex-shrink: 0;
+    }
+    
+    @include element(content) {
+      flex: 1;
+    }
+  }
+  
+  // Alertas desmontables
+  @include modifier(dismissible) {
+    padding-right: spacer(6);
   }
 }
 
 // Toast notifications
-.toast {
-  @extend .alert;
+@include bem(cs, toast) {
   position: fixed;
-  top: spacer(4);
-  right: spacer(4);
+  bottom: 20px;
+  right: 20px;
+  z-index: 1080;
   min-width: 300px;
   max-width: 400px;
-  z-index: z(toast);
-  @include box-shadow(3);
-  animation: slideInRight 0.3s ease;
+  background-color: $color-white;
+  border-radius: $border-radius;
+  box-shadow: $shadow-lg;
+  border-left: 4px solid $primary-color;
+  transform: translateX(400px);
+  transition: transform 0.3s ease;
   
-  &--top-left {
-    top: spacer(4);
-    left: spacer(4);
-    right: auto;
-    animation: slideInLeft 0.3s ease;
-  }
-  
-  &--top-center {
-    top: spacer(4);
-    left: 50%;
-    transform: translateX(-50%);
-    animation: slideInDown 0.3s ease;
-  }
-  
-  &--bottom-right {
-    top: auto;
-    bottom: spacer(4);
-    right: spacer(4);
-    animation: slideInUp 0.3s ease;
-  }
-  
-  &--bottom-left {
-    top: auto;
-    bottom: spacer(4);
-    left: spacer(4);
-    right: auto;
-    animation: slideInUp 0.3s ease;
-  }
-  
-  &--bottom-center {
-    top: auto;
-    bottom: spacer(4);
-    left: 50%;
-    transform: translateX(-50%);
-    animation: slideInUp 0.3s ease;
-  }
-  
-  &__container {
-    position: fixed;
-    z-index: z(toast);
+  @include element(header) {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: spacer(2) spacer(3);
+    border-bottom: 1px solid $color-border;
     
-    &--top-right {
-      top: spacer(4);
-      right: spacer(4);
+    @include element(title) {
+      font-weight: 600;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      
+      i {
+        margin-right: spacer(1);
+        color: $primary-color;
+      }
     }
     
-    &--top-left {
-      top: spacer(4);
-      left: spacer(4);
+    @include element(close) {
+      background: none;
+      border: none;
+      font-size: var(--font-size-lg);
+      opacity: 0.7;
+      cursor: pointer;
+      padding: spacer(1);
+      line-height: 1;
+      
+      &:hover {
+        opacity: 1;
+      }
     }
-    
-    &--top-center {
-      top: spacer(4);
-      left: 50%;
-      transform: translateX(-50%);
-    }
-    
-    &--bottom-right {
-      bottom: spacer(4);
-      right: spacer(4);
-    }
-    
-    &--bottom-left {
-      bottom: spacer(4);
-      left: spacer(4);
-    }
-    
-    &--bottom-center {
-      bottom: spacer(4);
-      left: 50%;
-      transform: translateX(-50%);
-    }
-  }
-}
-
-// Offline alert
-.offline-alert {
-  @extend .alert;
-  @extend .alert--warning;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: z(toast);
-  border-radius: 0;
-  border-left: none;
-  border-top: 3px solid $color-warning;
-  text-align: center;
-  animation: slideInDown 0.3s ease;
-}
-
-// Inline form alerts
-.form-alert {
-  @extend .alert;
-  margin: spacer(2) 0;
-  font-size: $font-size-sm;
-  
-  &--success {
-    @extend .alert--success;
   }
   
-  &--error {
-    @extend .alert--danger;
+  @include element(body) {
+    padding: spacer(3);
   }
-}
-
-// Animations
-@include keyframe(slideInRight) {
-  from {
-    transform: translateX(100%);
-    opacity: 0;
+  
+  @include element(text) {
+    margin: 0;
+    line-height: var(--line-height-normal);
   }
-  to {
+  
+  // Estados del toast
+  @include state(show) {
     transform: translateX(0);
-    opacity: 1;
+  }
+  
+  // Variantes de toast
+  @include modifier(success) {
+    border-left-color: $color-success;
+    
+    .cs-toast__header i {
+      color: $color-success;
+    }
+  }
+  
+  @include modifier(warning) {
+    border-left-color: $color-warning;
+    
+    .cs-toast__header i {
+      color: $color-warning;
+    }
+  }
+  
+  @include modifier(danger) {
+    border-left-color: $color-danger;
+    
+    .cs-toast__header i {
+      color: $color-danger;
+    }
+  }
+  
+  @include modifier(info) {
+    border-left-color: $color-info;
+    
+    .cs-toast__header i {
+      color: $color-info;
+    }
   }
 }
 
-@include keyframe(slideInLeft) {
-  from {
-    transform: translateX(-100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
-}
-
-@include keyframe(slideInDown) {
-  from {
-    transform: translateY(-100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-@include keyframe(slideInUp) {
-  from {
-    transform: translateY(100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-// Dark mode adjustments
-[data-bs-theme="dark"] {
-  .alert {
-    &--primary {
-      background: rgba($primary-color, 0.2);
-      color: lighten($primary-color, 20%);
-    }
-    
-    &--success {
-      background: rgba($color-success, 0.2);
-      color: lighten($color-success, 20%);
-    }
-    
-    &--warning {
-      background: rgba($color-warning, 0.2);
-      color: lighten($color-warning, 20%);
-    }
-    
-    &--danger {
-      background: rgba($color-danger, 0.2);
-      color: lighten($color-danger, 20%);
-    }
-    
-    &--info {
-      background: rgba($color-info, 0.2);
-      color: lighten($color-info, 20%);
-    }
+// Responsive
+@include media-breakpoint-down(sm) {
+  @include bem(cs, toast) {
+    bottom: 10px;
+    right: 10px;
+    left: 10px;
+    min-width: auto;
+    max-width: none;
   }
 }

@@ -1,103 +1,54 @@
-// Utilidades BEM (Block Element Modifier) para metodología estricta
-
-// Block - Define un bloque BEM
-@mixin block($name) {
-  .#{$name} {
+// abstracts/_bem-utilities.scss
+// Mixins para metodología BEM estricta
+@mixin block($block) {
+  .#{$block} {
     @content;
   }
 }
 
-// Element - Define un elemento dentro de un bloque
-@mixin element($elements...) {
-  @each $element in $elements {
-    &__#{$element} {
-      @content;
-    }
-  }
-}
-
-// Modifier - Define un modificador para un bloque o elemento
-@mixin modifier($modifiers...) {
-  @each $modifier in $modifiers {
-    &--#{$modifier} {
-      @content;
-    }
-  }
-}
-
-// Utility para generar componentes BEM completos
-@mixin bem-component($block-name, $elements: (), $modifiers: ()) {
-  // Bloque principal
-  .#{$block-name} {
+@mixin element($element) {
+  &__#{$element} {
     @content;
-    
-    // Elementos
-    @each $element in $elements {
-      &__#{$element} {
+  }
+}
+
+@mixin modifier($modifier) {
+  &--#{$modifier} {
+    @content;
+  }
+}
+
+@mixin bem($block, $element: null, $modifier: null) {
+  @if $element == null and $modifier == null {
+    @include block($block) {
+      @content;
+    }
+  } @else if $modifier == null {
+    @include block($block) {
+      @include element($element) {
         @content;
       }
     }
-    
-    // Modificadores
-    @each $modifier in $modifiers {
-      &--#{$modifier} {
-        @content;
+  } @else {
+    @include block($block) {
+      @include element($element) {
+        @include modifier($modifier) {
+          @content;
+        }
       }
     }
   }
 }
 
-// Mixin para estados de componentes
+// Mixin para estados
 @mixin state($state) {
-  @if $state == 'hover' {
-    &:hover {
-      @content;
-    }
-  } @else if $state == 'focus' {
-    &:focus {
-      @content;
-    }
-  } @else if $state == 'active' {
-    &:active {
-      @content;
-    }
-  } @else if $state == 'disabled' {
-    &:disabled {
-      @content;
-    }
+  &.is-#{$state} {
+    @content;
   }
 }
 
-// Utility para responsive BEM
-@mixin bem-responsive($breakpoint, $block-name, $elements: (), $modifiers: ()) {
-  @include media-breakpoint-up($breakpoint) {
-    .#{$block-name} {
-      @content;
-      
-      @each $element in $elements {
-        &__#{$element} {
-          @content;
-        }
-      }
-      
-      @each $modifier in $modifiers {
-        &--#{$modifier} {
-          @content;
-        }
-      }
-    }
+@mixin has($element) {
+  &.has-#{$element} {
+    @content;
   }
 }
-
-// Ejemplo de uso:
-// @include block('product-card') {
-//   padding: 1rem;
-//   
-//   @include element('image', 'title', 'price') {
-//     margin-bottom: 0.5rem;
-//   }
-//   
-//   @include modifier('featured', 'discounted') {
-//     border: 2px solid $primary-color;
-//   }
-// }

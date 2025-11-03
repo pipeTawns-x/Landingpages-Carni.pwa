@@ -1,91 +1,60 @@
-// Funciones SCSS utilitarias
+// abstracts/_functions.scss
+@use 'sass:color';
+@use 'sass:map';
+@use 'sass:math';
 
-// Convertir px a rem
-@function rem($pixels, $context: 16) {
-  @return calc($pixels / $context) * 1rem;
+// Funciones de color
+@function tint($color, $percentage) {
+  @return color.mix(white, $color, $percentage);
 }
 
-// Convertir px a em
-@function em($pixels, $context: 16) {
-  @return calc($pixels / $context) * 1em;
+@function shade($color, $percentage) {
+  @return color.mix(black, $color, $percentage);
 }
 
-// Calcular luminosidad del color
-@function luminance($color) {
-  $red: red($color) / 255;
-  $green: green($color) / 255;
-  $blue: blue($color) / 255;
-
-  $red: if($red < 0.03928, $red / 12.92, pow(($red + 0.055) / 1.055, 2.4));
-  $green: if($green < 0.03928, $green / 12.92, pow(($green + 0.055) / 1.055, 2.4));
-  $blue: if($blue < 0.03928, $blue / 12.92, pow(($blue + 0.055) / 1.055, 2.4));
-
-  @return 0.2126 * $red + 0.7152 * $green + 0.0722 * $blue;
-}
-
-// Calcular contraste entre colores (WCAG)
-@function contrast-ratio($background, $foreground) {
-  $luminance1: luminance($background) + 0.05;
-  $luminance2: luminance($foreground) + 0.05;
-  
-  @return max($luminance1, $luminance2) / min($luminance1, $luminance2);
-}
-
-// Determinar color de texto basado en fondo (accesibilidad)
-@function text-color($background) {
-  @if (contrast-ratio($background, #000) > 4.5) {
+@function color-yiq($color) {
+  $r: color.red($color);
+  $g: color.green($color);
+  $b: color.blue($color);
+  $yiq: (($r * 299) + ($g * 587) + ($b * 114)) / 1000;
+  @if ($yiq >= 150) {
     @return #000;
   } @else {
     @return #fff;
   }
 }
 
-// Generar paleta de colores
-@function color-shade($color, $percentage) {
-  @if lightness($color) > 50% {
-    @return darken($color, $percentage);
-  } @else {
-    @return lighten($color, $percentage);
+// Funciones de espaciado
+@function spacer($key) {
+  @return map.get($spacers, $key);
+}
+
+@function border-radius($key: null) {
+  @if $key {
+    @return map.get((
+      sm: $border-radius-sm,
+      lg: $border-radius-lg
+    ), $key);
   }
+  @return $border-radius;
 }
 
-// Obtener valor de espaciado
-@function spacer($index) {
-  @return map-get($spacers, $index);
-}
-
-// Obtener breakpoint
-@function breakpoint($name) {
-  @return map-get((
+// Funciones de breakpoint
+@function breakpoint($key) {
+  @return map.get((
     sm: $breakpoint-sm,
     md: $breakpoint-md,
     lg: $breakpoint-lg,
-    xl: $breakpoint-xl,
-    xxl: $breakpoint-xxl
-  ), $name);
+    xl: $breakpoint-xl
+  ), $key);
 }
 
-// Calcular ancho de columna grid
-@function grid-column($columns) {
-  @return percentage(calc($columns / $grid-columns));
-}
-
-// Función para z-index
-@function z($layer) {
-  @return map-get((
-    dropdown: $z-index-dropdown,
-    sticky: $z-index-sticky,
-    fixed: $z-index-fixed,
-    modal-backdrop: $z-index-modal-backdrop,
-    modal: $z-index-modal,
-    popover: $z-index-popover,
-    tooltip: $z-index-tooltip,
-    offcanvas: $z-index-offcanvas,
-    toast: $z-index-toast
-  ), $layer);
-}
-
-// Función para transiciones suaves
-@function transition($property: all, $duration: 0.3s, $timing: ease) {
-  @return #{$property} #{$duration} #{$timing};
+// Funciones de shadow
+@function shadow($key) {
+  @return map.get((
+    1: $shadow-sm,
+    2: $shadow-md,
+    3: $shadow-lg,
+    4: $shadow-xl
+  ), $key);
 }

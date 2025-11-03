@@ -1,98 +1,182 @@
-// themes/_dark-mode.scss (completo)
+// themes/_dark-mode.scss
+// Implementación del tema oscuro
 [data-bs-theme="dark"] {
-  // Variables CSS personalizadas para tema oscuro
-  --bs-body-bg: #{$dark-bg};
-  --bs-body-color: #{$dark-text};
-  --bs-border-color: #{$dark-border};
-  --bs-card-bg: #{$dark-surface};
-  --bs-modal-bg: #{$dark-surface};
-
-  // Componentes base
-  background-color: $dark-bg;
-  color: $dark-text;
-
-  // Cards
-  .card {
-    background-color: $dark-surface;
-    border-color: $dark-border;
-    
-    &-header {
-      background-color: rgba($dark-bg, 0.5);
-      border-bottom-color: $dark-border;
-    }
-  }
-
-  // Formularios
-  .form-control {
-    background-color: $dark-bg;
-    border-color: $dark-border;
-    color: $dark-text;
-
-    &:focus {
-      background-color: $dark-bg;
-      border-color: $primary-color;
-      color: $dark-text;
-    }
-  }
-
-  .form-select {
-    background-color: $dark-bg;
-    border-color: $dark-border;
-    color: $dark-text;
-  }
-
-  // Tablas
-  .table {
-    --bs-table-bg: #{$dark-surface};
-    --bs-table-color: #{$dark-text};
-    --bs-table-border-color: #{$dark-border};
-  }
-
-  // Modals
-  .modal-content {
-    background-color: $dark-surface;
-    border-color: $dark-border;
-  }
-
-  // Navbars
-  .navbar {
-    background-color: $dark-surface !important;
-    
-    &-brand, &-nav .nav-link {
-      color: $dark-text;
-      
-      &:hover {
-        color: $primary-color;
-      }
-    }
-  }
-
-  // Dropdowns
-  .dropdown-menu {
-    background-color: $dark-surface;
-    border-color: $dark-border;
-    
-    .dropdown-item {
-      color: $dark-text;
-      
-      &:hover {
-        background-color: rgba($primary-color, 0.1);
-        color: $primary-color;
-      }
-    }
-  }
-
-  // Utilidades de texto
-  .text-dark { color: $dark-text !important; }
-  .text-muted { color: rgba($dark-text, 0.6) !important; }
+  // Variables específicas del tema oscuro
+  --body-bg: #1a1d23;
+  --text-color: #e9ecef;
+  --text-color-light: #adb5bd;
+  --border-color: #495057;
+  --card-bg: #2d3035;
+  --header-bg: #343a40;
   
-  // Utilidades de fondo
-  .bg-light { background-color: $dark-surface !important; }
-  .bg-white { background-color: $dark-surface !important; }
-  .bg-dark { background-color: $color-white !important; }
+  // Sobrescribir variables
+  $body-bg: var(--body-bg) !global;
+  $color-text: var(--text-color) !global;
+  $color-text-light: var(--text-color-light) !global;
+  $color-border: var(--border-color) !global;
+  $color-white: #1a1d23 !global;
+  $color-light: #2d3035 !global;
+  
+  // Estilos base para tema oscuro
+  background-color: $body-bg;
+  color: $color-text;
+  
+  // Componentes que necesitan ajustes específicos
+  .cs-card,
+  .cs-product-card,
+  .cs-auth-card,
+  .bs-card {
+    background-color: $card-bg;
+    border-color: $color-border;
+    color: $color-text;
+  }
+  
+  .cs-header,
+  .bs-bg-dark {
+    background-color: $header-bg !important;
+  }
+  
+  .form-control {
+    background-color: $card-bg;
+    border-color: $color-border;
+    color: $color-text;
+    
+    &:focus {
+      background-color: $card-bg;
+      border-color: $primary-color;
+      color: $color-text;
+    }
+  }
+  
+  .table {
+    color: $color-text;
+    
+    th {
+      background-color: $header-bg;
+      border-color: $color-border;
+    }
+    
+    td {
+      border-color: $color-border;
+    }
+  }
+  
+  // Ajustes para modales
+  .modal-content {
+    background-color: $card-bg;
+    border-color: $color-border;
+  }
+  
+  .modal-header,
+  .modal-footer {
+    border-color: $color-border;
+  }
+  
+  // Ajustes para offcanvas
+  .offcanvas {
+    background-color: $card-bg;
+    
+    &.offcanvas-end {
+      border-left-color: $color-border;
+    }
+  }
+  
+  .offcanvas-header {
+    border-bottom-color: $color-border;
+  }
+  
+  // Ajustes para el carrito
+  .cs-cart-offcanvas {
+    background-color: $card-bg;
+  }
+  
+  // Ajustes para alertas
+  .alert {
+    &.alert-info {
+      background-color: rgba($color-info, 0.1);
+      border-color: rgba($color-info, 0.2);
+      color: tint($color-info, 60%);
+    }
+    
+    &.alert-warning {
+      background-color: rgba($color-warning, 0.1);
+      border-color: rgba($color-warning, 0.2);
+      color: tint($color-warning, 60%);
+    }
+    
+    &.alert-success {
+      background-color: rgba($color-success, 0.1);
+      border-color: rgba($color-success, 0.2);
+      color: tint($color-success, 60%);
+    }
+    
+    &.alert-danger {
+      background-color: rgba($color-danger, 0.1);
+      border-color: rgba($color-danger, 0.2);
+      color: tint($color-danger, 60%);
+    }
+  }
+  
+  // Ajustes para el dashboard
+  .cs-dashboard-sidebar {
+    background-color: $header-bg;
+    
+    .cs-dashboard-sidebar__link {
+      color: $color-text-light;
+      
+      &:hover,
+      &.active {
+        color: $color-text;
+        background-color: rgba($primary-color, 0.1);
+      }
+    }
+  }
+  
+  .cs-dashboard-header {
+    background-color: $card-bg;
+    border-bottom-color: $color-border;
+  }
+  
+  // Ajustes para el carrusel
+  .cs-carousel__caption {
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+  }
+  
+  // Ajustes para el footer
+  .cs-footer {
+    background-color: $header-bg;
+    border-top-color: $color-border;
+  }
 }
 
-// Transición suave entre temas
-[data-bs-theme] {
-  transition: background-color 0.3s ease, color 0.3s ease;
+// Toggle del tema
+@include bem(cs, theme-toggle) {
+  background: none;
+  border: none;
+  padding: spacer(1);
+  border-radius: $border-radius;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  
+  @include element(icon) {
+    font-size: var(--font-size-lg);
+    color: $color-text;
+  }
+  
+  &:hover {
+    background-color: rgba($primary-color, 0.1);
+    
+    .cs-theme-toggle__icon {
+      color: $primary-color;
+    }
+  }
+  
+  // Estados
+  @include state(active) {
+    background-color: rgba($primary-color, 0.2);
+    
+    .cs-theme-toggle__icon {
+      color: $primary-color;
+    }
+  }
 }

@@ -1,209 +1,183 @@
-// Sistema de badges BEM
-
-.badge {
-  @extend %badge-base;
+// components/_badges.scss
+// Sistema de badges y etiquetas BEM
+@include bem(cs, badge) {
+  display: inline-flex;
+  align-items: center;
+  padding: spacer(1) spacer(2);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: baseline;
+  border-radius: $border-radius-pill;
+  transition: all 0.3s ease;
   
-  &--primary {
-    background: $primary-color;
-    color: $color-white;
+  // Variantes de color
+  @include modifier(primary) {
+    background-color: $primary-color;
+    color: color-yiq($primary-color);
   }
   
-  &--secondary {
-    background: $color-text-light;
-    color: $color-white;
+  @include modifier(secondary) {
+    background-color: $secondary-color;
+    color: color-yiq($secondary-color);
   }
   
-  &--success {
-    background: $color-success;
-    color: $color-white;
+  @include modifier(success) {
+    background-color: $color-success;
+    color: color-yiq($color-success);
   }
   
-  &--warning {
-    background: $color-warning;
+  @include modifier(warning) {
+    background-color: $color-warning;
+    color: color-yiq($color-warning);
+  }
+  
+  @include modifier(danger) {
+    background-color: $color-danger;
+    color: color-yiq($color-danger);
+  }
+  
+  @include modifier(info) {
+    background-color: $color-info;
+    color: color-yiq($color-info);
+  }
+  
+  @include modifier(light) {
+    background-color: $color-light;
     color: $color-text;
   }
   
-  &--danger {
-    background: $color-danger;
+  @include modifier(dark) {
+    background-color: $color-text;
     color: $color-white;
   }
   
-  &--info {
-    background: $color-info;
-    color: $color-white;
-  }
-  
-  &--light {
-    background: $color-light;
-    color: $color-text;
-  }
-  
-  &--dark {
-    background: $color-text;
-    color: $color-white;
-  }
-  
-  // Outline variants
-  &--outline-primary {
-    background: transparent;
+  // Badges outline
+  @include modifier(outline-primary) {
+    background-color: transparent;
     border: 1px solid $primary-color;
     color: $primary-color;
   }
   
-  &--outline-success {
-    background: transparent;
+  @include modifier(outline-success) {
+    background-color: transparent;
     border: 1px solid $color-success;
     color: $color-success;
   }
   
-  &--outline-warning {
-    background: transparent;
+  @include modifier(outline-warning) {
+    background-color: transparent;
     border: 1px solid $color-warning;
     color: $color-warning;
   }
   
-  &--outline-danger {
-    background: transparent;
+  @include modifier(outline-danger) {
+    background-color: transparent;
     border: 1px solid $color-danger;
     color: $color-danger;
   }
   
-  &--outline-info {
-    background: transparent;
-    border: 1px solid $color-info;
-    color: $color-info;
-  }
-  
-  // Sizes
-  &--sm {
-    padding: 0.125rem 0.375rem;
-    font-size: $font-size-xs;
-  }
-  
-  &--lg {
-    padding: 0.375rem 0.75rem;
-    font-size: $font-size-sm;
-  }
-  
-  // Pill shape
-  &--pill {
-    border-radius: 50rem;
-  }
-  
-  // With icon
-  &--with-icon {
+  // Badges con íconos
+  @include modifier(with-icon) {
     display: inline-flex;
     align-items: center;
-    gap: 0.25rem;
+    gap: spacer(1);
     
     i {
       font-size: 0.875em;
     }
   }
-}
-
-// Status badges
-.status-badge {
-  @extend .badge;
-  position: relative;
-  padding-left: 1.25rem;
   
-  &::before {
-    content: '';
-    position: absolute;
-    left: 0.5rem;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 0.5rem;
-    height: 0.5rem;
-    border-radius: 50%;
-    background: currentColor;
+  // Badges grandes
+  @include modifier(lg) {
+    padding: spacer(2) spacer(3);
+    font-size: var(--font-size-sm);
   }
   
-  &--online {
-    @extend .badge--success;
-  }
-  
-  &--offline {
-    @extend .badge--secondary;
-  }
-  
-  &--busy {
-    @extend .badge--warning;
-  }
-  
-  &--dnd {
-    @extend .badge--danger;
+  // Badges pequeños
+  @include modifier(sm) {
+    padding: spacer(0.5) spacer(1.5);
+    font-size: 0.75rem;
   }
 }
 
-// Product badges
-.product-badge {
-  @extend .badge;
-  @extend .badge--pill;
-  font-weight: $font-weight-bold;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+// Badges de estado
+@include bem(cs, status-badge) {
+  @extend .cs-badge;
   
-  &--new {
-    @extend .badge--success;
+  @include modifier(online) {
+    background-color: $color-success;
+    color: $color-white;
+    
+    &::before {
+      content: '';
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background-color: currentColor;
+      margin-right: spacer(1);
+    }
   }
   
-  &--sale {
-    @extend .badge--danger;
+  @include modifier(offline) {
+    background-color: $color-text-light;
+    color: $color-white;
+    
+    &::before {
+      content: '';
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background-color: currentColor;
+      margin-right: spacer(1);
+    }
   }
   
-  &--featured {
-    @extend .badge--primary;
-  }
-  
-  &--limited {
-    @extend .badge--warning;
-  }
-  
-  &--out-of-stock {
-    @extend .badge--secondary;
+  @include modifier(busy) {
+    background-color: $color-warning;
+    color: $color-white;
+    
+    &::before {
+      content: '';
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background-color: currentColor;
+      margin-right: spacer(1);
+    }
   }
 }
 
-// Notification badges
-.notification-badge {
-  @extend .badge;
-  @extend .badge--danger;
-  @extend .badge--pill;
-  position: absolute;
-  top: -0.5rem;
-  right: -0.5rem;
-  min-width: 1.25rem;
-  height: 1.25rem;
-  padding: 0;
-  font-size: $font-size-xs;
-  font-weight: $font-weight-bold;
-  display: flex;
+// Badges de contador
+@include bem(cs, counter-badge) {
+  display: inline-flex;
   align-items: center;
   justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 spacer(1);
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1;
+  color: $color-white;
+  background-color: $color-danger;
   border: 2px solid $color-white;
-  animation: pulse 2s infinite;
-}
-
-// Dark mode adjustments
-[data-bs-theme="dark"] {
-  .badge {
-    &--light {
-      background: $dark-surface;
-      color: $dark-text;
-    }
-    
-    &--outline-primary,
-    &--outline-success,
-    &--outline-warning,
-    &--outline-danger,
-    &--outline-info {
-      background: transparent;
-    }
+  border-radius: 50%;
+  
+  @include modifier(lg) {
+    min-width: 24px;
+    height: 24px;
+    font-size: var(--font-size-xs);
   }
   
-  .notification-badge {
-    border-color: $dark-surface;
+  @include modifier(sm) {
+    min-width: 16px;
+    height: 16px;
+    font-size: 0.625rem;
   }
 }

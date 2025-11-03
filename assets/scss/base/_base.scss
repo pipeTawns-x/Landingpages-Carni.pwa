@@ -1,871 +1,177 @@
-// base/_base.scss - Estilos Base para Elementos HTML - Carnicería PWA
-
-/* ==========================================================================
-   ESTILOS BASE - Elementos HTML fundamentales
-   ========================================================================== */
-
-/**
- * Configuración global del documento
- */
-:root {
-  color-scheme: light dark;
+// base/_base.scss
+// Estilos base para elementos HTML
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
 }
 
-/**
- * Estilos base para el body
- */
 body {
-  font-family: $font-family-base;
-  font-size: $font-size-base;
-  font-weight: $font-weight-normal;
-  line-height: $line-height-normal;
-  color: $color-text;
   background-color: $body-bg;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+}
+
+// Enlaces
+a {
+  color: $primary-color;
+  text-decoration: none;
+  transition: color 0.3s ease;
   
-  &.auth-layout {
-    background: linear-gradient(135deg, $body-bg 0%, tint($body-bg, 50%) 100%);
-    min-height: 100vh;
+  &:hover,
+  &:focus {
+    color: shade($primary-color, 20%);
+    text-decoration: underline;
   }
   
-  &.dashboard-layout {
-    background: $color-gray-100;
-  }
-  
-  &.offline-layout {
-    background: $body-bg;
+  &:focus-visible {
+    @extend %focus-ring;
   }
 }
 
-/**
- * Contenedor principal de la aplicación
- */
-.app-container {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-}
-
-.main-content {
-  flex: 1;
-  padding-top: $header-height;
+// Botones base
+button {
+  transition: all 0.3s ease;
   
-  @include media-breakpoint-down(md) {
-    padding-top: $header-height-mobile;
+  &:focus-visible {
+    @extend %focus-ring;
   }
 }
 
-/**
- * Estilos para elementos de sección
- */
-section {
-  padding: $spacer-5 0;
-  position: relative;
-  
-  @include media-breakpoint-down(md) {
-    padding: $spacer-4 0;
-  }
-  
-  &.section-dark {
-    background: $color-gray-900;
-    color: $color-white;
-  }
-  
-  &.section-light {
-    background: $color-white;
-  }
-  
-  &.section-accent {
-    background: linear-gradient(135deg, $primary-color 0%, $primary-dark 100%);
-    color: $color-white;
-  }
-}
-
-.container {
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 $spacer-3;
-  
-  @include media-breakpoint-up(xl) {
-    max-width: 1140px;
-  }
-  
-  @include media-breakpoint-up(xxl) {
-    max-width: 1320px;
-  }
-  
-  &--fluid {
-    max-width: none;
-    padding: 0 $spacer-3;
-  }
-  
-  &--narrow {
-    max-width: 800px;
-  }
-}
-
-/**
- * Estilos para elementos de formulario base
- */
-input, textarea, select {
-  width: 100%;
-  padding: $input-padding;
-  border: $border-width solid $color-border;
-  border-radius: $input-border-radius;
-  background: $color-white;
+// Formularios
+label {
+  display: inline-block;
+  margin-bottom: spacer(1);
+  font-weight: 500;
   color: $color-text;
-  font-family: $font-family-base;
-  font-size: $font-size-base;
-  line-height: $line-height-normal;
-  transition: all $transition-base $ease-in-out;
+}
+
+input,
+textarea,
+select {
+  width: 100%;
+  padding: spacer(2) spacer(3);
+  border: 1px solid $color-border;
+  border-radius: $border-radius-sm;
+  background-color: $color-white;
+  transition: all 0.3s ease;
   
   &:focus {
-    outline: none;
     border-color: $primary-color;
     box-shadow: 0 0 0 0.2rem rgba($primary-color, 0.15);
   }
   
   &:disabled {
-    background: $color-gray-100;
-    color: $color-gray-600;
-    cursor: not-allowed;
-    opacity: 0.6;
-  }
-  
-  &::placeholder {
-    color: $color-gray-500;
-    opacity: 1;
-  }
-  
-  &.is-valid {
-    border-color: $color-success;
-    
-    &:focus {
-      border-color: $color-success;
-      box-shadow: 0 0 0 0.2rem rgba($color-success, 0.15);
-    }
-  }
-  
-  &.is-invalid {
-    border-color: $color-danger;
-    
-    &:focus {
-      border-color: $color-danger;
-      box-shadow: 0 0 0 0.2rem rgba($color-danger, 0.15);
-    }
-  }
-}
-
-/**
- * Estilos específicos para tipos de input
- */
-input[type="text"],
-input[type="email"],
-input[type="password"],
-input[type="tel"],
-input[type="number"],
-input[type="search"] {
-  height: $input-height;
-}
-
-textarea {
-  resize: vertical;
-  min-height: 100px;
-  line-height: $line-height-normal;
-  
-  &.resize-none {
-    resize: none;
-  }
-  
-  &.resize-both {
-    resize: both;
-  }
-}
-
-select {
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
-  background-position: right 0.5rem center;
-  background-repeat: no-repeat;
-  background-size: 1.5em 1.5em;
-  padding-right: 2.5rem;
-  
-  &::-ms-expand {
-    display: none;
-  }
-}
-
-/**
- * Estilos para botones base
- */
-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: $spacer-2;
-  padding: $btn-padding-y $btn-padding-x;
-  font-family: $font-family-base;
-  font-size: $font-size-base;
-  font-weight: $font-weight-medium;
-  line-height: $line-height-normal;
-  text-decoration: none;
-  border: $border-width solid transparent;
-  border-radius: $btn-border-radius;
-  background: transparent;
-  color: $color-text;
-  cursor: pointer;
-  transition: all $transition-base $ease-in-out;
-  position: relative;
-  overflow: hidden;
-  
-  &:disabled {
+    background-color: $color-light;
     opacity: 0.6;
     cursor: not-allowed;
-    pointer-events: none;
-  }
-  
-  &:focus-visible {
-    @include focus-outline;
   }
 }
 
-/**
- * Estilos para imágenes y medios
- */
+// Tablas
+table {
+  width: 100%;
+  margin-bottom: spacer(4);
+  
+  th,
+  td {
+    padding: spacer(2);
+    border-bottom: 1px solid $color-border;
+    text-align: left;
+  }
+  
+  th {
+    font-weight: 600;
+    background-color: $color-light;
+  }
+}
+
+// Imágenes responsivas
 img {
   max-width: 100%;
   height: auto;
-  display: block;
+}
+
+// Listas
+ul:not([class]),
+ol:not([class]) {
+  padding-left: spacer(4);
+  margin-bottom: spacer(3);
   
-  &.img-fluid {
-    width: 100%;
-  }
-  
-  &.img-thumbnail {
-    border: 1px solid $color-border;
-    border-radius: $border-radius;
-    padding: 0.25rem;
-    background: $color-white;
-  }
-  
-  &.img-rounded {
-    border-radius: $border-radius-lg;
-  }
-  
-  &.img-circle {
-    border-radius: 50%;
+  li {
+    margin-bottom: spacer(1);
   }
 }
 
-figure {
-  margin: 0 0 $spacer-3;
-  
-  img {
-    margin-bottom: $spacer-2;
-  }
-}
-
-figcaption {
-  font-size: $font-size-sm;
-  color: $color-text-light;
-  text-align: center;
+// Citas
+blockquote {
+  padding: spacer(3);
+  margin: spacer(4) 0;
+  border-left: 4px solid $primary-color;
+  background-color: $color-light;
   font-style: italic;
-}
-
-/**
- * Estilos para tablas
- */
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: $spacer-3;
-}
-
-th, td {
-  padding: $spacer-3;
-  text-align: left;
-  border-bottom: 1px solid $color-border;
-}
-
-th {
-  font-weight: $font-weight-semibold;
-  color: $color-text;
-  background: $color-gray-100;
-}
-
-tbody tr {
-  transition: background-color $transition-fast $ease-in-out;
   
-  &:hover {
-    background: $color-gray-50;
-  }
-  
-  &:last-child td {
-    border-bottom: none;
+  p:last-child {
+    margin-bottom: 0;
   }
 }
 
-/**
- * Estilos para elementos interactivos
- */
-details {
-  margin-bottom: $spacer-3;
-  
-  &[open] summary {
-    margin-bottom: $spacer-2;
-  }
+// Código
+code {
+  padding: spacer(1);
+  background-color: $color-light;
+  border-radius: $border-radius-sm;
+  font-family: 'Monaco', 'Consolas', monospace;
+  font-size: 0.875em;
 }
 
-summary {
-  font-weight: $font-weight-semibold;
-  cursor: pointer;
-  padding: $spacer-2;
-  background: $color-gray-100;
-  border-radius: $border-radius;
-  transition: background-color $transition-base $ease-in-out;
-  
-  &:hover {
-    background: $color-gray-200;
-  }
-  
-  &::-webkit-details-marker {
-    display: none;
-  }
-  
-  &::marker {
-    display: none;
-  }
-}
-
-/**
- * Estilos para elementos de énfasis
- */
-hr {
-  border: none;
-  height: 1px;
-  background: $color-border;
-  margin: $spacer-4 0;
-  
-  &.hr-thick {
-    height: 2px;
-  }
-  
-  &.hr-accent {
-    background: $primary-color;
-  }
-}
-
-/**
- * Estilos para elementos de código
- */
 pre {
-  background: $color-gray-100;
-  border: 1px solid $color-border;
+  padding: spacer(3);
+  background-color: $color-light;
   border-radius: $border-radius;
-  padding: $spacer-3;
   overflow-x: auto;
-  margin-bottom: $spacer-3;
-  font-size: $font-size-sm;
-  line-height: $line-height-normal;
   
   code {
-    background: none;
     padding: 0;
-    color: inherit;
+    background: none;
   }
 }
 
-code {
-  background: $color-gray-100;
-  color: $color-danger;
-  padding: 0.2em 0.4em;
-  border-radius: $border-radius-sm;
-  font-size: 0.875em;
-  font-family: $font-family-mono;
-}
-
-kbd {
-  background: $color-gray-900;
-  color: $color-white;
-  padding: 0.2em 0.4em;
-  border-radius: $border-radius-sm;
-  font-size: 0.875em;
-  font-family: $font-family-mono;
-  box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.25);
-}
-
-/**
- * Estilos para elementos de bloque
- */
-blockquote {
-  border-left: 4px solid $primary-color;
-  padding-left: $spacer-4;
-  margin: $spacer-4 0;
-  font-style: italic;
-  color: $color-text-light;
-  
-  cite {
-    display: block;
-    margin-top: $spacer-2;
-    font-style: normal;
-    font-size: $font-size-sm;
-    color: $color-text-muted;
-    
-    &::before {
-      content: "— ";
-    }
-  }
-}
-
-/**
- * Estilos para elementos de lista
- */
-ul, ol {
-  margin-bottom: $spacer-3;
-  
-  ul, ol {
-    margin-bottom: 0;
-    margin-top: $spacer-1;
-  }
-}
-
-dl {
-  margin-bottom: $spacer-3;
-}
-
-dt {
-  font-weight: $font-weight-semibold;
-  color: $color-text;
-  margin-top: $spacer-2;
-  
-  &:first-child {
-    margin-top: 0;
-  }
-}
-
-dd {
-  margin-left: 0;
-  margin-bottom: $spacer-2;
-  color: $color-text-light;
-}
-
-/**
- * Estilos para elementos de formulario agrupados
- */
-fieldset {
-  border: 1px solid $color-border;
-  border-radius: $border-radius;
-  padding: $spacer-4;
-  margin-bottom: $spacer-3;
-  
-  legend {
-    font-weight: $font-weight-semibold;
-    color: $color-text;
-    padding: 0 $spacer-2;
-    margin-left: -$spacer-2;
-  }
-}
-
-/**
- * Estilos para elementos de progreso
- */
-progress {
-  width: 100%;
-  height: 0.5rem;
-  border: none;
-  border-radius: $border-radius-pill;
-  background: $color-gray-200;
-  overflow: hidden;
-  
-  &::-webkit-progress-bar {
-    background: $color-gray-200;
-    border-radius: $border-radius-pill;
-  }
-  
-  &::-webkit-progress-value {
-    background: $primary-color;
-    border-radius: $border-radius-pill;
-    transition: width $transition-slow $ease-out;
-  }
-  
-  &::-moz-progress-bar {
-    background: $primary-color;
-    border-radius: $border-radius-pill;
-  }
-}
-
-/**
- * Estilos para elementos de medición
- */
-meter {
-  width: 100%;
-  height: 0.5rem;
-  
-  &::-webkit-meter-bar {
-    background: $color-gray-200;
-    border: none;
-    border-radius: $border-radius-pill;
-  }
-  
-  &::-webkit-meter-optimum-value {
-    background: $color-success;
-    border-radius: $border-radius-pill;
-  }
-  
-  &::-webkit-meter-suboptimum-value {
-    background: $color-warning;
-    border-radius: $border-radius-pill;
-  }
-  
-  &::-webkit-meter-even-less-good-value {
-    background: $color-danger;
-    border-radius: $border-radius-pill;
-  }
-}
-
-/**
- * Estilos para elementos de diálogo
- */
-dialog {
-  border: none;
-  border-radius: $border-radius-lg;
-  padding: 0;
-  background: $color-white;
-  box-shadow: $shadow-2xl;
-  max-width: 90vw;
-  max-height: 90vh;
-  
-  &::backdrop {
-    background: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(4px);
-  }
-}
-
-/**
- * Estilos para elementos de template
- */
-template {
-  display: none;
-}
-
-/**
- * Estilos para elementos de script
- */
-noscript {
-  display: block;
-  padding: $spacer-3;
-  background: $color-warning;
-  color: $color-black;
-  text-align: center;
-  font-weight: $font-weight-semibold;
-  border-radius: $border-radius;
-  margin-bottom: $spacer-3;
-}
-
-/**
- * Estilos para elementos de embed
- */
-embed, iframe, object {
-  max-width: 100%;
-  display: block;
-}
-
-/**
- * Estilos para elementos de audio y video
- */
-audio, video {
-  max-width: 100%;
-  display: block;
-}
-
-/**
- * Estilos para elementos de canvas
- */
-canvas {
-  display: block;
-  max-width: 100%;
-}
-
-/**
- * Estilos para elementos de SVG
- */
-svg {
-  display: inline-block;
-  vertical-align: middle;
-  fill: currentColor;
-  
-  &:not(:root) {
-    overflow: hidden;
-  }
-}
-
-/**
- * Estilos para elementos de tiempo
- */
-time {
-  font-variant-numeric: tabular-nums;
-}
-
-/**
- * Estilos para elementos de mark
- */
-mark {
-  background: tint($color-warning, 80%);
-  color: $color-text;
-  padding: 0.1em 0.2em;
-  border-radius: $border-radius-sm;
-}
-
-/**
- * Estilos para elementos de small
- */
-small {
-  font-size: $font-size-sm;
-  line-height: $line-height-normal;
-}
-
-/**
- * Estilos para elementos de sup y sub
- */
-sup, sub {
-  font-size: 0.75em;
-  line-height: 0;
-  position: relative;
-  vertical-align: baseline;
-}
-
-sup {
-  top: -0.5em;
-}
-
-sub {
-  bottom: -0.25em;
-}
-
-/**
- * Estilos para elementos de abbr
- */
-abbr[title] {
-  text-decoration: underline dotted;
-  cursor: help;
-}
-
-/**
- * Estilos para elementos de address
- */
-address {
-  font-style: normal;
-  line-height: $line-height-normal;
-  margin-bottom: $spacer-3;
-}
-
-/**
- * Estilos para elementos de cite
- */
-cite {
-  font-style: italic;
-}
-
-/**
- * Estilos para elementos de bdo
- */
-bdo {
-  unicode-bidi: bidi-override;
-}
-
-/**
- * Estilos para elementos de wbr
- */
-wbr {
-  display: inline-block;
-}
-
-/**
- * Estilos para elementos de ruby
- */
-ruby {
-  ruby-align: center;
-}
-
-rt {
-  font-size: 0.75em;
-  opacity: 0.7;
-}
-
-/**
- * Estilos para elementos de data
- */
-data {
-  font-variant-numeric: tabular-nums;
-}
-
-/**
- * Estilos para elementos de var
- */
-var {
-  font-style: italic;
-  font-family: $font-family-mono;
-}
-
-/**
- * Estilos para elementos de samp
- */
-samp {
-  font-family: $font-family-mono;
-  background: $color-gray-100;
-  padding: 0.1em 0.2em;
-  border-radius: $border-radius-sm;
-}
-
-/**
- * Estilos para elementos de kbd
- */
-kbd {
-  font-family: $font-family-mono;
-  background: $color-gray-900;
-  color: $color-white;
-  padding: 0.2em 0.4em;
-  border-radius: $border-radius-sm;
-  font-size: 0.875em;
-  box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.25);
-}
-
-/**
- * Estilos para elementos de output
- */
-output {
-  font-family: $font-family-mono;
-  background: $color-gray-100;
-  padding: 0.2em 0.4em;
-  border-radius: $border-radius-sm;
-  display: inline-block;
-}
-
-/**
- * Estilos para elementos de menu
- */
-menu {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-/**
- * Estilos para elementos de command (obsoleto)
- */
-command {
-  display: none;
-}
-
-/**
- * Utilidades de estado
- */
-.is-loading {
-  opacity: 0.7;
-  pointer-events: none;
-  position: relative;
-  
-  &::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 20px;
-    height: 20px;
-    margin: -10px 0 0 -10px;
-    border: 2px solid $color-border;
-    border-top: 2px solid $primary-color;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-  }
-}
-
-.is-hidden {
-  display: none !important;
-}
-
-.is-visible {
-  display: block !important;
-}
-
-.is-disabled {
+// Reglas horizontales
+hr {
+  margin: spacer(4) 0;
+  border: 0;
+  border-top: 1px solid $color-border;
   opacity: 0.5;
-  pointer-events: none;
-  cursor: not-allowed;
 }
 
-/**
- * Estados de validación
- */
-.is-valid {
-  border-color: $color-success !important;
-  
-  &:focus {
-    border-color: $color-success !important;
-    box-shadow: 0 0 0 0.2rem rgba($color-success, 0.15) !important;
-  }
+// Contenedor principal
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 spacer(3);
 }
 
-.is-invalid {
-  border-color: $color-danger !important;
-  
-  &:focus {
-    border-color: $color-danger !important;
-    box-shadow: 0 0 0 0.2rem rgba($color-danger, 0.15) !important;
-  }
-}
-
-/**
- * Estados de interacción
- */
-.is-active {
-  background: $primary-color !important;
-  color: $color-white !important;
-}
-
-.is-hovered {
-  background: $color-gray-100 !important;
-}
-
-.is-focused {
-  @include focus-outline;
-}
-
-/**
- * Utilidades de accesibilidad
- */
+// Utilidades de accesibilidad
 .sr-only {
-  @include sr-only;
+  @extend %sr-only;
 }
 
-.sr-only-focusable {
-  @include sr-only-focusable;
+// Estados de carga
+.loading {
+  opacity: 0.6;
+  pointer-events: none;
 }
 
-/**
- * Utilidades de impresión
- */
-@media print {
-  .no-print {
-    display: none !important;
-  }
-  
-  .print-only {
-    display: block !important;
-  }
+// Estados de error
+.error {
+  border-color: $color-danger !important;
+  color: $color-danger;
 }
 
-/**
- * Utilidades de modo oscuro
- */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-bs-theme="light"]) {
-    --body-bg: #{$color-gray-900};
-    --color-text: #{$color-gray-100};
-    --color-border: #{$color-gray-700};
-  }
+// Estados de éxito
+.success {
+  border-color: $color-success !important;
+  color: $color-success;
 }

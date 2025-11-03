@@ -1,64 +1,59 @@
-// main.scss
-// Archivo principal SCSS - Carnicería PWA
-// Patrón 7-1 Architecture
+// main.scss - Archivo maestro orquestador
+// ======================================
+// Abstracts - Herramientas y definiciones
+@use 'abstracts/variables';
+@use 'abstracts/mixins';
+@use 'abstracts/functions';
+@use 'abstracts/placeholders';
+@use 'abstracts/bem-utilities';
 
-// 1. Abstracts - Variables, mixins, funciones
-@import 'abstracts/variables';
-@import 'abstracts/mixins';
-@import 'abstracts/functions';
-@import 'abstracts/placeholders';
-@import 'abstracts/bem-utilities';
+// Base - Estilos base y reset
+@use 'base/reset';
+@use 'base/typography';
+@use 'base/utilities';
+@use 'base/base';
 
-// 2. Vendors - Librerías externas
-@import 'vendors/bootstrap';
-@import 'vendors/custom-vendors';
+// Layout - Estructura y layout
+@use 'layout/header';
+@use 'layout/footer';
+@use 'layout/sidebar';
+@use 'layout/auth-layout';
+@use 'layout/dashboard-layout';
 
-// 3. Base - Estilos base y reset
-@import 'base/reset';
-@import 'base/typography';
-@import 'base/utilities';
-@import 'base/base';
+// Components - Componentes UI reutilizables
+@use 'components/buttons';
+@use 'components/cards';
+@use 'components/modals';
+@use 'components/alerts';
+@use 'components/badges';
+@use 'components/carousel';
+@use 'components/loading';
 
-// 4. Layout - Estructuras principales
-@import 'layout/header';
-@import 'layout/footer';
-@import 'layout/sidebar';
-@import 'layout/auth-layout';
-@import 'layout/dashboard-layout';
+// Pages - Estilos específicos por página
+@use 'pages/home';
+@use 'pages/catalog';
+@use 'pages/cart';
+@use 'pages/login';
+@use 'pages/admin';
+@use 'pages/products';
+@use 'pages/dashboard';
+@use 'pages/offline';
 
-// 5. Components - Componentes reutilizables
-@import 'components/buttons';
-@import 'components/cards';
-@import 'components/modals';
-@import 'components/loading';
-@import 'components/alerts';
-@import 'components/badges';
-@import 'components/carousel';
+// Themes - Sistema de temas
+@use 'themes/dark-mode';
+@use 'themes/theme';
 
-// 6. Pages - Estilos específicos por página
-@import 'pages/home';
-@import 'pages/catalog';
-@import 'pages/cart';
-@import 'pages/login';
-@import 'pages/admin';
-@import 'pages/products';
-@import 'pages/dashboard';
-@import 'pages/offline';
+// Vendors - Librerías externas
+@use 'vendors/bootstrap';
+@use 'vendors/custom-vendors';
 
-// 7. Themes - Temas y variantes
-@import 'themes/theme';
-@import 'themes/dark-mode';
+// Importar Bootstrap (debe ir después de nuestros overrides)
+@import 'bootstrap/scss/bootstrap';
 
-// 8. Utilidades globales finales
-// Asegurar que las utilidades tengan la última palabra
-@include generate-utility-classes;
+// Estilos globales finales
+// ========================
 
-// 9. Estilos de impresión
-@media print {
-  @import 'base/print';
-}
-
-// 10. Estilos de alta prioridad (prefers-reduced-motion)
+// Mejoras de accesibilidad
 @media (prefers-reduced-motion: reduce) {
   * {
     animation-duration: 0.01ms !important;
@@ -67,15 +62,49 @@
   }
 }
 
-// 11. Soporte para navegadores antiguos
-@supports not (display: grid) {
-  .grid-fallback {
-    display: flex;
-    flex-wrap: wrap;
-    
-    > * {
-      flex: 1 1 300px;
-      margin: 1rem;
-    }
+// High contrast mode support
+@media (prefers-contrast: high) {
+  .cs-product-card {
+    border: 2px solid variables.$color-border;
   }
+  
+  .btn {
+    border-width: 2px;
+  }
+}
+
+// Mejoras de rendimiento
+img {
+  content-visibility: auto;
+}
+
+// Estilos para JavaScript
+.js-hidden {
+  display: none !important;
+}
+
+.js-visible {
+  display: block !important;
+}
+
+// Estados de la aplicación
+.app-loading {
+  cursor: wait;
+  
+  * {
+    pointer-events: none;
+  }
+}
+
+.app-ready {
+  cursor: default;
+}
+
+// Utilidades finales
+.sr-only {
+  @extend %sr-only;
+}
+
+.focus-ring {
+  @extend %focus-ring;
 }
