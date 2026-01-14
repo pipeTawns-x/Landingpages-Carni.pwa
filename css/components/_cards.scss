@@ -1,0 +1,479 @@
+// _cards.scss - Cards modernas para productos con Maximalismo Mexicano
+
+// Colores y estilos maximalistas
+$gold-color: #ffd700;
+$dark-red: #b71c1c;
+$light-bg: #faf8f3;
+
+.product-card-modern {
+  border: 4px solid $gold-color;
+  border-radius: 16px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  box-shadow: 
+    0 4px 20px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 215, 0, 0.3),
+    0 0 0 1px rgba(255, 215, 0, 0.2);
+  background: linear-gradient(145deg, #ffffff, $light-bg);
+  position: relative;
+  
+  // Ornamento decorativo maximalista (patrón de oro)
+  &::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: repeating-linear-gradient(
+      45deg,
+      $gold-color,
+      $gold-color 2px,
+      transparent 2px,
+      transparent 10px
+    );
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: -1;
+    border-radius: 16px;
+  }
+  
+  &:hover {
+    transform: translateY(-12px) scale(1.02);
+    box-shadow: 
+      0 20px 50px rgba(0, 0, 0, 0.15),
+      inset 0 1px 0 rgba(255, 215, 0, 0.5),
+      0 0 30px rgba(255, 215, 0, 0.3);
+  }
+  
+  .product-img-container {
+    position: relative;
+    overflow: hidden;
+    border-radius: 12px 12px 0 0;
+    background: linear-gradient(135deg, #f5f5f5, #e0e0e0);
+    background-image: url('../img/wood-texture.jpg');
+    background-blend-mode: overlay;
+    background-size: cover;
+    
+    .card-img-top {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+      transition: transform 0.4s ease, filter 0.3s ease;
+      filter: contrast(1.05) saturate(1.1);
+    }
+    
+    &:hover .card-img-top {
+      transform: scale(1.1) rotate(1deg);
+      filter: contrast(1.15) saturate(1.25);
+    }
+    
+    .product-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(to bottom, transparent 50%, rgba(0, 0, 0, 0.4));
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    
+
+      /* Maximalist card theme */
+      background-image: url("../img/wood-texture.jpg");
+      background-size: cover;
+      background-repeat: repeat;
+      border: 4px solid #ffd700;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.6), inset 0 2px 6px rgba(255,255,255,0.02);
+
+    .product-badge {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      z-index: 2;
+      font-size: 0.7rem;
+      padding: 0.4rem 0.8rem;
+      border-radius: 4px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      background: $dark-red;
+      color: $gold-color;
+      border: 2px solid $gold-color;
+      box-shadow: 0 4px 12px rgba(183, 28, 28, 0.3);
+    }
+  }
+  
+  .card-body {
+    padding: 1.75rem;
+
+      .product-img-container img {
+        width: 100%;
+        height: 300px;
+        object-fit: cover;
+        display: block;
+        filter: contrast(1.1) saturate(1.2);
+      }
+
+      .card-body {
+        padding: 1rem;
+        color: #2b2113;
+      }
+
+      .card-title {
+        font-family: 'Melvis One', serif;
+        color: #b71c1c;
+        font-size: 1.5rem;
+        margin: 0.25rem 0 0.5rem 0;
+        font-weight: 700;
+      }
+
+      .card-text {
+        color: #ffd700;
+        font-style: italic;
+      }
+
+      .product-price {
+        color: #ffd700;
+        font-size: 1.8rem;
+        font-weight: 800;
+      }
+
+      .rating { color: #ffd700; text-shadow: 0 2px 6px rgba(183,28,28,0.18); }
+
+      .btn-view-products.btn-danger {
+        background-color: #b71c1c;
+        border-color: #8f1212;
+        color: #fff;
+        transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+      }
+
+      .btn-view-products.btn-danger:hover,
+      .btn-view-products.btn-danger:focus {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(183,28,28,0.28);
+        background-color: #8f1212;
+      }
+
+      &:hover { transform: scale(1.05) translateY(-8px); box-shadow: 0 28px 60px rgba(0,0,0,0.6); }
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: linear-gradient(180deg, #ffffff 0%, $light-bg 100%);
+    border-top: 2px solid rgba(255, 215, 0, 0.2);
+    
+    .product-category {
+      font-size: 0.7rem;
+      font-weight: 900;
+      color: $dark-red;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 0.75rem;
+      text-shadow: 1px 1px 2px rgba(255, 215, 0, 0.3);
+    }
+    
+    .card-title {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: #1a1a1a;
+      margin-bottom: 1rem;
+      line-height: 1.3;
+      border-bottom: 3px solid $gold-color;
+      padding-bottom: 0.75rem;
+      letter-spacing: 0.5px;
+      font-family: 'Melvis One', 'Helvetica Neue', Arial, sans-serif;
+    }
+    
+    .card-text {
+      color: #555;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      margin-bottom: 1rem;
+      flex-grow: 1;
+      font-style: italic;
+    }
+    
+    .product-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      padding: 1rem;
+      background: rgba(255, 215, 0, 0.08);
+      border-radius: 8px;
+      border-left: 4px solid $gold-color;
+      
+      .product-price {
+        font-size: 1.6rem;
+        font-weight: 900;
+        color: $dark-red;
+        text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+      }
+      
+      .rating {
+        display: flex;
+        align-items: center;
+        font-size: 0.9rem;
+        color: #ffc107;
+        font-weight: 700;
+        gap: 0.3rem;
+        
+        i {
+          font-size: 1.1rem;
+        }
+      }
+    }
+    
+    .product-actions {
+      .btn-view-products {
+        width: 100%;
+        min-height: 48px;
+        padding: 0.85rem 1.5rem;
+        border-radius: 6px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        border: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        background: linear-gradient(135deg, $dark-red, #a00000);
+        color: #fff;
+        box-shadow: 0 4px 15px rgba(183, 28, 28, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        position: relative;
+        overflow: hidden;
+        
+        &::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.3), transparent);
+          transition: left 0.5s ease;
+        }
+        
+        &:hover::before {
+          left: 100%;
+        }
+        
+        &:hover, &:focus {
+          transform: translateY(-4px) scale(1.05);
+          box-shadow: 
+            0 12px 30px rgba(183, 28, 28, 0.4),
+            0 0 20px rgba(255, 215, 0, 0.3),
+            inset 0 1px 0 rgba(255, 255, 255, 0.3);
+          background: linear-gradient(135deg, #9b1616, #800000);
+          outline: none;
+          letter-spacing: 1.5px;
+        }
+        
+        &:active {
+          transform: translateY(-2px) scale(1.03);
+        }
+      }
+    }
+  }
+
+  // Category card variant — "Ver Productos" button with green accent (México 🇲🇽)
+  &--cta {
+    .product-actions {
+      .btn-view-products {
+        background: #388e3c;
+        color: #fff;
+        
+        &:hover, &:focus {
+          background: darken(#388e3c, 10%);
+          transform: translateY(-3px);
+          box-shadow: 0 10px 20px rgba(56, 142, 60, 0.25);
+          outline: none;
+        }
+        
+        &:active {
+          transform: translateY(0);
+        }
+      }
+    }
+  }
+  
+  &:hover {
+    .product-img-container {
+      .card-img-top {
+        transform: scale(1.05);
+      }
+      
+      .product-overlay {
+        opacity: 1;
+      }
+    }
+  }
+}
+
+// Cart counter styles
+.cart-counter {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    transform: translate(25%, -50%);
+}
+
+.cart-item {
+    .card-body {
+        padding: 0.75rem;
+    }
+    
+    .product-image {
+        width: 100%;
+        height: 100px;
+        object-fit: cover;
+        border-radius: 0.375rem;
+    }
+
+    .input-group-sm {
+        .form-control {
+            text-align: center;
+            min-width: 40px;
+        }
+        
+        .btn {
+            padding: 0.25rem 0.5rem;
+        }
+    }
+}
+
+.delivery-options {
+    .btn-group {
+        .btn {
+            flex: 1;
+            white-space: nowrap;
+        }
+    }
+
+    .form-control {
+        &:focus {
+            border-color: var(--bs-primary);
+            box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25);
+        }
+    }
+}
+
+.cart-summary {
+    .card-body {
+        padding: 1rem;
+    }
+
+    .btn {
+        i {
+            font-size: 1.1em;
+        }
+    }
+}
+
+.delivery-fee {
+    margin-bottom: 0;
+    padding: 0.5rem;
+    font-size: 0.875rem;
+}
+
+// Toast notifications
+.toast {
+    z-index: 1056; // Por encima del offcanvas
+    
+    .toast-header {
+        i {
+            color: var(--bs-primary);
+        }
+    }
+}
+
+// Responsive
+@media (max-width: 576px) {
+    .delivery-options {
+        .btn-group {
+            flex-direction: column;
+            
+            .btn {
+                border-radius: 0.375rem !important;
+                margin-bottom: 0.5rem;
+                
+                &:last-child {
+                    margin-bottom: 0;
+                }
+            }
+        }
+    }
+    
+    .product-card-modern {
+        .card-body {
+            padding: 1.25rem;
+            
+            .product-info {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+                
+                .product-price {
+                    font-size: 1.25rem;
+                }
+            }
+        }
+    }
+}
+
+// Animaciones para las cards
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.product-card-modern {
+  animation: fadeInUp 0.6s ease forwards;
+  
+  @for $i from 1 through 9 {
+    &:nth-child(#{$i}) {
+      animation-delay: #{$i * 0.1}s;
+    }
+  }
+}
+
+// Override: Red maximalist variant for category CTA buttons
+// Ensures .product-card--cta uses the brand red for "Ver Productos"
+.product-card--cta {
+  .btn-view-products {
+    background: #b71c1c !important;
+    color: #ffffff !important;
+    border-radius: 8px;
+    padding: 0.75rem;
+    font-weight: 700;
+    width: 100%;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+    -webkit-tap-highlight-color: transparent;
+
+    &:hover,
+    &:focus {
+      background: darken(#b71c1c, 10%) !important;
+      transform: translateY(-3px);
+      box-shadow: 0 10px 20px rgba(183, 28, 28, 0.3);
+      outline: 3px solid rgba(183,28,28,0.16);
+      outline-offset: 2px;
+    }
+
+    &:active {
+      transform: translateY(0);
+      box-shadow: 0 6px 12px rgba(183,28,28,0.25) inset;
+    }
+  }
+}

@@ -1,0 +1,179 @@
+// ===================================
+// CATEGORÍAS - Bento Grid
+// 9 Tarjetas de Productos
+// Mobile-First Responsive
+// Diseño basado en CSS Grid Generator
+// ===================================
+
+// Sección de categorías - sin espacios en blanco en desktop
+.categories-section {
+  width: 100%;
+  
+  .container-fluid {
+    width: 100%;
+    
+    // En desktop, reducir padding para eliminar espacios en blanco
+    @media (min-width: 1024px) {
+      padding-left: 0.5rem;
+      padding-right: 0.5rem;
+    }
+    
+    @media (min-width: 1200px) {
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+  }
+}
+
+// GRID CONTAINER - Mobile First
+.bento-categories-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  width: 100%;
+
+  // Tablet: 2 columnas
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+
+  // Desktop: 4 columnas x 6 filas (diseño bento grid)
+  @media (min-width: 1024px) {
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(6, 1fr);
+    gap: 8px;
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+}
+
+// CARD: Diseño Producto (blanco + imagen + botón rojo)
+.category-card {
+  background: #ffffff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.28s ease, box-shadow 0.28s ease;
+  height: 100%;
+
+  // Imagen: zoom suave en hover
+  .category-img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.35s ease;
+  }
+
+  // Contenido: padding y flex para alinear botón al fondo
+  .category-body {
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    justify-content: space-between;
+  }
+
+  // Título: fuerte, oscuro
+  .category-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #363432;
+    margin: 0 0 0.5rem 0;
+  }
+
+  // Descripción: gris claro, legible
+  .category-desc {
+    font-size: 0.9rem;
+    color: #666;
+    margin: 0 0 1rem 0;
+    flex: 1;
+  }
+
+  // Botón: rojo, prominente
+  .btn {
+    font-weight: 600;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    padding: 0.75rem 1.5rem;
+  }
+
+  // HOVER: Tarjeta salta + imagen zoom
+  &:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 16px 32px rgba(0, 0, 0, 0.12);
+
+    .category-img {
+      transform: scale(1.08);
+    }
+  }
+}
+
+// DESKTOP: Bento Layout (diseño EXACTO CSS Grid Generator)
+// Grid de 4 columnas x 6 filas - Solo en desktop, mobile-first intacto
+@media (min-width: 1024px) {
+  .bento-categories-grid {
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(6, 1fr);
+    gap: 8px;
+  }
+
+  // Card 1: span 2x2 (arriba izquierda)
+  .category-card-1 {
+    grid-column: 1 / 3;
+    grid-row: 1 / 3;
+  }
+
+  // Card 2: span 1x2 (arriba, columna 3)
+  .category-card-2 {
+    grid-column: 3 / 4;
+    grid-row: 1 / 3;
+  }
+
+  // Card 3: span 1x3 (arriba derecha, columna 4)
+  .category-card-3 {
+    grid-column: 4 / 5;
+    grid-row: 1 / 4;
+  }
+
+  // Card 4: span 2x2 (columna 2, fila 3)
+  .category-card-4 {
+    grid-column: 2 / 4;
+    grid-row: 3 / 5;
+  }
+
+  // Card 5: span 1x2 (columna 1, fila 3)
+  .category-card-5 {
+    grid-column: 1 / 2;
+    grid-row: 3 / 5;
+  }
+
+  // Card 6: span 2x2 (columna 1, fila 5)
+  .category-card-6 {
+    grid-column: 1 / 3;
+    grid-row: 5 / 7;
+  }
+
+  // Card 7: span 1x2 (columna 3, fila 5)
+  .category-card-7 {
+    grid-column: 3 / 4;
+    grid-row: 5 / 7;
+  }
+
+  // Card 8: span 1x2 (columna 4, fila 4)
+  .category-card-8 {
+    grid-column: 4 / 5;
+    grid-row: 4 / 6;
+  }
+
+  // Card 9: span 1x1 (columna 4, fila 6)
+  .category-card-9 {
+    grid-column: 4 / 5;
+    grid-row: 6 / 7;
+  }
+}

@@ -1,0 +1,140 @@
+// Login page styles
+.login-page {
+  background-color: $body-bg;
+  background-image: url('../img/meat-pattern.png');
+  background-size: 300px;
+  background-blend-mode: overlay;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+
+  .mini-header {
+    background-color: $blue-header;
+  }
+
+  .login-main {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    padding: map-get($spacers, 5) 0;
+    
+    @include media-breakpoint-down(md) {
+      padding: map-get($spacers, 4) 0;
+    }
+  }
+
+  .login-card {
+    border-radius: $border-radius-sm;
+    background-color: rgba($white, 0.95);
+    @include box-shadow(3);
+    @include transition(all);
+    border: 1px solid rgba($primary-color, 0.1);
+    overflow: hidden;
+    width: 100%;
+    max-width: 450px;
+    margin: 0 auto;
+
+    &:hover {
+      @include box-shadow(4);
+    }
+
+    h2 {
+      font-weight: 700;
+      color: $primary-color;
+      position: relative;
+      margin-bottom: map-get($spacers, 3);
+      font-size: 1.8rem;
+      text-align: center;
+      
+      @include media-breakpoint-down(md) {
+        font-size: 1.5rem;
+      }
+    }
+
+    .text-muted {
+      color: lighten($primary-color, 25%) !important;
+      font-size: 0.95rem;
+      text-align: center;
+      margin-bottom: map-get($spacers, 4);
+    }
+
+    .form-control {
+      border-color: $secondary-color;
+      padding: map-get($spacers, 3);
+      background-color: rgba($white, 0.9);
+      @include transition(all);
+      
+      &:focus {
+        border-color: $primary-color;
+        box-shadow: 0 0 0 0.2rem rgba($primary-color, 0.1);
+      }
+    }
+    
+    .form-check-label {
+      font-size: 0.9rem;
+      color: lighten($primary-color, 15%);
+    }
+    
+    .btn-primary {
+      padding: map-get($spacers, 2) map-get($spacers, 4);
+      font-weight: 500;
+    }
+    
+    .login-footer {
+      margin-top: map-get($spacers, 4);
+      padding-top: map-get($spacers, 3);
+      border-top: 1px solid rgba($primary-color, 0.1);
+      
+      .contact-info, .social-links {
+        margin-bottom: map-get($spacers, 3);
+        
+        h6 {
+          color: $primary-color;
+          font-weight: 600;
+          font-size: 1rem;
+          margin-bottom: map-get($spacers, 2);
+        }
+      }
+      
+      .social-icons {
+        a {
+          color: $primary-color;
+          @include transition(all);
+          display: inline-block;
+          margin: 0 map-get($spacers, 2);
+          font-size: 1.25rem;
+          
+          &:hover {
+            color: darken($primary-color, 15%);
+            transform: translateY(-2px);
+          }
+        }
+      }
+      
+      .copyright {
+        color: $primary-color;
+        opacity: 0.7;
+        font-size: 0.85rem;
+        margin-top: map-get($spacers, 3);
+      }
+    }
+    
+    @include media-breakpoint-down(md) {
+      padding: map-get($spacers, 4) !important;
+      margin: 0 map-get($spacers, 2);
+    }
+    
+    @include media-breakpoint-down(sm) {
+      padding: map-get($spacers, 3) !important;
+      
+      h2 {
+        font-size: 1.5rem;
+      }
+      
+      .btn-primary {
+        padding: map-get($spacers, 2) map-get($spacers, 3);
+        font-size: 0.9rem;
+      }
+    }
+  }
+}

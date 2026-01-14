@@ -1,0 +1,18 @@
+// _typography.scss - Tipografías del proyecto
+@import url('https://fonts.googleapis.com/css2?family=Melvis+One:wght@400;700&family=Proseco:ital,wght@0,400;0,500;1,400&display=swap');
+
+$font-heading: 'Melvis One', Georgia, 'Times New Roman', serif;
+$font-body: 'Proseco', 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: $font-heading;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+body, input, button, textarea, select {
+  font-family: $font-body;
+}
+
+.hero-title { font-size: 3rem; }
+.hero-subtitle { font-size: 1.1rem; color: darken($primary-color, 10%); }

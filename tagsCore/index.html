@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#363432" />
+  <title>Carnicería El Señor de La Misericordia - Cortes Premium y Carnes Frescas en SLP</title>
+  <meta name="description" content="🥩 Carnicería premium en San Luis Potosí. Cortes de res, cerdo, pollo y carnes especiales. Entregas a domicilio. Programa de fidelización. Calidad garantizada.">
+  <meta name="keywords" content="carnicería, carne fresca, cortes premium, res, cerdo, pollo, San Luis Potosí, carnes de calidad, venta de carnes">
+  <meta name="author" content="Carnicería El Señor de La Misericordia">
+  <meta property="og:title" content="Carnicería El Señor de La Misericordia - Cortes Premium">
+  <meta property="og:description" content="Los mejores cortes de carne fresca. Entregas a domicilio disponibles en San Luis Potosí.">
+  <meta property="og:image" content="../img/logo-user.png">
+  <meta property="og:url" content="https://carniceriamisericordia.com">
+  <meta property="og:type" content="business.business">
+  <link rel="canonical" href="https://carniceriamisericordia.com">
+
+  <link rel="manifest" href="../manifest.json">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  <link href="https://fonts.googleapis.com/css2?family=Melvis+One&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="icon" href="../img/logo-user.png" type="image/png">
+</head>
+
+<body>
+  <!-- Alerta Offline -->
+  <div class="offline-alert alert alert-warning d-none" role="alert">
+    <i class="bi bi-wifi-off me-2"></i> Estás en modo offline. Algunas funciones pueden estar limitadas.
+  </div>
+
+  <!-- Main Header -->
+  <header class="main-header" id="mainHeader" role="banner">
+    <nav class="navbar navbar-expand-lg main-header__nav-container container-fluid px-3 px-lg-5">
+      <button class="hamburger-btn" type="button" id="menuToggle" aria-label="Abrir menú de navegación">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <div class="main-header__logo-container">
+        <a class="navbar-brand" href="index.html">
+          <img src="../img/logo-user.png" alt="Logo" class="main-header__logo" style="object-fit:contain;max-height:56px;">
+        </a>
+      </div>
+
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
+          <li class="nav-item"><a class="nav-link" href="products.html">Productos</a></li>
+          <li class="nav-item"><a class="nav-link" href="#sobre-nosotros">Sobre Nosotros</a></li>
+          <li class="nav-item"><a class="nav-link" href="#contacto">Contacto</a></li>
+        </ul>
+      </div>
+
+      <div class="main-header__icons-container d-flex align-items-center gap-2">
+        <button class="btn btn-link p-0" aria-label="Buscar"><i class="bi bi-search"></i></button>
+        <button class="btn btn-link p-0 position-relative" id="cartBtn" data-bs-toggle="modal" data-bs-target="#cartModal" aria-label="Carrito">
+          <i class="bi bi-cart3 fs-4"></i>
+          <span class="badge bg-danger rounded-pill position-absolute top-0 start-100 translate-middle main-header__cart-count">0</span>
+        </button>
+        <a href="user/login.html" class="btn btn-link p-0" aria-label="Usuario"><i class="bi bi-person fs-4"></i></a>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Drawer móvil -->
+  <div class="drawer-overlay" id="drawerOverlay"></div>
+  <aside class="mobile-drawer" id="mobileDrawer" aria-hidden="true">
+    <div class="mobile-drawer__header">
+      <div class="d-flex align-items-center gap-2">
+        <img src="../img/logo-user.png" alt="Carnicería" class="mobile-drawer__logo">
+        <div>
+          <p class="mb-0 fw-bold">Carnicería Premium</p>
+          <small class="text-muted">El Señor de La Misericordia</small>
+        </div>
+      </div>
+      <button class="mobile-drawer__close" id="drawerClose" aria-label="Cerrar menú">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+
+    <nav class="mobile-drawer__nav">
+      <a href="index.html" class="mobile-drawer__link">Inicio</a>
+      <a href="#sobre-nosotros" class="mobile-drawer__link">Sobre Nosotros</a>
+      <a href="#contacto" class="mobile-drawer__link">Contacto</a>
+      <a href="products.html" class="mobile-drawer__link">Productos</a>
+    </nav>
+
+    <div class="mobile-drawer__section">
+      <p class="mobile-drawer__section-title">Categorías destacadas</p>
+      <div class="mobile-drawer__chips">
+        <a href="products.html?categoria=res" class="chip">Res</a>
+        <a href="products.html?categoria=cerdo" class="chip">Cerdo</a>
+        <a href="products.html?categoria=pollo" class="chip">Pollo</a>
+        <a href="products.html?categoria=embutidos" class="chip">Embutidos</a>
+        <a href="products.html?categoria=preparadas" class="chip">Preparadas</a>
+        <a href="products.html?categoria=premium" class="chip">Premium</a>
+        <a href="products.html?categoria=merch" class="chip">Merch</a>
+        <a href="products.html?categoria=otros" class="chip">Otros</a>
+        <a href="products.html?categoria=ofertas" class="chip">Ofertas</a>
+      </div>
+    </div>
+
+    <div class="mobile-drawer__footer">
+      <button class="btn btn-outline-light w-100 mb-2" onclick="window.location.href='products.html'">
+        <i class="bi bi-eye me-2"></i>Ver productos
+      </button>
+      <button class="btn btn-danger w-100" onclick="document.getElementById('cartBtn')?.click()">
+        <i class="bi bi-cart3 me-2"></i>Mi carrito
+      </button>
+    </div>
+  </aside>
+
+  <main>
+    <!-- SECCIÓN 1: CAROUSEL HERO + CARDS LATERALES -->
+    <section class="hero-section py-4 py-lg-5" style="background: linear-gradient(135deg, #e4d1b0 0%, #f0e5d8 100%);">
+      <div class="container-fluid px-2 px-md-3 px-lg-5">
+        <!-- Mobile Title -->
+        <div class="d-lg-none text-center mb-4">
+          <h1 class="fw-bold" style="color: #363432; font-size: 1.8rem; margin: 0;">CARNICERÍA</h1>
+          <p class="text-muted small">El Señor de La Misericordia</p>
+        </div>
+
+        <!-- Layout Grid: Carousel (Left) + Cards (Right) -->
+        <div class="row g-3 g-lg-4">
+          <!-- Carousel (8 cols en desktop) -->
+          <div class="col-12 col-lg-8">
+            <div id="mainCarousel" class="carousel slide rounded-3 overflow-hidden" data-bs-ride="carousel" style="box-shadow: 0 4px 16px rgba(0,0,0,0.1); min-height: 400px;">
+              <div class="carousel-inner" style="height: 400px;">
+                <div class="carousel-item active h-100">
+                  <img src="../img/carrusel_products/rib-eye.png" class="d-block w-100 h-100" style="object-fit:cover;" alt="New York Strip">
+                  <div class="carousel-caption d-none d-md-block">
+                    <h5 class="fw-bold">New York Strip</h5>
+                    <p>Balance perfecto entre marmoleado y textura firme</p>
+                  </div>
+                </div>
+                <div class="carousel-item h-100">
+                  <img src="../img/carrusel_products/filet_mignon.png" class="d-block w-100 h-100" style="object-fit:cover;" alt="Filet Mignon">
+                  <div class="carousel-caption d-none d-md-block">
+                    <h5 class="fw-bold">Filet Mignon</h5>
+                    <p>La corte más tierna y delicada del mercado</p>
+                  </div>
+                </div>
+                <div class="carousel-item h-100">
+                  <img src="../img/carrusel_products/porterhouse.png" class="d-block w-100 h-100" style="object-fit:cover;" alt="Porterhouse">
+                  <div class="carousel-caption d-none d-md-block">
+                    <h5 class="fw-bold">Porterhouse</h5>
+                    <p>Lo mejor de dos mundos: filet y lomo</p>
+                  </div>
+                </div>
+                <div class="carousel-item h-100">
+                  <img src="../img/carrusel_products/ney_york_strip.png" class="d-block w-100 h-100" style="object-fit:cover;" alt="Rib Eye">
+                  <div class="carousel-caption d-none d-md-block">
+                    <h5 class="fw-bold">Rib Eye Premium</h5>
+                    <p>Jugosidad y sabor intenso garantizados</p>
+                  </div>
+                </div>
+              </div>
+              <button class="carousel-control-prev" type="button" data-bs-target="#mainCarousel" data-bs-slide="prev">
+                <i class="bi bi-chevron-left fs-5"></i>
+              </button>
+              <button class="carousel-control-next" type="button" data-bs-target="#mainCarousel" data-bs-slide="next">
+                <i class="bi bi-chevron-right fs-5"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Cards Laterales (4 cols en desktop) -->
+          <div class="col-12 col-lg-4">
+            <!-- Card: Título Desktop -->
+            <div class="d-none d-lg-block mb-3">
+              <div class="card border-0 rounded-3" style="background: linear-gradient(135deg, #363432 0%, #4a4440 100%); color: #e4d1b0; box-shadow: 0 4px 16px rgba(0,0,0,0.1); padding: 1.5rem; text-align: center;">
+                <h2 class="fw-bold mb-1" style="font-size: 1.3rem;">CARNICERÍA</h2>
+                <p class="small mb-0" style="color: #d4a574;">El Señor de La Misericordia</p>
+              </div>
+            </div>
+
+            <!-- Card: Clima -->
+            <div class="mb-3">
+              <div class="card border-0 rounded-3" style="box-shadow: 0 4px 16px rgba(0,0,0,0.08); padding: 1.5rem;">
+                <div class="text-center">
+                  <i class="bi bi-cloud-sun weather-icon" style="font-size: 2.5rem; color: #ff9800;"></i>
+                  <h4 class="fw-bold mt-2 mb-0 weather-temp" style="color: #363432; font-size: 1.8rem;">--°C</h4>
+                  <small class="weather-desc" style="color: #999; font-size: 0.85rem;">Cargando clima...</small>
+                  <small class="weather-humidity d-block mt-1" style="color: #999; font-size: 0.75rem;">Humedad: --</small>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card: Botones -->
+            <div>
+              <div class="card border-0 rounded-3" style="box-shadow: 0 4px 16px rgba(0,0,0,0.08); padding: 1.5rem;">
+                <div class="d-flex flex-column gap-2">
+                  <a href="products.html" class="btn btn-danger fw-bold rounded-2">
+                    <i class="bi bi-eye me-2"></i>Ver Productos
+                  </a>
+                  <button class="btn btn-outline-danger fw-bold rounded-2" id="loyaltyBtn">
+                    <i class="bi bi-gift me-2"></i>Fidelidad
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECCIÓN 2: CATEGORÍAS CON BENTO GRID DINÁMICO -->
+    <section class="categories-section py-5" style="background: linear-gradient(135deg, #e4d1b0 0%, #f0e5d8 100%);">
+      <div class="container-fluid px-2 px-md-3 px-lg-5">
+        <h2 class="text-center fw-bold mb-5" style="color: #363432; font-size: 2rem;">Nuestras Categorías</h2>
+        
+        <!-- Bento Grid: 10 Categorías -->
+        <div class="bento-categories-grid">
+          <!-- 1: Cortes de Res -->
+          <article class="category-card category-card-1">
+            <img src="../img/products/res.png" alt="Cortes de Res" class="category-img">
+            <div class="category-body">
+              <div>
+                <h3 class="category-title"><i class="bi bi-fire me-2" style="color: #d22222;"></i>Cortes de Res</h3>
+                <p class="category-desc">Selección premium para parrilla y asados</p>
+              </div>
+              <a href="products.html?categoria=res" class="btn btn-danger w-100">Ver Productos</a>
+            </div>
+          </article>
+
+          <!-- 2: Cerdo -->
+          <article class="category-card category-card-2">
+            <img src="../img/products/cerdo.png" alt="Cerdo" class="category-img">
+            <div class="category-body">
+              <div>
+                <h3 class="category-title"><i class="bi bi-piggy-bank me-2" style="color: #d22222;"></i>Cerdo</h3>
+                <p class="category-desc">Variedad para asados y especialidades</p>
+              </div>
+              <a href="products.html?categoria=cerdo" class="btn btn-danger w-100">Ver Productos</a>
+            </div>
+          </article>
+
+          <!-- 3: Pollo -->
+          <article class="category-card category-card-3">
+            <img src="../img/products/pollo.png" alt="Pollo" class="category-img">
+            <div class="category-body">
+              <div>
+                <h3 class="category-title"><i class="bi bi-egg-fried me-2" style="color: #d22222;"></i>Pollo</h3>
+                <p class="category-desc">Fresco y de excelente calidad</p>
+              </div>
+              <a href="products.html?categoria=pollo" class="btn btn-danger w-100">Ver Productos</a>
+            </div>
+          </article>
+
+          <!-- 4: Preparadas -->
+          <article class="category-card category-card-4">
+            <img src="../img/products/preparadas.png" alt="Preparadas" class="category-img">
+            <div class="category-body">
+              <div>
+                <h3 class="category-title"><i class="bi bi-clock-fill me-2" style="color: #d22222;"></i>Preparadas</h3>
+                <p class="category-desc">Carnes listas para cocinar y servir</p>
+              </div>
+              <a href="products.html?categoria=preparadas" class="btn btn-danger w-100">Ver Productos</a>
+            </div>
+          </article>
+
+          <!-- 5: Embutidos -->
+          <article class="category-card category-card-5">
+            <img src="../img/products/embutidos.png" alt="Embutidos" class="category-img">
+            <div class="category-body">
+              <div>
+                <h3 class="category-title"><i class="bi bi-link-45deg me-2" style="color: #d22222;"></i>Embutidos</h3>
+                <p class="category-desc">Variedad artesanal y sabores únicos</p>
+              </div>
+              <a href="products.html?categoria=embutidos" class="btn btn-danger w-100">Ver Productos</a>
+            </div>
+          </article>
+
+          <!-- 6: Selección Premium -->
+          <article class="category-card category-card-6">
+            <img src="../img/products/premium.png" alt="Selección Premium" class="category-img">
+            <div class="category-body">
+              <div>
+                <h3 class="category-title"><i class="bi bi-star-fill me-2" style="color: #d22222;"></i>Selección Premium</h3>
+                <p class="category-desc">Cortes exclusivos y gourmet</p>
+              </div>
+              <a href="products.html?categoria=premium" class="btn btn-danger w-100">Ver Productos</a>
+            </div>
+          </article>
+
+          <!-- 7: Merchandising -->
+          <article class="category-card category-card-7">
+            <img src="../img/products/merch.png" alt="Merchandising" class="category-img">
+            <div class="category-body">
+              <div>
+                <h3 class="category-title"><i class="bi bi-bag-fill me-2" style="color: #d22222;"></i>Merchandising</h3>
+                <p class="category-desc">Gorras, playeras y accesorios</p>
+              </div>
+              <a href="products.html?categoria=merch" class="btn btn-danger w-100">Ver Productos</a>
+            </div>
+          </article>
+
+          <!-- 8: Otros Productos -->
+          <article class="category-card category-card-8">
+            <img src="../img/products/otros.png" alt="Otros Productos" class="category-img">
+            <div class="category-body">
+              <div>
+                <h3 class="category-title"><i class="bi bi-box me-2" style="color: #d22222;"></i>Otros Productos</h3>
+                <p class="category-desc">Variedad de opciones para tu cocina</p>
+              </div>
+              <a href="products.html?categoria=otros" class="btn btn-danger w-100">Ver Productos</a>
+            </div>
+          </article>
+
+          <!-- 9: Ofertas Especiales -->
+          <article class="category-card category-card-9">
+            <img src="../img/products/ofertas.png" alt="Ofertas Especiales" class="category-img">
+            <div class="category-body">
+              <div>
+                <h3 class="category-title"><i class="bi bi-tag-fill me-2" style="color: #d22222;"></i>Ofertas Especiales</h3>
+                <p class="category-desc">Descuentos exclusivos y paquetes</p>
+              </div>
+              <a href="products.html?categoria=ofertas" class="btn btn-danger w-100">Ver Productos</a>
+            </div>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- SECCIÓN 3: SOBRE NOSOTROS + UBICACIÓN -->
+    <section id="sobre-nosotros" class="about-section py-5" style="background: linear-gradient(135deg, #e4d1b0 0%, #f0e5d8 100%);">
+      <div class="container-fluid px-2 px-md-3 px-lg-5">
+        <h2 class="text-center fw-bold mb-5" style="color: #363432; font-size: 2rem;">Sobre Nosotros</h2>
+        
+        <div class="row g-4 g-lg-5">
+          <!-- Card: Quiénes Somos -->
+          <div class="col-12 col-lg-6">
+            <div class="card border-0 rounded-3 h-100" style="box-shadow: 0 4px 16px rgba(0,0,0,0.08); padding: 2rem;">
+              <h3 class="fw-bold mb-3" style="color: #363432;"><i class="bi bi-info-circle me-2" style="color: #d22222;"></i>Quiénes Somos</h3>
+              <p style="color: #666; line-height: 1.7;">Carnicería El Señor de La Misericordia es una carnicería premium que ofrece los mejores cortes y productos cárnicos frescos. Nos destacamos por nuestro compromiso con la excelencia y la satisfacción del cliente.</p>
+              <p style="color: #666; line-height: 1.7;">Los clientes valoran nuestra atención personalizada, la confianza en la procedencia de nuestros productos y los precios justos. Somos parte de la comunidad local.</p>
+            </div>
+          </div>
+
+          <!-- Card: Ubicación -->
+          <div class="col-12 col-lg-6">
+            <div class="card border-0 rounded-3 h-100" style="box-shadow: 0 4px 16px rgba(0,0,0,0.08); padding: 2rem;">
+              <h3 class="fw-bold mb-3" style="color: #363432;"><i class="bi bi-geo-alt me-2" style="color: #d22222;"></i>Ubicación</h3>
+              <p style="color: #666; margin-bottom: 1.5rem;">
+                <strong>Carnicería El Señor de La Misericordia</strong><br>
+                Agua Marina 110, Manuel J. Othon<br>
+                78150 San Luis Potosí, S.L.P.<br>
+                México
+              </p>
+              <a href="https://maps.google.com/?q=Agua+Marina+110,+San+Luis+Potosí" target="_blank" class="btn btn-outline-danger btn-sm">
+                <i class="bi bi-map me-2"></i>Cómo llegar
+              </a>
+            </div>
+          </div>
+
+          <!-- Full Width: Horario -->
+          <div class="col-12">
+            <div class="card border-0 rounded-3" style="background: linear-gradient(135deg, #d22222 0%, #b71c1c 100%); color: white; box-shadow: 0 4px 16px rgba(0,0,0,0.15); padding: 2rem; text-align: center;">
+              <h3 class="fw-bold mb-3"><i class="bi bi-clock me-2"></i>Horario de Atención</h3>
+              <div class="row g-3">
+                <div class="col-12 col-md-6">
+                  <p class="mb-1 fw-bold">Lunes a Sábado</p>
+                  <p class="mb-0" style="font-size: 1.1rem;">8:00 - 17:00</p>
+                </div>
+                <div class="col-12 col-md-6">
+                  <p class="mb-1 fw-bold">Domingos y Festivos</p>
+                  <p class="mb-0" style="font-size: 1.1rem;">Cerrado</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECCIÓN 4: CONTACTO DIRECTO -->
+    <section id="contacto" class="contact-section py-5">
+      <div class="container-fluid px-2 px-md-3 px-lg-5">
+        <h2 class="text-center fw-bold mb-5" style="color: #363432; font-size: 2rem;">Contacto Directo</h2>
+        
+        <div class="row g-4">
+          <!-- Teléfono -->
+          <div class="col-12 col-md-6 col-lg-4">
+            <div class="card border-0 rounded-3 h-100 text-center" style="box-shadow: 0 4px 16px rgba(0,0,0,0.08); padding: 2rem;">
+              <i class="bi bi-telephone-fill" style="font-size: 2.5rem; color: #d22222; margin-bottom: 1rem;"></i>
+              <h3 class="fw-bold mb-3" style="color: #363432;">Teléfono</h3>
+              <p class="text-muted mb-3">Llama directamente</p>
+              <a href="tel:+524442715470" class="btn btn-danger fw-bold">
+                +52 444 271 5470
+              </a>
+            </div>
+          </div>
+
+          <!-- WhatsApp -->
+          <div class="col-12 col-md-6 col-lg-4">
+            <div class="card border-0 rounded-3 h-100 text-center" style="box-shadow: 0 4px 16px rgba(0,0,0,0.08); padding: 2rem;">
+              <i class="bi bi-whatsapp" style="font-size: 2.5rem; color: #25d366; margin-bottom: 1rem;"></i>
+              <h3 class="fw-bold mb-3" style="color: #363432;">WhatsApp</h3>
+              <p class="text-muted mb-3">Mensajes directos</p>
+              <a href="https://wa.me/524442715470" target="_blank" class="btn btn-success fw-bold">
+                Chatear
+              </a>
+            </div>
+          </div>
+
+          <!-- Email -->
+          <div class="col-12 col-md-6 col-lg-4">
+            <div class="card border-0 rounded-3 h-100 text-center" style="box-shadow: 0 4px 16px rgba(0,0,0,0.08); padding: 2rem;">
+              <i class="bi bi-envelope-fill" style="font-size: 2.5rem; color: #0066cc; margin-bottom: 1rem;"></i>
+              <h3 class="fw-bold mb-3" style="color: #363432;">Email</h3>
+              <p class="text-muted mb-3">Escríbenos</p>
+              <a href="mailto:contacto@carniceriasenmisericordia.com" class="btn btn-primary fw-bold">
+                Enviar Email
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="main-footer" style="background: #363432; color: white; padding: 3rem 0 1rem;">
+    <div class="container-fluid px-2 px-md-3 px-lg-5">
+      <div class="row g-4 mb-4">
+        <!-- Column 1: Empresa -->
+        <div class="col-12 col-md-6 col-lg-4">
+          <h5 class="fw-bold mb-3" style="color: #e4d1b0;">Carnicería El Señor de La Misericordia</h5>
+          <p style="font-size: 0.9rem; color: #ccc; line-height: 1.6;">Productos cárnicos frescos de la más alta calidad. Compromiso con la excelencia.</p>
+          <div class="mt-3 d-flex gap-2">
+            <a href="#" class="btn btn-sm btn-outline-light rounded-circle" style="width: 40px; height: 40px; padding: 0; display: flex; align-items: center; justify-content: center;"><i class="bi bi-facebook"></i></a>
+            <a href="#" class="btn btn-sm btn-outline-light rounded-circle" style="width: 40px; height: 40px; padding: 0; display: flex; align-items: center; justify-content: center;"><i class="bi bi-instagram"></i></a>
+            <a href="#" class="btn btn-sm btn-outline-light rounded-circle" style="width: 40px; height: 40px; padding: 0; display: flex; align-items: center; justify-content: center;"><i class="bi bi-whatsapp"></i></a>
+          </div>
+        </div>
+
+        <!-- Column 2: Información -->
+        <div class="col-12 col-md-6 col-lg-4">
+          <h5 class="fw-bold mb-3" style="color: #e4d1b0;">Información</h5>
+          <ul class="list-unstyled" style="font-size: 0.9rem;">
+            <li class="mb-2"><a href="#sobre-nosotros" style="color: #ccc; text-decoration: none;">Sobre Nosotros</a></li>
+            <li class="mb-2"><a href="products.html" style="color: #ccc; text-decoration: none;">Productos</a></li>
+            <li class="mb-2"><a href="#contacto" style="color: #ccc; text-decoration: none;">Contacto</a></li>
+          </ul>
+        </div>
+
+        <!-- Column 3: Contacto Rápido -->
+        <div class="col-12 col-md-6 col-lg-4">
+          <h5 class="fw-bold mb-3" style="color: #e4d1b0;">Contacto Rápido</h5>
+          <p style="font-size: 0.9rem; margin-bottom: 0.5rem; color: #ccc;">
+            <i class="bi bi-telephone me-2"></i><a href="tel:+524442715470" style="color: #ccc;">+52 444 271 5470</a>
+          </p>
+          <p style="font-size: 0.9rem; margin-bottom: 0; color: #ccc;">
+            <i class="bi bi-envelope me-2"></i><a href="mailto:contacto@carniceriasenmisericordia.com" style="color: #ccc;">contacto@carniceriasenmisericordia.com</a>
+          </p>
+        </div>
+      </div>
+
+      <!-- Bottom -->
+      <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1.5rem; text-align: center;">
+        <p style="font-size: 0.85rem; color: #999; margin: 0;">© 2025 Carnicería El Señor de La Misericordia. Todos los derechos reservados.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Cart Modal -->
+  <div class="modal fade" id="cartModal" tabindex="-1" aria-labelledby="cartModalLabel" aria-hidden="true" data-bs-backdrop="true" data-bs-keyboard="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header bg-danger text-white">
+          <h5 class="modal-title" id="cartModalLabel">🛒 Tu Carrito de Compras</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div id="cartItems" style="max-height: 500px; overflow-y: auto;"></div>
+          <div id="cartSummary" class="mt-3 border-top pt-3"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Seguir Comprando</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+  <script src="../js/modules/ui/header.js" defer></script>
+  <script src="../js/modules/core/cart.js" defer></script>
+  <script src="../js/modules/ui/weather.js" defer></script>
+  <script src="../js/app.js" defer></script>
+</body>
+
+</html>

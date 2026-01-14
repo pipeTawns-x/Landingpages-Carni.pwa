@@ -1,0 +1,56 @@
+// Catalog styles
+.products-section {
+  background-color: $white;
+  padding: map-get($spacers, 6) 0;
+  
+  .section-title {
+    color: $primary-color;
+    font-weight: 700;
+    position: relative;
+    padding-bottom: map-get($spacers, 3);
+    margin-bottom: map-get($spacers, 5);
+    text-align: center;
+    
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 3px;
+      background-color: $primary-color;
+    }
+  }
+  
+  .row.g-4 {
+    margin-bottom: map-get($spacers, 5);
+  }
+  
+  .text-center.mt-5 {
+    margin-top: map-get($spacers, 5) !important;
+  }
+  
+  @include media-breakpoint-down(md) {
+    padding: map-get($spacers, 4) 0;
+    
+    .section-title {
+      margin-bottom: map-get($spacers, 4);
+      font-size: 1.75rem;
+    }
+    
+    .row.g-4 {
+      margin-bottom: map-get($spacers, 4);
+    }
+  }
+  
+  @include media-breakpoint-down(sm) {
+    .section-title {
+      font-size: 1.5rem;
+    }
+    
+    .col-md-6 {
+      margin-bottom: map-get($spacers, 3);
+    }
+  }
+}
