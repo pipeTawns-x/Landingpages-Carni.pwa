@@ -23,8 +23,8 @@
     rel="stylesheet">
 
   <link rel="stylesheet" href="../../css/styles.css">
-  <link rel="icon" href="../../img/logo-user.png" type="image/png">
-  <link rel="apple-touch-icon" href="../../img/logo-user.png">
+  <link rel="icon" href="../../img/recursos_web/logo-user.png" type="image/png">
+  <link rel="apple-touch-icon" href="../../img/recursos_web/logo-user.png">
 </head>
 
 <body class="auth-page">
@@ -32,52 +32,38 @@
     <i class="bi bi-wifi-off me-2"></i> Estás en modo offline. Algunas funciones pueden estar limitadas.
   </div>
 
-  <!-- Mini Header (igual que products.html) -->
-  <div class="mini-header show" id="miniHeader">
-    <div class="container-fluid px-3 px-lg-5">
-      <p class="mb-0 text-center">
-        <i class="bi bi-truck me-2"></i>
-        Envío gratis a todo San Luis Potosí / Free shipping across SLP
-      </p>
-    </div>
-  </div>
-
-  <!-- Main Header -->
-  <header class="main-header" id="mainHeader" role="banner">
-    <nav class="navbar navbar-expand-lg main-header__nav-container container-fluid px-3 px-lg-5">
-      <button class="hamburger-btn" type="button" id="menuToggle" aria-label="Abrir menú de navegación">
-        <span></span>
-        <span></span>
-        <span></span>
-      </button>
-
-      <div class="main-header__logo-container">
-        <a class="navbar-brand" href="../index.html">
-          <img src="../../img/logo-user.png" alt="Logo" class="main-header__logo"
-            style="object-fit:contain;max-height:56px;">
-        </a>
-      </div>
-
-      <div
-        class="main-header__icons-container main-header__icons-container--auth-level d-flex align-items-center gap-2">
-        <button class="btn btn-link p-0 position-relative header-icon-btn" id="cartBtn" data-bs-toggle="modal"
-          data-bs-target="#cartModal" aria-label="Carrito">
-          <i class="bi bi-cart3"></i>
-          <span
-            class="badge bg-danger rounded-pill position-absolute top-0 start-100 translate-middle main-header__cart-count">0</span>
-        </button>
-        <a href="accessweb.html" class="btn btn-link p-0 header-icon-btn" aria-label="Usuario"><i
-            class="bi bi-person"></i></a>
-      </div>
-    </nav>
+  <!-- Header Minimalista para Auth - Logo Centrado -->
+  <header class="auth-header" id="authHeader" role="banner">
+    <!-- Hamburger a la izquierda -->
+    <button class="auth-header__hamburger" type="button" id="menuToggle" aria-label="Abrir menú">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+    
+    <!-- Logo centrado -->
+    <a href="../index.html" class="auth-header__logo">
+      <img src="../../img/recursos_web/logo-user.png" alt="Carnicería El Señor de La Misericordia">
+    </a>
   </header>
+
+  <!-- Iconos flotantes en esquina inferior derecha -->
+  <div class="auth-floating-icons" id="floatingIcons">
+    <button class="auth-floating-icons__btn" id="cartBtn" data-bs-toggle="modal" data-bs-target="#cartModal" aria-label="Carrito">
+      <i class="bi bi-cart3"></i>
+      <span class="auth-floating-icons__badge">0</span>
+    </button>
+    <a href="../index.html" class="auth-floating-icons__btn" aria-label="Ir a inicio">
+      <i class="bi bi-house-door"></i>
+    </a>
+  </div>
 
   <!-- Drawer móvil -->
   <div class="drawer-overlay" id="drawerOverlay"></div>
   <aside class="mobile-drawer" id="mobileDrawer" aria-hidden="true">
     <div class="mobile-drawer__header">
       <div class="d-flex align-items-center gap-2">
-        <img src="../../img/logo-user.png" alt="Carnicería" class="mobile-drawer__logo">
+        <img src="../../img/recursos_web/logo-user.png" alt="Carnicería" class="mobile-drawer__logo">
         <div>
           <p class="mb-0 fw-bold">Carnicería Premium</p>
           <small class="text-muted">El Señor de La Misericordia</small>
@@ -155,6 +141,11 @@
                 <i class="fab fa-twitter"></i>
               </a>
             </div>
+
+            <!-- Toggle para mobile -->
+            <div class="form-toggle">
+              ¿No tienes cuenta? <button type="button" id="mobileShowRegister">Regístrate aquí</button>
+            </div>
           </form>
 
           <!-- ===== FORMULARIO REGISTRO ===== -->
@@ -213,6 +204,11 @@
                 <i class="fab fa-twitter"></i>
               </a>
             </div>
+
+            <!-- Toggle para mobile -->
+            <div class="form-toggle">
+              ¿Ya tienes cuenta? <button type="button" id="mobileShowLogin">Inicia sesión</button>
+            </div>
           </form>
         </div>
       </div>
@@ -227,7 +223,7 @@
             <p>Regístrate y accede a cortes frescos, ofertas diarias y carne premium.</p>
             <button class="btn transparent" type="button" id="btnShowRegister">REGISTRARSE</button>
           </div>
-          <img src="../../img/carniLogin.png" alt="Carnicero dando la bienvenida" class="image" loading="lazy">
+          <img src="../../img/recursos_web/carniLogin.png" alt="Carnicero dando la bienvenida" class="image" loading="lazy">
         </div>
 
         <!-- Panel derecho (visible en modo registro) - Imagen de REGISTRO -->
@@ -237,7 +233,7 @@
             <p>Inicia sesión y pide tus cortes favoritos en segundos.</p>
             <button class="btn transparent" type="button" id="btnShowLogin">INICIAR SESIÓN</button>
           </div>
-          <img src="../../img/carniRegistro.png" alt="Carnicero cortando carne premium" class="image" loading="lazy">
+          <img src="../../img/recursos_web/carniRegistro.png" alt="Carnicero cortando carne premium" class="image" loading="lazy">
         </div>
       </div>
     </div>
@@ -303,6 +299,43 @@
   <script type="module" src="../../js/modules/core/cart.js"></script>
   <script type="module" src="../../js/modules/core/delivery.js"></script>
   <script type="module" src="../../js/modules/core/auth.js"></script>
+
+  <!-- Script inline para sliding panel (funciona independiente de módulos) -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const container = document.getElementById('authContainer');
+      
+      // Botones de los paneles (desktop/tablet)
+      const btnShowRegister = document.getElementById('btnShowRegister');
+      const btnShowLogin = document.getElementById('btnShowLogin');
+      
+      // Botones mobile (dentro de los formularios)
+      const mobileShowRegister = document.getElementById('mobileShowRegister');
+      const mobileShowLogin = document.getElementById('mobileShowLogin');
+
+      if (container) {
+        // Función para mostrar registro
+        function showRegister(e) {
+          e.preventDefault();
+          container.classList.add('sign-up-mode');
+        }
+
+        // Función para mostrar login
+        function showLogin(e) {
+          e.preventDefault();
+          container.classList.remove('sign-up-mode');
+        }
+
+        // Eventos de paneles (desktop/tablet)
+        if (btnShowRegister) btnShowRegister.addEventListener('click', showRegister);
+        if (btnShowLogin) btnShowLogin.addEventListener('click', showLogin);
+
+        // Eventos mobile
+        if (mobileShowRegister) mobileShowRegister.addEventListener('click', showRegister);
+        if (mobileShowLogin) mobileShowLogin.addEventListener('click', showLogin);
+      }
+    });
+  </script>
 </body>
 
 </html>
