@@ -13,8 +13,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Melvis+One&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../css/styles.css">
     <link rel="icon" href="../img/logo-user.png" type="image/png">
-    <script src="../js/modules/ui/header.js" defer></script>
-    <script src="../js/modules/core/cart.js" defer></script>
+    <script src="../js/modules/ui/header.js" type="module"></script>
+    <script src="../js/modules/core/cart.js" type="module"></script>
+    <script src="../js/modules/ui/search.js" type="module"></script>
     <script src="../js/app.js" defer></script>
 </head>
 
@@ -23,6 +24,16 @@
     <div class="offline-alert alert alert-warning d-none" role="alert">
         <i class="bi bi-wifi-off me-2"></i> Estás en modo offline. Algunas funciones pueden estar limitadas.
     </div>
+
+  <!-- Mini Header (ANTES del main header) -->
+  <div class="mini-header show" id="miniHeader">
+    <div class="container-fluid px-3 px-lg-5">
+      <p class="mb-0 text-center">
+        <i class="bi bi-truck me-2"></i>
+        Envío gratis a todo San Luis Potosí / Free shipping across SLP
+      </p>
+    </div>
+  </div>
 
   <!-- Main Header -->
   <header class="main-header" id="mainHeader" role="banner">
@@ -37,36 +48,24 @@
         <a class="navbar-brand" href="index.html">
           <img src="../img/logo-user.png" alt="Logo" class="main-header__logo" style="object-fit:contain;max-height:56px;">
         </a>
-      </div>
-
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
-          <li class="nav-item"><a class="nav-link" href="products.html">Productos</a></li>
-          <li class="nav-item"><a class="nav-link" href="index.html#sobre-nosotros">Sobre Nosotros</a></li>
-          <li class="nav-item"><a class="nav-link" href="index.html#contacto">Contacto</a></li>
-        </ul>
                 </div>
+
+      <!-- Nav links eliminados - solo en drawer móvil -->
                 
       <div class="main-header__icons-container d-flex align-items-center gap-2">
-        <button class="btn btn-link p-0" aria-label="Buscar"><i class="bi bi-search"></i></button>
-        <button class="btn btn-link p-0 position-relative" id="cartBtn" data-bs-toggle="modal" data-bs-target="#cartModal" aria-label="Carrito">
-          <i class="bi bi-cart3 fs-4"></i>
+        <button class="header-icon-btn header-icon-btn--round" aria-label="Buscar" id="searchBtn">
+                        <i class="bi bi-search"></i>
+                    </button>
+        <button class="header-icon-btn header-icon-btn--round position-relative" id="cartBtn" data-bs-toggle="modal" data-bs-target="#cartModal" aria-label="Carrito">
+          <i class="bi bi-cart3"></i>
           <span class="badge bg-danger rounded-pill position-absolute top-0 start-100 translate-middle main-header__cart-count">0</span>
                     </button>
-        <a href="user/login.html" class="btn btn-link p-0" aria-label="Usuario"><i class="bi bi-person fs-4"></i></a>
-      </div>
+        <a href="user/accessweb.html" class="header-icon-btn header-icon-btn--round" aria-label="Usuario">
+                        <i class="bi bi-person"></i>
+                    </a>
+                </div>
     </nav>
   </header>
-
-  <!-- Mini Header (solo en products.html) -->
-  <div class="mini-header show" id="miniHeader">
-    <div class="container-fluid px-3 px-lg-5">
-      <p class="mb-0 text-center">
-        <i class="bi bi-truck me-2"></i>
-        Envío gratis a todo San Luis Potosí / Free shipping across SLP
-      </p>
-                </div>
-            </div>
 
   <!-- Drawer móvil -->
   <div class="drawer-overlay" id="drawerOverlay"></div>
@@ -611,7 +610,7 @@
       } catch (error) {
         console.warn('⚠️ No se pudo cargar ProductosManager:', error);
         // No es crítico, los scroll buttons pueden no funcionar pero la página seguirá funcionando
-      }
+            }
     })();
     </script>
 </body>

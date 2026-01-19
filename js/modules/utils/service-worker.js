@@ -1,26 +1,23 @@
-const CACHE_NAME = 'carniceria-cache-v1';
-const OFFLINE_URL = 'offline.html';
+const CACHE_NAME = 'carniceria-cache-v2';
+const OFFLINE_URL = '/tagsCore/offline.html';
 const ASSETS_TO_CACHE = [
   '/',
-  '/index.html',
-  '/login.html',
-  '/register.html',
+  '/tagsCore/index.html',
+  '/tagsCore/products.html',
+  '/tagsCore/user/accessweb.html',
+  '/tagsCore/offline.html',
   '/css/styles.css',
   '/js/app.js',
-  '/js/auth.js',
-  '/js/catalog.js',
-  '/js/loyalty.js',
-  '/img/rib-eye.png',
-  '/img/filet_mignon.png',
-  '/img/porterhouse.png',
-  '/img/ney_york_string.png',
-  '/img/tomahawk.png',
-  '/img/bravette_steak.png',
-  '/img/res.jpg',
-  '/img/cerdo.jpg',
-  '/img/pollo.jpg',
-  '/img/meat-pattern.png',
-  '/img/icon-192.png',
+  '/js/modules/core/cart.js',
+  '/js/modules/core/auth.js',
+  '/js/modules/ui/header.js',
+  '/js/modules/ui/search.js',
+  '/img/logo-user.png',
+  '/img/products/res.png',
+  '/img/products/cerdo.png',
+  '/img/products/pollo.png',
+  '/img/carniLogin.png',
+  '/img/carniRegistro.png',
   '/manifest.json'
 ];
 

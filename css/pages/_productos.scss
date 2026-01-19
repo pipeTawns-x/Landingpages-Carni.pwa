@@ -32,9 +32,9 @@
       transform: scale(1.05);
     }
     
-    .personalizar-btn {
+      .personalizar-btn {
       background: darken($primary-color, 10%);
-      transform: translateY(-2px);
+        transform: translateY(-2px);
     }
   }
   
@@ -104,7 +104,7 @@
     align-items: center;
     gap: 0.75rem;
   }
-
+  
   .nav-scroll {
     display: flex;
     overflow-x: auto;

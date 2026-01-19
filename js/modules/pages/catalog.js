@@ -12,7 +12,7 @@ function renderizarProductos(categoria) {
     if (!contenedor) {
         console.error('❌ Contenedor no encontrado: productos-' + categoria);
         return;
-    }
+                    }
     
     const productosCategoria = productos[categoria];
     console.log('📦 Productos encontrados:', productosCategoria);
@@ -20,17 +20,17 @@ function renderizarProductos(categoria) {
     if (!productosCategoria || productosCategoria.length === 0) {
         contenedor.innerHTML = '<div class="col-12"><p class="text-center text-muted py-5">No hay productos disponibles</p></div>';
         console.warn('⚠️ No hay productos para:', categoria);
-        return;
-    }
-    
-    let html = '';
+            return;
+        }
+
+        let html = '';
     productosCategoria.forEach(producto => {
         // Corregir ruta de imagen
         let imagenSrc = producto.imagen || `../img/products/${categoria}.png`;
         if (imagenSrc.startsWith('img/')) {
             imagenSrc = '../' + imagenSrc;
-        }
-        
+    }
+
         // Precio
         let precioHtml = '';
         if (producto.tipo === 'unidad') {
@@ -82,7 +82,7 @@ function cambiarCategoria(categoria) {
         section.classList.add('d-none');
         section.classList.remove('active');
     });
-    
+        
     // Actualizar botones
     document.querySelectorAll('.categoria-btn').forEach(btn => {
         btn.classList.remove('active');
@@ -90,7 +90,7 @@ function cambiarCategoria(categoria) {
             btn.classList.add('active');
         }
     });
-    
+
     // Mostrar sección seleccionada
     const seccion = document.getElementById(categoria);
     if (seccion) {
@@ -106,7 +106,7 @@ function cambiarCategoria(categoria) {
 function initCatalog() {
     console.log('🚀 === INICIALIZANDO CATÁLOGO ===');
     console.log('URL completa:', window.location.href);
-    
+
     // Leer categoría de URL
     const urlParams = new URLSearchParams(window.location.search);
     const categoriaFromUrl = urlParams.get('categoria');
@@ -131,8 +131,8 @@ function initCatalog() {
     if (categoriaProductos.length === 0) {
         console.error('❌ ERROR: No se encontraron secciones de productos');
         return;
-    }
-    
+        }
+
     // Event listeners para botones
     categoriaBtns.forEach(btn => {
         btn.addEventListener('click', (e) => {
@@ -157,7 +157,7 @@ function ejecutarInit() {
         });
     } else {
         setTimeout(initCatalog, 200);
-    }
+        }
 }
 
 // Ejecutar inmediatamente y también después de un delay

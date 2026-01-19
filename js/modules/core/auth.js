@@ -1,16 +1,115 @@
-import { supabase, appState } from './app.js';
+import { supabase } from '../supabase.js';
+
+// Estado de la aplicación
+export const appState = {
+  user: null,
+  cart: [],
+  isAuthenticated: false
+};
 
 // Elementos del DOM
-const loginForm = document.getElementById('loginForm');
-const registerForm = document.getElementById('registerForm');
-const googleLoginBtn = document.getElementById('googleLogin');
-const facebookLoginBtn = document.getElementById('facebookLogin');
+let loginForm;
+let registerForm;
+let googleLoginBtn;
+let facebookLoginBtn;
+
+/**
+ * ========================================
+ * FUNCIÓN PRINCIPAL: setupAuthToggle()
+ * ========================================
+ * 
+ * Implementa el efecto de deslizamiento mejorado basado en Codehal + Grok.
+ * Cuando el usuario hace clic en "Crear cuenta", se agrega la clase 'sign-up-mode'
+ * al contenedor principal, activando animaciones CSS suaves y fluidas.
+ * 
+ * Mejoras implementadas:
+ * - ✅ Validación robusta de elementos DOM
+ * - ✅ Logs de debugging para troubleshooting
+ * - ✅ Prevención de eventos duplicados (cloneNode)
+ * - ✅ DOMContentLoaded para asegurar elementos cargados
+ */
+function setupAuthToggle() {
+  const container = document.getElementById('authContainer');
+  const btnShowRegister = document.getElementById('btnShowRegister');
+  const btnShowLogin = document.getElementById('btnShowLogin');
+
+  // Validación exhaustiva
+  if (!container) {
+    console.error('❌ authContainer no encontrado en el DOM');
+    console.warn('💡 Verifica que el HTML tenga: <div id="authContainer">');
+    return;
+  }
+
+  if (!btnShowRegister) {
+    console.error('❌ btnShowRegister no encontrado en el DOM');
+    console.warn('💡 Verifica que el HTML tenga: <button id="btnShowRegister">');
+    return;
+  }
+
+  if (!btnShowLogin) {
+    console.error('❌ btnShowLogin no encontrado en el DOM');
+    console.warn('💡 Verifica que el HTML tenga: <button id="btnShowLogin">');
+    return;
+  }
+
+  console.log('✅ Elementos encontrados, configurando eventos de deslizamiento...');
+
+  // Remover listeners previos para evitar duplicados (técnica cloneNode)
+  const newBtnRegister = btnShowRegister.cloneNode(true);
+  btnShowRegister.parentNode.replaceChild(newBtnRegister, btnShowRegister);
+  
+  const newBtnLogin = btnShowLogin.cloneNode(true);
+  btnShowLogin.parentNode.replaceChild(newBtnLogin, btnShowLogin);
+
+  /**
+   * EVENTO: Click en "Crear cuenta"
+   * Activa el modo registro con animación suave
+   */
+  newBtnRegister.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log('🔄 Activando modo registro...');
+    container.classList.add('sign-up-mode');
+    console.log('✅ Clase sign-up-mode agregada - Animación iniciada');
+  });
+
+  /**
+   * EVENTO: Click en "Iniciar sesión"
+   * Revierte al modo login
+   */
+  newBtnLogin.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log('🔄 Activando modo login...');
+    container.classList.remove('sign-up-mode');
+    console.log('✅ Clase sign-up-mode removida - Volviendo a login');
+  });
+
+  console.log('✅ setupAuthToggle configurado correctamente');
+}
 
 // Inicialización
-if (loginForm) setupLoginForm();
-if (registerForm) setupRegisterForm();
-if (googleLoginBtn) googleLoginBtn.addEventListener('click', loginWithGoogle);
-if (facebookLoginBtn) facebookLoginBtn.addEventListener('click', loginWithFacebook);
+function initAuth() {
+  loginForm = document.getElementById('loginForm');
+  registerForm = document.getElementById('registerForm');
+  googleLoginBtn = document.getElementById('googleLogin');
+  facebookLoginBtn = document.getElementById('facebookLogin');
+
+  if (loginForm) setupLoginForm();
+  if (registerForm) setupRegisterForm();
+  if (googleLoginBtn) googleLoginBtn.addEventListener('click', loginWithGoogle);
+  if (facebookLoginBtn) facebookLoginBtn.addEventListener('click', loginWithFacebook);
+  
+  // CRÍTICO: setupAuthToggle debe ejecutarse después de que el DOM esté listo
+  setupAuthToggle();
+}
+
+// Ejecutar cuando el DOM esté listo
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initAuth);
+} else {
+  initAuth();
+}
 
 // Verificar si es acceso administrativo
 const urlParams = new URLSearchParams(window.location.search);

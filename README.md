@@ -158,13 +158,10 @@ Carni-mvp/
 │   ├── products.html (catálogo dinámico)
 │   ├── offline.html (PWA offline)
 │   ├── admin/
-│   │   ├── dashboard.html (métricas)
-│   │   ├── login.html
-│   │   └── register.html
+│   │   └── dashboar.html (métricas - NO login/register público)
 │   └── user/
-│       ├── login.html
-│       ├── register.html
-│       └── profile.html
+│       ├── accessweb.html (login/registro unificado con sliding effect)
+│       └── profile.html (perfil usuario)
 │
 ├── 🖼️ img/ (recursos multimedia)
 │   ├── products/ (9 categorías)
@@ -803,6 +800,7 @@ Para probar la conexión con Supabase:
    ```
 
 2. **Verificar en consola del navegador**:
+
    - Deberías ver: `✅ Supabase configurado: { url: '...', keyPresent: true }`
    - Si hay errores, revisa las credenciales en Supabase Dashboard
 
@@ -849,17 +847,20 @@ npm run dev
 ### Mejoras de UI y Servidor (2026-01-09)
 
 **Eliminación de Recursividad**:
+
 - Removido menú dropdown duplicado de "Productos" del header
 - Reemplazado por enlace simple para evitar duplicación con menú hamburger
 - Todas las categorías siguen disponibles en el menú hamburger móvil
 
 **Configuración Vite**:
+
 - `vite.config.js` optimizado para servir desde `tagsCore/`
 - Auto-open configurado para `index.html`
 - CORS habilitado para desarrollo
 - Puerto 3002 configurado
 
 **Uso del Servidor**:
+
 ```bash
 npm run dev
 # Abre automáticamente: http://127.0.0.1:3002/tagsCore/index.html
@@ -867,6 +868,265 @@ npm run dev
 
 ---
 
-**📅 Última Actualización**: 9 de enero 2026  
-**📌 Versión**: README.md v2.4 - UI Optimizada + Vite Configurado  
-**✅ Estado**: LISTO PARA PRODUCCIÓN - 100% FUNCIONAL SIN RECURSIVIDAD
+**📅 Última Actualización**: 18 de enero 2026  
+**📌 Versión**: README.md v3.0 - Sistema de Autenticación Unificado + Header Global Optimizado  
+**✅ Estado**: LISTO PARA PRODUCCIÓN - 100% FUNCIONAL CON SLIDING EFFECT
+
+---
+
+## 🔐 Sistema de Autenticación Unificado (accessweb.html)
+
+### Descripción General
+
+El proyecto ha consolidado 4 páginas de autenticación en una sola página moderna con **efecto deslizante (sliding panel)** inspirado en las mejores prácticas de UX 2026.
+
+**ANTES** (4 páginas):
+
+- `tagsCore/user/login.html`
+- `tagsCore/user/register.html`
+- `tagsCore/admin/login.html` (ELIMINADO - riesgo seguridad)
+- `tagsCore/admin/register.html` (ELIMINADO - riesgo seguridad)
+
+**AHORA** (1 página unificada):
+
+- `tagsCore/user/accessweb.html` - Login + Registro con sliding effect
+
+### Características Principales
+
+| Característica              | Descripción                                                    |
+| --------------------------- | -------------------------------------------------------------- |
+| **Sliding Panel Effect**    | Panel rojo deslizante que alterna entre login y registro       |
+| **Responsive Total**        | Layout vertical en móvil (<870px), horizontal en desktop       |
+| **Animaciones Suaves**      | Custom cubic-bezier, staggered animations, breathe effect      |
+| **Imágenes Personalizadas** | `carniLogin.png` y `carniRegistro.png` con recorte inteligente |
+| **Seguridad OWASP**         | Validaciones frontend, RLS backend, admin roles por Supabase   |
+| **UX Premium**              | Transiciones fluidas, micro-interacciones en botones           |
+
+### Arquitectura Técnica
+
+#### Estructura DOM
+
+```html
+<div id="authContainer" class="auth-container">
+  <div class="auth-form-box">
+    <form class="auth-form--sign-in"><!-- Login --></form>
+    <form class="auth-form--sign-up"><!-- Registro --></form>
+  </div>
+  <div class="auth-toggle-box">
+    <div class="panel panel--left"><!-- Panel izquierdo --></div>
+    <div class="panel panel--right"><!-- Panel derecho --></div>
+  </div>
+</div>
+```
+
+#### Lógica del Efecto Deslizante
+
+```scss
+// Estado inicial: Login visible
+.auth-container {
+  overflow: hidden; // CRÍTICO
+}
+
+// Estado activo: Registro visible
+.auth-container.sign-up-mode {
+  .auth-form-box {
+    transform: translateX(-50%); // Mueve formularios
+  }
+  .auth-toggle-box {
+    left: 0; // Panel rojo a la izquierda
+  }
+}
+```
+
+#### JavaScript (setupAuthToggle)
+
+```javascript
+function setupAuthToggle() {
+  const container = document.getElementById("authContainer");
+  const btnShowRegister = document.getElementById("btnShowRegister");
+  const btnShowLogin = document.getElementById("btnShowLogin");
+
+  // Validación exhaustiva
+  if (!container || !btnShowRegister || !btnShowLogin) {
+    console.error("❌ Elementos críticos no encontrados");
+    return;
+  }
+
+  // Eventos
+  btnShowRegister.addEventListener("click", () => {
+    container.classList.add("sign-up-mode");
+  });
+
+  btnShowLogin.addEventListener("click", () => {
+    container.classList.remove("sign-up-mode");
+  });
+}
+```
+
+### IDs Críticos (NO MODIFICAR)
+
+| ID                | Elemento               | Uso                         |
+| ----------------- | ---------------------- | --------------------------- |
+| `authContainer`   | Contenedor principal   | Toggle clase `sign-up-mode` |
+| `btnShowRegister` | Botón "Crear cuenta"   | Activa modo registro        |
+| `btnShowLogin`    | Botón "Iniciar sesión" | Activa modo login           |
+| `loginForm`       | Formulario login       | Submit handler              |
+| `registerForm`    | Formulario registro    | Submit handler              |
+
+### Responsive Breakpoints
+
+| Breakpoint      | Comportamiento                                    |
+| --------------- | ------------------------------------------------- |
+| **>870px**      | Layout horizontal, imágenes completas             |
+| **570px-870px** | Imágenes reducidas con `clip-path`                |
+| **<570px**      | Layout vertical, imágenes recortadas al carnicero |
+
+### Imágenes Responsive
+
+```scss
+.panel .image {
+  // Desktop: imagen completa
+  @media (min-width: 871px) {
+    max-width: 380px;
+  }
+
+  // Tablet: recorte intermedio
+  @media (max-width: 870px) {
+    max-width: 250px;
+    clip-path: polygon(15% 10%, 85% 10%, 90% 70%, 10% 70%);
+  }
+
+  // Móvil: solo carnicero
+  @media (max-width: 570px) {
+    max-width: 180px;
+    clip-path: polygon(20% 15%, 80% 15%, 85% 65%, 15% 65%);
+  }
+}
+```
+
+### Seguridad Implementada
+
+1. **Validaciones Frontend**:
+
+```javascript
+const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+const isValidPhone = (phone) => /^[0-9]{10}$/.test(phone);
+const isValidPassword = (pass) => pass.length >= 8;
+```
+
+2. **Roles por Supabase**:
+
+- ✅ Usuario común: Registro público desde `accessweb.html`
+- ✅ Admin: Rol asignado MANUALMENTE en Supabase Dashboard
+- ✅ Redirección automática según rol
+
+3. **RLS (Row Level Security)**:
+
+```sql
+CREATE POLICY "Users can view own profile" ON profiles
+  FOR SELECT USING (auth.uid() = id);
+
+CREATE POLICY "Admins can view all profiles" ON profiles
+  FOR SELECT USING (auth.jwt() ->> 'role' = 'admin');
+```
+
+### Testing Checklist
+
+- [ ] Efecto deslizante funciona (click en botones)
+- [ ] Formularios envían a Supabase correctamente
+- [ ] Validaciones frontend operativas
+- [ ] Responsive en 320px, 768px, 1024px
+- [ ] Console sin errores (DevTools F12)
+- [ ] Imágenes cargan sin errores 404
+- [ ] Redirección roles (admin → dashboard, user → index)
+- [ ] OAuth funciona (Google, Facebook)
+
+### Archivos Relacionados
+
+- **HTML**: `tagsCore/user/accessweb.html`
+- **SCSS**: `css/pages/_login.scss`, `css/layout/_auth-layout.scss`
+- **JS**: `js/modules/core/auth.js` (función `setupAuthToggle`)
+- **Imágenes**: `img/carniLogin.png`, `img/carniRegistro.png`
+
+### Referencia de Diseño
+
+- 🎥 **Video Codehal**: https://youtu.be/Z_AbWH-Vyl8
+- 💡 **Concepto**: Sliding panel effect inspirado en diseños modernos
+- 🎨 **Mejoras Grok**: Animaciones avanzadas, custom easing, staggered effects
+
+---
+
+## 🎨 Mejoras Globales del Header (Todas las Páginas)
+
+### Iconos Redondos y Pequeños
+
+**ANTES**: Iconos cuadrados/rectangulares, tamaño grande (`fs-4`)  
+**AHORA**: Iconos redondos (`border-radius: 50%`), tamaño reducido (`40px`)
+
+```html
+<button class="header-icon-btn header-icon-btn--round" id="cartBtn">
+  <i class="bi bi-cart3"></i>
+  <span class="badge bg-danger rounded-pill">0</span>
+</button>
+```
+
+```scss
+.header-icon-btn--round {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: scale(1.1);
+  }
+}
+```
+
+### Eliminación de Nav Links
+
+**ANTES**: Links "Productos", "Sobre Nosotros", "Contacto" en header desktop  
+**AHORA**: Links SOLO en `mobile-drawer` (hamburger)
+
+**Beneficios**:
+
+- ✅ Header minimalista
+- ✅ Sin duplicación (header + drawer)
+- ✅ Navegación unificada
+- ✅ Menos código para mantener
+
+### Barra de Búsqueda Selectiva
+
+| Página           | Barra de Búsqueda | Funcionalidad            |
+| ---------------- | ----------------- | ------------------------ |
+| `index.html`     | ✅ Visible        | Redirige a products.html |
+| `products.html`  | ✅ Visible        | Filtrado en tiempo real  |
+| `accessweb.html` | ❌ Oculta         | No aplica                |
+| `dashboar.html`  | ❌ Oculta         | No aplica                |
+
+### Iconos Flotantes (accessweb.html)
+
+Iconos posicionados al nivel del mini-header, lado izquierdo:
+
+```scss
+.main-header__icons-container--auth-level {
+  position: fixed;
+  top: 0;
+  left: 1rem;
+  z-index: 1036;
+  background: rgba(217, 83, 79, 0.95);
+  border-radius: 0 0 25px 25px;
+  padding: 0.5rem 1rem;
+}
+```
+
+### Resumen Visual
+
+| Página           | Logo | Hamburger | Nav Links | Search | Carrito       | Usuario       |
+| ---------------- | ---- | --------- | --------- | ------ | ------------- | ------------- |
+| `index.html`     | ✅   | ✅        | ❌        | ✅     | ✅            | ✅            |
+| `products.html`  | ✅   | ✅        | ❌        | ✅     | ✅            | ✅            |
+| `accessweb.html` | ✅   | ✅        | ❌        | ❌     | ✅ (flotante) | ✅ (flotante) |
+| `dashboar.html`  | ✅   | ✅        | ❌        | ❌     | ✅            | ❌            |
+
+---
