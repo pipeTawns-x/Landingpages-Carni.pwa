@@ -163,33 +163,35 @@ main {
 // ===================================
 // HAMBURGER MENU - Mejorado (visible siempre)
 // ===================================
-.hamburger-btn {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-around;
-  width: 32px;
-  height: 32px;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  z-index: 1040;
-  margin-right: 1rem;
-  
-  // Visible siempre, no solo en mobile
-  @media (min-width: 992px) {
-    display: flex; // Mantener visible en desktop
+
+.header-icon-btn {
+  &.header-icon-btn--round {
+    background: linear-gradient(135deg, #d9534f 0%, #c9302c 100%);
+    color: #fff;
+    border-radius: 50%;
+    width: 54px;
+    height: 54px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.7rem;
+    box-shadow: 0 4px 18px rgba(217, 83, 79, 0.25);
+    border: none;
+    margin: 0 0.35rem;
+    transition: background 0.2s, transform 0.2s;
+    &:hover, &:focus {
+      background: #c9302c;
+      color: #fff;
+      transform: scale(1.12);
+      box-shadow: 0 8px 28px rgba(217, 83, 79, 0.35);
+    }
+    @media (max-width: 350px) {
+      width: 38px;
+      height: 38px;
+      font-size: 1.1rem;
+    }
   }
-  
-  span {
-    width: 100%;
-    height: 3px;
-    background: #fff;
-    border-radius: 3px;
-    transition: all 0.3s ease;
-    transform-origin: center;
-  }
-  
+}
   &:hover span {
     background: rgba(255, 255, 255, 0.8);
   }
