@@ -1,5 +1,5 @@
 // js/modules/catalog.js
-import { productos } from '../../utils/base_dinamica.js';
+import { productos } from '../utils/base_dinamica.js';
 
 console.log('📦 catalog.js CARGADO');
 console.log('📦 Productos disponibles:', Object.keys(productos));
@@ -25,11 +25,10 @@ function renderizarProductos(categoria) {
 
         let html = '';
     productosCategoria.forEach(producto => {
-        // Corregir ruta de imagen
-        let imagenSrc = producto.imagen || `../img/products/${categoria}.png`;
-        if (imagenSrc.startsWith('img/')) {
-            imagenSrc = '../' + imagenSrc;
-    }
+        // Usar fallback de imagen existente para categorias sin archivo dedicado.
+        const fallbackCategoria = categoria === 'otros' ? 'otrosproductos' : (categoria === 'ofertas' ? 'premium' : categoria);
+        const fallbackImg = `img/products/${fallbackCategoria}.png`;
+        const imagenSrc = producto.imagen || fallbackImg;
 
         // Precio
         let precioHtml = '';
@@ -53,7 +52,7 @@ function renderizarProductos(categoria) {
                          alt="${producto.nombre}" 
                          class="card-img-top" 
                          style="height: 200px; object-fit: cover; width: 100%;"
-                         onerror="this.src='../img/products/${categoria}.png'">
+                        onerror="this.src='${fallbackImg}'">
                     <div class="card-body d-flex flex-column">
                         <h5 class="card-title mb-2">${producto.nombre}</h5>
                         <div class="precio-info mb-3">

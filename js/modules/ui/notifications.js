@@ -93,8 +93,8 @@ function urlBase64ToUint8Array(base64String) {
 export function showWelcomeNotification() {
   showNotification('Bienvenido a Carnicería Sr. Misericordia', {
     body: 'Gracias por visitarnos. ¡Disfruta de nuestras ofertas especiales!',
-    icon: 'img/icon-192.png',
-    badge: 'img/badge.png'
+    icon: 'img/recursos_web/logo-user.png',
+    badge: 'img/recursos_web/logo-user.png'
   });
 }
 
@@ -112,6 +112,6 @@ export function showWeatherNotification(weatherData) {
   
   showNotification('Sugerencia del día', {
     body,
-    icon: 'img/icon-192.png'
+    icon: 'img/recursos_web/logo-user.png'
   });
 }

@@ -412,7 +412,7 @@ export const productos = {
             precioLb: 36.29,
             categoria: 'otros', 
             tipo: 'kg',
-            imagen: 'img/products/otros.png'
+            imagen: 'img/products/otrosproductos.png'
         },
         { 
             id: 'queso_fresco', 
@@ -421,7 +421,7 @@ export const productos = {
             precioLb: 54.43,
             categoria: 'otros', 
             tipo: 'kg',
-            imagen: 'img/products/otros.png'
+            imagen: 'img/products/otrosproductos.png'
         },
         { 
             id: 'chorizo_verde', 
@@ -430,7 +430,7 @@ export const productos = {
             precioLb: 63.50,
             categoria: 'otros', 
             tipo: 'kg',
-            imagen: 'img/products/otros.png'
+            imagen: 'img/products/otrosproductos.png'
         },
         { 
             id: 'manteca_cerdo', 
@@ -439,7 +439,7 @@ export const productos = {
             precioLb: 40.82,
             categoria: 'otros', 
             tipo: 'kg',
-            imagen: 'img/products/otros.png'
+            imagen: 'img/products/otrosproductos.png'
         }
     ],
     ofertas: [
@@ -449,7 +449,7 @@ export const productos = {
             precioPorPaquete: 1200, 
             categoria: 'ofertas', 
             tipo: 'paquete',
-            imagen: 'img/products/ofertas.png'
+            imagen: 'img/products/premium.png'
         },
         { 
             id: 'paquete_parrilla', 
@@ -457,7 +457,7 @@ export const productos = {
             precioPorPaquete: 1500, 
             categoria: 'ofertas', 
             tipo: 'paquete',
-            imagen: 'img/products/ofertas.png'
+            imagen: 'img/products/premium.png'
         },
         { 
             id: 'combo_premium', 
@@ -465,7 +465,7 @@ export const productos = {
             precioPorPaquete: 2000, 
             categoria: 'ofertas', 
             tipo: 'paquete',
-            imagen: 'img/products/ofertas.png'
+            imagen: 'img/products/premium.png'
         },
         { 
             id: 'promo_martes', 
@@ -474,7 +474,7 @@ export const productos = {
             precioLb: 65.29,
             categoria: 'ofertas', 
             tipo: 'kg',
-            imagen: 'img/products/ofertas.png'
+            imagen: 'img/products/premium.png'
         }
     ]
 };

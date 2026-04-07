@@ -5,7 +5,7 @@ export default defineConfig({
   root: '.', // Raíz del proyecto
   server: {
     port: 3002,
-    open: '/tagsCore/index.html', // Abre index.html automáticamente
+    open: '/index.html', // Abre index.html automáticamente
     host: true, // Accesible desde red local
     cors: true
   },

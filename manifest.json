@@ -9,59 +9,29 @@
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "img/icon-72.png",
-      "sizes": "72x72",
-      "type": "image/png"
-    },
-    {
-      "src": "img/icon-96.png",
-      "sizes": "96x96",
-      "type": "image/png"
-    },
-    {
-      "src": "img/icon-128.png",
-      "sizes": "128x128",
-      "type": "image/png"
-    },
-    {
-      "src": "img/icon-144.png",
-      "sizes": "144x144",
-      "type": "image/png"
-    },
-    {
-      "src": "img/icon-152.png",
-      "sizes": "152x152",
-      "type": "image/png"
-    },
-    {
-      "src": "img/icon-192.png",
+      "src": "img/recursos_web/logo-user.png",
       "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "img/recursos_web/logo-user.png",
+      "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
-    },
-    {
-      "src": "img/icon-384.png",
-      "sizes": "384x384",
-      "type": "image/png"
-    },
-    {
-      "src": "img/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png"
     }
   ],
   "screenshots": [
     {
-      "src": "img/screenshot1.png",
-      "sizes": "1280x720",
+      "src": "img/recursos_web/carniLogin.png",
+      "sizes": "1024x1024",
       "type": "image/png",
-      "description": "Página principal mostrando los cortes de carne"
+      "description": "Pantalla de acceso y registro"
     },
     {
-      "src": "img/screenshot2.png",
-      "sizes": "1280x720",
+      "src": "img/recursos_web/carniRegistro.png",
+      "sizes": "1024x1024",
       "type": "image/png",
-      "description": "Catálogo de productos"
+      "description": "Pantalla de registro de usuarios"
     }
   ],
   "related_applications": [

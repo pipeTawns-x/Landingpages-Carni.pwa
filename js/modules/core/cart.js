@@ -115,9 +115,9 @@
       
       row.innerHTML = `
         <div style="width:80px; flex-shrink: 0;">
-          <img src="${it.img||'../img/products/placeholder.png'}" 
+          <img src="${it.img||'img/products/res.png'}" 
                style="width:80px;height:80px;object-fit:cover;border-radius:8px" 
-               onerror="this.src='../img/products/${it.categoria||'res'}.png'">
+               onerror="this.src='img/products/${it.categoria === 'otros' ? 'otrosproductos' : it.categoria === 'ofertas' ? 'premium' : (it.categoria||'res')}.png'">
         </div>
         <div style="flex:1; margin-left: 1rem;">
           <h6 class="mb-2">${it.name}</h6>

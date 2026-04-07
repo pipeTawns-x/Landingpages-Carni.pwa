@@ -1,23 +1,22 @@
-const CACHE_NAME = 'carniceria-cache-v2';
-const OFFLINE_URL = '/tagsCore/offline.html';
+const CACHE_NAME = 'carniceria-cache-v3';
+const OFFLINE_URL = '/offline.html';
 const ASSETS_TO_CACHE = [
   '/',
-  '/tagsCore/index.html',
-  '/tagsCore/products.html',
-  '/tagsCore/user/accessweb.html',
-  '/tagsCore/offline.html',
+  '/index.html',
+  '/products.html',
+  '/user/accessweb.html',
+  '/offline.html',
   '/css/styles.css',
-  '/js/app.js',
   '/js/modules/core/cart.js',
   '/js/modules/core/auth.js',
   '/js/modules/ui/header.js',
   '/js/modules/ui/search.js',
-  '/img/logo-user.png',
+  '/img/recursos_web/logo-user.png',
   '/img/products/res.png',
   '/img/products/cerdo.png',
   '/img/products/pollo.png',
-  '/img/carniLogin.png',
-  '/img/carniRegistro.png',
+  '/img/recursos_web/carniLogin.png',
+  '/img/recursos_web/carniRegistro.png',
   '/manifest.json'
 ];
 
@@ -113,8 +112,8 @@ self.addEventListener('push', (event) => {
   
   const options = {
     body: data.body,
-    icon: 'img/icon-192.png',
-    badge: 'img/badge.png',
+    icon: '/img/recursos_web/logo-user.png',
+    badge: '/img/recursos_web/logo-user.png',
     data: {
       url: data.url || '/'
     }

@@ -61,10 +61,10 @@ npx vite --port 3002
 
 ### Acceder a la aplicación
 
-- **Landing page**: http://localhost:3002/tagsCore/index.html
-- **Productos**: http://localhost:3002/tagsCore/products.html
-- **Login/Registro**: http://localhost:3002/tagsCore/user/accessweb.html
-- **Admin**: http://localhost:3002/tagsCore/admin/dashboar.html
+- **Landing page**: http://localhost:3002/index.html
+- **Productos**: http://localhost:3002/products.html
+- **Login/Registro**: http://localhost:3002/user/accessweb.html
+- **Admin**: http://localhost:3002/admin/dashboar.html
 
 ---
 
@@ -74,11 +74,11 @@ Este proyecto implementa **Screaming Architecture**, donde la estructura grita e
 
 ```
 Carni-mvp/
-├── tagsCore/              # Vistas del negocio
-│   ├── index.html         # Home/Landing
-│   ├── products.html      # Catálogo
-│   ├── user/accessweb.html    # Autenticación
-│   └── admin/dashboar.html    # Administración
+├── index.html             # Home/Landing
+├── products.html          # Catálogo
+├── offline.html           # Vista offline PWA
+├── user/accessweb.html    # Autenticación
+└── admin/dashboar.html    # Administración
 │
 ├── css/                   # SCSS 7-1 Pattern
 │   ├── abstracts/         # Variables, mixins, funciones
