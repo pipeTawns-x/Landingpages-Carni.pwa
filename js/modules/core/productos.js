@@ -45,4 +45,3 @@ class ProductosManager {
 
 // Exportar como default para compatibilidad
 export default ProductosManager;
-export default ProductosManager;

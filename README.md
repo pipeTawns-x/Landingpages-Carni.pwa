@@ -8,7 +8,7 @@
 [![Stack](https://img.shields.io/badge/Stack-Vanilla%20JS%20%7C%20SCSS%207--1%20%7C%20Bootstrap%205%20%7C%20Supabase-orange)](https://github.com/pipeTawns-x/Landingpages-Carni.pwa)
 [![PWA](https://img.shields.io/badge/PWA-Ready-green)](manifest.json)
 [![Responsive](https://img.shields.io/badge/Responsive-320→768→1024-brightgreen)](https://github.com/pipeTawns-x/Landingpages-Carni.pwa)
-[![Branch](https://img.shields.io/badge/Branch-mvpDeployed--R1-purple)](https://github.com/pipeTawns-x/Landingpages-Carni.pwa/tree/mvpDeployed-R1)
+[![Branch](https://img.shields.io/badge/Branch-main-purple)](https://github.com/pipeTawns-x/Landingpages-Carni.pwa/tree/main)
 
 ---
 
@@ -17,6 +17,7 @@
 ### Resumen ejecutivo
 
 - **Existe hoy**: frontend navegable con landing, catálogo, auth, carrito, PWA y dashboard admin base con rutas corregidas a la raíz.
+- **Existe hoy para EBAC Phase 1**: script Node.js en raíz con `CommonJS`, `axios`, `dotenv` y `chalk`, separado del frontend.
 - **Existe parcialmente**: integración Supabase stub y placeholders admin.
 - **Todavía no existe dentro del repo**: dashboard cliente real, flujos n8n, campañas Meta Ads activas, RLS productiva y automatizaciones operativas.
 
@@ -340,9 +341,136 @@ Este proyecto hoy es un frontend estático con tooling Node definido para ejecut
 - `.env`: contrato local unico del proyecto para variables de entorno dentro del contenedor
 - no se versionan archivos espejo de ejemplo para evitar drift documental y basura de soporte
 
+---
+
+## EBAC Node.js Phase 1
+
+### Qué agrega esta práctica al repo
+
+La práctica EBAC se implementa como una **capa Node.js aislada** sobre Carni-mvp, sin tocar los entrypoints HTML ni la lógica del frontend. El runtime comercial actual sigue siendo la PWA con Vite; la práctica agrega un script de consola en la raíz para demostrar fundamentos de Node.js con `CommonJS`, `dotenv` y `axios`.
+
+### Fundamentos Node.js en el contexto de Carni-mvp
+
+- **Runtime separado del navegador**: `app.js` corre con Node y no entra al bundle de Vite.
+- **Módulos CommonJS**: la práctica usa `require()` porque EBAC Phase 1 pide una base simple y explícita.
+- **I/O HTTP controlado**: `axios` hace un `GET` a una API pública relevante al negocio.
+- **Configuración por entorno**: `dotenv` lee `.env`, que ya es el contrato único del repo.
+- **Sin romper la PWA**: `npm run ebac` vive en paralelo a `npm run dev` y `npm run build`.
+
+### API pública elegida para la ejecución verificable
+
+La práctica ejecutable usa **Open-Meteo** porque encaja con Carni-mvp y permite verificación estable sin depender de claves privadas.
+
+| API               | Relevancia para Carni-mvp                                             | Auth | Uso recomendado                          |
+| ----------------- | --------------------------------------------------------------------- | ---- | ---------------------------------------- |
+| **Open-Meteo**    | clima para delivery, operación diaria y alertas logísticas            | No   | práctica EBAC ejecutable con `axios GET` |
+| **OpenFoodFacts** | enriquecimiento futuro de productos, categorías y datos nutricionales | No   | roadmap técnico para catálogo/admin      |
+| **TheMealDB**     | contenido futuro de recetas, bundles y campañas comerciales           | No   | prototipos de marketing y contenido      |
+
+### APIs investigadas desde publicapis.dev para evolución segura del proyecto
+
+El catálogo de `publicapis.dev` aporta opciones que sí encajan con la carnicería y con una evolución realista del MVP sin romper la PWA actual.
+
+| API           | Categoría    | Auth    | Uso propuesto en Carni-mvp                                            | Implementación segura                                                                                 |
+| ------------- | ------------ | ------- | --------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| **Meteoblue** | Weather      | API Key | clima comercial para promos, planeación de delivery y widgets futuros | guardar key en `.env` como `VITE_METEOBLUE_KEY` para frontend o `METEOBLUE_KEY` para scripts Node/n8n |
+| **IPWhois**   | Geocoding    | API Key | detectar ciudad, ISP y cobertura de delivery para SLP                 | usar desde Node/n8n con variable no `VITE_*`; no exponer la key al navegador                          |
+| **LCBO**      | Food & Drink | API Key | maridaje de vinos o bebidas con cortes premium y bundles comerciales  | integrar primero en backend o automatización; no acoplar al catálogo hasta validar UX                 |
+| **Sent.dm**   | Messaging    | API Key | difusión por WhatsApp y recordatorios operativos                      | consumir solo desde n8n o backend; nunca desde la PWA pública                                         |
+
+### Cómo usar estas APIs sin romper el MVP
+
+1. **Phase 1 EBAC**: mantener `app.js` con una API pública verificable y desacoplada del frontend.
+2. **Phase 2 Producto**: llevar integraciones con key a backend ligero, n8n o Supabase Edge Functions.
+3. **Phase 3 Comercial**: exponer solo datos derivados al frontend, nunca las credenciales ni respuestas sensibles completas.
+
+### Patrón recomendado de integración
+
+```text
+publicapis.dev -> selección y contraste de APIs
+Node.js app.js -> práctica EBAC verificable por consola
+n8n / backend  -> llamadas autenticadas y automatización
+Supabase       -> cache, auditoría, configuración y datos derivados
+PWA frontend   -> solo consume resultados listos para UI
+```
+
+### Cómo se seleccionó la API
+
+- **publicapis.dev** sirve como catálogo para filtrar APIs públicas por utilidad, auth y madurez.
+- **Perplexity** es útil para contrastar rápidamente límites, casos de uso y señales de mantenimiento antes de integrar.
+- **NotebookLM** sirve para condensar README, notas del sprint y entregables EBAC en una base de estudio o defensa técnica.
+
+Ninguna de esas herramientas forma parte del runtime del proyecto. En este repo se documentan como apoyo de investigación, validación y aprendizaje agentic.
+
+### Implementación segura con `.devcontainer/`, Docker y flujo agentic
+
+1. Abrir Carni-mvp dentro del devcontainer cuando el flujo de trabajo sea el canónico del equipo.
+2. Mantener `.env` como contrato único; no crear archivos espejo de entorno.
+3. Usar variables no `VITE_*` para scripts Node futuros que no deban exponerse al navegador.
+4. Preferir APIs sin auth para verificación inicial y dejar APIs con llave para capas posteriores del producto.
+5. Mantener el script EBAC desacoplado del frontend para no introducir regresiones en la PWA.
+
+### Variables de entorno usadas por la práctica
+
+La práctica funciona sin configuración adicional, pero puede personalizarse en `.env` con estas claves opcionales:
+
+```env
+EBAC_CITY=Queretaro
+EBAC_GEOCODE_URL=https://geocoding-api.open-meteo.com/v1/search
+EBAC_WEATHER_URL=https://api.open-meteo.com/v1/forecast
+```
+
+Si no se definen, `app.js` usa valores por defecto seguros para poder verificar la entrega sin depender de secretos.
+
+### Entregable EBAC y cómo este repo lo satisface
+
+| Requisito EBAC Phase 1           | Cómo se cubre en Carni-mvp                                                        |
+| -------------------------------- | --------------------------------------------------------------------------------- |
+| Proyecto Node con `package.json` | ya existe y ahora incluye metadata y script `npm run ebac`                        |
+| Uso de `require()`               | `app.js` usa CommonJS                                                             |
+| Uso de `axios`                   | `app.js` hace `GET` a Open-Meteo                                                  |
+| Uso de `dotenv`                  | `app.js` carga `.env` con `dotenv.config()`                                       |
+| Salida entendible en consola     | `chalk` colorea la salida sin afectar el flujo del proyecto                       |
+| Ejecución limpia                 | la práctica corre en paralelo al frontend y se valida también con `npm run build` |
+
+### Comandos de validación
+
+```bash
+npm install
+npm run ebac
+npm run build
+```
+
+### Checklist de cumplimiento EBAC Phase 1
+
+| Requisito                                 | Estado | Evidencia en el repo                                                         |
+| ----------------------------------------- | ------ | ---------------------------------------------------------------------------- |
+| Inicializar proyecto Node                 | ✅     | `package.json` en raíz                                                       |
+| Modificar `name`, `author`, `description` | ✅     | metadata actualizada para la práctica                                        |
+| Instalar `axios` y un paquete libre       | ✅     | `axios`, `dotenv`, `chalk`                                                   |
+| Crear `app.js` con `require()`            | ✅     | `app.js` usa CommonJS                                                        |
+| Hacer request a API externa               | ✅     | `app.js` consulta Open-Meteo                                                 |
+| Imprimir respuesta en consola             | ✅     | salida con `chalk` y métricas legibles                                       |
+| Entrega reproducible                      | ✅     | `package-lock.json` ya puede versionarse y regenerarse dentro del contenedor |
+
+### Entrega recomendada para EBAC sin romper Carni-mvp
+
+1. Abrir el repo en `.devcontainer/`.
+2. Ejecutar `npm install` para generar `package-lock.json` reproducible.
+3. Validar `npm run ebac`.
+4. Validar `npm run build` para confirmar que la PWA no se rompió.
+5. Entregar `app.js`, `package.json` y `package-lock.json` junto con este README actualizado como soporte técnico.
+
+### Estado por capas
+
+- **Existe hoy**: frontend/PWA/Vite, `.devcontainer/`, `.env` y el nuevo script Node de práctica.
+- **Práctica EBAC**: `app.js`, dependencias Node mínimas y documentación de ejecución.
+- **Roadmap**: integraciones reales con OpenFoodFacts, TheMealDB, Supabase productivo, n8n y automatización comercial.
+
 ### Arquitectura estable del repo
 
 ```text
+app.js                   -> script Node.js para la práctica EBAC Phase 1
 html raíz                -> entrypoints públicos y administrativos
 css/                     -> estilos organizados en 7-1 pattern
 js/modules/core/         -> auth, cart, delivery, productos, loyalty
@@ -543,6 +671,6 @@ MIT License.
 
 ---
 
-**Branch activo**: `mvpDeployed-R1`
+**Branch activo**: `main`
 **Última actualización**: Abril 2026
-**Versión**: v3.1
+**Versión**: v3.2

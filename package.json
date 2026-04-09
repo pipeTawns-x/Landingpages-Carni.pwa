@@ -1,16 +1,25 @@
 {
-  "name": "carniceria-pwa",
+  "name": "carni-node-practice",
   "version": "1.0.0",
-  "description": "PWA de la Carnicería El Señor de La Misericordia",
+  "description": "MVP frontend de Carni-mvp con capa de práctica EBAC Node.js Phase 1 aislada del flujo PWA/Vite",
+  "author": "Felipe Eduardo Torres Aguilar",
+  "main": "app.js",
   "scripts": {
     "dev": "vite --host 0.0.0.0 --port 3002",
     "build": "vite build",
     "preview": "vite preview --host 0.0.0.0 --port 4173",
+    "ebac": "node app.js",
+    "ebac:check": "npm run ebac && npm run build",
     "serve:static": "serve . -l 3000",
     "start": "npm run serve:static"
   },
   "engines": {
     "node": ">=20.0.0"
+  },
+  "dependencies": {
+    "axios": "^1.12.2",
+    "chalk": "^4.1.2",
+    "dotenv": "^17.2.3"
   },
   "devDependencies": {
     "serve": "^14.2.4",
