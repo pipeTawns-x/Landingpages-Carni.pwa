@@ -5,7 +5,7 @@
   edge_functions = "edge-functions"
 
 [build.environment]
-  NODE_VERSION = "18.17.1"
+  NODE_VERSION = "20.19.0"
   NPM_VERSION = "9.6.7"
   CI = "true"
   VITE_APP_VERSION = "1.0.0"
@@ -58,6 +58,6 @@
 [dev]
   framework = "#custom"
   command = "npm run dev"
-  port = 5173
-  target_port = 5173
+  port = 3002
+  target_port = 3002
   auto_launch = true

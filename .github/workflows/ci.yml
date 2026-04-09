@@ -1,0 +1,68 @@
+name: Carni CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.19.0
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check app.js syntax
+        run: node --check app.js
+
+      - name: Build frontend
+        run: npm run buildname: Carni CI
+
+on:
+  push:
+    branches:
+      - main
+      - '**'
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.19.0'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate Node.js script syntax
+        run: node --check app.js
+
+      - name: Build frontend
+        run: npm run build
+
+      - name: Verify generated entrypoints
+        run: |
+          test -f dist/index.html
+          test -f dist/products.html
+          test -f dist/accessweb.html
+          test -f dist/dashboar.html
+          test -f dist/offline.html

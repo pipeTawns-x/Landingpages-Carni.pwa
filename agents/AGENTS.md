@@ -32,7 +32,8 @@ La meta local es evolucionar el producto sin romper la base funcional actual.
 ## Reglas para Agentes, MCPs y Herramientas de IA
 
 - No crear una segunda plataforma agentica dentro del repo.
-- No generar `skills`, `subagents`, `orchestrators` o instrucciones locales nuevas salvo que el usuario lo pida explicitamente.
+- Esta capa local ya expone primitivas controladas en `.github/agents/` y `.github/skills/` porque el usuario lo pidio explicitamente.
+- Mantener esa capa minima, enfocada en Carni-mvp y compatible con `gentle-ai`.
 - Usar estas reglas locales solo para restricciones del producto y del repo.
 - No tocar otros proyectos del workspace cuando el usuario delimite el alcance a Carni-mvp.
 - Antes de cambios estructurales, borrados, renombres o limpieza agresiva, aplicar human-in-the-loop.
@@ -61,8 +62,19 @@ Se requiere aprobacion explicita antes de:
 - `docs/TASK_PLAN.md`
 - `docs/IMPLEMENTATION_PLAN.md`
 - `agents/STITCH_REDESIGN_PROMPT.md`
+- `.github/agents/carni-orchestrator.agent.md`
+- `.github/agents/*.agent.md`
+- `.github/skills/*/SKILL.md`
 
 ## Limite de Esta Capa Local
 
 Este repo no debe replicar la estructura completa de VESTA-dashboard.
 Solo debe conservar reglas y contexto local utiles para colaboradores humanos y agentes.
+Los agentes y skills locales deben permanecer pequenos, especificos y orientados al dominio de Carni-mvp.
+
+## Roles Locales Disponibles
+
+- `carni-orchestrator`: coordina tareas locales del repo y delega por dominio.
+- `carni-frontend-specialist`: trabaja UI, HTML raiz, SCSS 7-1, PWA y Vite.
+- `carni-node-backend-planner`: aterriza la evolucion Node, Supabase, n8n y APIs.
+- `carni-docs-curator`: mantiene README, entregables, roadmap y contexto tecnico veraz.
