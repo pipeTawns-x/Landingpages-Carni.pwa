@@ -116,7 +116,10 @@ const urlParams = new URLSearchParams(window.location.search);
 const isAdminLogin = urlParams.get('admin') === 'true';
 
 if (isAdminLogin && loginForm) {
-  document.getElementById('adminLoginAlert').classList.remove('d-none');
+  const adminLoginAlert = document.getElementById('adminLoginAlert');
+  if (adminLoginAlert) {
+    adminLoginAlert.classList.remove('d-none');
+  }
 }
 
 // Configurar formulario de login
@@ -160,7 +163,7 @@ function setupLoginForm() {
 
       // Redirección según tipo de usuario
       if (isAdmin) {
-        window.location.href = 'admin/dashboard.html';
+        window.location.href = 'dashboar.html';
       } else {
         appState.user = data.user;
         window.location.href = 'index.html';
@@ -261,7 +264,7 @@ function setupRegisterForm() {
       }
       
       alert('¡Registro exitoso! Por favor verifica tu correo electrónico.');
-      window.location.href = 'login.html';
+      window.location.href = 'accessweb.html';
     } catch (error) {
       console.error('Register error:', error);
       alert('Error al registrarse: ' + error.message);
@@ -278,7 +281,7 @@ async function loginWithGoogle() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: window.location.origin + (isAdminLogin ? '/admin/dashboard.html' : '/index.html')
+        redirectTo: window.location.origin + (isAdminLogin ? '/dashboar.html' : '/index.html')
       }
     });
     
@@ -297,7 +300,7 @@ async function loginWithFacebook() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'facebook',
       options: {
-        redirectTo: window.location.origin + (isAdminLogin ? '/admin/dashboard.html' : '/index.html')
+        redirectTo: window.location.origin + (isAdminLogin ? '/dashboar.html' : '/index.html')
       }
     });
     
@@ -320,7 +323,7 @@ export async function logout() {
     }
     
     appState.user = null;
-    window.location.href = isAdminLogin ? 'login.html?admin=true' : 'index.html';
+    window.location.href = isAdminLogin ? 'accessweb.html?admin=true' : 'index.html';
   } catch (error) {
     console.error('Logout error:', error);
     alert('Error al cerrar sesión: ' + error.message);
@@ -332,7 +335,7 @@ export async function checkAdminAuth() {
   const { data: { user }, error } = await supabase.auth.getUser();
   
   if (error || !user) {
-    window.location.href = '../login.html?admin=true';
+    window.location.href = 'accessweb.html?admin=true';
     return;
   }
   
@@ -341,6 +344,14 @@ export async function checkAdminAuth() {
   
   if (!isAdmin) {
     await supabase.auth.signOut();
-    window.location.href = '../login.html?admin=true';
+    window.location.href = 'accessweb.html?admin=true';
   }
+}
+
+export function isAuthenticated() {
+  return Boolean(appState.user || appState.isAuthenticated);
+}
+
+export function getCurrentUser() {
+  return appState.user;
 }

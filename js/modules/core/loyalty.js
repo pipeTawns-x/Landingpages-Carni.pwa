@@ -1,4 +1,5 @@
-import { supabase, appState } from '../modules/app.js';
+import { supabase } from '../supabase.js';
+import { appState } from './auth.js';
 
 // Elementos del DOM
 const loyaltyBtn = document.getElementById('loyaltyBtn');
@@ -18,8 +19,8 @@ async function showLoyaltyInfo() {
         <h4 class="mb-4">Programa de Fidelidad</h4>
         <p class="mb-4">Únete a nuestro programa de fidelidad y comienza a ganar puntos con cada compra</p>
         <div class="d-flex justify-content-center gap-3">
-          <a href="register.html" class="btn btn-primary">Regístrate</a>
-          <a href="login.html" class="btn btn-outline-primary">Inicia Sesión</a>
+          <a href="accessweb.html" class="btn btn-primary">Regístrate</a>
+          <a href="accessweb.html" class="btn btn-outline-primary">Inicia Sesión</a>
         </div>
       </div>
     `;

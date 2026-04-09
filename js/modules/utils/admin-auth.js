@@ -1,4 +1,4 @@
-import { supabase } from '../app.js';
+import { supabase } from '../supabase.js';
 
 // Configurar formulario de login de administrador
 document.addEventListener('DOMContentLoaded', () => {
@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       
       // Redirigir al panel de administración
-      window.location.href = 'admin/index.html';
+      window.location.href = 'dashboar.html';
     });
   }
 });
@@ -54,7 +54,7 @@ export async function verifyAdminSession() {
   const { data: { user } } = await supabase.auth.getUser();
   
   if (!user) {
-    window.location.href = '../admin-login.html';
+    window.location.href = 'accessweb.html?admin=true';
     return;
   }
   
@@ -66,6 +66,6 @@ export async function verifyAdminSession() {
   
   if (error || !userData?.is_admin) {
     await supabase.auth.signOut();
-    window.location.href = '../admin-login.html';
+    window.location.href = 'accessweb.html?admin=true';
   }
 }

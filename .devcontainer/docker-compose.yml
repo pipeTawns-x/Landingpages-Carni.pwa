@@ -1,0 +1,14 @@
+services:
+  app:
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile
+    working_dir: /workspace
+    volumes:
+      - ..:/workspace:cached
+    ports:
+      - "3000:3000"
+      - "3002:3002"
+      - "4173:4173"
+    stdin_open: true
+    tty: true

@@ -4,7 +4,7 @@ const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
   '/products.html',
-  '/user/accessweb.html',
+  '/accessweb.html',
   '/offline.html',
   '/css/styles.css',
   '/js/modules/core/cart.js',

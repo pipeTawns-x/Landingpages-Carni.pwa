@@ -13,6 +13,49 @@
   <link href="https://fonts.googleapis.com/css2?family=Melvis+One&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/styles.css">
     <link rel="icon" href="img/recursos_web/logo-user.png" type="image/png">
+    <script>
+      (function() {
+        if (window.location.protocol !== 'file:') {
+          window.__carniServerProbe = { active: false, found: true };
+          return;
+        }
+
+        const pageName = window.location.pathname.split('/').pop() || 'products.html';
+        const projectName = 'Carni-mvp';
+        const candidates = [
+          `http://127.0.0.1:3000/${projectName}`,
+          `http://localhost:3000/${projectName}`,
+          'http://127.0.0.1:3000',
+          'http://localhost:3000',
+          'http://127.0.0.1:3002',
+          'http://localhost:3002',
+          'http://127.0.0.1:8000',
+          'http://localhost:8000'
+        ];
+
+        window.__carniServerProbe = { active: true, found: false };
+
+        const probeServer = (baseUrl) => new Promise((resolve) => {
+          const img = new Image();
+          const done = (ok) => resolve(ok ? baseUrl : null);
+
+          img.onload = () => done(true);
+          img.onerror = () => done(false);
+          img.src = `${baseUrl}/img/recursos_web/logo-user.png?probe=${Date.now()}`;
+        });
+
+        Promise.any(candidates.map(probeServer).map((promise) =>
+          promise.then((result) => result || Promise.reject(new Error('unreachable')))
+        ))
+          .then((baseUrl) => {
+            window.__carniServerProbe = { active: false, found: true, baseUrl };
+            window.location.replace(`${baseUrl}/${pageName}${window.location.search}${window.location.hash}`);
+          })
+          .catch(() => {
+            window.__carniServerProbe = { active: false, found: false };
+          });
+      })();
+    </script>
     <script src="js/modules/ui/header.js" type="module"></script>
     <script src="js/modules/core/cart.js" type="module"></script>
     <script src="js/modules/ui/search.js" type="module"></script>
@@ -55,7 +98,7 @@
           <i class="bi bi-cart3"></i>
           <span class="badge bg-danger rounded-pill position-absolute top-0 start-100 translate-middle main-header__cart-count">0</span>
         </button>
-        <a href="user/accessweb.html" class="header-icon-btn header-icon-btn--round" aria-label="Usuario">
+        <a href="accessweb.html" class="header-icon-btn header-icon-btn--round" aria-label="Usuario">
           <i class="bi bi-person"></i>
         </a>
       </div>
@@ -269,11 +312,16 @@
     function mostrarErrorCORS() {
       const contenedor = document.querySelector('.productos-container');
       if (contenedor) {
+        const probe = window.__carniServerProbe || { active: false, found: false };
+        const titulo = probe.found ? 'Redirigiendo al servidor local' : 'Servidor local no detectado';
+        const descripcion = probe.found
+          ? 'Se encontró un servidor local y la página intentará abrirse por HTTP automáticamente.'
+          : 'Abriste products.html con file:// y no se encontró un servidor local respondiendo para cargar los módulos del catálogo.';
         contenedor.innerHTML = `
           <div class="col-12">
             <div class="alert alert-danger text-center py-5">
-              <h4 class="mb-3">⚠️ Error de CORS - Servidor Local Requerido</h4>
-              <p class="mb-3">Los módulos ES6 no funcionan cuando abres el archivo directamente desde el sistema de archivos.</p>
+              <h4 class="mb-3">⚠️ ${titulo}</h4>
+              <p class="mb-3">${descripcion}</p>
               <div class="bg-light p-3 rounded mb-3">
                 <p class="mb-2"><strong>Soluciones:</strong></p>
                 <ol class="text-start" style="max-width: 600px; margin: 0 auto;">
@@ -322,6 +370,10 @@
         productos = {};
         productosCargados = true;
         
+        if (window.location.protocol === 'file:' && window.__carniServerProbe?.active) {
+          return;
+        }
+
         // Mostrar mensaje de error al usuario
         if (document.readyState === 'loading') {
           document.addEventListener('DOMContentLoaded', mostrarErrorCORS);

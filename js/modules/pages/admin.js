@@ -1,5 +1,5 @@
 
-import { supabase, checkAdminAuth } from '../../app.js';
+import { checkAdminAuth } from '../core/auth.js';
 
 // Verificar autenticación al cargar
 document.addEventListener('DOMContentLoaded', async () => {

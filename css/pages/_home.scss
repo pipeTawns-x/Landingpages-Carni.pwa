@@ -1,4 +1,4 @@
-/* Bento grid styles for tagsCore/index.html */
+/* Bento grid styles for index.html */
 .bento-grid-container {
   display: grid;
   gap: 1.5rem;
@@ -91,9 +91,9 @@
     content: '';
     position: absolute;
     inset: 0;
-    background-image: url('../img/wood-texture.jpg');
-    background-size: cover;
-    background-repeat: repeat;
+    background:
+      linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(228, 209, 176, 0.5)),
+      repeating-linear-gradient(45deg, rgba(93, 64, 55, 0.08) 0 14px, rgba(255, 255, 255, 0.04) 14px 28px);
     opacity: 0.03;
     z-index: 0;
     pointer-events: none;
@@ -210,7 +210,9 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: url('../../img/pattern.svg') repeat;
+    background:
+      radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.14) 0 2px, transparent 2px 16px),
+      radial-gradient(circle at 80% 30%, rgba(255, 215, 0, 0.08) 0 2px, transparent 2px 18px);
     opacity: 0.05;
     z-index: 1;
   }

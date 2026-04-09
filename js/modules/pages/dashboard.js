@@ -1,12 +1,12 @@
 import { supabase } from '../supabase.js';
 import { appState, showNotification, formatCurrency } from '../app.js';
-import { isAuthenticated, getCurrentUser } from './auth.js';
+import { isAuthenticated, getCurrentUser } from '../core/auth.js';
 
 // Dashboard initialization
 export async function initializeDashboard() {
   if (!isAuthenticated()) {
     showNotification('Debes iniciar sesión para acceder al dashboard', 'error');
-    window.location.href = '/login?redirectTo=' + encodeURIComponent(window.location.pathname);
+    window.location.href = '/accessweb.html?redirectTo=' + encodeURIComponent(window.location.pathname);
     return;
   }
 
@@ -219,13 +219,13 @@ function initializeQuickActions() {
           showRedeemPointsModal();
           break;
         case 'view-orders':
-          window.location.href = '/orders';
+          window.location.href = '/products.html';
           break;
         case 'edit-profile':
-          window.location.href = '/profile';
+          window.location.href = '/accessweb.html';
           break;
         case 'contact-support':
-          window.location.href = '/contact';
+          window.location.href = '/index.html#contacto';
           break;
       }
     });
