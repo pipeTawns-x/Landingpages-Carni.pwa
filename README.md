@@ -67,7 +67,11 @@ Carni-mvp/
 │   └── TASK_PLAN.md
 ├── agents/
 │   ├── AGENTS.md
-│   └── STITCH_REDESIGN_PROMPT.md
+│   ├── STITCH_REDESIGN_PROMPT.md
+│   ├── orchestrator/
+│   ├── subagents/
+│   ├── skills/
+│   └── workflows/
 ├── manifest.json
 ├── netlify.toml
 ├── package.json
@@ -77,6 +81,8 @@ Carni-mvp/
 ### Aclaracion documental
 
 Este repo mantiene una capa local minima en `AGENTS.md` y `agents/AGENTS.md` para versionar reglas del producto, sin duplicar la plataforma global del usuario.
+Los agentes, subagentes, skills y workflows locales viven dentro de `agents/`.
+`.github/` queda reservado para integraciones de plataforma como GitHub Actions.
 `docs/` queda reservado para planes versionados del proyecto.
 
 ---
@@ -181,6 +187,10 @@ Carni-mvp busca transformar una carnicería tradicional en una plataforma digita
 | ------------------------------------ | ------------------ | --------------------------------------------------------------------------- |
 | **AGENTS.md**                        | ✅                 | Punto de entrada local para herramientas y agentes                          |
 | **agents/AGENTS.md**                 | ✅                 | Guardrails locales del producto y del human-in-the-loop                     |
+| **agents/orchestrator/**             | ✅                 | Orquestador local del repo                                                  |
+| **agents/subagents/**                | ✅                 | Especialistas locales para frontend, Node y documentacion                   |
+| **agents/skills/**                   | ✅                 | Skills locales reutilizables para frontend, Node/EBAC y entregas            |
+| **agents/workflows/**                | ✅                 | Flujo documentado de la capa local                                          |
 | **agents/STITCH_REDESIGN_PROMPT.md** | ✅                 | Referencia visual puntual para tareas de rediseño                           |
 | **docs/TASK_PLAN.md**                | ✅                 | Estado de trabajo y prioridades vigentes                                    |
 | **docs/IMPLEMENTATION_PLAN.md**      | ✅                 | Base de implementación y decisiones del repo                                |

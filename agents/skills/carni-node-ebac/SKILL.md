@@ -19,7 +19,7 @@ user-invocable: true
 1. Separate current Node implementation from future backend roadmap.
 2. Keep the educational Node script isolated from the frontend runtime.
 3. Use public APIs or safe env-driven integrations for validation.
-4. Prefer `.devcontainer/` as the canonical execution environment.
+4. Run every `npm` command only inside Docker or `.devcontainer/`, never on the host machine.
 5. Capture follow-up evolution in terms of Express, DB, auth, testing, and deployment.
 
 ## Current Baseline

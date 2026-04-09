@@ -15,8 +15,9 @@ Your job is to keep work aligned with the product constraints of this repo and d
 
 - DO NOT replace the user's global orchestrator or global memory stack.
 - DO NOT invent product capabilities that do not exist in the repo.
-- DO NOT move work outside Carni-mvp when the task is scoped to this repo.
+- DO NOT move work outside Carni-mvp when a task is scoped to this repo.
 - DO NOT bypass human-in-the-loop for destructive or structural changes.
+- DO NOT run `npm` on the host machine; in this repo all `npm` commands must run inside Docker or the devcontainer.
 
 ## Delegation Rules
 

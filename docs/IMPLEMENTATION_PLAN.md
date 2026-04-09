@@ -15,12 +15,14 @@
 - `AGENTS.md`: punto de entrada para herramientas
 - `agents/AGENTS.md`: reglas locales del producto
 - `agents/STITCH_REDESIGN_PROMPT.md`: referencia visual para tareas de UI
-- `.github/agents/`: agentes locales descubribles por VS Code para orquestacion, frontend, Node y documentacion
-- `.github/skills/`: skills locales reutilizables para frontend guardrails, Node/EBAC y release checks
+- `agents/orchestrator/`: orquestador local del repo
+- `agents/subagents/`: subagentes por dominio
+- `agents/skills/`: skills locales reutilizables para frontend guardrails, Node/EBAC y release checks
+- `agents/workflows/`: workflows documentados de la capa local
 
 ## Regla de capas
 
-- capa local del repo: `AGENTS.md`, `agents/AGENTS.md`, `.github/agents/`, `.github/skills/`
+- capa local del repo: `AGENTS.md`, `agents/AGENTS.md`, `agents/orchestrator/`, `agents/subagents/`, `agents/skills/`, `agents/workflows/`
 - capa global del usuario: `stack-ia` / `gentle-ai` / `engram`
 - la capa local agrega contexto de Carni-mvp y no reemplaza el orquestador global
 
@@ -40,6 +42,7 @@
 ## CI minima requerida
 
 - workflow en `.github/workflows/ci.yml`
+- `.github/workflows/` no forma parte de la capa local agentica; solo existe porque GitHub Actions requiere esa ruta
 - Node `20.19.0` para alinear Vite y Netlify
 - `npm ci`
 - `node --check app.js`

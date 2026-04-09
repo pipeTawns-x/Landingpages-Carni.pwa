@@ -26,13 +26,15 @@ La meta local es evolucionar el producto sin romper la base funcional actual.
 - Variables publicas del frontend solo con prefijo `VITE_*`.
 - El contrato local de entorno es `.env`; no agregar archivos espejo de entorno ni duplicados documentales.
 - No hardcodear secrets en codigo fuente.
+- Todo comando `npm` se ejecuta dentro de Docker o `.devcontainer/`; nunca en el host.
 - El flujo de Node/Vite se ejecuta dentro de `.devcontainer/`.
 - Documentar como actual solo lo que realmente existe y funciona en el repo.
 
 ## Reglas para Agentes, MCPs y Herramientas de IA
 
 - No crear una segunda plataforma agentica dentro del repo.
-- Esta capa local ya expone primitivas controladas en `.github/agents/` y `.github/skills/` porque el usuario lo pidio explicitamente.
+- Toda la capa local de agentes, subagentes, skills y workflows del repo debe vivir dentro de `agents/`.
+- `.github/` solo puede usarse para integraciones que GitHub requiere por convencion, por ejemplo `workflows/`.
 - Mantener esa capa minima, enfocada en Carni-mvp y compatible con `gentle-ai`.
 - Usar estas reglas locales solo para restricciones del producto y del repo.
 - No tocar otros proyectos del workspace cuando el usuario delimite el alcance a Carni-mvp.
@@ -62,9 +64,10 @@ Se requiere aprobacion explicita antes de:
 - `docs/TASK_PLAN.md`
 - `docs/IMPLEMENTATION_PLAN.md`
 - `agents/STITCH_REDESIGN_PROMPT.md`
-- `.github/agents/carni-orchestrator.agent.md`
-- `.github/agents/*.agent.md`
-- `.github/skills/*/SKILL.md`
+- `agents/orchestrator/carni-orchestrator.agent.md`
+- `agents/subagents/*.agent.md`
+- `agents/skills/*/SKILL.md`
+- `agents/workflows/*.md`
 
 ## Limite de Esta Capa Local
 
