@@ -1,22 +1,17 @@
 // Supabase client configuration
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
-// Get environment variables (con fallback para desarrollo)
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://wlikxgklwutxxazbhmkv.supabase.co';
-const supabaseKey = import.meta.env.VITE_SUPABASE_KEY || 'sb_publishable_cutr6jvyxlE6tikIfy20Vw_fa7eyeBO';
+const env = typeof import.meta !== 'undefined' && import.meta.env ? import.meta.env : {};
+
+const supabaseUrl = env.VITE_SUPABASE_URL;
+const supabaseKey = env.VITE_SUPABASE_ANON_KEY || env.VITE_SUPABASE_KEY;
 
 // Validate environment variables
 if (!supabaseUrl || !supabaseKey) {
-  console.error('Supabase environment variables are not configured');
-  console.error('URL:', supabaseUrl);
-  console.error('Key:', supabaseKey ? 'Present' : 'Missing');
-  throw new Error('Supabase configuration missing');
+  throw new Error(
+    'Supabase configuration missing. Define VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY inside the container environment.'
+  );
 }
-
-console.log('✅ Supabase configurado:', {
-  url: supabaseUrl,
-  keyPresent: !!supabaseKey
-});
 
 // Create Supabase client
 export const supabase = createClient(supabaseUrl, supabaseKey, {

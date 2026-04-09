@@ -13,6 +13,10 @@ build/
 .env
 .env.local
 .env.*.local
+.env.development
+.env.production
+.devcontainer/.env
+
 
 # IDE and editor files
 .vscode/
