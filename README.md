@@ -68,6 +68,7 @@ Carni-mvp/
 ├── agents/
 │   ├── AGENTS.md
 │   ├── STITCH_REDESIGN_PROMPT.md
+│   ├── agents/
 │   ├── orchestrator/
 │   ├── subagents/
 │   ├── skills/
@@ -187,6 +188,7 @@ Carni-mvp busca transformar una carnicería tradicional en una plataforma digita
 | ------------------------------------ | ------------------ | --------------------------------------------------------------------------- |
 | **AGENTS.md**                        | ✅                 | Punto de entrada local para herramientas y agentes                          |
 | **agents/AGENTS.md**                 | ✅                 | Guardrails locales del producto y del human-in-the-loop                     |
+| **agents/agents/**                   | ✅                 | Agentes de rol para seguridad, DevOps e integraciones IA                    |
 | **agents/orchestrator/**             | ✅                 | Orquestador local del repo                                                  |
 | **agents/subagents/**                | ✅                 | Especialistas locales para frontend, Node y documentacion                   |
 | **agents/skills/**                   | ✅                 | Skills locales reutilizables para frontend, Node/EBAC y entregas            |
@@ -197,6 +199,30 @@ Carni-mvp busca transformar una carnicería tradicional en una plataforma digita
 | **Memoria persistente / MCP / GGA**  | 🟡 Externo al repo | Parte del stack-ia/gentle-ai del usuario, no infraestructura local del repo |
 
 ---
+
+## Skills Locales Activos
+
+Inspirados en una mezcla de guardrails del producto, mentalidad tipo Prowler y rutas de evolucion de roadmaps.sh.
+
+| Skill                           | Enfoque           | Uso principal                                       |
+| ------------------------------- | ----------------- | --------------------------------------------------- |
+| `carni-frontend-guardrails`     | Frontend seguro   | proteger UI, assets, PWA y rutas actuales           |
+| `carni-node-ebac`               | Node + Docker     | validar y evolucionar `app.js` dentro de contenedor |
+| `carni-release-check`           | Release hygiene   | revisar claims, entregas y artefactos               |
+| `api-design-dashboard-safe`     | API hardening     | contratos de API y checklist defensivo              |
+| `supabase-postgres-vesta-style` | Data + auth       | esquemas, RLS y tenancy en Supabase                 |
+| `devops-docker-dashboard`       | Operacion         | Docker, compose, comandos y runtime local           |
+| `ci-security-and-governance`    | Pipeline trust    | CI con escaneo, gates y disciplina de merge         |
+| `n8n-workflow-method-local`     | Automation        | workflows, triggers, errores y reintentos           |
+| `analytics-tracking-dashboard`  | Product analytics | eventos, metricas y visualizacion con Chart.js      |
+
+## Mentalidad Prowler en Carni-mvp
+
+- secrets fuera del codigo, del frontend y de la documentacion
+- auth y permisos con privilegio minimo desde el diseno
+- RLS en todas las tablas que toquen datos de clientes, pedidos o analytics
+- CI con escaneo preventivo antes de merge o release
+- revisar claims de seguridad solo contra implementacion real, no contra roadmap
 
 ## Estándar 2026 de Trabajo con IA
 
@@ -210,6 +236,12 @@ Este repo se apoya en el stack-ia/gentle-ai base del usuario. El repositorio evi
 - **Memoria y continuidad**: decisiones importantes deben persistirse en el stack del usuario, no como promesas falsas dentro del repo.
 - **No destruir la base actual**: el rediseño debe mejorar el MVP existente, no reemplazarlo ignorando rutas, IDs, assets o flujos ya conectados.
 - **Capa local complementaria**: el repo puede versionar reglas propias del producto y del flujo del equipo, siempre que no replique la plataforma global ni compita con ella.
+
+### Agentes locales extendidos
+
+- `security-guardian`: revisa secretos, auth, RLS y superficie de ataque.
+- `devops-captain`: cuida Docker, compose, CI y gobernanza de pipelines.
+- `ai-engineer`: aterriza integraciones IA, prompts, n8n y automatizacion local.
 
 ### Decisiones de rediseño activas
 

@@ -3,7 +3,14 @@ name: Carni Orchestrator
 description: "Use when working on Carni-mvp across multiple areas: orchestrating frontend, Node.js, README, PWA, dashboard, delivery, refactors, or repo-wide tasks. Delegates to local Carni subagents by domain."
 tools: [read, search, edit, execute, todo, agent, web]
 agents:
-  [carni-frontend-specialist, carni-node-backend-planner, carni-docs-curator]
+  [
+    carni-frontend-specialist,
+    carni-node-backend-planner,
+    carni-docs-curator,
+    security-guardian,
+    devops-captain,
+    ai-engineer,
+  ]
 user-invocable: true
 ---
 
@@ -24,6 +31,9 @@ Your job is to keep work aligned with the product constraints of this repo and d
 1. Use `carni-frontend-specialist` for HTML root pages, SCSS 7-1, JS modules, Vite, responsive work, PWA, and visual consistency.
 2. Use `carni-node-backend-planner` for Node.js scripts, Express direction, Supabase, n8n, APIs, auth, delivery logic, and backend evolution.
 3. Use `carni-docs-curator` for README, delivery messages, EBAC context, product roadmap, and truthful documentation.
+4. Use `security-guardian` for secrets, auth, RLS, trust boundaries, and Prowler-style review.
+5. Use `devops-captain` for Docker, compose, CI, pipelines, and runtime governance.
+6. Use `ai-engineer` for n8n, prompts, workflow design, and local AI integrations.
 
 ## Product Guardrails
 

@@ -65,6 +65,7 @@ Se requiere aprobacion explicita antes de:
 - `docs/IMPLEMENTATION_PLAN.md`
 - `agents/STITCH_REDESIGN_PROMPT.md`
 - `agents/orchestrator/carni-orchestrator.agent.md`
+- `agents/agents/*.agent.md`
 - `agents/subagents/*.agent.md`
 - `agents/skills/*/SKILL.md`
 - `agents/workflows/*.md`
@@ -78,6 +79,23 @@ Los agentes y skills locales deben permanecer pequenos, especificos y orientados
 ## Roles Locales Disponibles
 
 - `carni-orchestrator`: coordina tareas locales del repo y delega por dominio.
+- `security-guardian`: revisa secretos, auth, RLS y criterios estilo Prowler.
+- `devops-captain`: valida Docker, CI, pipelines y gobernanza de entrega.
+- `ai-engineer`: diseña integraciones IA, prompts, n8n y automatizacion local.
 - `carni-frontend-specialist`: trabaja UI, HTML raiz, SCSS 7-1, PWA y Vite.
 - `carni-node-backend-planner`: aterriza la evolucion Node, Supabase, n8n y APIs.
 - `carni-docs-curator`: mantiene README, entregables, roadmap y contexto tecnico veraz.
+
+## Skills Locales Activos
+
+| Skill                           | Descripcion                                        | Trigger principal            |
+| ------------------------------- | -------------------------------------------------- | ---------------------------- |
+| `carni-frontend-guardrails`     | preserva rutas, assets, PWA y consistencia visual  | frontend, SCSS, PWA, Vite    |
+| `carni-node-ebac`               | valida la capa Node y exige npm solo en contenedor | Node.js, npm, Docker         |
+| `carni-release-check`           | revisa entregas y claims del repo                  | release, PR, entrega         |
+| `api-design-dashboard-safe`     | define endpoints seguros y checklist defensivo     | API, dashboard, security     |
+| `supabase-postgres-vesta-style` | diseña esquemas, roles y RLS multi-tenant          | Supabase, PostgreSQL, RLS    |
+| `devops-docker-dashboard`       | fija comandos Docker y operacion local             | Docker, compose, pipelines   |
+| `ci-security-and-governance`    | endurece CI con escaneo y gates                    | CI, TruffleHog, governance   |
+| `n8n-workflow-method-local`     | documenta triggers, errores y reintentos           | n8n, workflows, automation   |
+| `analytics-tracking-dashboard`  | define eventos y metricas del dashboard            | analytics, metrics, Chart.js |
