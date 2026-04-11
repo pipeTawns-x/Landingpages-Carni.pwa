@@ -33,11 +33,11 @@ document.addEventListener('DOMContentLoaded', () => {
       // Verificar rol de administrador
       const { data: userData, error: userError } = await supabase
         .from('profiles')
-        .select('is_admin')
+        .select('role')
         .eq('id', data.user.id)
         .single();
       
-      if (userError || !userData?.is_admin) {
+      if (userError || userData?.role !== 'admin') {
         await supabase.auth.signOut();
         alert('Acceso denegado. No tienes privilegios de administrador.');
         return;
@@ -60,11 +60,11 @@ export async function verifyAdminSession() {
   
   const { data: userData, error } = await supabase
     .from('profiles')
-    .select('is_admin')
+    .select('role')
     .eq('id', user.id)
     .single();
   
-  if (error || !userData?.is_admin) {
+  if (error || userData?.role !== 'admin') {
     await supabase.auth.signOut();
     window.location.href = 'accessweb.html?admin=true';
   }

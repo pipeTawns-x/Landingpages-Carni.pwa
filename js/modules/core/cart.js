@@ -21,6 +21,20 @@
   // Clave para almacenamiento en localStorage
   const LS_KEY = 'carni_cart_v1';
 
+  // Import dinámico para createOrder (evita romper IIFE)
+  let _createOrder = null;
+  async function getCreateOrder() {
+    if (!_createOrder) {
+      try {
+        const mod = await import('../supabase.js');
+        _createOrder = mod.createOrder;
+      } catch {
+        _createOrder = null;
+      }
+    }
+    return _createOrder;
+  }
+
   /**
    * Carga el carrito desde localStorage
    * @returns {Array} Array de productos en el carrito
@@ -253,10 +267,13 @@
       const newGen = gen.cloneNode(true);
       gen.parentNode.replaceChild(newGen, gen);
       
-      newGen.addEventListener('click', ()=>{ 
+      newGen.addEventListener('click', async ()=>{ 
         const cart = loadCart();
+        if (!cart.length) { alert('El carrito está vacío'); return; }
+
         const deliverySelect = document.getElementById('deliverySelect');
         const deliveryCost = deliverySelect ? Number(deliverySelect.value) : 0;
+        const deliveryType = deliveryCost > 0 ? 'delivery' : 'pickup';
         let total = cart.reduce((sum, it) => {
           let cantidad = 0;
           if(it.tipo === 'kg' || it.tipo === 'corte') {
@@ -270,19 +287,53 @@
           }
           return sum + (Number(it.price||0) * cantidad);
         }, 0) + deliveryCost;
-        
-        alert(`✅ Ticket generado\n\nTotal: ${formatPrice(total)}\n\nVer consola para detalles completos`);
-        console.log('🎫 TICKET GENERADO', { 
-          cart, 
-          deliveryCost, 
-          total,
-          items: cart.map(it => ({
-            nombre: it.name,
-            cantidad: it.tipo === 'kg' || it.tipo === 'corte' ? (it.peso || 0.5) + ' kg' : (it.piezas || 1) + ' piezas',
-            precio: formatPrice(it.price),
-            subtotal: formatPrice((it.price || 0) * (it.tipo === 'kg' || it.tipo === 'corte' ? (it.peso || 0.5) : (it.piezas || 1)))
-          }))
+
+        // Build items array for RPC
+        const orderItems = cart.map(it => {
+          let qty = 0;
+          if(it.tipo === 'kg' || it.tipo === 'corte') {
+            qty = it.peso || 0.5;
+            if(it.tipo === 'corte' && it.grosor) {
+              qty = (it.basePeso || 0.3) * it.grosor;
+            }
+          } else {
+            qty = it.piezas || 1;
+          }
+          return {
+            product_id: Number(it.id),
+            quantity_kg: Number(qty.toFixed(3)),
+            unit_price: Number(it.price || 0)
+          };
         });
+
+        // Try to persist to Supabase
+        const fnCreateOrder = await getCreateOrder();
+        if (fnCreateOrder) {
+          try {
+            newGen.disabled = true;
+            newGen.textContent = 'Procesando...';
+            const orderId = await fnCreateOrder({
+              delivery_type: deliveryType,
+              delivery_address: deliveryType === 'delivery' ? { note: 'Dirección pendiente' } : null,
+              notes: null,
+              items: orderItems
+            });
+            alert(`✅ Pedido creado\n\nTotal: ${formatPrice(total)}\nID: ${orderId}`);
+            saveCart([]);
+            renderCartModal();
+            updateBadge();
+          } catch (err) {
+            console.error('Error al crear pedido:', err);
+            alert(`⚠️ No se pudo guardar el pedido.\n\nTotal: ${formatPrice(total)}\n\nError: ${err.message || 'Inicia sesión para ordenar'}`);
+          } finally {
+            newGen.disabled = false;
+            newGen.textContent = 'Generar Ticket';
+          }
+        } else {
+          // Fallback: offline/no-auth mode
+          alert(`✅ Ticket generado (modo local)\n\nTotal: ${formatPrice(total)}\n\nVer consola para detalles completos`);
+          console.log('🎫 TICKET GENERADO (local)', { cart, deliveryCost, total });
+        }
       });
     }
     

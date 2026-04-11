@@ -15,9 +15,14 @@
   <link rel="stylesheet" href="css/styles.css">
   <link rel="icon" href="img/recursos_web/logo-user.png" type="image/png">
   <link rel="apple-touch-icon" href="img/recursos_web/logo-user.png">
+  <script type="module">
+    import { verifyAdminSession } from './js/modules/utils/admin-auth.js';
+
+    void verifyAdminSession();
+  </script>
 </head>
 
-<body class="admin-dashboard">
+<body class="admin-dashboard dark-premium">
   <div class="d-flex">
     <!-- Sidebar -->
     <div class="admin-sidebar bg-dark text-white">
@@ -109,74 +114,13 @@
           </div>
         </div>
 
-        <!-- Stats Cards -->
-        <div class="row mb-4">
-          <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-primary shadow h-100 py-2">
-              <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                  <div class="col mr-2">
-                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                      Ventas Hoy</div>
-                    <div class="h5 mb-0 font-weight-bold text-gray-800">$24,500</div>
-                  </div>
-                  <div class="col-auto">
-                    <i class="bi bi-cash-stack fa-2x text-gray-300"></i>
-                  </div>
-                </div>
-              </div>
+        <!-- Stats Cards (populated by admin.js) -->
+        <div id="adminStats">
+          <div class="text-center py-4">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Cargando...</span>
             </div>
-          </div>
-
-          <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-success shadow h-100 py-2">
-              <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                  <div class="col mr-2">
-                    <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                      Nuevos Clientes</div>
-                    <div class="h5 mb-0 font-weight-bold text-gray-800">12</div>
-                  </div>
-                  <div class="col-auto">
-                    <i class="bi bi-people fa-2x text-gray-300"></i>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-info shadow h-100 py-2">
-              <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                  <div class="col mr-2">
-                    <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
-                      Productos</div>
-                    <div class="h5 mb-0 font-weight-bold text-gray-800">48</div>
-                  </div>
-                  <div class="col-auto">
-                    <i class="bi bi-box-seam fa-2x text-gray-300"></i>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-warning shadow h-100 py-2">
-              <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                  <div class="col mr-2">
-                    <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                      Puntos Fidelidad</div>
-                    <div class="h5 mb-0 font-weight-bold text-gray-800">1,256</div>
-                  </div>
-                  <div class="col-auto">
-                    <i class="bi bi-award fa-2x text-gray-300"></i>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <p class="text-muted mt-2">Cargando estadísticas...</p>
           </div>
         </div>
 

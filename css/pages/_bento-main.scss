@@ -29,20 +29,20 @@
 .bento-categories-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 1.5rem;
+  gap: 1rem;
   width: 100%;
 
   // Tablet: 2 columnas
   @media (min-width: 768px) {
     grid-template-columns: repeat(2, 1fr);
-    gap: 1.5rem;
+    gap: 1.25rem;
   }
 
   // Desktop: 4 columnas x 6 filas (diseño bento grid)
   @media (min-width: 1024px) {
     grid-template-columns: repeat(4, 1fr);
     grid-template-rows: repeat(6, 1fr);
-    gap: 8px;
+    gap: 16px;
     width: 100%;
     max-width: 100%;
     margin: 0;
@@ -50,15 +50,16 @@
   }
 }
 
-// CARD: Diseño Producto (blanco + imagen + botón rojo)
+// CARD: Dark Premium style
 .category-card {
-  background: #ffffff;
-  border-radius: 12px;
+  background: #111111;
+  border-radius: 14px;
   overflow: hidden;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   display: flex;
   flex-direction: column;
-  transition: transform 0.28s ease, box-shadow 0.28s ease;
+  transition: transform 0.28s ease, box-shadow 0.28s ease, border-color 0.28s ease;
   height: 100%;
 
   // Imagen: zoom suave en hover
@@ -79,18 +80,18 @@
     justify-content: space-between;
   }
 
-  // Título: fuerte, oscuro
+  // Título
   .category-title {
     font-size: 1.05rem;
     font-weight: 700;
-    color: #363432;
+    color: #F5F5F5;
     margin: 0 0 0.5rem 0;
   }
 
-  // Descripción: gris claro, legible
+  // Descripción
   .category-desc {
     font-size: 0.9rem;
-    color: #666;
+    color: #A3A3A3;
     margin: 0 0 1rem 0;
     flex: 1;
   }
@@ -103,13 +104,14 @@
     padding: 0.75rem 1.5rem;
   }
 
-  // HOVER: Tarjeta salta + imagen zoom
+  // HOVER
   &:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 16px 32px rgba(0, 0, 0, 0.12);
+    transform: translateY(-6px);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45);
+    border-color: rgba(220, 38, 38, 0.35);
 
     .category-img {
-      transform: scale(1.08);
+      transform: scale(1.05);
     }
   }
 }
@@ -120,7 +122,7 @@
   .bento-categories-grid {
     grid-template-columns: repeat(4, 1fr);
     grid-template-rows: repeat(6, 1fr);
-    gap: 8px;
+    gap: 16px;
   }
 
   // Card 1: span 2x2 (arriba izquierda)

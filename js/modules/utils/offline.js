@@ -137,7 +137,7 @@ export class OfflineManager {
   async syncFavoriteProduct(data) {
     if (data.favorited) {
       const { error } = await supabase
-        .from('user_favorites')
+        .from('favorites')
         .insert({
           user_id: data.userId,
           product_id: data.productId
@@ -146,7 +146,7 @@ export class OfflineManager {
       if (error) throw error;
     } else {
       const { error } = await supabase
-        .from('user_favorites')
+        .from('favorites')
         .delete()
         .eq('user_id', data.userId)
         .eq('product_id', data.productId);

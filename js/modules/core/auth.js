@@ -7,11 +7,46 @@ export const appState = {
   isAuthenticated: false
 };
 
+let authSubscription;
+
 // Elementos del DOM
 let loginForm;
 let registerForm;
 let googleLoginBtn;
 let facebookLoginBtn;
+
+function syncAppState(user) {
+  appState.user = user;
+  appState.isAuthenticated = Boolean(user);
+}
+
+async function hydrateAuthState() {
+  const {
+    data: { session },
+    error
+  } = await supabase.auth.getSession();
+
+  if (error) {
+    console.error('Error loading auth session:', error);
+    return;
+  }
+
+  syncAppState(session?.user ?? null);
+}
+
+async function getProfileRole(userId) {
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', userId)
+    .single();
+
+  if (error) {
+    throw error;
+  }
+
+  return data?.role || 'customer';
+}
 
 /**
  * ========================================
@@ -89,11 +124,23 @@ function setupAuthToggle() {
 }
 
 // Inicialización
-function initAuth() {
+async function initAuth() {
   loginForm = document.getElementById('loginForm');
   registerForm = document.getElementById('registerForm');
   googleLoginBtn = document.getElementById('googleLogin');
   facebookLoginBtn = document.getElementById('facebookLogin');
+
+  await hydrateAuthState();
+
+  if (!authSubscription) {
+    const {
+      data: { subscription }
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      syncAppState(session?.user ?? null);
+    });
+
+    authSubscription = subscription;
+  }
 
   if (loginForm) setupLoginForm();
   if (registerForm) setupRegisterForm();
@@ -102,25 +149,27 @@ function initAuth() {
   
   // CRÍTICO: setupAuthToggle debe ejecutarse después de que el DOM esté listo
   setupAuthToggle();
+
+  if (isAdminLogin && loginForm) {
+    const adminLoginAlert = document.getElementById('adminLoginAlert');
+    if (adminLoginAlert) {
+      adminLoginAlert.classList.remove('d-none');
+    }
+  }
 }
 
 // Ejecutar cuando el DOM esté listo
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initAuth);
+  document.addEventListener('DOMContentLoaded', () => {
+    void initAuth();
+  });
 } else {
-  initAuth();
+  void initAuth();
 }
 
 // Verificar si es acceso administrativo
 const urlParams = new URLSearchParams(window.location.search);
 const isAdminLogin = urlParams.get('admin') === 'true';
-
-if (isAdminLogin && loginForm) {
-  const adminLoginAlert = document.getElementById('adminLoginAlert');
-  if (adminLoginAlert) {
-    adminLoginAlert.classList.remove('d-none');
-  }
-}
 
 // Configurar formulario de login
 function setupLoginForm() {
@@ -153,19 +202,20 @@ function setupLoginForm() {
         throw error;
       }
 
-      // Verificar si es administrador (en un sistema real esto debería verificarse en la base de datos)
-      const isAdmin = email.endsWith('@carniceriaadmin.com');
+      const role = await getProfileRole(data.user.id);
+      const isAdmin = role === 'admin';
       
       if (isAdminLogin && !isAdmin) {
         await supabase.auth.signOut();
         throw new Error('Acceso denegado. Solo personal autorizado.');
       }
 
+      syncAppState(data.user);
+
       // Redirección según tipo de usuario
       if (isAdmin) {
         window.location.href = 'dashboar.html';
       } else {
-        appState.user = data.user;
         window.location.href = 'index.html';
       }
     } catch (error) {
@@ -234,36 +284,13 @@ function setupRegisterForm() {
         throw error;
       }
       
-      // Crear registro en la tabla de clientes
-      const { error: profileError } = await supabase
-        .from('customers')
-        .insert([{
-          user_id: data.user.id,
-          name,
-          email,
-          phone,
-          newsletter: registerForm.newsletterCheck.checked,
-          loyalty_points: 0
-        }]);
-      
-      if (profileError) {
-        throw profileError;
+      if (!data.user) {
+        throw new Error('No se pudo crear el usuario en Auth.');
       }
-      
-      // Crear registro en el programa de fidelidad
-      const { error: loyaltyError } = await supabase
-        .from('loyalty_program')
-        .insert([{
-          user_id: data.user.id,
-          points: 0,
-          qr_code: data.user.id
-        }]);
-      
-      if (loyaltyError) {
-        throw loyaltyError;
-      }
-      
-      alert('¡Registro exitoso! Por favor verifica tu correo electrónico.');
+
+      alert(data.session
+        ? '¡Registro exitoso! Ya puedes usar tu cuenta.'
+        : '¡Registro exitoso! Por favor verifica tu correo electrónico.');
       window.location.href = 'accessweb.html';
     } catch (error) {
       console.error('Register error:', error);
@@ -339,10 +366,16 @@ export async function checkAdminAuth() {
     return;
   }
   
-  // Verificar si el usuario es administrador
-  const isAdmin = user.email.endsWith('@carniceriaadmin.com');
+  try {
+    const role = await getProfileRole(user.id);
+    const isAdmin = role === 'admin';
   
-  if (!isAdmin) {
+    if (!isAdmin) {
+      await supabase.auth.signOut();
+      window.location.href = 'accessweb.html?admin=true';
+    }
+  } catch (profileError) {
+    console.error('Admin profile verification failed:', profileError);
     await supabase.auth.signOut();
     window.location.href = 'accessweb.html?admin=true';
   }

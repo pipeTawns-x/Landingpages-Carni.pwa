@@ -16,6 +16,102 @@
 
 ---
 
+## ACTUALIZACION ESTRICTA ABRIL 2026
+
+Este prompt ya no debe interpretarse como una simple guia estetica. A partir de ahora el objetivo obligatorio es producir una mejora real del producto, manteniendo el sitio funcional y preparando una base visual compatible con una web moderna, funcional y segura.
+
+### Fallos anteriores que NO se pueden repetir
+
+- No trabajar solo la landing o el index.
+- No limitarse a cambiar colores y venderlo como rediseño.
+- No romper rutas, enlaces ni carga de paginas secundarias.
+- No empeorar `accessweb.html`, `products.html`, `dashboar.html` o las paginas admin.
+- No dejar layouts flojos, vacios o con padding pobre.
+- No hacer un bento grid improvisado; debe sentirse intencional, moderno y mejor resuelto que el actual.
+- No mezclar estilos inconsistentes entre ecommerce, auth y paneles.
+
+### Alcance obligatorio
+
+Toda propuesta o implementacion de rediseño debe cubrir, como minimo:
+
+- `index.html`
+- `products.html`
+- `accessweb.html`
+- `dashboar.html`
+- `admin-products.html`
+- `admin-customers.html`
+- `admin-orders.html`
+
+Si una iteracion mejora solo una pagina y deja el resto roto, inconsistente o sin revisar, el resultado se considera fallido.
+
+### Guardrails de no regresion
+
+- Mantener la navegacion existente y validar que las rutas principales sigan cargando.
+- No introducir cambios que dificulten una futura proteccion de rutas por JWT y roles.
+- Mantener separadas las zonas publicas, autenticadas y admin.
+- Priorizar UX, legibilidad, spacing, padding y composicion antes que efectos decorativos.
+- Usar las referencias visuales del workspace como inspiracion, no como copia literal.
+
+### Direccion de seguridad a respetar
+
+El rediseño no implementa por si solo la seguridad backend, pero debe respetar esta evolucion del proyecto:
+
+- rutas con validacion de JWT desde `Authorization`
+- `401 Unauthorized` si el token falta o es invalido
+- `403 Forbidden` en rutas solo admin cuando el rol no corresponde
+- compatibilidad con middleware de proteccion sin rehacer flujos o navegacion
+
+### Resultado esperado actual
+
+El trabajo debe dejar al proyecto mas cerca de una web moderna, funcional y segura:
+
+- rediseño integral, no superficial
+- mejor composicion visual
+- mejor padding y espaciado
+- bento grid mas fuerte y mas contemporaneo
+- consistencia entre landing, productos, auth y paneles
+- cero regressions en rutas o paginas
+
+### Coordinacion entre capas agenticas
+
+Este proyecto opera con dos capas de instrucciones y ambas deben colaborar, no competir:
+
+- **Capa global `stack-ia/gentle-ai`**: define las reglas base de orquestacion, persistencia, rigor, seguridad operativa y flujo general de trabajo.
+- **Capa local `Carni-mvp`**: agrega contexto del producto, estructura real del repo, alcance funcional, guardrails visuales y restricciones del negocio.
+
+### Regla de precedencia
+
+- Si hay conflicto entre instrucciones globales y locales, prevalece la capa global.
+- La capa local no reemplaza la global; la complementa con contexto especifico del proyecto.
+- No ignores ninguna de las dos capas: usa la global para metodo y la local para aterrizar decisiones en este repo.
+
+### Forma correcta de usar ambas capas
+
+- Usa la capa global para mantener disciplina de ejecucion, no-regression, memoria, verificacion y prudencia tecnica.
+- Usa la capa local para entender que archivos tocar, que paginas existen, que rutas no deben romperse y cual es el resultado esperado del producto.
+- Usa el README actualizado como fuente de verdad sobre el liston actual del proyecto: web moderna, funcional y segura.
+- Usa `agents/AGENTS.md` y este prompt para el contexto de rediseño visual, alcance real y restricciones del repo.
+
+### Optimo desempeno entre capas
+
+Para obtener el mejor resultado, trabaja asi:
+
+1. Primero lee la capa global y respetala como marco operativo.
+2. Luego lee la capa local del repo y el README para obtener el contexto real de Carni-mvp.
+3. Despues audita el sitio completo antes de editar.
+4. Implementa cambios minimizando conflicto entre decisiones visuales, estructura actual y evolucion futura del producto.
+5. Verifica que el resultado final cumpla tanto con el rigor de la capa global como con los objetivos del repo.
+
+### Que NO hacer entre capas
+
+- No interpretar la capa local como permiso para romper reglas globales.
+- No aplicar reglas globales de forma tan abstracta que ignores el estado real del repo.
+- No improvisar reescrituras grandes del stack sin que el repo las soporte.
+- No hacer rediseños visuales que desconozcan la estructura funcional existente.
+- No duplicar instrucciones ni mezclar criterios contradictorios si la capa global ya resolvio la precedencia.
+
+---
+
 ## ESTILO VISUAL: Maximalismo Mexicano Equilibrado
 
 ### Paleta de Colores

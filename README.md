@@ -16,10 +16,11 @@
 
 ### Resumen ejecutivo
 
-- **Existe hoy**: frontend navegable con landing, catálogo, auth, carrito, PWA y dashboard admin base con rutas corregidas a la raíz.
+- **Existe hoy**: frontend navegable con landing, catálogo, auth (Supabase), carrito con persistencia a BD, PWA, dashboard admin con stats reales y panel de pedidos.
+- **Backend operativo**: Supabase local con migrations, RLS, triggers, RPCs y seed data. Auth basado en `profiles.role`, protección de admin pages, y función transaccional `create_order_with_items`.
 - **Existe hoy para EBAC Phase 1**: script Node.js en raíz con `CommonJS`, `axios`, `dotenv` y `chalk`, separado del frontend.
-- **Existe parcialmente**: integración Supabase stub y placeholders admin.
-- **Todavía no existe dentro del repo**: dashboard cliente real, flujos n8n, campañas Meta Ads activas, RLS productiva y automatizaciones operativas.
+- **Todavía no existe dentro del repo**: dashboard cliente real, flujos n8n, campañas Meta Ads activas, search dinámico y automatizaciones operativas.
+- **Criterio vigente de entrega**: toda mejora debe empujar Carni-mvp hacia una web moderna, funcional y segura; no se acepta rediseño superficial, regresión de rutas ni deterioro de páginas fuera de la landing.
 
 ### Qué funciona hoy
 
@@ -27,13 +28,13 @@
 | ----------------------------------- | ------------ | -------------------------------------------------------------------------------------------------------------------------- |
 | **Landing page**                    | ✅ Funcional | Navegación principal, hero y secciones comerciales                                                                         |
 | **Catálogo webcommerce**            | ✅ Funcional | Cards por categoría, filtros y render dinámico                                                                             |
-| **Carrito de compras**              | ✅ Funcional | `localStorage`, modal lateral, delivery o pickup y salida a WhatsApp                                                       |
-| **Auth (Login/Registro)**           | ✅ Funcional | Sliding panel, validaciones frontend y redirecciones corregidas                                                            |
+| **Carrito de compras**              | ✅ Funcional | `localStorage` + persistencia a Supabase vía RPC `create_order_with_items`, delivery o pickup                              |
+| **Auth (Login/Registro)**           | ✅ Funcional | Supabase Auth, trigger `handle_new_user` crea profile, role-based admin check                                              |
 | **PWA + Offline**                   | ✅ Funcional | `manifest.json`, service worker y `offline.html`                                                                           |
-| **Dashboard admin**                 | 🟡 Base      | Vista principal y páginas placeholder para productos, clientes y pedidos                                                   |
+| **Dashboard admin**                 | ✅ Funcional | Stats dinámicos (pedidos, ingresos, stock bajo), protección con `verifyAdminSession()`                                     |
 | **Dashboard cliente**               | 🔲 Pendiente | Sin perfil operativo, score ni historial real                                                                              |
 | **Programa de afiliados**           | 🔲 Pendiente | No implementado aún en UI ni backend                                                                                       |
-| **Supabase**                        | 🟡 Parcial   | Cliente configurado, sin modelo de datos vivo ni RLS real                                                                  |
+| **Supabase**                        | ✅ Operativo | 3 migrations, RLS en 7 tablas, 8 RPCs, triggers auth, seed data con 14 productos reales                                    |
 | **n8n**                             | 🔲 Pendiente | Sin workflows versionados en este repo                                                                                     |
 | **Infraestructura contenedorizada** | 🟡 Base      | `.devcontainer/` contiene `Dockerfile`, `devcontainer.json` y `docker-compose.yml` para trabajar npm dentro del contenedor |
 
@@ -45,7 +46,7 @@ Carni-mvp/
 │   ├── Dockerfile
 │   ├── devcontainer.json
 │   └── docker-compose.yml
-├── .env
+├── .env.example
 ├── README.md
 ├── index.html
 ├── products.html
@@ -58,12 +59,24 @@ Carni-mvp/
 ├── css/
 ├── js/
 │   └── modules/
+│       ├── core/        # auth, cart, search, loyalty
+│       ├── pages/       # admin, dashboard
+│       ├── utils/       # admin-auth, helpers
+│       └── supabase.js  # client + helpers (getProducts, createOrder, etc.)
 ├── img/
 │   ├── carrusel_products/
 │   ├── products/
 │   └── recursos_web/
+├── supabase/
+│   ├── config.toml
+│   ├── seed.sql           # 5 categorías + 14 productos reales
+│   └── migrations/
+│       ├── 202604100001_initial_schema.sql
+│       ├── 202604100002_rls_policies.sql
+│       └── 202604100003_functions.sql
 ├── docs/
 │   ├── IMPLEMENTATION_PLAN.md
+│   ├── SUPABASE_SCHEMA_README.md
 │   └── TASK_PLAN.md
 ├── agents/
 │   ├── AGENTS.md
@@ -86,6 +99,48 @@ Los agentes, subagentes, skills y workflows locales viven dentro de `agents/`.
 `.github/` queda reservado para integraciones de plataforma como GitHub Actions.
 `docs/` queda reservado para planes versionados del proyecto.
 
+### Setup local (desarrollo)
+
+```bash
+# 1. Clonar e instalar
+git clone <repo-url> && cd Carni-mvp
+npm install
+
+# 2. Supabase local
+supabase start          # levanta Postgres + Auth + Studio
+cp .env.example .env    # editar con los valores de 'supabase status'
+
+# 3. Aplicar migrations y seed
+supabase db reset       # corre migrations + seed.sql automáticamente
+
+# 4. Desarrollo
+npm run dev             # Vite dev server
+
+# 5. Cuentas de prueba
+# admin@carni.local / Admin12345!  (role=admin)
+# cliente@carni.local / Cliente12345!  (role=customer)
+```
+
+### Schema de base de datos
+
+| Tabla         | Descripción                                         |
+| ------------- | --------------------------------------------------- |
+| `profiles`    | Perfil de usuario (full_name, phone, role, points)  |
+| `categories`  | Categorías de productos (5 seed)                    |
+| `products`    | Catálogo (price_per_kg, stock, is_active) — 14 seed |
+| `orders`      | Pedidos con estado y delivery type                  |
+| `order_items` | Items de pedido (quantity_kg, unit_price, subtotal) |
+| `favorites`   | Productos favoritos del usuario                     |
+| `promotions`  | Códigos de descuento con validación                 |
+
+### Limitaciones conocidas (v1)
+
+- **Búsqueda**: El módulo `search.js` usa datos estáticos, no está conectado a Supabase aún.
+- **Dashboard cliente**: `dashboard.js` está implementado pero su contenedor HTML (`.dashboard-container`) no tiene página dedicada todavía.
+- **Imágenes productos**: El seed usa rutas `/img/products/*.webp` — verificar que las imágenes existan.
+- **Pagos**: No hay pasarela de pago integrada. Los pedidos se crean con status `pending`.
+- **n8n/Automatización**: Sin workflows en producción aún.
+
 ---
 
 ## Visión del Producto
@@ -105,6 +160,32 @@ Carni-mvp busca transformar una carnicería tradicional en una plataforma digita
 1. Consolidar el frontend existente y corregir deuda visual, responsive y de consistencia.
 2. Rediseñar la experiencia comercial sin romper la base funcional actual.
 3. Preparar la transición ordenada hacia Supabase, n8n y dashboards realmente operativos.
+
+### Criterio actual de calidad
+
+- **Rediseño real, no recolor**: el estándar esperado no es cambiar la paleta y ya; debe mejorar jerarquía visual, espaciado, padding, cards, composición y consistencia entre landing, ecommerce y paneles.
+- **Cobertura completa del sitio**: cualquier rediseño debe revisar `index.html`, `products.html`, `accessweb.html`, `dashboar.html` y vistas administrativas relacionadas. No se considera válida una mejora que solo favorece la landing.
+- **Cero regressions funcionales**: no se deben romper rutas, navegación, carga de páginas, flujos públicos, vistas admin, ni compatibilidad con la estructura actual del proyecto.
+- **Referencias como inspiración, no copia**: los assets visuales del workspace sirven para elevar el criterio estético, especialmente en bento grid, espaciado y densidad visual, sin clonar layouts literal o ciegamente.
+- **Base apta para entorno real**: toda mejora debe dejar el proyecto más cerca de un producto real, con mejor UX, mejor legibilidad, mejor organización visual y una ruta clara hacia seguridad de acceso.
+
+### Guardrails de rediseño
+
+- Mantener la navegación existente y validar manualmente que las páginas principales sigan cargando después de cada cambio.
+- No introducir cambios visuales que oculten errores funcionales o de routing.
+- No mezclar lenguajes visuales distintos entre páginas públicas y paneles internos.
+- Mejorar el bento grid con proporciones intencionales, más aire, mejor padding y ritmo visual más moderno.
+- Priorizar claridad comercial, lectura rápida y percepción premium antes que adornos o efectos.
+
+### Dirección de seguridad de rutas
+
+Aunque este repo hoy combina frontend estático con auth y lógica de cliente, la dirección técnica vigente exige preparar el proyecto para protección de rutas más explícita.
+
+- **JWT en `Authorization`**: las rutas protegidas deberán poder validar un bearer token enviado por header.
+- **401 por ausencia o invalidez**: si el token falta o no es válido, el acceso deberá bloquearse con `401 Unauthorized`.
+- **403 por rol insuficiente**: las rutas exclusivas de admin deberán responder `403 Forbidden` cuando el usuario autenticado no tenga permisos.
+- **Separación clara de vistas**: mantener nítida la frontera entre vistas públicas, vistas autenticadas y vistas admin para que el endurecimiento futuro no exija rehacer UX o navegación.
+- **Compatibilidad con middleware**: cualquier trabajo de UI o rediseño debe respetar esta evolución y no acoplar la navegación a supuestos inseguros.
 
 ### Plataforma objetivo en 4 pilares
 

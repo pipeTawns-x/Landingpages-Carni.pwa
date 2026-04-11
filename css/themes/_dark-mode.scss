@@ -1,0 +1,236 @@
+// =============================================================
+// Dark Premium Theme — Carni-mvp
+// Central overrides for .dark-premium class on <body>
+// =============================================================
+
+// CSS Custom Properties (design tokens)
+:root {
+  --carni-red: #DC2626;
+  --carni-red-dark: #B91C1C;
+  --carni-gold: #E4D1B0;
+  --carni-amber: #F59E0B;
+  --carni-dark: #050505;
+  --carni-charcoal: #111111;
+  --carni-gray: #181818;
+  --carni-text: #F5F5F5;
+  --carni-text-muted: #A3A3A3;
+
+  --font-primary: 'Poppins', sans-serif;
+  --font-display: 'Melvis One', cursive;
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.4);
+  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.5);
+
+  --transition-fast: 150ms ease;
+  --transition-normal: 300ms ease;
+  --transition-slow: 500ms ease;
+}
+
+// Body dark-premium base
+.dark-premium {
+  background-color: var(--carni-dark);
+  color: var(--carni-text);
+}
+
+// Header
+.dark-premium .main-header {
+  background: rgba(17, 17, 17, 0.98);
+}
+
+.dark-premium .mini-header {
+  background: var(--carni-charcoal);
+}
+
+// Buttons
+.dark-premium .btn-primary {
+  background: var(--carni-red);
+  border-color: var(--carni-red);
+}
+
+.dark-premium .btn-primary:hover,
+.dark-premium .btn-primary:focus {
+  background: var(--carni-red-dark);
+  border-color: var(--carni-red-dark);
+}
+
+// Generic cards
+.dark-premium .card {
+  background: var(--carni-charcoal);
+  border-color: var(--carni-gray);
+  color: var(--carni-text);
+}
+
+// Stats cards
+.dark-premium .stats-card {
+  background: linear-gradient(135deg, var(--carni-charcoal) 0%, var(--carni-gray) 100%);
+  border: 1px solid var(--carni-gray);
+}
+
+.dark-premium .stats-card .stats-value {
+  color: var(--carni-gold);
+}
+
+// Text
+.dark-premium .text-muted {
+  color: var(--carni-text-muted) !important;
+}
+
+// Forms
+.dark-premium .form-control {
+  background: var(--carni-charcoal);
+  border-color: var(--carni-gray);
+  color: var(--carni-text);
+}
+
+.dark-premium .form-control:focus {
+  background: var(--carni-dark);
+  border-color: var(--carni-red);
+  color: var(--carni-text);
+}
+
+// Modals
+.dark-premium .modal-content {
+  background: var(--carni-charcoal);
+  color: var(--carni-text);
+}
+
+// Dropdowns
+.dark-premium .dropdown-menu {
+  background: var(--carni-charcoal);
+  border-color: var(--carni-gray);
+}
+
+// Auth page
+.dark-premium.auth-page .auth-container {
+  background: var(--carni-charcoal);
+}
+
+.dark-premium.auth-page .sign-in-form .title,
+.dark-premium.auth-page .sign-up-form .title {
+  color: var(--carni-gold);
+}
+
+.dark-premium.auth-page .input-field input {
+  background: var(--carni-dark);
+  border-color: var(--carni-gray);
+  color: var(--carni-text);
+}
+
+.dark-premium.auth-page .input-field input::placeholder {
+  color: var(--carni-text-muted);
+}
+
+.dark-premium.auth-page .btn-maximalista {
+  background: var(--carni-red);
+  color: white;
+}
+
+.dark-premium.auth-page .btn-maximalista:hover {
+  background: var(--carni-red-dark);
+}
+
+// Admin dashboard
+.dark-premium.admin-dashboard .admin-sidebar {
+  background: var(--carni-charcoal) !important;
+}
+
+.dark-premium.admin-dashboard .admin-navbar {
+  background: var(--carni-dark) !important;
+}
+
+.dark-premium.admin-dashboard .card {
+  background: var(--carni-charcoal);
+  border: 1px solid var(--carni-gray);
+}
+
+.dark-premium.admin-dashboard .table {
+  color: var(--carni-text);
+}
+
+.dark-premium.admin-dashboard .table thead th {
+  background: var(--carni-gray);
+  border-color: var(--carni-gray);
+  color: var(--carni-gold);
+}
+
+.dark-premium.admin-dashboard .table tbody td {
+  border-color: var(--carni-gray);
+}
+
+// Category cards in bento grid
+.dark-premium .category-card {
+  background: var(--carni-charcoal);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  .category-title {
+    color: var(--carni-text);
+  }
+
+  .category-desc {
+    color: var(--carni-text-muted);
+  }
+}
+
+// Product cards
+.dark-premium .product-card-modern {
+  background: var(--carni-charcoal);
+  border-color: rgba(255, 255, 255, 0.08);
+
+  .card-body {
+    background: var(--carni-charcoal);
+
+    .card-title {
+      color: var(--carni-text);
+    }
+
+    .card-text {
+      color: var(--carni-text-muted);
+    }
+
+    .product-price {
+      color: var(--carni-text);
+    }
+  }
+}
+
+// Carousel area
+.dark-premium .carousel-caption {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.dark-premium .carousel-title {
+  color: var(--carni-red);
+}
+
+.dark-premium .carousel-sub {
+  color: var(--carni-gold);
+}
+
+// Select and form-select
+.dark-premium .form-select {
+  background-color: var(--carni-charcoal);
+  border-color: var(--carni-gray);
+  color: var(--carni-text);
+}
+
+// Table rows hover
+.dark-premium .table-hover tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.04);
+}
+
+// Offcanvas / Cart
+.dark-premium .offcanvas {
+  background-color: var(--carni-charcoal);
+  color: var(--carni-text);
+}
+
+.dark-premium .offcanvas-header {
+  border-bottom-color: var(--carni-gray);
+}
