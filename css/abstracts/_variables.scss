@@ -1,25 +1,32 @@
-// components/_variables.scss
+// Carni-mvp Color ADN
+// Primary
+$carni-red: #DC2626;
+$carni-beige: #E4D1B0;
+$carni-gold: #F59E0B;
+$carni-brown: #363432;
+$carni-white: #FFFFFF;
+$carni-green: #059669;
 
-// Colores principales
-$primary-color: #d32f2f;
-$secondary-color: #f5f5f5;
-$accent-color: #388e3c;
+// Colores principales (ADN)
+$primary-color: $carni-red;
+$secondary-color: $carni-beige;
+$accent-color: $carni-green;
 $color-primary: $primary-color;
 $color-secondary: $secondary-color;
 $color-accent: $accent-color;
-$color-white: #fff;
-$white: #fff;
+$color-white: $carni-white;
+$white: $carni-white;
 $color-light: #f8f9fa;
 $color-text: #333;
 $color-text-light: #666;
 $color-border: #dee2e6;
-$color-success: #28a745;
-$color-warning: #ffc107;
-$color-danger: #dc3545;
+$color-success: $carni-green;
+$color-warning: $carni-gold;
+$color-danger: $carni-red;
 $color-info: #17a2b8;
-$color-dark: #363432;
-$color-gold: #e4d1b0;
-$dark: #363432;
+$color-dark: $carni-brown;
+$color-gold: $carni-gold;
+$dark: $carni-brown;
 
 // Gray scale (para Bootstrap compatibility)
 $gray-50: #f9fafb;

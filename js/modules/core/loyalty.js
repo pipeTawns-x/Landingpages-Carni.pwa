@@ -30,9 +30,9 @@ async function showLoyaltyInfo() {
   
   // Cargar información de fidelidad del usuario
   const { data: loyaltyData, error } = await supabase
-    .from('loyalty_program')
-    .select('*')
-    .eq('user_id', appState.user.id)
+    .from('profiles')
+    .select('points, full_name')
+    .eq('id', appState.user.id)
     .single();
   
   if (error) {
@@ -52,7 +52,7 @@ async function showLoyaltyInfo() {
         <p class="mb-0">Acumulados</p>
       </div>
       <div class="qr-code mb-4">
-        <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${loyaltyData.qr_code || appState.user.id}" 
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${appState.user.id}" 
              alt="QR Code" class="img-fluid">
         <p class="small text-muted mt-2">Muestra este código al pagar para acumular puntos</p>
       </div>
@@ -78,7 +78,7 @@ async function showLoyaltyInfo() {
 // Obtener historial de puntos de fidelidad
 async function getLoyaltyHistory() {
   const { data: history, error } = await supabase
-    .from('loyalty_history')
+    .from('orders')
     .select('*')
     .eq('user_id', appState.user.id)
     .order('created_at', { ascending: false })
@@ -93,14 +93,13 @@ async function getLoyaltyHistory() {
   
   history.forEach(record => {
     const date = new Date(record.created_at).toLocaleDateString();
-    const points = record.points > 0 ? 
-      `<span class="text-success">+${record.points}</span>` : 
-      `<span class="text-danger">${record.points}</span>`;
+    const earnedPoints = Math.max(Math.floor(Number(record.total || 0) / 100), 0);
+    const points = `<span class="text-success">+${earnedPoints}</span>`;
     
     html += `
       <div class="list-group-item">
         <div class="d-flex justify-content-between">
-          <span>${record.description}</span>
+          <span>Pedido ${record.status}</span>
           <div>
             ${points} puntos <span class="text-muted small">${date}</span>
           </div>
@@ -115,43 +114,15 @@ async function getLoyaltyHistory() {
 
 // Función para agregar puntos de fidelidad
 export async function addLoyaltyPoints(userId, points, description) {
-  // Actualizar puntos totales
-  const { data: currentData, error: fetchError } = await supabase
-    .from('loyalty_program')
-    .select('points')
-    .eq('user_id', userId)
-    .single();
-  
-  if (fetchError) {
-    console.error('Error fetching current points:', fetchError);
+  const { error } = await supabase.rpc('add_points', {
+    p_user_id: userId,
+    p_points: points
+  });
+
+  if (error) {
+    console.error('Error adding loyalty points:', error, description);
     return false;
   }
-  
-  const newPoints = currentData.points + points;
-  
-  const { error: updateError } = await supabase
-    .from('loyalty_program')
-    .update({ points: newPoints })
-    .eq('user_id', userId);
-  
-  if (updateError) {
-    console.error('Error updating points:', updateError);
-    return false;
-  }
-  
-  // Registrar en el historial
-  const { error: historyError } = await supabase
-    .from('loyalty_history')
-    .insert([{
-      user_id: userId,
-      points,
-      description,
-      created_at: new Date().toISOString()
-    }]);
-  
-  if (historyError) {
-    console.error('Error adding history record:', historyError);
-  }
-  
+
   return true;
 }

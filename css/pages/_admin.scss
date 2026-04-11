@@ -1,29 +1,29 @@
-// Admin styles
+// Admin styles — Dark Premium
 .admin-dashboard {
-  background-color: #f8f9fa;
+  background-color: #050505;
   
   .admin-sidebar {
     width: 250px;
     min-height: 100vh;
     @include transition(all);
-    background-color: $primary-color;
-    color: $white;
+    background-color: #111111;
+    color: #F5F5F5;
     
     .sidebar-header {
-      border-bottom: 1px solid rgba($white, 0.1);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
       padding: map-get($spacers, 3) map-get($spacers, 4);
     }
     
     .nav-link {
-      color: rgba($white, 0.8);
+      color: rgba(255, 255, 255, 0.7);
       padding: map-get($spacers, 2) map-get($spacers, 3);
       @include transition(all);
       border-left: 3px solid transparent;
       
       &:hover, &.active {
-        color: $white;
-        background-color: rgba($white, 0.1);
-        border-left-color: $white;
+        color: #F5F5F5;
+        background-color: rgba(255, 255, 255, 0.06);
+        border-left-color: $primary-color;
       }
       
       i {
@@ -39,13 +39,14 @@
     flex: 1;
     
     .admin-navbar {
-      box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
-      background-color: $white;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+      background-color: #111111;
       padding: map-get($spacers, 2) map-get($spacers, 3);
     }
     
     .card {
-      border: none;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: #111111;
       @include box-shadow(1);
       @include transition(all);
       
@@ -54,8 +55,8 @@
       }
       
       .card-header {
-        background-color: #f8f9fc;
-        border-bottom: 1px solid #e3e6f0;
+        background-color: #181818;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
         padding: map-get($spacers, 3) map-get($spacers, 4);
         
         h5 {
@@ -72,41 +73,42 @@
 }
 
 .admin-login-brand {
-  color: #1a237e;
+  color: $primary-color;
   font-weight: 700;
   font-size: 1.5rem;
 }
 
 .admin-login-card {
-  border-top: 4px solid #1a237e;
+  border-top: 4px solid $primary-color;
+  background: #111111;
   @include box-shadow(3);
 }
 
 .admin-login-btn {
-  background-color: #1a237e;
-  border-color: #1a237e;
+  background-color: $primary-color;
+  border-color: $primary-color;
   padding: 0.75rem 1.5rem;
   font-weight: 500;
   
   &:hover {
-    background-color: #303f9f;
-    border-color: #303f9f;
+    background-color: darken($primary-color, 10%);
+    border-color: darken($primary-color, 10%);
   }
 }
 
 .admin-navbar {
-  background-color: #1a237e !important;
+  background-color: #111111 !important;
 }
 
 .admin-sidebar {
   .nav-link {
     &.active {
-      background-color: rgba(26, 35, 126, 0.2);
-      border-left: 3px solid #1a237e;
+      background-color: rgba(220, 38, 38, 0.12);
+      border-left: 3px solid $primary-color;
     }
     
     &:hover {
-      background-color: rgba(26, 35, 126, 0.1);
+      background-color: rgba(255, 255, 255, 0.06);
     }
   }
 }

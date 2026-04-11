@@ -30,17 +30,16 @@ export const supabase = createClient(supabaseUrl, supabaseKey, {
 // Database schema types (for better development experience)
 /**
  * @typedef {Object} Product
- * @property {string} id
+ * @property {number} id
+ * @property {number} category_id
  * @property {string} name
  * @property {string} description
- * @property {number} price
- * @property {string} category
+ * @property {number} price_per_kg
+ * @property {number} price_per_lb
  * @property {string} image_url
  * @property {number} stock
- * @property {number} rating
- * @property {number} rating_count
- * @property {boolean} active
- * @property {boolean} is_new
+ * @property {boolean} is_active
+ * @property {Object} metadata
  * @property {string} created_at
  * @property {string} updated_at
  */
@@ -48,15 +47,11 @@ export const supabase = createClient(supabaseUrl, supabaseKey, {
 /**
  * @typedef {Object} UserProfile
  * @property {string} id
- * @property {string} email
- * @property {string} first_name
- * @property {string} last_name
+ * @property {string} full_name
  * @property {string} phone
- * @property {string} address
- * @property {string} city
- * @property {string} state
- * @property {string} zip_code
- * @property {string} avatar_url
+ * @property {Object} address
+ * @property {string} role
+ * @property {number} points
  * @property {string} created_at
  * @property {string} updated_at
  */
@@ -65,11 +60,11 @@ export const supabase = createClient(supabaseUrl, supabaseKey, {
  * @typedef {Object} Order
  * @property {string} id
  * @property {string} user_id
- * @property {number} total_amount
+ * @property {number} total
  * @property {string} status
- * @property {string} payment_method
- * @property {string} shipping_address
- * @property {Array} items
+ * @property {string} delivery_type
+ * @property {Object} delivery_address
+ * @property {string} notes
  * @property {string} created_at
  * @property {string} updated_at
  */
@@ -86,7 +81,6 @@ export async function getProducts(options = {}) {
     category = null,
     minPrice = 0,
     maxPrice = Infinity,
-    minRating = 0,
     inStock = true,
     limit = 50,
     offset = 0,
@@ -96,25 +90,21 @@ export async function getProducts(options = {}) {
   
   let query = supabase
     .from('products')
-    .select('*')
-    .eq('active', true)
+    .select('*, categories(name, slug)')
+    .eq('is_active', true)
     .range(offset, offset + limit - 1);
   
   // Apply filters
   if (category) {
-    query = query.eq('category', category);
+    query = query.eq('category_id', category);
   }
   
   if (minPrice > 0) {
-    query = query.gte('price', minPrice);
+    query = query.gte('price_per_kg', minPrice);
   }
   
   if (maxPrice < Infinity) {
-    query = query.lte('price', maxPrice);
-  }
-  
-  if (minRating > 0) {
-    query = query.gte('rating', minRating);
+    query = query.lte('price_per_kg', maxPrice);
   }
   
   if (inStock) {
@@ -146,9 +136,9 @@ export async function getProducts(options = {}) {
 export async function getProductById(productId) {
   const { data, error } = await supabase
     .from('products')
-    .select('*')
+    .select('*, categories(name, slug)')
     .eq('id', productId)
-    .eq('active', true)
+    .eq('is_active', true)
     .single();
   
   if (error) {
@@ -202,16 +192,21 @@ export async function updateUserProfile(userId, updates) {
 }
 
 /**
- * Create new order
- * @param {Object} orderData 
- * @returns {Promise<Order>}
+ * Create new order using the RPC function (transactional)
+ * @param {Object} orderData
+ * @param {string} orderData.delivery_type - 'pickup' or 'delivery'
+ * @param {Object} [orderData.delivery_address] - Address object for delivery orders
+ * @param {string} [orderData.notes] - Optional order notes
+ * @param {Array<{product_id: number, quantity_kg: number}>} orderData.items - Cart items
+ * @returns {Promise<string>} Order UUID
  */
 export async function createOrder(orderData) {
-  const { data, error } = await supabase
-    .from('orders')
-    .insert(orderData)
-    .select()
-    .single();
+  const { data, error } = await supabase.rpc('create_order_with_items', {
+    p_delivery_type: orderData.delivery_type || 'pickup',
+    p_address: orderData.delivery_address || null,
+    p_notes: orderData.notes || null,
+    p_items: orderData.items
+  });
   
   if (error) {
     console.error('Error creating order:', error);

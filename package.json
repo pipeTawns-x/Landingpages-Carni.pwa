@@ -8,6 +8,8 @@
     "dev": "vite --host 0.0.0.0 --port 3002",
     "build": "vite build",
     "preview": "vite preview --host 0.0.0.0 --port 4173",
+    "ts:check": "tsc --noEmit",
+    "ts:build": "tsc",
     "ebac": "node app.js",
     "ebac:check": "npm run ebac && npm run build",
     "serve:static": "serve . -l 3000",
@@ -22,7 +24,9 @@
     "dotenv": "^17.2.3"
   },
   "devDependencies": {
+    "@types/node": "^25.6.0",
     "serve": "^14.2.4",
+    "typescript": "^6.0.2",
     "vite": "^7.1.12"
   },
   "license": "MIT"

@@ -9,8 +9,13 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
   <link rel="stylesheet" href="css/styles.css">
   <link rel="icon" href="img/recursos_web/logo-user.png" type="image/png">
+  <script type="module">
+    import { verifyAdminSession } from './js/modules/utils/admin-auth.js';
+
+    void verifyAdminSession();
+  </script>
 </head>
-<body class="admin-dashboard">
+<body class="admin-dashboard dark-premium">
   <div class="d-flex">
     <div class="admin-sidebar bg-dark text-white">
       <div class="sidebar-header p-3 text-center">

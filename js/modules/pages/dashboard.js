@@ -4,7 +4,16 @@ import { isAuthenticated, getCurrentUser } from '../core/auth.js';
 
 // Dashboard initialization
 export async function initializeDashboard() {
-  if (!isAuthenticated()) {
+  let user = getCurrentUser();
+
+  if (!user) {
+    const {
+      data: { user: sessionUser }
+    } = await supabase.auth.getUser();
+    user = sessionUser;
+  }
+
+  if (!isAuthenticated() && !user) {
     showNotification('Debes iniciar sesión para acceder al dashboard', 'error');
     window.location.href = '/accessweb.html?redirectTo=' + encodeURIComponent(window.location.pathname);
     return;
@@ -33,31 +42,27 @@ export async function initializeDashboard() {
 // Load dashboard data
 async function loadDashboardData() {
   try {
-    const user = getCurrentUser();
+    const currentUser = getCurrentUser() || (await supabase.auth.getUser()).data.user;
+    if (!currentUser) {
+      throw new Error('No hay sesión activa');
+    }
     
     // Load user profile
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('*')
-      .eq('id', user.id)
+      .eq('id', currentUser.id)
       .single();
     
     if (profileError) {
       throw profileError;
     }
     
-    // Load loyalty points
-    const { data: loyalty, error: loyaltyError } = await supabase
-      .from('loyalty_points')
-      .select('*')
-      .eq('user_id', user.id)
-      .single();
-    
     // Load recent orders
     const { data: orders, error: ordersError } = await supabase
       .from('orders')
       .select('*')
-      .eq('user_id', user.id)
+      .eq('user_id', currentUser.id)
       .order('created_at', { ascending: false })
       .limit(5);
     
@@ -67,14 +72,18 @@ async function loadDashboardData() {
     
     // Load favorite products
     const { data: favorites, error: favoritesError } = await supabase
-      .from('user_favorites')
+      .from('favorites')
       .select('product_id')
-      .eq('user_id', user.id);
+      .eq('user_id', currentUser.id);
+
+    if (favoritesError) {
+      throw favoritesError;
+    }
     
     // Update UI with loaded data
     updateDashboardUI({
+      currentUser,
       profile,
-      loyalty: loyalty || { points: 0, level: 'bronze' },
       orders: orders || [],
       favoritesCount: favorites?.length || 0
     });
@@ -87,11 +96,13 @@ async function loadDashboardData() {
 
 // Update dashboard UI with data
 function updateDashboardUI(data) {
-  const { profile, loyalty, orders, favoritesCount } = data;
+  const { currentUser, profile, orders, favoritesCount } = data;
+  const points = profile?.points || 0;
+  const loyalty = { points, level: getCurrentLevel(points) };
   
   // Update user info
-  updateElementText('.user-name', `${profile.first_name} ${profile.last_name}`);
-  updateElementText('.user-email', profile.email);
+  updateElementText('.user-name', profile.full_name || currentUser.email || 'Cliente');
+  updateElementText('.user-email', currentUser.email || '');
   updateElementText('.user-phone', profile.phone || 'No especificado');
   
   // Update stats cards
@@ -100,7 +111,7 @@ function updateDashboardUI(data) {
   updateElementText('.stats-favorites .stat-value', favoritesCount.toString());
   
   // Calculate total spent
-  const totalSpent = orders.reduce((total, order) => total + order.total_amount, 0);
+  const totalSpent = orders.reduce((total, order) => total + Number(order.total || 0), 0);
   updateElementText('.stats-total .stat-value', formatCurrency(totalSpent));
   
   // Update loyalty progress
@@ -108,6 +119,13 @@ function updateDashboardUI(data) {
   
   // Update recent orders table
   updateOrdersTable(orders);
+}
+
+function getCurrentLevel(points) {
+  if (points >= 1000) return 'diamond';
+  if (points >= 500) return 'gold';
+  if (points >= 200) return 'silver';
+  return 'bronze';
 }
 
 // Update loyalty progress
@@ -151,8 +169,8 @@ function updateOrdersTable(orders) {
       <tr>
         <td>#${order.id.slice(-6)}</td>
         <td>${new Date(order.created_at).toLocaleDateString()}</td>
-        <td>${order.items.length} productos</td>
-        <td>${formatCurrency(order.total_amount)}</td>
+        <td>${order.items?.length ?? 0} productos</td>
+        <td>${formatCurrency(order.total)}</td>
         <td><span class="badge badge-${getStatusBadgeClass(order.status)}">${order.status}</span></td>
         <td>
           <button class="btn btn-sm btn-outline-primary view-order" data-order-id="${order.id}">
