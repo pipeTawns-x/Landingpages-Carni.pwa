@@ -3,10 +3,11 @@
     "target": "ES2020",
     "module": "ESNext",
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "baseUrl": ".",
     "moduleResolution": "bundler",
-    "strict": false,
-    "noImplicitAny": false,
-    "strictNullChecks": false,
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "esModuleInterop": true,
@@ -16,13 +17,18 @@
     "isolatedModules": true,
     "allowJs": true,
     "checkJs": false,
+    "jsx": "react-jsx",
+    "types": ["node", "react", "react-dom"],
+    "paths": {
+      "@src/*": ["src/*"]
+    },
     "outDir": "./ts",
-    "rootDir": "./ts",
+    "rootDir": ".",
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
     "ignoreDeprecations": "6.0"
   },
-  "include": ["ts/**/*"],
+  "include": ["ts/**/*", "src/**/*", "server/**/*"],
   "exclude": ["node_modules", "dist", "js"]
 }

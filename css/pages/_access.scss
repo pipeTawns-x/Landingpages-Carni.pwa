@@ -254,6 +254,44 @@
     border-radius: 30px;
     box-shadow: 0 25px 80px rgba(0, 0, 0, 0.25);
   }
+
+}
+
+@media (max-width: 869px) {
+  .auth-container {
+    min-height: auto;
+  }
+
+  .forms-container {
+    overflow: visible;
+  }
+
+  .signin-signup {
+    min-height: auto;
+  }
+
+  .sign-in-form,
+  .sign-up-form {
+    width: 100%;
+  }
+
+  .sign-up-form {
+    position: relative;
+    display: none;
+    padding: 1rem 0;
+  }
+
+  .auth-container.sign-up-mode .sign-in-form {
+    display: none;
+  }
+
+  .auth-container.sign-up-mode .sign-up-form {
+    display: flex;
+  }
+
+  .panels-container {
+    display: none;
+  }
 }
 
 // ========================================

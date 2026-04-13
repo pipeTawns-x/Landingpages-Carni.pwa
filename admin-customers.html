@@ -35,10 +35,35 @@
         <div class="container-fluid"><span class="navbar-brand mb-0 h1">Clientes</span></div>
       </nav>
       <div class="container-fluid py-4">
+        <div id="adminCustomersStudioRoot" class="mb-4"></div>
         <div class="row g-4 mb-4">
           <div class="col-md-4"><div class="card shadow-sm border-0"><div class="card-body"><h3 class="h6 text-muted">Clientes activos</h3><p class="display-6 mb-0">128</p></div></div></div>
           <div class="col-md-4"><div class="card shadow-sm border-0"><div class="card-body"><h3 class="h6 text-muted">Afiliados</h3><p class="display-6 mb-0">42</p></div></div></div>
           <div class="col-md-4"><div class="card shadow-sm border-0"><div class="card-body"><h3 class="h6 text-muted">Nuevos esta semana</h3><p class="display-6 mb-0">9</p></div></div></div>
+        </div>
+        <div class="row g-4 mb-4">
+          <div class="col-lg-7">
+            <div class="card admin-analytics-card shadow-sm border-0 h-100">
+              <div class="card-header bg-transparent border-0 pb-0">
+                <h3 class="h5 mb-1">Crecimiento semanal</h3>
+                <p class="text-muted mb-0">Seguimiento visual de captación para campañas y retención.</p>
+              </div>
+              <div class="card-body chart-panel__canvas">
+                <canvas id="customerGrowthChart" aria-label="Gráfica de crecimiento semanal de clientes"></canvas>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-5">
+            <div class="card admin-analytics-card shadow-sm border-0 h-100">
+              <div class="card-header bg-transparent border-0 pb-0">
+                <h3 class="h5 mb-1">Canales de adquisición</h3>
+                <p class="text-muted mb-0">Comparativa rápida entre web, WhatsApp, mostrador y referidos.</p>
+              </div>
+              <div class="card-body chart-panel__canvas">
+                <canvas id="customerChannelChart" aria-label="Gráfica de canales de adquisición"></canvas>
+              </div>
+            </div>
+          </div>
         </div>
         <div class="card shadow-sm border-0">
           <div class="card-body">
@@ -61,5 +86,14 @@
     </div>
   </div>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script type="module">
+    import { initializeCustomersAdminCharts } from './js/modules/pages/chart-config.js';
+
+    document.addEventListener('DOMContentLoaded', () => {
+      initializeCustomersAdminCharts();
+    });
+  </script>
+  <script type="module" src="/src/entry/admin-customers.tsx"></script>
 </body>
 </html>

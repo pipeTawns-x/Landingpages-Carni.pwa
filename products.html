@@ -72,7 +72,7 @@
     <div class="container-fluid px-3 px-lg-5">
       <p class="mb-0 text-center">
         <i class="bi bi-truck me-2"></i>
-        Envío gratis a todo San Luis Potosí / Free shipping across SLP
+        Hoy puedes pedir tus cortes favoritos y recibirlos en zonas participantes de San Luis Potosi.
       </p>
     </div>
   </div>
@@ -89,6 +89,15 @@
         <a class="navbar-brand" href="index.html">
           <img src="img/recursos_web/logo-user.png" alt="Logo" class="main-header__logo" style="object-fit:contain;max-height:56px;">
         </a>
+        <div class="main-header__brand-lockup d-none d-lg-flex">
+          <strong>El Señor de la Misericordia</strong>
+        </div>
+      </div>
+      <div class="desktop-site-nav d-none d-lg-flex" aria-label="Navegación principal">
+        <a class="desktop-site-nav__link" href="index.html">Home</a>
+        <a class="desktop-site-nav__link desktop-site-nav__link--active" href="products.html">Products</a>
+        <a class="desktop-site-nav__link" href="accessweb.html">Club Misericordia</a>
+        <a class="desktop-site-nav__link" href="index.html#sobre-nosotros">About</a>
       </div>
       <div class="main-header__icons-container d-flex align-items-center gap-2">
         <button class="header-icon-btn header-icon-btn--round" aria-label="Buscar" id="searchBtn">
@@ -153,7 +162,7 @@
     </div>
   </aside>
 
-  <main>
+  <main class="products-main-layout">
     <!-- Breadcrumbs -->
     <nav aria-label="breadcrumb" class="container-fluid px-3 px-lg-5 py-3">
       <ol class="breadcrumb mb-0">
@@ -163,8 +172,8 @@
         </nav>
 
     <!-- Categorías Menu -->
-    <div class="container-fluid px-3 px-lg-5 mb-4">
-                <div class="categorias-menu mb-4">
+    <div class="container-fluid px-3 px-lg-5 mb-4 products-top-zone">
+          <div class="categorias-menu mb-4" id="productsCategorySlider">
             <div class="nav-scroll-wrapper">
                 <button class="scroll-btn prev" aria-label="Categorías anteriores"><i class="bi bi-chevron-left"></i></button>
                     <div class="nav-scroll">
@@ -182,6 +191,8 @@
                         </div>
                     </div>
                     
+        <div id="productsReactRoot" class="mb-5"></div>
+
         <!-- Contenedor de Productos por Categoría -->
         <div class="productos-container">
             <!-- Res -->
@@ -295,6 +306,73 @@
                 </div>
             </div>
         </div>
+
+  <div class="modal fade" id="premiumOrderModal" tabindex="-1" aria-labelledby="premiumOrderModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable">
+      <div class="modal-content premium-order-modal">
+        <div class="modal-header premium-order-modal__header">
+          <div>
+            <h5 class="modal-title" id="premiumOrderModalLabel">Configura tu corte premium</h5>
+            <p class="mb-0 small" id="premiumOrderPriceInfo">Selecciona cómo quieres pedirlo.</p>
+          </div>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="premium-order-product mb-4">
+            <h4 class="premium-order-product__title mb-1" id="premiumOrderProductName">Corte premium</h4>
+            <div class="d-flex flex-wrap gap-3 premium-order-product__prices">
+              <span id="premiumOrderKgPrice">Precio por kg: $0</span>
+              <span id="premiumOrderLbPrice">Precio por lb: $0</span>
+            </div>
+          </div>
+
+          <div class="premium-order-modes mb-4" role="radiogroup" aria-label="Tipo de pedido premium">
+            <label class="premium-order-mode-option">
+              <input type="radio" name="premiumOrderMode" value="weight" checked>
+              <span>Por peso</span>
+            </label>
+            <label class="premium-order-mode-option">
+              <input type="radio" name="premiumOrderMode" value="price">
+              <span>Por precio</span>
+            </label>
+            <label class="premium-order-mode-option">
+              <input type="radio" name="premiumOrderMode" value="pieces">
+              <span>Por piezas</span>
+            </label>
+          </div>
+
+          <div class="premium-order-grid mb-4">
+            <label class="premium-order-field">
+              <span class="premium-order-field__label" id="premiumOrderTargetLabel">Cantidad solicitada</span>
+              <input type="number" min="0.1" step="0.1" value="1" id="premiumOrderTarget" class="form-control form-control-lg">
+            </label>
+            <label class="premium-order-field">
+              <span class="premium-order-field__label">Unidad</span>
+              <select id="premiumOrderTargetUnit" class="form-select form-select-lg" disabled>
+                <option value="kg">kg</option>
+                <option value="mxn">MXN</option>
+                <option value="piezas">piezas</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="premium-order-field mb-4">
+            <div class="d-flex justify-content-between align-items-center gap-3 mb-2">
+              <span class="premium-order-field__label">Grosor del corte (pulgadas)</span>
+              <strong id="premiumOrderThicknessValue">1.25"</strong>
+            </div>
+            <input type="range" min="0.5" max="5" step="0.25" value="1.25" id="premiumOrderThickness" class="form-range">
+          </div>
+
+          <div class="premium-order-summary" id="premiumOrderSummary"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn btn-danger" id="confirmPremiumOrderBtn">Agregar al carrito</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
@@ -524,6 +602,205 @@
       }
     }
     
+    const PREMIUM_MODE_META = {
+      weight: { label: 'Peso solicitado', unit: 'kg', min: 0.1, step: 0.1 },
+      price: { label: 'Presupuesto objetivo', unit: 'mxn', min: 50, step: 10 },
+      pieces: { label: 'Piezas solicitadas', unit: 'piezas', min: 1, step: 1 }
+    };
+
+    let premiumProductSelection = null;
+    let premiumOrderModal = null;
+
+    function fallbackPremiumQuote({ mode, targetValue, pricePerKg, basePeso, grosor }) {
+      const normalizedMode = PREMIUM_MODE_META[mode] ? mode : 'weight';
+      const safeGrosor = Math.max(Number(grosor) || 1.25, 0.5);
+      const safePrice = Math.max(Number(pricePerKg) || 0, 0);
+      const safeBasePeso = Math.max(Number(basePeso) || 0.3, 0.1);
+      const unitWeightKg = safeBasePeso * (safeGrosor / 1.25);
+      let estimatedPieces = 1;
+      let totalWeightKg = unitWeightKg;
+      let totalPrice = safePrice * totalWeightKg;
+
+      if (normalizedMode === 'weight') {
+        totalWeightKg = Math.max(Number(targetValue) || 0, 0.1);
+        estimatedPieces = Math.max(1, Math.ceil(totalWeightKg / unitWeightKg));
+        totalPrice = safePrice * totalWeightKg;
+      } else if (normalizedMode === 'pieces') {
+        estimatedPieces = Math.max(1, Math.round(Number(targetValue) || 1));
+        totalWeightKg = unitWeightKg * estimatedPieces;
+        totalPrice = safePrice * totalWeightKg;
+      } else {
+        totalPrice = Math.max(Number(targetValue) || 0, 50);
+        totalWeightKg = safePrice > 0 ? totalPrice / safePrice : unitWeightKg;
+        estimatedPieces = Math.max(1, Math.round(totalWeightKg / unitWeightKg));
+      }
+
+      const avgPieceWeightKg = estimatedPieces > 0 ? totalWeightKg / estimatedPieces : totalWeightKg;
+      return {
+        mode: normalizedMode,
+        unitWeightKg,
+        totalWeightKg,
+        estimatedPieces,
+        avgPieceWeightKg,
+        totalPrice,
+        targetValue: normalizedMode === 'pieces' ? estimatedPieces : totalPrice && normalizedMode === 'price' ? totalPrice : totalWeightKg
+      };
+    }
+
+    function quotePremiumSelection(params) {
+      if (window.CarniCart && typeof window.CarniCart.quotePremium === 'function') {
+        return window.CarniCart.quotePremium(params);
+      }
+      return fallbackPremiumQuote(params);
+    }
+
+    function isPremiumCut(producto) {
+      return producto?.tipo === 'corte' && producto?.categoria === 'premium';
+    }
+
+    function getPremiumOrderModal() {
+      if (!premiumOrderModal) {
+        const modalElement = document.getElementById('premiumOrderModal');
+        if (modalElement) {
+          premiumOrderModal = bootstrap.Modal.getOrCreateInstance(modalElement);
+        }
+      }
+      return premiumOrderModal;
+    }
+
+    function getPremiumTargetMeta(mode) {
+      return PREMIUM_MODE_META[mode] || PREMIUM_MODE_META.weight;
+    }
+
+    function updatePremiumOrderSummary() {
+      if (!premiumProductSelection) return;
+
+      const selectedMode = document.querySelector('input[name="premiumOrderMode"]:checked')?.value || 'weight';
+      const targetInput = document.getElementById('premiumOrderTarget');
+      const unitSelect = document.getElementById('premiumOrderTargetUnit');
+      const thicknessInput = document.getElementById('premiumOrderThickness');
+      const thicknessValue = document.getElementById('premiumOrderThicknessValue');
+      const summary = document.getElementById('premiumOrderSummary');
+      const targetLabel = document.getElementById('premiumOrderTargetLabel');
+      const meta = getPremiumTargetMeta(selectedMode);
+
+      if (!targetInput || !unitSelect || !thicknessInput || !thicknessValue || !summary || !targetLabel) return;
+
+      targetLabel.textContent = meta.label;
+      unitSelect.value = meta.unit;
+      targetInput.min = String(meta.min);
+      targetInput.step = String(meta.step);
+      thicknessValue.textContent = `${Number(thicknessInput.value).toFixed(2)}\"`;
+
+      const quote = quotePremiumSelection({
+        mode: selectedMode,
+        targetValue: Number(targetInput.value),
+        pricePerKg: premiumProductSelection.precioPorKg,
+        basePeso: premiumProductSelection.basePeso,
+        grosor: Number(thicknessInput.value)
+      });
+
+      premiumProductSelection.__quote = quote;
+
+      summary.innerHTML = `
+        <div class="premium-order-summary__title">Resumen</div>
+        <p class="mb-2">${quote.estimatedPieces} corte(s) estimados de ${premiumProductSelection.nombre}.</p>
+        <p class="mb-2">Peso total estimado: <strong>${quote.totalWeightKg.toFixed(2)} kg</strong> · Peso por pieza: <strong>${quote.avgPieceWeightKg.toFixed(2)} kg</strong></p>
+        <p class="mb-0">Total estimado: <strong>${new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(quote.totalPrice)}</strong></p>
+      `;
+    }
+
+    function openPremiumOrderModal(producto) {
+      premiumProductSelection = { ...producto };
+
+      const nameEl = document.getElementById('premiumOrderProductName');
+      const kgPriceEl = document.getElementById('premiumOrderKgPrice');
+      const lbPriceEl = document.getElementById('premiumOrderLbPrice');
+      const targetInput = document.getElementById('premiumOrderTarget');
+      const thicknessInput = document.getElementById('premiumOrderThickness');
+      const modeInput = document.querySelector('input[name="premiumOrderMode"][value="weight"]');
+
+      if (nameEl) nameEl.textContent = producto.nombre;
+      if (kgPriceEl) kgPriceEl.textContent = `Precio por kg: $${producto.precioPorKg}`;
+      if (lbPriceEl) lbPriceEl.textContent = `Precio por lb: $${producto.precioLb || (producto.precioPorKg / 2.20462).toFixed(2)}`;
+      if (targetInput) targetInput.value = '1';
+      if (thicknessInput) thicknessInput.value = '1.25';
+      if (modeInput) modeInput.checked = true;
+
+      updatePremiumOrderSummary();
+      getPremiumOrderModal()?.show();
+    }
+
+    function buildPremiumCartItem(producto) {
+      const quote = premiumProductSelection?.__quote || quotePremiumSelection({
+        mode: 'weight',
+        targetValue: 1,
+        pricePerKg: producto.precioPorKg,
+        basePeso: producto.basePeso,
+        grosor: 1.25
+      });
+
+      return {
+        id: producto.id,
+        name: producto.nombre,
+        price: producto.precioPorKg,
+        img: producto.imagen ? (producto.imagen.startsWith('/') ? producto.imagen.slice(1) : producto.imagen) : 'img/products/premium.png',
+        categoria: producto.categoria,
+        tipo: producto.tipo,
+        peso: Number(quote.totalWeightKg.toFixed(3)),
+        piezas: quote.estimatedPieces,
+        grosor: Number((document.getElementById('premiumOrderThickness')?.value || 1.25)),
+        basePeso: producto.basePeso || 0.3,
+        orderMode: quote.mode,
+        requestedWeightKg: quote.mode === 'weight' ? Number(quote.targetValue.toFixed(3)) : undefined,
+        requestedPieces: quote.mode === 'pieces' ? quote.estimatedPieces : undefined,
+        requestedBudget: quote.mode === 'price' ? Number(quote.targetValue.toFixed(2)) : undefined,
+        unitWeightKg: Number(quote.unitWeightKg.toFixed(3)),
+        avgPieceWeightKg: Number(quote.avgPieceWeightKg.toFixed(3))
+      };
+    }
+
+    function initPremiumOrderModal() {
+      const modalElement = document.getElementById('premiumOrderModal');
+      const confirmButton = document.getElementById('confirmPremiumOrderBtn');
+      const targetInput = document.getElementById('premiumOrderTarget');
+      const thicknessInput = document.getElementById('premiumOrderThickness');
+
+      if (!modalElement || modalElement.dataset.bound === 'true') return;
+      modalElement.dataset.bound = 'true';
+
+      modalElement.querySelectorAll('input[name="premiumOrderMode"]').forEach((input) => {
+        input.addEventListener('change', () => {
+          const meta = getPremiumTargetMeta(input.value);
+          if (targetInput) {
+            targetInput.value = input.value === 'pieces' ? '1' : input.value === 'price' ? '500' : '1';
+            targetInput.min = String(meta.min);
+            targetInput.step = String(meta.step);
+          }
+          updatePremiumOrderSummary();
+        });
+      });
+
+      if (targetInput) {
+        targetInput.addEventListener('input', updatePremiumOrderSummary);
+      }
+
+      if (thicknessInput) {
+        thicknessInput.addEventListener('input', updatePremiumOrderSummary);
+      }
+
+      if (confirmButton) {
+        confirmButton.addEventListener('click', () => {
+          if (!premiumProductSelection) return;
+          const item = buildPremiumCartItem(premiumProductSelection);
+          if (window.CarniCart && typeof window.CarniCart.addItem === 'function') {
+            window.CarniCart.addItem(item);
+            getPremiumOrderModal()?.hide();
+          }
+        });
+      }
+    }
+
     /**
      * Agrega un producto al carrito
      * @param {Object} producto - Objeto del producto a agregar
@@ -531,6 +808,11 @@
     function agregarAlCarrito(producto) {
       if (!producto || !producto.id) {
         console.error('Producto inválido:', producto);
+        return;
+      }
+
+      if (isPremiumCut(producto)) {
+        openPremiumOrderModal(producto);
         return;
       }
       
@@ -560,6 +842,7 @@
      */
     function init() {
       try {
+        initPremiumOrderModal();
         // Esperar a que los productos estén cargados
         if (!productosCargados) {
           setTimeout(init, 200);
@@ -660,6 +943,7 @@
             }
     })();
     </script>
+  <script type="module" src="/src/entry/products.tsx"></script>
 </body>
 
 </html>

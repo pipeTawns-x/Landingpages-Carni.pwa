@@ -73,6 +73,104 @@
     return '$' + Number(n).toFixed(2); 
   }
 
+  const PREMIUM_REFERENCE_GROSOR = 1.25;
+
+  function roundValue(value, decimals = 3) {
+    const factor = 10 ** decimals;
+    return Math.round((Number(value) || 0) * factor) / factor;
+  }
+
+  function isPremiumCutItem(item) {
+    return item?.tipo === 'corte' && item?.categoria === 'premium';
+  }
+
+  function getPremiumUnitWeight(basePeso, grosor) {
+    const safeBasePeso = Math.max(Number(basePeso) || 0.3, 0.1);
+    const safeGrosor = Math.max(Number(grosor) || PREMIUM_REFERENCE_GROSOR, 0.5);
+    return safeBasePeso * (safeGrosor / PREMIUM_REFERENCE_GROSOR);
+  }
+
+  function quotePremium(itemOrConfig) {
+    const mode = ['weight', 'pieces', 'price'].includes(itemOrConfig?.mode || itemOrConfig?.orderMode)
+      ? (itemOrConfig.mode || itemOrConfig.orderMode)
+      : 'weight';
+    const pricePerKg = Math.max(Number(itemOrConfig?.pricePerKg ?? itemOrConfig?.price) || 0, 0);
+    const unitWeightKg = getPremiumUnitWeight(itemOrConfig?.basePeso, itemOrConfig?.grosor);
+    let totalWeightKg = unitWeightKg;
+    let estimatedPieces = Math.max(1, Math.round(Number(itemOrConfig?.requestedPieces || itemOrConfig?.piezas) || 1));
+    let totalPrice = pricePerKg * totalWeightKg;
+    let targetValue = 0;
+
+    if (mode === 'weight') {
+      targetValue = Math.max(Number(itemOrConfig?.targetValue ?? itemOrConfig?.requestedWeightKg ?? itemOrConfig?.peso) || unitWeightKg, 0.1);
+      totalWeightKg = targetValue;
+      estimatedPieces = Math.max(1, Math.ceil(totalWeightKg / unitWeightKg));
+      totalPrice = pricePerKg * totalWeightKg;
+    } else if (mode === 'pieces') {
+      targetValue = Math.max(Number(itemOrConfig?.targetValue ?? itemOrConfig?.requestedPieces ?? itemOrConfig?.piezas) || 1, 1);
+      estimatedPieces = Math.max(1, Math.round(targetValue));
+      totalWeightKg = unitWeightKg * estimatedPieces;
+      totalPrice = pricePerKg * totalWeightKg;
+    } else {
+      targetValue = Math.max(Number(itemOrConfig?.targetValue ?? itemOrConfig?.requestedBudget ?? pricePerKg * unitWeightKg) || 0, 50);
+      totalPrice = targetValue;
+      totalWeightKg = pricePerKg > 0 ? totalPrice / pricePerKg : unitWeightKg;
+      estimatedPieces = Math.max(1, Math.round(totalWeightKg / unitWeightKg));
+    }
+
+    const avgPieceWeightKg = estimatedPieces > 0 ? totalWeightKg / estimatedPieces : totalWeightKg;
+
+    return {
+      mode,
+      unitWeightKg: roundValue(unitWeightKg),
+      totalWeightKg: roundValue(totalWeightKg),
+      estimatedPieces,
+      avgPieceWeightKg: roundValue(avgPieceWeightKg),
+      totalPrice: roundValue(totalPrice, 2),
+      targetValue: roundValue(targetValue, mode === 'pieces' ? 0 : 2)
+    };
+  }
+
+  function normalizeCartItem(item) {
+    const itemPrice = Number(item.price || 0);
+
+    if (isPremiumCutItem(item)) {
+      const quote = quotePremium(item);
+      return {
+        itemPrice,
+        amount: quote.totalWeightKg,
+        itemTotal: quote.totalPrice,
+        unitLabel: 'kg',
+        premiumQuote: quote,
+        modeLabel: quote.mode === 'weight' ? 'Por peso' : quote.mode === 'pieces' ? 'Por piezas' : 'Por precio'
+      };
+    }
+
+    let amount = 0;
+    let itemTotal = 0;
+
+    if(item.tipo === 'kg' || item.tipo === 'corte') {
+      amount = item.peso || 0.5;
+      if(item.tipo === 'corte' && item.grosor) {
+        const pesoBase = item.basePeso || 0.3;
+        amount = pesoBase * (item.grosor || 1.25);
+      }
+      itemTotal = itemPrice * amount;
+    } else if(item.tipo === 'unidad' || item.tipo === 'paquete') {
+      amount = item.piezas || 1;
+      itemTotal = itemPrice * amount;
+    }
+
+    return {
+      itemPrice,
+      amount,
+      itemTotal,
+      unitLabel: item.tipo === 'unidad' ? 'pieza' : item.tipo === 'paquete' ? 'paquete' : 'kg',
+      premiumQuote: null,
+      modeLabel: null
+    };
+  }
+
   /**
    * Renderiza el contenido del modal del carrito
    * Genera la interfaz completa con productos, controles y resumen
@@ -106,24 +204,10 @@
     cart.forEach((it, idx)=>{
       const row = document.createElement('div'); 
       row.className='item-row d-flex align-items-start mb-3 p-3 border rounded';
-      const itemPrice = Number(it.price||0);
-      
-      // Calcular cantidad según tipo
-      let cantidad = 0;
-      let itemTotal = 0;
-      
-      if(it.tipo === 'kg' || it.tipo === 'corte') {
-        cantidad = it.peso || 0.5;
-        if(it.tipo === 'corte' && it.grosor) {
-          // Para cortes, el peso se calcula con grosor
-          const pesoBase = it.basePeso || 0.3;
-          cantidad = pesoBase * (it.grosor || 1.25);
-        }
-        itemTotal = itemPrice * cantidad;
-      } else if(it.tipo === 'unidad' || it.tipo === 'paquete') {
-        cantidad = it.piezas || 1;
-        itemTotal = itemPrice * cantidad;
-      }
+      const normalized = normalizeCartItem(it);
+      const itemPrice = normalized.itemPrice;
+      const cantidad = normalized.amount;
+      const itemTotal = normalized.itemTotal;
       
       subtotal += itemTotal;
       
@@ -136,7 +220,21 @@
         <div style="flex:1; margin-left: 1rem;">
           <h6 class="mb-2">${it.name}</h6>
           <div class="item-controls mt-2 d-flex gap-3 flex-wrap align-items-center">
-            ${it.tipo === 'kg' || it.tipo === 'corte' ? `
+            ${isPremiumCutItem(it) ? `
+              <label class="d-flex align-items-center gap-2 flex-wrap premium-cart-control">
+                <small>Modo:</small>
+                <select data-idx="${idx}" class="premium-mode-input form-select form-select-sm" style="width: 150px;">
+                  <option value="weight" ${normalized.premiumQuote?.mode === 'weight' ? 'selected' : ''}>Por peso</option>
+                  <option value="price" ${normalized.premiumQuote?.mode === 'price' ? 'selected' : ''}>Por precio</option>
+                  <option value="pieces" ${normalized.premiumQuote?.mode === 'pieces' ? 'selected' : ''}>Por piezas</option>
+                </select>
+              </label>
+              <label class="d-flex align-items-center gap-1 premium-cart-control">
+                <small>${normalized.premiumQuote?.mode === 'weight' ? 'Kg:' : normalized.premiumQuote?.mode === 'pieces' ? 'Piezas:' : 'MXN:'}</small>
+                <input type="number" min="${normalized.premiumQuote?.mode === 'pieces' ? '1' : normalized.premiumQuote?.mode === 'price' ? '50' : '0.1'}" step="${normalized.premiumQuote?.mode === 'pieces' ? '1' : normalized.premiumQuote?.mode === 'price' ? '10' : '0.1'}" value="${normalized.premiumQuote?.targetValue}" 
+                       data-idx="${idx}" class="premium-target-input form-control form-control-sm" style="width: 110px;">
+              </label>
+            ` : it.tipo === 'kg' || it.tipo === 'corte' ? `
               <label class="d-flex align-items-center gap-1">
                 <small>Peso (kg):</small>
                 <input type="number" min="0.1" step="0.1" value="${cantidad.toFixed(2)}" 
@@ -159,8 +257,11 @@
               </label>
             ` : ''}
           </div>
-          <div class="mt-2">
-            <small class="text-muted">Precio: ${formatPrice(itemPrice)}/${it.tipo === 'unidad' ? 'pieza' : it.tipo === 'paquete' ? 'paquete' : 'kg'}</small>
+          <div class="mt-2 d-flex flex-column gap-1">
+            <small class="text-muted">Precio: ${formatPrice(itemPrice)}/${normalized.unitLabel}</small>
+            ${normalized.premiumQuote ? `
+              <small class="text-muted">${normalized.modeLabel} · ${normalized.premiumQuote.estimatedPieces} pieza(s) estimadas · ${normalized.premiumQuote.avgPieceWeightKg.toFixed(2)} kg/pieza</small>
+            ` : ''}
           </div>
         </div>
         <div style="min-width:120px;text-align:right; margin-left: 1rem;">
@@ -202,6 +303,51 @@
       `; 
     }
 
+    container.querySelectorAll('.premium-mode-input').forEach((inp) => {
+      inp.addEventListener('change', (e) => {
+        const i = Number(e.target.dataset.idx);
+        const cart = loadCart();
+        if(!cart[i]) return;
+        const quote = quotePremium(cart[i]);
+        cart[i].orderMode = e.target.value;
+        if (e.target.value === 'weight') {
+          cart[i].requestedWeightKg = quote.totalWeightKg;
+          delete cart[i].requestedPieces;
+          delete cart[i].requestedBudget;
+        } else if (e.target.value === 'pieces') {
+          cart[i].requestedPieces = quote.estimatedPieces;
+          delete cart[i].requestedWeightKg;
+          delete cart[i].requestedBudget;
+        } else {
+          cart[i].requestedBudget = quote.totalPrice;
+          delete cart[i].requestedWeightKg;
+          delete cart[i].requestedPieces;
+        }
+        saveCart(cart);
+        renderCartModal();
+        updateBadge();
+      });
+    });
+
+    container.querySelectorAll('.premium-target-input').forEach((inp) => {
+      inp.addEventListener('change', (e) => {
+        const i = Number(e.target.dataset.idx);
+        const cart = loadCart();
+        if(!cart[i]) return;
+        const value = Number(e.target.value);
+        if ((cart[i].orderMode || 'weight') === 'weight') {
+          cart[i].requestedWeightKg = value;
+        } else if ((cart[i].orderMode || 'weight') === 'pieces') {
+          cart[i].requestedPieces = Math.max(1, Math.round(value));
+        } else {
+          cart[i].requestedBudget = value;
+        }
+        saveCart(cart);
+        renderCartModal();
+        updateBadge();
+      });
+    });
+
     // Bind controls - Peso
     container.querySelectorAll('.peso-input').forEach(inp=>{
       inp.addEventListener('change', (e)=>{ 
@@ -237,8 +383,8 @@
         cart[i].grosor = Number(e.target.value);
         const valueSpan = e.target.parentElement.querySelector('.grosor-value');
         if(valueSpan) valueSpan.textContent = e.target.value + '"';
-        // Recalcular peso para cortes
-        if(cart[i].tipo === 'corte') {
+        // Recalcular peso para cortes clásicos
+        if(cart[i].tipo === 'corte' && !isPremiumCutItem(cart[i])) {
           const pesoBase = cart[i].basePeso || 0.3;
           cart[i].peso = pesoBase * cart[i].grosor;
         }
@@ -275,33 +421,16 @@
         const deliveryCost = deliverySelect ? Number(deliverySelect.value) : 0;
         const deliveryType = deliveryCost > 0 ? 'delivery' : 'pickup';
         let total = cart.reduce((sum, it) => {
-          let cantidad = 0;
-          if(it.tipo === 'kg' || it.tipo === 'corte') {
-            cantidad = it.peso || 0.5;
-            if(it.tipo === 'corte' && it.grosor) {
-              const pesoBase = it.basePeso || 0.3;
-              cantidad = pesoBase * it.grosor;
-            }
-          } else {
-            cantidad = it.piezas || 1;
-          }
-          return sum + (Number(it.price||0) * cantidad);
+          const normalized = normalizeCartItem(it);
+          return sum + normalized.itemTotal;
         }, 0) + deliveryCost;
 
         // Build items array for RPC
         const orderItems = cart.map(it => {
-          let qty = 0;
-          if(it.tipo === 'kg' || it.tipo === 'corte') {
-            qty = it.peso || 0.5;
-            if(it.tipo === 'corte' && it.grosor) {
-              qty = (it.basePeso || 0.3) * it.grosor;
-            }
-          } else {
-            qty = it.piezas || 1;
-          }
+          const normalized = normalizeCartItem(it);
           return {
             product_id: Number(it.id),
-            quantity_kg: Number(qty.toFixed(3)),
+            quantity_kg: Number(normalized.amount.toFixed(3)),
             unit_price: Number(it.price || 0)
           };
         });
@@ -416,7 +545,9 @@
     renderCartModal, 
     updateBadge, 
     loadCart, 
-    saveCart 
+    saveCart,
+    quotePremium,
+    isPremiumCutItem 
   };
 
   /**

@@ -230,8 +230,49 @@ function setupLoginForm() {
 
 // Configurar formulario de registro
 function setupRegisterForm() {
+  const deliveryToggle = document.getElementById('deliveryDetailsToggle');
+  const deliveryFields = document.getElementById('deliveryFields');
+  const deliveryInputs = deliveryFields ? deliveryFields.querySelectorAll('input, textarea') : [];
+  const verifyEmailBtn = document.getElementById('verifyEmailBtn');
+  const verifyPhoneBtn = document.getElementById('verifyPhoneBtn');
+  const deliverySummary = document.getElementById('registerDeliverySummary');
+
+  function syncDeliveryFields() {
+    const enabled = Boolean(deliveryToggle?.checked);
+    deliveryFields?.classList.toggle('is-open', enabled);
+    deliveryInputs.forEach((input) => {
+      input.required = false;
+      input.disabled = !enabled;
+    });
+  }
+
+  deliveryToggle?.addEventListener('change', syncDeliveryFields);
+  syncDeliveryFields();
+
+  verifyEmailBtn?.addEventListener('click', () => {
+    const email = registerForm.registerEmail.value.trim();
+    const isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    alert(isValid
+      ? 'Correo listo para validacion. La confirmacion final se enviara al completar el registro.'
+      : 'Escribe un correo valido antes de continuar.');
+  });
+
+  verifyPhoneBtn?.addEventListener('click', () => {
+    const phone = registerForm.registerPhone.value.trim();
+    const isValid = /^\d{10}$/.test(phone);
+    alert(isValid
+      ? 'Telefono listo para validacion. El codigo SMS se activa al completar el registro.'
+      : 'Escribe un telefono de 10 digitos para continuar.');
+  });
+
   registerForm.addEventListener('submit', async (e) => {
     e.preventDefault();
+
+    const deliveryText = deliverySummary?.value?.trim() ?? '';
+    if (deliveryText) {
+      registerForm.registerAddress.value = deliveryText;
+      registerForm.registerReference.value = deliveryText;
+    }
     
     const name = registerForm.registerName.value;
     const email = registerForm.registerEmail.value;

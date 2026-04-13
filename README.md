@@ -10,6 +10,12 @@
 [![Responsive](https://img.shields.io/badge/Responsive-320→768→1024-brightgreen)](https://github.com/pipeTawns-x/Landingpages-Carni.pwa)
 [![Branch](https://img.shields.io/badge/Branch-main-purple)](https://github.com/pipeTawns-x/Landingpages-Carni.pwa/tree/main)
 
+## Entrega EBAC React
+
+- La práctica React alineada a la consigna de EBAC vive en `src/App.js`, `src/components/Header.js`, `src/components/Song.js` y `src/App.css`.
+- La página de revisión para esa práctica se encuentra en `ebac-react.html`.
+- La app usa componentes de clase y `componentDidMount` en `App.js`, sin eliminar el resto del trabajo realizado en el MVP principal.
+
 ---
 
 ## Estado Real del Proyecto

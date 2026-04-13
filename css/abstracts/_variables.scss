@@ -63,8 +63,23 @@ $spacers: (
 // Breakpoints
 $breakpoint-sm: 576px;
 $breakpoint-md: 768px;
+$breakpoint-auth: 870px;
 $breakpoint-lg: 992px;
 $breakpoint-xl: 1200px;
+
+:root {
+  --carni-red: #{$carni-red};
+  --carni-red-dark: #{darken($carni-red, 10%)};
+  --carni-gold: #{$carni-beige};
+  --carni-amber: #{$carni-gold};
+  --carni-dark: #050505;
+  --carni-charcoal: #111111;
+  --carni-gray: #181818;
+  --carni-surface: #{$carni-white};
+  --carni-text: #F5F5F5;
+  --carni-text-muted: #A3A3A3;
+  --carni-text-strong: #{$carni-brown};
+}
 
 // Sombras
 $shadow-sm: 0 2px 10px rgba(0,0,0,0.05);
