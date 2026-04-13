@@ -45,6 +45,15 @@
         <a class="navbar-brand" href="index.html">
           <img src="img/recursos_web/logo-user.png" alt="Carnicería El Señor de La Misericordia" class="main-header__logo" style="object-fit:contain;max-height:56px;">
         </a>
+        <div class="main-header__brand-lockup d-none d-lg-flex">
+          <strong>El Señor de la Misericordia</strong>
+        </div>
+      </div>
+      <div class="desktop-site-nav d-none d-lg-flex" aria-label="Navegación principal">
+        <a class="desktop-site-nav__link" href="index.html">Home</a>
+        <a class="desktop-site-nav__link" href="products.html">Products</a>
+        <a class="desktop-site-nav__link desktop-site-nav__link--active" href="accessweb.html">Club Misericordia</a>
+        <a class="desktop-site-nav__link" href="index.html#sobre-nosotros">About</a>
       </div>
       <div class="main-header__icons-container d-flex align-items-center gap-2">
         <button class="header-icon-btn header-icon-btn--round position-relative" id="cartBtn" data-bs-toggle="modal" data-bs-target="#cartModal" aria-label="Carrito">
@@ -107,16 +116,16 @@
 
           <!-- ===== FORMULARIO LOGIN ===== -->
           <form id="loginForm" class="sign-in-form">
-            <h2 class="title">¡Bienvenido de vuelta!</h2>
+            <h2 class="title">Bienvenido de vuelta a tu carniceria</h2>
 
             <div class="input-field">
               <i class="fas fa-envelope"></i>
-              <input type="email" id="loginEmail" name="email" placeholder="Email del carnicero" autocomplete="email"
+              <input type="email" id="loginEmail" name="email" placeholder="Correo electronico" autocomplete="email"
                 required>
             </div>
             <div class="input-field">
               <i class="fas fa-lock"></i>
-              <input type="password" id="loginPassword" name="password" placeholder="Contraseña segura"
+              <input type="password" id="loginPassword" name="password" placeholder="Contrasena"
                 autocomplete="current-password" required minlength="8">
             </div>
 
@@ -131,7 +140,7 @@
 
               <button type="submit" class="btn-maximalista">ENTRAR A LA CARNICERÍA</button>
 
-            <p class="social-text">O inicia con plataformas para pedidos rápidos</p>
+            <p class="social-text">Tambien puedes continuar con tus accesos vinculados</p>
             <div class="social-media">
               <a href="#" class="social-icon" id="googleLogin" aria-label="Login con Google">
                 <i class="fab fa-google"></i>
@@ -150,10 +159,10 @@
             </div>
           </form>
 
-          <!-- ===== FORMULARIO REGISTRO CON DATOS DE DELIVERY ===== -->
+          <!-- ===== FORMULARIO REGISTRO ORDENADO ===== -->
           <form id="registerForm" class="sign-up-form">
-            <h2 class="title">¡Únete a la carnicería!</h2>
-            <p class="form-subtitle">Regístrate para delivery y ofertas exclusivas</p>
+            <h2 class="title">Crea tu cuenta de cliente</h2>
+            <p class="form-subtitle">Empieza con lo esencial y agrega datos de entrega solo si los necesitas</p>
 
             <!-- Datos personales -->
             <div class="input-field">
@@ -163,50 +172,55 @@
             </div>
             <div class="input-field">
               <i class="fas fa-envelope"></i>
-              <input type="email" id="registerEmail" name="email" placeholder="Email" autocomplete="email" required>
+              <input type="email" id="registerEmail" name="email" placeholder="Correo electronico" autocomplete="email" required>
+            </div>
+            <div class="field-hint-row">
+              <span class="field-hint">Al finalizar enviaremos confirmacion por correo.</span>
+              <button type="button" class="verify-chip" id="verifyEmailBtn">Validar correo</button>
             </div>
             <div class="input-field">
               <i class="fas fa-phone"></i>
               <input type="tel" id="registerPhone" name="phone" placeholder="Teléfono (10 dígitos)" inputmode="tel"
                 autocomplete="tel" pattern="[0-9]{10}" required>
             </div>
-
-            <!-- Datos de delivery -->
-            <div class="input-field">
-              <i class="fas fa-map-marker-alt"></i>
-              <input type="text" id="registerAddress" name="address" placeholder="Calle y número"
-                autocomplete="street-address" required>
-            </div>
-            <div class="input-field">
-              <i class="fas fa-building"></i>
-              <input type="text" id="registerColonia" name="colonia" placeholder="Colonia" autocomplete="address-level3"
-                required>
-            </div>
-            <div class="input-field">
-              <i class="fas fa-mail-bulk"></i>
-              <input type="text" id="registerPostal" name="postal_code" placeholder="Código Postal" inputmode="numeric"
-                pattern="[0-9]{5}" autocomplete="postal-code" required>
-            </div>
-            <div class="input-field">
-              <i class="fas fa-sticky-note"></i>
-              <input type="text" id="registerReference" name="reference" placeholder="Referencias (opcional)"
-                autocomplete="off">
+            <div class="field-hint-row">
+              <span class="field-hint">Podras confirmar este numero por SMS.</span>
+              <button type="button" class="verify-chip" id="verifyPhoneBtn">Validar telefono</button>
             </div>
 
             <!-- Contraseña -->
             <div class="input-field">
               <i class="fas fa-lock"></i>
-              <input type="password" id="registerPassword" name="password" placeholder="Contraseña segura"
+              <input type="password" id="registerPassword" name="password" placeholder="Contrasena segura"
                 autocomplete="new-password" required minlength="8">
             </div>
             <div class="input-field">
               <i class="fas fa-shield-alt"></i>
               <input type="password" id="registerConfirmPassword" name="password_confirm"
-                placeholder="Confirmar contraseña" autocomplete="new-password" required minlength="8">
+                placeholder="Confirmar contrasena" autocomplete="new-password" required minlength="8">
+            </div>
+
+            <label class="delivery-toggle-card">
+              <input type="checkbox" id="deliveryDetailsToggle" name="deliveryDetailsToggle">
+              <span>
+                <strong>Agregar datos de delivery ahora</strong>
+                <small>Si prefieres, puedes completar direccion y referencias despues.</small>
+              </span>
+            </label>
+
+            <div class="delivery-fields" id="deliveryFields">
+              <div class="delivery-fields__single">
+                <label class="delivery-fields__label" for="registerDeliverySummary">Direccion para delivery</label>
+                <textarea id="registerDeliverySummary" name="delivery_summary" rows="4" placeholder="Calle y numero, colonia, codigo postal y referencia opcional"></textarea>
+                <input type="hidden" id="registerAddress" name="address">
+                <input type="hidden" id="registerColonia" name="colonia">
+                <input type="hidden" id="registerPostal" name="postal_code">
+                <input type="hidden" id="registerReference" name="reference">
+              </div>
             </div>
 
             <!-- Checkboxes -->
-            <div class="form-checkboxes">
+            <div class="form-checkboxes compact-form-checkboxes">
               <label class="checkbox-label">
                 <input type="checkbox" name="termsCheck" id="termsCheck" required>
                 <span>Acepto los <a href="#" class="terms-link">términos y condiciones</a></span>
@@ -233,8 +247,8 @@
         <!-- Panel izquierdo (visible en modo login) - Imagen de LOGIN -->
         <div class="panel left-panel">
           <div class="content">
-            <h3>¿Nuevo en la carnicería?</h3>
-            <p>Regístrate y accede a cortes frescos, ofertas diarias y carne premium.</p>
+            <h3>¿Primera vez por aqui?</h3>
+            <p>Crea tu cuenta en minutos y deja listo tu acceso para pedir sin filas ni vueltas.</p>
             <button class="btn transparent" type="button" id="btnShowRegister">REGISTRARSE</button>
           </div>
           <img src="img/recursos_web/carniLogin.png" alt="Carnicero dando la bienvenida" class="image"
@@ -244,8 +258,8 @@
         <!-- Panel derecho (visible en modo registro) - Imagen de REGISTRO -->
         <div class="panel right-panel">
           <div class="content">
-            <h3>¿Ya eres cliente habitual?</h3>
-            <p>Inicia sesión y pide tus cortes favoritos en segundos.</p>
+            <h3>¿Ya compras con nosotros?</h3>
+            <p>Entra, revisa tus favoritos y vuelve a pedir tus cortes de siempre en segundos.</p>
             <button class="btn transparent" type="button" id="btnShowLogin">INICIAR SESIÓN</button>
           </div>
           <img src="img/recursos_web/carniRegistro.png" alt="Carnicero cortando carne premium" class="image"
@@ -254,6 +268,10 @@
       </div>
     </div>
   </main>
+
+  <section class="container-fluid px-3 px-lg-5 py-4">
+    <div id="authExperienceRoot"></div>
+  </section>
 
   <footer class="auth-footer">
     <div class="container-fluid px-3 px-lg-5">
@@ -352,6 +370,7 @@
       }
     });
   </script>
+  <script type="module" src="/src/entry/auth.tsx"></script>
 </body>
 
 </html>

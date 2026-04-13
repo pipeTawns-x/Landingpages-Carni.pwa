@@ -120,6 +120,8 @@
                 <p>Los pedidos que realices se sincronizarán automáticamente cuando recuperes la conexión.</p>
             </div>
         </div>
+
+        <div id="offlineReactRoot"></div>
     </div>
 
     <script>
@@ -138,5 +140,6 @@
         // Check connection every 30 seconds
         setInterval(checkConnection, 30000);
     </script>
+    <script type="module" src="/src/entry/offline.tsx"></script>
 </body>
 </html>

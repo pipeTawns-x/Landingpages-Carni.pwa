@@ -69,3 +69,19 @@
     }
   }
 }
+
+.admin-analytics-card {
+  .card-body {
+    min-height: 320px;
+  }
+}
+
+.chart-panel__canvas {
+  position: relative;
+  min-height: 260px;
+}
+
+.chart-panel__canvas canvas {
+  width: 100% !important;
+  height: 260px !important;
+}

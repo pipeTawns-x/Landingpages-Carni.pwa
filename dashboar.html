@@ -103,6 +103,7 @@
 
       <!-- Main Content Area -->
       <div class="container-fluid py-4">
+        <div id="buildAdsReactRoot" class="mb-4"></div>
         <div class="row mb-4">
           <div class="col-12">
             <h2 class="mb-0">Dashboard</h2>
@@ -262,75 +263,18 @@
         }
       });
     });
-    
-    // Charts
-    document.addEventListener('DOMContentLoaded', function() {
-      // Sales Chart
-      const salesCtx = document.getElementById('salesChart').getContext('2d');
-      const salesChart = new Chart(salesCtx, {
-        type: 'line',
-        data: {
-          labels: ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct"],
-          datasets: [{
-            label: "Ventas",
-            lineTension: 0.3,
-            backgroundColor: "rgba(78, 115, 223, 0.05)",
-            borderColor: "rgba(78, 115, 223, 1)",
-            pointRadius: 3,
-            pointBackgroundColor: "rgba(78, 115, 223, 1)",
-            pointBorderColor: "rgba(78, 115, 223, 1)",
-            pointHoverRadius: 3,
-            pointHoverBackgroundColor: "rgba(78, 115, 223, 1)",
-            pointHoverBorderColor: "rgba(78, 115, 223, 1)",
-            pointHitRadius: 10,
-            pointBorderWidth: 2,
-            data: [15000, 18000, 21000, 19000, 24000, 28000, 25000, 26000, 23000, 29000],
-          }],
-        },
-        options: {
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              display: false
-            }
-          },
-          scales: {
-            y: {
-              beginAtZero: true
-            }
-          }
-        }
-      });
+  </script>
+  <script type="module">
+    import { initializeDashboardCharts } from './js/modules/pages/chart-config.js';
 
-      // Products Chart
-      const productsCtx = document.getElementById('productsChart').getContext('2d');
-      const productsChart = new Chart(productsCtx, {
-        type: 'doughnut',
-        data: {
-          labels: ["Rib Eye", "Filet Mignon", "Tomahawk", "Otros"],
-          datasets: [{
-            data: [45, 30, 15, 10],
-            backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc', '#f6c23e'],
-            hoverBackgroundColor: ['#2e59d9', '#17a673', '#2c9faf', '#dda20a'],
-            hoverBorderColor: "rgba(234, 236, 244, 1)",
-          }],
-        },
-        options: {
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              display: false
-            }
-          },
-          cutout: '70%',
-        },
-      });
-    });
+    document.addEventListener('DOMContentLoaded', () => {
+      initializeDashboardCharts();
 
-    // Toggle sidebar on mobile
-    document.getElementById('sidebarToggle').addEventListener('click', function() {
-      document.querySelector('.admin-sidebar').classList.toggle('show');
+      document.getElementById('sidebarToggle')?.addEventListener('click', () => {
+        document.querySelector('.admin-sidebar')?.classList.toggle('show');
+      });
     });
   </script>
+  <script type="module" src="/src/entry/dashboard.tsx"></script>
 </body>
 </html>

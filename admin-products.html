@@ -35,6 +35,7 @@
         <div class="container-fluid"><span class="navbar-brand mb-0 h1">Productos</span></div>
       </nav>
       <div class="container-fluid py-4">
+        <div id="adminProductsStudioRoot" class="mb-4"></div>
         <div class="card shadow-sm border-0">
           <div class="card-body">
             <div class="d-flex justify-content-between align-items-center mb-4">
@@ -43,6 +44,30 @@
                 <p class="text-muted mb-0">Vista mínima operativa para evitar rutas rotas mientras se implementa el CRUD real.</p>
               </div>
               <button class="btn btn-danger"><i class="bi bi-plus-lg me-2"></i>Nuevo producto</button>
+            </div>
+            <div class="row g-4 mb-4">
+              <div class="col-lg-7">
+                <div class="card admin-analytics-card shadow-sm border-0 h-100">
+                  <div class="card-header bg-transparent border-0 pb-0">
+                    <h3 class="h5 mb-1">Stock por categoría</h3>
+                    <p class="text-muted mb-0">Lectura rápida del inventario base para decisiones de reposición.</p>
+                  </div>
+                  <div class="card-body chart-panel__canvas">
+                    <canvas id="stockByCategoryChart" aria-label="Gráfica de stock por categoría"></canvas>
+                  </div>
+                </div>
+              </div>
+              <div class="col-lg-5">
+                <div class="card admin-analytics-card shadow-sm border-0 h-100">
+                  <div class="card-header bg-transparent border-0 pb-0">
+                    <h3 class="h5 mb-1">Estado del inventario</h3>
+                    <p class="text-muted mb-0">Distribución rápida entre disponibilidad, reserva y alertas.</p>
+                  </div>
+                  <div class="card-body chart-panel__canvas">
+                    <canvas id="inventoryStatusChart" aria-label="Gráfica del estado de inventario"></canvas>
+                  </div>
+                </div>
+              </div>
             </div>
             <div class="table-responsive">
               <table class="table align-middle">
@@ -62,5 +87,14 @@
     </div>
   </div>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script type="module">
+    import { initializeProductsAdminCharts } from './js/modules/pages/chart-config.js';
+
+    document.addEventListener('DOMContentLoaded', () => {
+      initializeProductsAdminCharts();
+    });
+  </script>
+  <script type="module" src="/src/entry/admin-products.tsx"></script>
 </body>
 </html>

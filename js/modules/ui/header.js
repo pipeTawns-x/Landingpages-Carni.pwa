@@ -3,16 +3,23 @@
     function initHeader() {
     // Header scroll behavior
     const header = document.querySelector('.main-header');
+    const miniHeader = document.querySelector('.mini-header');
+    const body = document.body;
     let lastScroll = 0;
 
     if (header) {
         window.addEventListener('scroll', () => {
             const currentScroll = window.pageYOffset;
+            const scrollingDown = currentScroll > lastScroll;
             
-            if (currentScroll > lastScroll && currentScroll > 100) {
+            if (scrollingDown && currentScroll > 90) {
                 header.classList.add('scrolled');
+                miniHeader?.classList.add('mini-header--hidden');
+                body.classList.add('header-collapsed');
             } else {
                 header.classList.remove('scrolled');
+                miniHeader?.classList.remove('mini-header--hidden');
+                body.classList.remove('header-collapsed');
             }
             
             lastScroll = currentScroll;
@@ -24,7 +31,6 @@
     const drawerClose = document.getElementById('drawerClose');
     const drawerOverlay = document.getElementById('drawerOverlay');
     const mobileDrawer = document.getElementById('mobileDrawer');
-    const body = document.body;
 
     function openDrawer() {
         if (mobileDrawer && drawerOverlay) {

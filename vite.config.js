@@ -1,7 +1,9 @@
+import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 import { resolve } from 'path';
 
 export default defineConfig({
+  plugins: [react()],
   root: '.',
   server: {
     port: 3002,
@@ -12,7 +14,8 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': resolve(__dirname, './js'),
-      '@css': resolve(__dirname, './css')
+      '@css': resolve(__dirname, './css'),
+      '@src': resolve(__dirname, './src')
     }
   },
   build: {
@@ -21,6 +24,7 @@ export default defineConfig({
     sourcemap: true,
     rollupOptions: {
       input: {
+        ebacReact: resolve(__dirname, 'ebac-react.html'),
         home: resolve(__dirname, 'index.html'),
         products: resolve(__dirname, 'products.html'),
         accessweb: resolve(__dirname, 'accessweb.html'),

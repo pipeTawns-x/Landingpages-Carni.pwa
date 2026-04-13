@@ -2,12 +2,12 @@ import { supabase } from '../supabase.js';
 import { appState } from './auth.js';
 
 // Elementos del DOM
-const loyaltyBtn = document.getElementById('loyaltyBtn');
+const loyaltyButtons = Array.from(document.querySelectorAll('[data-loyalty-trigger]'));
 
 // Inicialización
-if (loyaltyBtn) {
-  loyaltyBtn.addEventListener('click', showLoyaltyInfo);
-}
+loyaltyButtons.forEach((button) => {
+  button.addEventListener('click', showLoyaltyInfo);
+});
 
 // Mostrar información de fidelidad
 async function showLoyaltyInfo() {
