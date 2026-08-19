@@ -1,0 +1,26 @@
+// ProductList — catalogue grid.
+// Compiled with: sass src/components:src/components --no-source-map
+// The component imports the generated styles.css, never this file.
+
+.product-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  width: 100%;
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (min-width: 1200px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+// The panel is an overlay, not a column, so the grid keeps its own widths and
+// only gives up room on the wide breakpoint where three cards no longer fit.
+.cart-is-open .product-list {
+  @media (min-width: 1200px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

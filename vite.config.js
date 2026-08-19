@@ -24,7 +24,6 @@ export default defineConfig({
     sourcemap: true,
     rollupOptions: {
       input: {
-        ebacReact: resolve(__dirname, 'ebac-react.html'),
         home: resolve(__dirname, 'index.html'),
         products: resolve(__dirname, 'products.html'),
         accessweb: resolve(__dirname, 'accessweb.html'),
