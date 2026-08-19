@@ -36,12 +36,27 @@
 @import 'pages/dashboard';
 @import 'pages/bento-main';
 @import 'pages/access';
+// Never imported before, so its rules only survived as hand-edits in the
+// generated stylesheet. Importing it is what makes the admin pages rebuildable.
+@import 'pages/admin';
 
 // Themes and vendors
 @import 'themes/theme';
 @import 'themes/dark-mode';
 @import 'vendors/bootstrap';
 @import 'vendors/custom-vendors';
+
+// A `.row` with a `g-4` gutter pulls itself 12px wider than its parent on each
+// side. Containers using `px-2` only offer 8px, so on a 320px viewport the row
+// spilled 4px past the edge and produced horizontal scroll. Matching the
+// padding to the gutter's half-width absorbs it. `!important` is needed because
+// the utility it overrides carries one too.
+@media (max-width: 575.98px) {
+  .container-fluid.px-2 {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+  }
+}
 
 // Base Styles
 * {
@@ -76,22 +91,25 @@ main {
 }
 
 // Spacing Utilities
+// Spacing utilities.
+//
+// Only the directional shorthands Bootstrap 5 does not ship are defined here.
+// The rest (m, mt, mb, mx, my, p, pt, pb, px, py) used to be generated too,
+// with `!important` and no breakpoint variants. Since Bootstrap marks its own
+// utilities `!important` as well, equal specificity meant the later sheet won —
+// this one — so every responsive variant was silently dead sitewide:
+// px-lg-* (15 uses), px-md-* (6) and py-lg-* (1) all collapsed to their base
+// value. That is what let `.row` negative gutters overflow the viewport.
+//
+// The $spacers map matches Bootstrap 5's scale exactly (0, .25, .5, 1, 1.5, 3),
+// so dropping the duplicates changes no computed value — it only stops them
+// from overriding the breakpoint-aware versions.
 @each $spacer, $value in $spacers {
-  .m-#{$spacer} { margin: $value !important; }
-  .mt-#{$spacer} { margin-top: $value !important; }
+  // Bootstrap 5 uses logical properties (me/ms/pe/ps) and has no mr/ml/pr/pl.
   .mr-#{$spacer} { margin-right: $value !important; }
-  .mb-#{$spacer} { margin-bottom: $value !important; }
   .ml-#{$spacer} { margin-left: $value !important; }
-  .mx-#{$spacer} { margin-left: $value !important; margin-right: $value !important; }
-  .my-#{$spacer} { margin-top: $value !important; margin-bottom: $value !important; }
-  
-  .p-#{$spacer} { padding: $value !important; }
-  .pt-#{$spacer} { padding-top: $value !important; }
   .pr-#{$spacer} { padding-right: $value !important; }
-  .pb-#{$spacer} { padding-bottom: $value !important; }
   .pl-#{$spacer} { padding-left: $value !important; }
-  .px-#{$spacer} { padding-left: $value !important; padding-right: $value !important; }
-  .py-#{$spacer} { padding-top: $value !important; padding-bottom: $value !important; }
 }
 
 // Text Utilities
@@ -305,7 +323,15 @@ main {
   }
 }
 
-@keyframes pulse {
+// Renamed from `pulse`. This file is imported last, so a second definition of
+// that name overrode the opacity-based `pulse` declared in layout/_header.scss
+// and layout/_auth-layout.scss. Both of those style the cart badge, which lives
+// inside the sticky header: the badge ended up animating box-shadow forever.
+// box-shadow is not a compositable property, so every frame repainted a strip
+// across the top of the page — over the bento images while they scrolled past.
+// Nothing referenced this ring effect; the name collision was the only reason
+// it was reaching anything.
+@keyframes pulse-ring {
   0% {
     box-shadow: 0 0 0 0 rgba($primary-color, 0.4);
   }

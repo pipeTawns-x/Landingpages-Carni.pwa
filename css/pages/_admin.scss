@@ -132,3 +132,23 @@
     }
   }
 }
+
+// --- Rescued from css/styles.css (hand-edited compiled output) ---
+// These rules existed only in the generated stylesheet and would have
+// been destroyed by the first recompile. Ported verbatim; restyling
+// belongs in the redesign phases, not in this rescue.
+
+body.dark-premium {
+
+  background-color: var(--carni-dark);
+  color: var(--carni-text);
+}
+
+.dark-premium .admin-analytics-card,
+.dark-premium .chart-panel__canvas {
+  background: transparent;
+}
+
+// The responsive sidebar rules that also appear in the compiled stylesheet are
+// already defined above (see the max-width: 991.98px block); they only ever
+// went missing because this partial was never imported.

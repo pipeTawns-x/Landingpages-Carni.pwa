@@ -64,20 +64,12 @@
         <a class="navbar-brand" href="index.html">
           <img src="img/recursos_web/logo-user.png" alt="Logo" class="main-header__logo" style="object-fit:contain;max-height:56px;">
         </a>
-        <div class="main-header__brand-lockup d-none d-lg-flex">
-          <strong>El Señor de la Misericordia</strong>
-        </div>
       </div>
-      <div class="desktop-site-nav d-none d-lg-flex" aria-label="Navegación principal">
-        <a class="desktop-site-nav__link desktop-site-nav__link--active" href="index.html">Home</a>
-        <a class="desktop-site-nav__link" href="products.html">Products</a>
-        <button class="desktop-site-nav__link desktop-site-nav__button" type="button" data-loyalty-trigger>Club Misericordia</button>
-        <a class="desktop-site-nav__link" href="#sobre-nosotros">About</a>
-      </div>
+      <button class="header-search" type="button" id="searchBtn" aria-label="Buscar productos">
+        <i class="bi bi-search" aria-hidden="true"></i>
+        <span class="header-search__label">Buscar cortes y productos</span>
+      </button>
       <div class="main-header__icons-container d-flex align-items-center gap-2">
-        <button class="header-icon-btn header-icon-btn--round" aria-label="Buscar" id="searchBtn">
-          <i class="bi bi-search"></i>
-        </button>
         <button class="header-icon-btn header-icon-btn--round position-relative" id="cartBtn" data-bs-toggle="modal" data-bs-target="#cartModal" aria-label="Carrito">
           <i class="bi bi-cart3"></i>
           <span class="badge bg-danger rounded-pill position-absolute top-0 start-100 translate-middle main-header__cart-count">0</span>
@@ -106,10 +98,11 @@
     </div>
 
     <nav class="mobile-drawer__nav">
-      <a href="index.html" class="mobile-drawer__link">Inicio</a>
+      <a href="index.html" class="mobile-drawer__link mobile-drawer__link--active">Inicio</a>
+      <a href="products.html" class="mobile-drawer__link">Productos</a>
+      <button type="button" class="mobile-drawer__link mobile-drawer__link--button" data-loyalty-trigger>Club Misericordia</button>
       <a href="#sobre-nosotros" class="mobile-drawer__link">Sobre Nosotros</a>
       <a href="#contacto" class="mobile-drawer__link">Contacto</a>
-      <a href="products.html" class="mobile-drawer__link">Productos</a>
     </nav>
 
     <div class="mobile-drawer__section">
@@ -155,32 +148,28 @@
               style="box-shadow: 0 4px 16px rgba(0,0,0,0.1); min-height: 400px;">
               <div class="carousel-inner" style="height: 400px;">
                 <div class="carousel-item active h-100">
-                  <img src="img/carrusel_products/rib-eye.png" class="d-block w-100 h-100" style="object-fit:cover;"
-                    alt="New York Strip">
+                  <picture><source srcset="img/products/ney_york_strip.webp" type="image/webp"><img src="img/products/ney_york_strip.png" class="d-block w-100 h-100" style="object-fit:cover;" alt="New York Strip"></picture>
                   <div class="carousel-caption d-none d-md-block">
                     <h5 class="fw-bold">New York Strip</h5>
                     <p>Balance perfecto entre marmoleado y textura firme</p>
                   </div>
                 </div>
                 <div class="carousel-item h-100">
-                  <img src="img/carrusel_products/filet_mignon.png" class="d-block w-100 h-100"
-                    style="object-fit:cover;" alt="Filet Mignon">
+                  <picture><source srcset="img/products/filet_mignon.webp" type="image/webp"><img src="img/products/filet_mignon.png" class="d-block w-100 h-100" style="object-fit:cover;" alt="Filet Mignon"></picture>
                   <div class="carousel-caption d-none d-md-block">
                     <h5 class="fw-bold">Filet Mignon</h5>
                     <p>La corte más tierna y delicada del mercado</p>
                   </div>
                 </div>
                 <div class="carousel-item h-100">
-                  <img src="img/carrusel_products/porterhouse.png" class="d-block w-100 h-100"
-                    style="object-fit:cover;" alt="Porterhouse">
+                  <picture><source srcset="img/products/porterhouse.webp" type="image/webp"><img src="img/products/porterhouse.png" class="d-block w-100 h-100" style="object-fit:cover;" alt="Porterhouse"></picture>
                   <div class="carousel-caption d-none d-md-block">
                     <h5 class="fw-bold">Porterhouse</h5>
                     <p>Lo mejor de dos mundos: filet y lomo</p>
                   </div>
                 </div>
                 <div class="carousel-item h-100">
-                  <img src="img/carrusel_products/ney_york_strip.png" class="d-block w-100 h-100"
-                    style="object-fit:cover;" alt="Rib Eye">
+                  <picture><source srcset="img/products/rib-eye.webp" type="image/webp"><img src="img/products/rib-eye.png" class="d-block w-100 h-100" style="object-fit:cover;" alt="Rib Eye"></picture>
                   <div class="carousel-caption d-none d-md-block">
                     <h5 class="fw-bold">Rib Eye Premium</h5>
                     <p>Jugosidad y sabor intenso garantizados</p>
@@ -198,17 +187,10 @@
 
           <!-- Cards Laterales (4 cols en desktop) -->
           <div class="col-12 col-lg-4">
-            <!-- Card: Título Desktop -->
-            <div class="d-none d-lg-block mb-3">
-              <div class="card border-0 rounded-3"
-                style="background: linear-gradient(135deg, var(--carni-charcoal) 0%, var(--carni-gray) 100%); color: var(--carni-gold); box-shadow: 0 4px 16px rgba(0,0,0,0.1); padding: 1.5rem; text-align: center;"
-                class="home-side-card home-side-card--brand">
-                <h2 class="fw-bold mb-1" style="font-size: 1.3rem;">CARNICERÍA</h2>
-                <p class="small mb-0" style="color: var(--carni-gold);">El Señor de La Misericordia</p>
-              </div>
-            </div>
-
             <!-- Card: Clima -->
+            <!-- The brand card that used to sit above repeated the shop name a
+                 third time on the first screen; the weather card inherits its
+                 space because it carries information the header does not. -->
             <div class="mb-3">
               <div class="card border-0 rounded-3 home-side-card home-side-card--weather" style="box-shadow: 0 4px 16px rgba(0,0,0,0.08); padding: 1.5rem;">
                 <div class="text-center">
@@ -248,7 +230,7 @@
         <div class="bento-categories-grid">
           <!-- 1: Cortes de Res -->
           <article class="category-card category-card-1">
-            <img src="img/products/res.png" alt="Cortes de Res" class="category-img">
+            <picture><source srcset="img/products/res.webp" type="image/webp"><img src="img/products/res.png" alt="Cortes de Res" class="category-img"></picture>
             <div class="category-body">
               <div>
                 <h3 class="category-title"><i class="bi bi-fire me-2" style="color: #d22222;"></i>Cortes de Res</h3>
@@ -260,7 +242,7 @@
 
           <!-- 2: Cerdo -->
           <article class="category-card category-card-2">
-            <img src="img/products/cerdo.png" alt="Cerdo" class="category-img">
+            <picture><source srcset="img/products/cerdo.webp" type="image/webp"><img src="img/products/cerdo.png" alt="Cerdo" class="category-img"></picture>
             <div class="category-body">
               <div>
                 <h3 class="category-title"><i class="bi bi-piggy-bank me-2" style="color: #d22222;"></i>Cerdo</h3>
@@ -272,7 +254,7 @@
 
           <!-- 3: Pollo -->
           <article class="category-card category-card-3">
-            <img src="img/products/pollo.png" alt="Pollo" class="category-img">
+            <picture><source srcset="img/products/pollo.webp" type="image/webp"><img src="img/products/pollo.png" alt="Pollo" class="category-img"></picture>
             <div class="category-body">
               <div>
                 <h3 class="category-title"><i class="bi bi-egg-fried me-2" style="color: #d22222;"></i>Pollo</h3>
@@ -284,7 +266,7 @@
 
           <!-- 4: Preparadas -->
           <article class="category-card category-card-4">
-            <img src="img/products/preparadas.png" alt="Preparadas" class="category-img">
+            <picture><source srcset="img/products/preparadas.webp" type="image/webp"><img src="img/products/preparadas.png" alt="Preparadas" class="category-img"></picture>
             <div class="category-body">
               <div>
                 <h3 class="category-title"><i class="bi bi-clock-fill me-2" style="color: #d22222;"></i>Preparadas</h3>
@@ -296,7 +278,7 @@
 
           <!-- 5: Embutidos -->
           <article class="category-card category-card-5">
-            <img src="img/products/embutidos.png" alt="Embutidos" class="category-img">
+            <picture><source srcset="img/products/embutidos.webp" type="image/webp"><img src="img/products/embutidos.png" alt="Embutidos" class="category-img"></picture>
             <div class="category-body">
               <div>
                 <h3 class="category-title"><i class="bi bi-link-45deg me-2" style="color: #d22222;"></i>Embutidos</h3>
@@ -308,7 +290,7 @@
 
           <!-- 6: Selección Premium -->
           <article class="category-card category-card-6">
-            <img src="img/products/premium.png" alt="Selección Premium" class="category-img">
+            <picture><source srcset="img/products/premium.webp" type="image/webp"><img src="img/products/premium.png" alt="Selección Premium" class="category-img"></picture>
             <div class="category-body">
               <div>
                 <h3 class="category-title"><i class="bi bi-star-fill me-2" style="color: #d22222;"></i>Selección Premium
@@ -321,7 +303,7 @@
 
           <!-- 7: Merchandising -->
           <article class="category-card category-card-7">
-            <img src="img/products/merch.png" alt="Merchandising" class="category-img">
+            <picture><source srcset="img/products/merch.webp" type="image/webp"><img src="img/products/merch.png" alt="Merchandising" class="category-img"></picture>
             <div class="category-body">
               <div>
                 <h3 class="category-title"><i class="bi bi-bag-fill me-2" style="color: #d22222;"></i>Merchandising</h3>
@@ -333,7 +315,7 @@
 
           <!-- 8: Otros Productos -->
           <article class="category-card category-card-8">
-            <img src="img/products/otrosproductos.png" alt="Otros Productos" class="category-img">
+            <picture><source srcset="img/products/otrosproductos.webp" type="image/webp"><img src="img/products/otrosproductos.png" alt="Otros Productos" class="category-img"></picture>
             <div class="category-body">
               <div>
                 <h3 class="category-title"><i class="bi bi-box me-2" style="color: #d22222;"></i>Otros Productos</h3>
@@ -345,7 +327,7 @@
 
           <!-- 9: Ofertas Especiales -->
           <article class="category-card category-card-9">
-            <img src="img/products/premium.png" alt="Ofertas Especiales" class="category-img">
+            <picture><source srcset="img/products/premium.webp" type="image/webp"><img src="img/products/premium.png" alt="Ofertas Especiales" class="category-img"></picture>
             <div class="category-body">
               <div>
                 <h3 class="category-title"><i class="bi bi-tag-fill me-2" style="color: #d22222;"></i>Ofertas Especiales

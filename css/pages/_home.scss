@@ -900,3 +900,234 @@
   .bento-grid-container { display: grid; grid-template-columns: 1fr; grid-auto-rows: auto; }
   .bento-grid-container > * { grid-column: 1 / -1 !important; }
 }
+
+// --- Rescued from css/styles.css (hand-edited compiled output) ---
+// These rules existed only in the generated stylesheet and would have
+// been destroyed by the first recompile. Ported verbatim; restyling
+// belongs in the redesign phases, not in this rescue.
+
+.home-shell {
+
+  max-width: 1360px;
+  margin: 0 auto;
+}
+
+.home-hero-section {
+
+  padding-top: 1.25rem !important;
+  padding-bottom: 2.5rem !important;
+}
+
+.home-hero-section .row {
+
+  align-items: stretch;
+}
+
+.home-hero-carousel {
+
+  border-radius: 28px !important;
+  border: 1px solid rgba(228, 209, 176, 0.1);
+  background: #090909;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.4) !important;
+}
+
+.home-hero-carousel .carousel-inner {
+
+  height: clamp(340px, 52vw, 620px) !important;
+}
+
+.home-hero-carousel .carousel-item img {
+
+  transform: scale(1.02);
+  filter: saturate(0.95) contrast(1.02);
+}
+
+.home-hero-carousel .carousel-caption {
+
+  left: 2rem;
+  right: 2rem;
+  bottom: 2rem;
+  padding: 1.35rem 1.5rem;
+  border-radius: 22px;
+  background: linear-gradient(180deg, rgba(8, 8, 8, 0.18), rgba(8, 8, 8, 0.82));
+  border: 1px solid rgba(228, 209, 176, 0.08);
+  // backdrop-filter removed: on scroll it repaints everything behind it.
+}
+
+.home-hero-carousel .carousel-caption h5 {
+
+  font-size: clamp(1.35rem, 2.4vw, 2.15rem);
+  margin-bottom: 0.35rem;
+}
+
+.home-hero-carousel .carousel-caption p {
+
+  margin: 0;
+  color: rgba(255, 255, 255, 0.84);
+  font-size: 1rem;
+}
+
+.home-hero-carousel .carousel-control-prev,
+.home-hero-carousel .carousel-control-next {
+
+  width: 52px;
+  height: 52px;
+  top: calc(50% - 26px);
+  border-radius: 999px;
+  background: rgba(8, 8, 8, 0.38);
+  // backdrop-filter removed: on scroll it repaints everything behind it.
+}
+
+.home-side-card {
+
+  min-height: calc((clamp(340px, 52vw, 620px) - 1rem) / 3);
+  border: 1px solid rgba(228, 209, 176, 0.1) !important;
+  background: linear-gradient(180deg, rgba(18, 18, 18, 0.96), rgba(25, 25, 25, 0.96)) !important;
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.28) !important;
+  color: #f5f5f5;
+}
+
+.home-side-card--brand,
+.home-side-card--weather,
+.home-side-card--actions {
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.home-side-card--weather .weather-temp,
+.home-side-card--weather .weather-desc,
+.home-side-card--weather .weather-humidity {
+
+  color: #f5f5f5 !important;
+}
+
+.home-side-card--actions .btn {
+
+  min-height: 56px;
+  border-radius: 16px;
+  width: 100%;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
+}
+
+.about-section .btn,
+.contact-section .btn,
+.home-side-card--actions .btn {
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  min-height: 56px;
+}
+
+.categories-section h2 {
+
+  margin-bottom: 2.25rem !important;
+}
+
+.contact-section .card,
+.about-section .card {
+
+  border-radius: 24px !important;
+}
+
+.contact-section .btn {
+
+  min-height: 56px;
+  width: 100%;
+  border-radius: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding-inline: 1.5rem;
+}
+
+.contact-direct-card {
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.contact-direct-card p {
+
+  min-height: 2.8rem;
+}
+
+.contact-direct-card__button {
+
+  width: min(100%, 220px);
+  margin-top: auto;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.22);
+}
+
+.contact-direct-card__button--phone,
+.contact-direct-card__button--whatsapp,
+.contact-direct-card__button--email {
+
+  justify-content: center;
+}
+
+.home-hero-carousel .carousel-item::after,
+.tw-highlight-card::after {
+
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0,0,0,0.1), rgba(0,0,0,0.5));
+  pointer-events: none;
+}
+
+@media (max-width: 767.98px) {
+  .home-hero-section .container-fluid,
+  .about-section .container-fluid,
+  .contact-section .container-fluid {
+
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+  .home-hero-carousel {
+
+    border-radius: 22px !important;
+  }
+  .home-hero-carousel .carousel-inner {
+
+    height: 310px !important;
+  }
+  .home-hero-carousel .carousel-caption {
+
+    left: 1rem;
+    right: 1rem;
+    bottom: 1rem;
+    padding: 1rem 1.1rem;
+  }
+  .home-hero-carousel .carousel-caption h5 {
+
+    font-size: 1.15rem;
+  }
+  .home-side-card {
+
+    min-height: 156px;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .home-hero-section {
+
+    padding-top: 1rem !important;
+  }
+  .home-hero-carousel .carousel-inner {
+
+    height: 420px !important;
+  }
+  .home-side-card {
+
+    min-height: auto;
+  }
+}

@@ -436,3 +436,158 @@
     }
   }
 }
+
+// --- Rescued from css/styles.css (hand-edited compiled output) ---
+// These rules existed only in the generated stylesheet and would have
+// been destroyed by the first recompile. Ported verbatim; restyling
+// belongs in the redesign phases, not in this rescue.
+
+body.header-collapsed .products-top-zone {
+
+  padding-top: 0.5rem;
+}
+
+.products-main-layout {
+
+  padding-top: 0.75rem;
+}
+
+.products-top-zone {
+
+  position: relative;
+  z-index: 20;
+}
+
+body.header-collapsed .categorias-menu {
+
+  top: 0.75rem;
+}
+
+.tw-empty-state {
+
+  min-height: 84px;
+}
+
+.tw-empty-state p {
+
+  color: rgba(255,255,255,0.72) !important;
+}
+
+.tw-card-shell__image-wrap {
+
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+}
+
+.tw-card-shell__image {
+
+  transition: transform 260ms ease, filter 260ms ease;
+  filter: saturate(0.92) contrast(1.04) brightness(0.92);
+}
+
+.tw-card-shell:hover .tw-card-shell__image {
+
+  transform: scale(1.05);
+  filter: saturate(1) contrast(1.08) brightness(0.98);
+}
+
+.product-card-modern::before {
+
+  content: "";
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: -1;
+  border-radius: 16px;
+}
+
+.product-card-modern .card-body .product-img-container img {
+
+  width: 100%;
+  height: 300px;
+  object-fit: cover;
+  display: block;
+  filter: contrast(1.1) saturate(1.2);
+}
+
+.product-card-modern .card-body .card-body {
+
+  padding: 1rem;
+  color: #A3A3A3;
+}
+
+.product-card-modern .card-body .product-price {
+
+  color: #F5F5F5;
+  font-size: 1.8rem;
+  font-weight: 800;
+}
+
+.product-card-modern .card-body .rating {
+
+  color: #E4D1B0;
+  text-shadow: 0 2px 6px rgba(183, 28, 28, 0.18);
+}
+
+.product-card-modern .card-body .btn-view-products.btn-danger {
+
+  background-color: #b71c1c;
+  border-color: #8f1212;
+  color: #fff;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+}
+
+.product-card-modern .card-body .btn-view-products.btn-danger:hover,
+.product-card-modern .card-body .btn-view-products.btn-danger:focus {
+
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(183, 28, 28, 0.28);
+  background-color: #8f1212;
+}
+
+.product-card-modern .card-body:hover {
+
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+}
+
+.product-card-modern .card-body .product-actions .btn-view-products::before {
+
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: none;
+  transition: left 0.5s ease;
+}
+
+.product-card-modern .card-body .product-actions .btn-view-products:hover::before {
+
+  left: 100%;
+}
+
+// Category chip row.
+// The row sits immediately under the sticky header, so its top edge was being
+// tucked behind it. Reserve the header's real height rather than a guess, and
+// give the horizontally scrolling track enough vertical room that the chips'
+// own top margin is not clipped by its `overflow-y: hidden`.
+.categorias-menu {
+  scroll-margin-top: calc(var(--carni-header-h, 84px) + 1rem);
+  padding-top: 1.5rem;
+}
+
+.nav-scroll {
+  // overflow-x is auto here, so overflow-y cannot be `visible` — the pair would
+  // resolve to auto and add a vertical scrollbar. Padding is the way to keep
+  // the chips clear of the clip edge.
+  padding-top: 1.25rem;
+  padding-bottom: 0.75rem;
+  scroll-padding-top: calc(var(--carni-header-h, 84px) + 1rem);
+}

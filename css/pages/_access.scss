@@ -604,8 +604,7 @@
     height: 48px;
     font-size: 0.85rem;
     box-shadow: none;
-    backdrop-filter: blur(5px);
-
+    // backdrop-filter removed: on scroll it repaints everything behind it.
     &:hover {
       background: rgba(255, 255, 255, 0.25);
       transform: translateY(-3px);
@@ -951,5 +950,256 @@
     color: rgba(255, 255, 255, 0.6);
     font-size: 0.8rem;
     border-color: rgba(255, 255, 255, 0.2) !important;
+  }
+}
+
+// --- Rescued from css/styles.css (hand-edited compiled output) ---
+// These rules existed only in the generated stylesheet and would have
+// been destroyed by the first recompile. Ported verbatim; restyling
+// belongs in the redesign phases, not in this rescue.
+
+.field-hint-row {
+
+  width: min(100%, 420px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin: -0.3rem 0 0.7rem;
+}
+
+.field-hint {
+
+  display: block;
+  color: rgba(255,255,255,0.68);
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
+.verify-chip {
+
+  border: 1px solid rgba(255,255,255,0.24);
+  background: rgba(255,255,255,0.06);
+  color: #f5f5f5;
+  border-radius: 999px;
+  padding: 0.5rem 0.9rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.verify-chip:hover {
+
+  background: rgba(255,255,255,0.12);
+}
+
+.delivery-toggle-card {
+
+  width: min(100%, 420px);
+  display: flex;
+  align-items: flex-start;
+  gap: 0.9rem;
+  padding: 0.95rem 1rem;
+  margin: 0.35rem 0 1rem;
+  border-radius: 18px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: #f5f5f5;
+}
+
+.delivery-toggle-card input {
+
+  margin-top: 0.3rem;
+}
+
+.delivery-toggle-card span {
+
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.delivery-toggle-card small {
+
+  color: rgba(255,255,255,0.68);
+  line-height: 1.45;
+}
+
+.delivery-fields {
+
+  width: min(100%, 420px);
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-height 260ms ease, opacity 220ms ease, margin 220ms ease;
+}
+
+.delivery-fields__single {
+
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.delivery-fields__label {
+
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: rgba(255,255,255,0.72);
+}
+
+.delivery-fields textarea {
+
+  width: 100%;
+  min-height: 112px;
+  resize: vertical;
+  border-radius: 18px;
+  border: 1px solid rgba(255,255,255,0.16);
+  background: rgba(255,255,255,0.04);
+  color: #f5f5f5;
+  padding: 1rem 1.1rem;
+}
+
+.delivery-fields textarea:focus {
+
+  outline: none;
+  border-color: rgba(220, 38, 38, 0.65);
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12);
+}
+
+.premium-order-modal {
+
+  border-radius: 24px;
+  overflow: hidden;
+}
+
+.premium-order-modal__header {
+
+  background: linear-gradient(135deg, rgba(117, 12, 12, 0.94), rgba(31, 9, 9, 0.98));
+  color: #fff5ec;
+}
+
+.premium-order-product__prices {
+
+  color: rgba(40, 40, 40, 0.84);
+  font-weight: 700;
+}
+
+.premium-order-modes {
+
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.premium-order-mode-option {
+
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid rgba(138, 25, 25, 0.14);
+  border-radius: 16px;
+  background: #fff;
+  font-weight: 700;
+  color: #3b302c;
+}
+
+.premium-order-grid {
+
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 0.9fr);
+  gap: 0.9rem;
+}
+
+.premium-order-field {
+
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.premium-order-field__label {
+
+  font-size: 0.94rem;
+  font-weight: 700;
+  color: #564b46;
+}
+
+.premium-order-summary {
+
+  background: linear-gradient(180deg, rgba(250, 248, 246, 1), rgba(243, 239, 235, 1));
+  border: 1px solid rgba(129, 31, 31, 0.12);
+  border-radius: 18px;
+  padding: 1rem 1.1rem;
+}
+
+.premium-order-summary__title {
+
+  font-weight: 800;
+  color: #b01212;
+  margin-bottom: 0.75rem;
+}
+
+.delivery-fields.is-open {
+
+  max-height: 420px;
+  opacity: 1;
+  margin-bottom: 0.75rem;
+}
+
+.delivery-fields__grid {
+
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.9rem;
+}
+
+.input-field--wide {
+
+  grid-column: 1 / -1;
+}
+
+.compact-form-checkboxes {
+
+  width: min(100%, 420px);
+}
+
+.compact-form-checkboxes .checkbox-label {
+
+  align-items: flex-start;
+}
+
+@media (max-width: 640px) {
+  .premium-order-modes,
+  .premium-order-grid {
+
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .field-hint-row {
+
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 869px) {
+  .field-hint-row,
+  .delivery-fields,
+  .delivery-toggle-card,
+  .compact-form-checkboxes {
+
+    width: 100%;
+  }
+}
+
+@media (min-width: 768px) {
+  .delivery-fields__grid {
+
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }

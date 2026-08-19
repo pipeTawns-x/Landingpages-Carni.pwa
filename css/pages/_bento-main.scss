@@ -41,7 +41,10 @@
   // Desktop: 4 columnas x 6 filas (diseño bento grid)
   @media (min-width: 1024px) {
     grid-template-columns: repeat(4, 1fr);
-    grid-template-rows: repeat(6, 1fr);
+    // `repeat(6, 1fr)` stretched every row to the tallest one, which is what
+    // produced ~450px of empty space inside each card. Auto rows size to their
+    // content and only enforce a floor.
+    grid-auto-rows: minmax(140px, auto);
     gap: 16px;
     width: 100%;
     max-width: 100%;
@@ -59,25 +62,69 @@
   border: 1px solid rgba(255, 255, 255, 0.08);
   display: flex;
   flex-direction: column;
-  transition: transform 0.28s ease, box-shadow 0.28s ease, border-color 0.28s ease;
+  // Only transform is animated. box-shadow and border-color were in here too,
+  // and neither is compositable: every frame of the transition forced a repaint
+  // of a tile that carries a full-bleed photo plus a gradient veil.
+  transition: transform 0.28s ease;
   height: 100%;
+  position: relative; // anchors the fill image, the veil and the stretched link
+  // Nothing this tile paints escapes its own box, so the browser can repaint a
+  // single card without re-examining the rest of the grid.
+  contain: paint;
 
-  // Imagen: zoom suave en hover
+  // The <img> is wrapped in a <picture> that serves WebP with a PNG fallback.
+  // `display: contents` keeps that wrapper out of the box tree so the absolute
+  // image still resolves against the card.
+  picture {
+    display: contents;
+  }
+
+  // The image now fills the whole card instead of sitting as a cropped banner
+  // on top. Kept as an <img> rather than a background so the alt text and lazy
+  // loading survive; absolute positioning gives the same cover behaviour.
   .category-img {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
     width: 100%;
-    height: 200px;
+    height: 100%;
     object-fit: cover;
     display: block;
     transition: transform 0.35s ease;
+    // Promotes the photo to its own compositor layer so scrolling moves it
+    // instead of repainting it, and stops the seam that shows on some GPUs
+    // when a scaled image sits under a gradient.
+    transform: translateZ(0);
+    backface-visibility: hidden;
   }
 
-  // Contenido: padding y flex para alinear botón al fondo
+  // Dark veil, heaviest at the bottom, so the copy stays legible over any photo.
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: linear-gradient(
+      to top,
+      rgba(5, 5, 5, 0.94) 0%,
+      rgba(5, 5, 5, 0.78) 38%,
+      rgba(5, 5, 5, 0.34) 68%,
+      rgba(5, 5, 5, 0.08) 100%
+    );
+    pointer-events: none;
+  }
+
+  // Contenido: se apoya sobre el velo, alineado al fondo de la tarjeta.
   .category-body {
+    position: relative;
+    z-index: 2;
     padding: 1.25rem;
     display: flex;
     flex-direction: column;
     flex: 1;
-    justify-content: space-between;
+    justify-content: flex-end; // was space-between, which pushed the CTA away
+    gap: 0.85rem;
+    min-height: 190px;
   }
 
   // Título
@@ -100,11 +147,15 @@
   .btn {
     font-weight: 600;
     border-radius: 8px;
-    transition: all 0.2s ease;
+    // `all` animated every changed property, including the non-compositable
+    // ones. Restricted to the two the compositor can handle on its own.
+    transition: transform 0.2s ease, opacity 0.2s ease;
     padding: 0.75rem 1.5rem;
   }
 
   // HOVER
+  // box-shadow and border-color still change here, but they are no longer
+  // transitioned: they switch in one step instead of repainting for 280ms.
   &:hover {
     transform: translateY(-6px);
     box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45);
@@ -121,7 +172,10 @@
 @media (min-width: 1024px) {
   .bento-categories-grid {
     grid-template-columns: repeat(4, 1fr);
-    grid-template-rows: repeat(6, 1fr);
+    // `repeat(6, 1fr)` stretched every row to the tallest one, which is what
+    // produced ~450px of empty space inside each card. Auto rows size to their
+    // content and only enforce a floor.
+    grid-auto-rows: minmax(140px, auto);
     gap: 16px;
   }
 
@@ -178,4 +232,63 @@
     grid-column: 4 / 5;
     grid-row: 6 / 7;
   }
+}
+
+// --- Rescued from css/styles.css (hand-edited compiled output) ---
+// These rules existed only in the generated stylesheet and would have
+// been destroyed by the first recompile. Ported verbatim; restyling
+// belongs in the redesign phases, not in this rescue.
+
+// The per-card image heights that used to live here (260/210/250/148px) are
+// gone: the image now fills its whole card via `position: absolute; inset: 0`,
+// so a fixed height would fight that and reintroduce the cropped-banner look.
+
+// The whole tile is the link. Bootstrap's stretched-link pattern, applied from
+// CSS: .category-card is positioned, the button is not, so this ::after
+// resolves against the card and covers it edge to edge.
+.category-card .category-body .btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+}
+
+// Every tile carries a visible button. An earlier revision hid the chrome on
+// the 1xN tiles and kept it only on the 2x2 ones, which read as broken rather
+// than deliberate: six of the nine cards looked like they had lost their CTA.
+//
+// The button never shrinks away. When a small tile runs short of room it is the
+// description that gives, never the call to action.
+.category-card .category-body .btn {
+  flex: 0 0 auto;
+  width: 100%;
+  white-space: nowrap;
+}
+
+// 1xN tiles: same button, tighter box.
+.category-card:not(.category-card-1):not(.category-card-4):not(.category-card-6) {
+  .category-body {
+    padding: 1rem;
+    gap: 0.5rem;
+
+    .btn {
+      padding: 0.5rem 0.75rem;
+      font-size: 0.85rem;
+    }
+
+    // The copy is what yields when the tile is short, so it is clamped rather
+    // than allowed to push the button out of the card.
+    .category-desc {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      margin-bottom: 0;
+    }
+  }
+}
+
+// The shortest tile in the span map (card 9 is a single row) gets one line.
+.category-card-9 .category-body .category-desc {
+  -webkit-line-clamp: 1;
 }

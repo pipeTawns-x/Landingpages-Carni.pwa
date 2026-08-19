@@ -45,16 +45,11 @@
         <a class="navbar-brand" href="index.html">
           <img src="img/recursos_web/logo-user.png" alt="Carnicería El Señor de La Misericordia" class="main-header__logo" style="object-fit:contain;max-height:56px;">
         </a>
-        <div class="main-header__brand-lockup d-none d-lg-flex">
-          <strong>El Señor de la Misericordia</strong>
-        </div>
       </div>
-      <div class="desktop-site-nav d-none d-lg-flex" aria-label="Navegación principal">
-        <a class="desktop-site-nav__link" href="index.html">Home</a>
-        <a class="desktop-site-nav__link" href="products.html">Products</a>
-        <a class="desktop-site-nav__link desktop-site-nav__link--active" href="accessweb.html">Club Misericordia</a>
-        <a class="desktop-site-nav__link" href="index.html#sobre-nosotros">About</a>
-      </div>
+      <a class="header-search" href="products.html?search=true" aria-label="Buscar productos">
+        <i class="bi bi-search" aria-hidden="true"></i>
+        <span class="header-search__label">Buscar cortes y productos</span>
+      </a>
       <div class="main-header__icons-container d-flex align-items-center gap-2">
         <button class="header-icon-btn header-icon-btn--round position-relative" id="cartBtn" data-bs-toggle="modal" data-bs-target="#cartModal" aria-label="Carrito">
           <i class="bi bi-cart3"></i>
@@ -87,9 +82,10 @@
 
     <nav class="mobile-drawer__nav">
       <a href="index.html" class="mobile-drawer__link">Inicio</a>
+      <a href="products.html" class="mobile-drawer__link">Productos</a>
+      <a href="accessweb.html" class="mobile-drawer__link mobile-drawer__link--active">Club Misericordia</a>
       <a href="index.html#sobre-nosotros" class="mobile-drawer__link">Sobre Nosotros</a>
       <a href="index.html#contacto" class="mobile-drawer__link">Contacto</a>
-      <a href="products.html" class="mobile-drawer__link">Productos</a>
     </nav>
 
     <div class="mobile-drawer__section">
