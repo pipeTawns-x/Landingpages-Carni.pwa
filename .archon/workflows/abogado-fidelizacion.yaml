@@ -1,0 +1,380 @@
+name: abogado-fidelizacion
+description: |
+  Corrida 2 del abogado del diablo — Fidelización por niveles + Afiliados
+  con QR y link de invitación, con parámetros editables desde el dashboard.
+
+  Misma estructura de 3 pasadas que abogado-del-diablo, distinta tesis y
+  distinta carpeta de salida (docs/abogado/fidelizacion/) para no pisar
+  los reportes de la corrida de afiliados.
+
+  Uso: archon run abogado-fidelizacion
+
+provider: claude
+model: sonnet
+
+worktree:
+  enabled: false
+mutates_checkout: false
+
+tags: [Analisis, SDD, Seguridad]
+
+nodes:
+
+  # ─────────────────────────────────────────────────────────────
+  # PRECHECK — determinista, sin IA, sin costo
+  # ─────────────────────────────────────────────────────────────
+  - id: precheck-skills
+    bash: |
+      set -e
+      FALTA=0
+      for S in abogado-del-diablo judgment-day; do
+        if [ -f ".claude/skills/$S/SKILL.md" ]; then
+          echo "OK    $S  → .claude/skills/$S (proyecto)"
+        elif [ -f "$HOME/.claude/skills/$S/SKILL.md" ]; then
+          echo "OK    $S  → ~/.claude/skills/$S (usuario)"
+        else
+          echo "FALTA $S  → no está en .claude/skills/ ni en ~/.claude/skills/"
+          FALTA=1
+        fi
+      done
+
+      if [ ! -f "docs/blueprints/logica-fidelizacion-afiliados.md" ]; then
+        echo "FALTA docs/blueprints/logica-fidelizacion-afiliados.md"
+        echo "      Es la fuente principal de esta corrida. Sin ese archivo"
+        echo "      el nodo generar no tiene qué atacar."
+        FALTA=1
+      fi
+
+      if [ "$FALTA" = "1" ]; then
+        echo ""
+        echo "Skills solo se descubren en .claude/skills/ y ~/.claude/skills/."
+        echo "Una skill ausente NO da error: el nodo corre sin ella en silencio."
+        echo "  cp -R ~/.config/opencode/skills/gentle-ai/internal/assets/skills/judgment-day .claude/skills/"
+        exit 1
+      fi
+
+      mkdir -p docs/abogado/fidelizacion
+      echo "Precheck OK. docs/abogado/fidelizacion/ listo."
+
+  # ─────────────────────────────────────────────────────────────
+  # PASADA 1 — GENERAR
+  # ─────────────────────────────────────────────────────────────
+  - id: generar
+    depends_on: [precheck-skills]
+    skills: [abogado-del-diablo]
+    effort: high
+    output_type: findings
+    allowed_tools: [Read, Grep, Glob, Write]
+    maxBudgetUsd: 3
+    prompt: |
+      Usa la skill abogado-del-diablo contra esta tesis:
+
+      TESIS:
+      "Carni-mvp puede operar un programa de fidelización por niveles y un
+      programa de afiliados con código QR y link de invitación, con sus
+      parámetros económicos editables desde el dashboard administrativo,
+      sin que un cliente pueda extraer valor por encima del tope
+      configurado, y sin que un administrador pueda desactivar por error
+      las defensas que lo impiden."
+
+      ═══ FUENTE PRINCIPAL ═══
+      docs/blueprints/logica-fidelizacion-afiliados.md — léelo completo
+      antes de objetar. Contiene la separación invariante/parámetro, los
+      valores mock, los 4 niveles, el diseño del QR y el tope de apilado.
+
+      ═══ CONTEXTO VERIFICADO ═══
+
+      Repo ~/Desktop/Carni-mvp (pipeTawns-x/Landingpages-Carni.pwa).
+
+      YA EXISTE Y FUNCIONA:
+        js/modules/core/loyalty.js (127 líneas, cargado en index.html y
+          js/modules/pages/dashboard.js). Reglas escritas ahí:
+          "1 punto por cada $100 en compras", "100 puntos = $50 de
+          descuento", ofertas exclusivas, descuento de cumpleaños.
+          Genera un QR con api.qrserver.com que codifica el user.id.
+          Otorga vía supabase.rpc('add_points').
+        profiles.points INTEGER — saldo sin historial
+        RPC add_points() — admin-only, RAISE si no es admin
+        trigger protect_profile_system_fields() — revierte role y points
+          en SILENCIO si el caller no es admin (no lanza excepción)
+        admin-customers.html línea 41: tarjeta "Afiliados: 42" con el
+          número escrito a mano, sin backend
+
+      NO EXISTE: affiliates, referrals, points_ledger, tier_settings,
+        loyalty_settings, track_score, referral_code, phone_verified,
+        server/routes/affiliate.ts
+
+      SCHEMA (supabase/migrations/202604100001_initial_schema.sql):
+        profiles: id UUID (= auth.uid), full_name,
+                  phone TEXT CHECK(char_length = 10) — SIN UNIQUE,
+                  address JSONB, role ∈ {customer, admin}, points INTEGER
+        orders:   user_id, total, delivery_type, delivery_address, notes,
+                  status ∈ {pending, confirmed, preparing, ready,
+                            delivered, cancelled}
+        products: category_id, name, price_per_kg, price_per_lb, stock,
+                  is_active, metadata JSONB — 14 productos en seed.sql
+        RLS por tabla con get_user_role() e is_admin()
+
+      HALLAZGO CONFIRMADO EN LA CORRIDA ANTERIOR (docs/abogado/02-verificacion.md):
+        create_order_with_items() línea 265 calcula el total con el
+        unit_price que envía el CLIENTE, sin cotejarlo contra products,
+        y order_items no tiene CHECK de positividad. Agujero activo.
+
+      CONTRADICCIÓN SIN RESOLVER:
+        docs/brain/vision.md línea 34: "1 point per $10 MXN spent"
+        js/modules/core/loyalty.js línea 96: Math.floor(total / 100)
+        Diferencia de 10x. Nadie ha decidido cuál gana.
+
+      MERCADO (agosto 2026, notas de prensa):
+        bistec mercados CDMX $185–260/kg, Guadalajara $215–235/kg
+        carne de res +16.5% anual
+        seed de Carni: Molida 80/20 a $155 — bajo el piso nacional
+        Carnívoros SLP: Shopify, por pieza, solo PayPal, sin lealtad
+
+      NEGOCIO: carnicería familiar real en San Luis Potosí. Dinero real,
+      márgenes de carnicería. El dueño NO ha dado sus márgenes todavía —
+      todos los números del blueprint son mock calibrados.
+
+      ═══ RESTRICCIONES DURAS ═══
+      React 18 + Vite 7 + TypeScript + Express 5 + SCSS 7-1.
+      Sin Next.js, sin Tailwind, sin rutas nuevas de página.
+      Supabase MCP en read_only: no ejecutes escrituras.
+
+      ═══ QUÉ ATACAR ═══
+
+      A. SEGURIDAD DEL CÓDIGO DE REFERIDO — prioridad máxima
+         1. El QR actual de loyalty.js codifica el user.id crudo en una
+            URL de api.qrserver.com. ¿Qué se puede hacer con un user.id
+            ajeno? ¿Se filtra a un tercero al generar el QR?
+         2. Un referral_code, ¿se puede adivinar por fuerza bruta,
+            enumerar o clonar? ¿Qué formato lo impide?
+         3. Atribución: si el código viaja en la URL y se guarda en el
+            navegador, ¿quién impide que alguien se lo sobreescriba a
+            otro, o que un tercero robe la atribución de una compra?
+         4. ¿Qué pasa si el mismo link se comparte en un grupo público
+            de WhatsApp o Facebook y lo usan 500 desconocidos?
+
+      B. SEGURIDAD DEL PANEL ADMINISTRATIVO
+         5. Los parámetros económicos son editables por cualquiera con
+            role='admin'. ¿Qué impide que un admin ponga pesos_por_punto
+            en 1 y se otorgue una fortuna? ¿Hay segunda firma, límites
+            de rango, o auditoría?
+         6. El blueprint dice que los invariantes NO se exponen. ¿Alcanza
+            con no ponerlos en la UI, o alguien puede tocarlos por API?
+         7. Si un parámetro cambia, ¿qué pasa con los puntos ya otorgados
+            bajo la regla anterior? ¿Se recalculan, se respetan, o queda
+            un estado inconsistente?
+
+      C. LA ECONOMÍA APILADA
+         8. Puntos (5% + hasta 3% de bono VIP) + descuento por pago web
+            (3%) + canje de puntos previos + comisión Stripe (3.6%).
+            El blueprint propone un tope de 12% por pedido. ¿Alcanza?
+            ¿Dónde exactamente empieza a vender bajo costo?
+         9. Los puntos son un pasivo contable que crece. Con caducidad a
+            6 meses, ¿cuál es la exposición máxima acumulada?
+        10. Inflación de 16.5% anual en res: los umbrales de nivel en
+            pesos nominales se degradan solos. ¿Qué tan rápido deja de
+            significar algo ser VIP?
+
+      D. LOS DOS PROGRAMAS JUNTOS
+        11. ¿Fidelización y afiliados se refuerzan o se canibalizan? Un
+            cliente que refiere gana puntos que suben su nivel, que le
+            dan más puntos. ¿Es un bucle que se retroalimenta?
+        12. Liberar el referral_code solo en nivel Regular, ¿es defensa
+            real o solo retrasa el fraude seis compras?
+
+      E. LA PREMISA
+        13. ¿Una carnicería de barrio necesita niveles VIP, o su lealtad
+            ya viene del trato en el mostrador y esto es sobreingeniería
+            copiada del e-commerce grande?
+        14. Los números son mock sin márgenes reales del dueño. ¿Se puede
+            construir esto honestamente sin ese dato, o cualquier cosa
+            que se implemente hoy hay que rehacerla después?
+
+      ═══ REGLAS ═══
+      - NO propongas soluciones. Solo objeciones.
+      - NO escribas código. NO modifiques archivos del proyecto.
+      - Ordena de más letal a menos.
+      - Marca lo especulativo como especulativo.
+      - Si una objeción aplica a un archivo que existe hoy, cítalo con
+        línea. Si aplica a algo propuesto que no existe, dilo.
+
+      ═══ FORMATO DE SALIDA ═══
+      Escribe docs/abogado/fidelizacion/01-objeciones.md con esta
+      estructura exacta por objeción:
+
+        ## Objeción N: <título en una línea>
+        - Categoría: seguridad | economía | producto | implementación
+        - Supuesto que rompe:
+        - Evidencia que la sostiene: <archivo y línea, o "propuesta">
+        - Consecuencia si nadie la atiende:
+        - Confianza: alta | media | especulativa
+
+      Termina con el total de objeciones.
+
+  # ─────────────────────────────────────────────────────────────
+  # PASADA 2 — VERIFICAR (a ciegas)
+  # ─────────────────────────────────────────────────────────────
+  - id: verificar
+    depends_on: [generar]
+    context: fresh
+    settingSources: ['project']
+    effort: high
+    output_type: findings
+    allowed_tools: [Read, Grep, Glob, Write]
+    maxBudgetUsd: 3
+    prompt: |
+      Eres verificador. Alguien más escribió las objeciones de
+      docs/abogado/fidelizacion/01-objeciones.md. No sabes quién ni cómo
+      llegó a ellas. Tu único trabajo es comprobar si cada una se sostiene.
+
+      Repo: ~/Desktop/Carni-mvp
+
+      FUENTES DE VERDAD — solo estas cuentan como evidencia:
+        supabase/migrations/202604100001_initial_schema.sql
+        supabase/migrations/202604100002_rls_policies.sql
+        supabase/migrations/202604100003_functions.sql
+        supabase/seed.sql
+        js/modules/core/loyalty.js
+        js/modules/pages/dashboard.js
+        admin-customers.html
+        src/, server/, package.json
+        docs/blueprints/logica-fidelizacion-afiliados.md
+        docs/blueprints/module-scopes.md
+        docs/brain/vision.md
+        docs/abogado/02-verificacion.md   (corrida anterior, ya verificada)
+
+      REGLA ESPECIAL DE ESTA CORRIDA:
+      Muchas objeciones apuntan a cosas PROPUESTAS que no existen en el
+      código (affiliates, points_ledger, el tope de apilado). Esas NO se
+      marcan SIN EVIDENCIA por no estar implementadas. Se verifican contra
+      docs/blueprints/logica-fidelizacion-afiliados.md: ¿el blueprint dice
+      lo que la objeción afirma que dice? ¿La consecuencia se sigue del
+      diseño propuesto?
+
+      Distingue con claridad:
+        - objeción sobre CÓDIGO EXISTENTE  → verifica archivo y línea
+        - objeción sobre DISEÑO PROPUESTO  → verifica contra el blueprint
+
+      Para cada objeción emite un veredicto:
+        CONFIRMADA    — la evidencia existe y sostiene la objeción
+        PARCIAL       — la evidencia existe pero la consecuencia se exagera
+        SIN EVIDENCIA — no cita nada verificable, o lo que cita no existe
+                        (ni en código ni en el blueprint)
+        FALSA         — contradicha por el repo o por el blueprint
+
+      Si es FALSA, pega la línea que la contradice.
+
+      REGLAS
+      - No agregues objeciones nuevas.
+      - No propongas soluciones.
+      - No modifiques archivos del proyecto.
+      - Si no puedes verificar algo, escribe NO VERIFICABLE y di qué
+        necesitarías. No adivines.
+
+      SALIDA: docs/abogado/fidelizacion/02-verificacion.md
+      Termina con el conteo por categoría.
+
+      ═══ VEREDICTO DE CONTINUIDAD ═══
+      Si (sin_evidencia + falsas) es MAYOR a la mitad del total, devuelve
+      veredicto = "PROMPT_DEFECTUOSO". En cualquier otro caso, "CONTINUAR".
+
+    output_format:
+      type: object
+      properties:
+        confirmadas:     { type: integer }
+        parciales:       { type: integer }
+        sin_evidencia:   { type: integer }
+        falsas:          { type: integer }
+        no_verificables: { type: integer }
+        total:           { type: integer }
+        veredicto:
+          type: string
+          enum: [CONTINUAR, PROMPT_DEFECTUOSO]
+      required: [confirmadas, parciales, sin_evidencia, falsas, total, veredicto]
+
+  # ─────────────────────────────────────────────────────────────
+  # PUERTA
+  # ─────────────────────────────────────────────────────────────
+  - id: prompt-defectuoso
+    depends_on: [verificar]
+    when: "$verificar.output.veredicto == 'PROMPT_DEFECTUOSO'"
+    cancel: >
+      Más de la mitad de las objeciones no se sostienen ni contra el código
+      ni contra el blueprint. El problema es el prompt del nodo `generar`.
+      Revisa docs/abogado/fidelizacion/02-verificacion.md para ver qué
+      inventó, corrige el prompt, y recién entonces vuelve a correr.
+
+  # ─────────────────────────────────────────────────────────────
+  # PASADA 3 — JUZGAR
+  # ─────────────────────────────────────────────────────────────
+  - id: juzgar
+    depends_on: [verificar]
+    when: "$verificar.output.veredicto == 'CONTINUAR'"
+    context: fresh
+    skills: [judgment-day]
+    effort: max
+    output_type: plan
+    allowed_tools: [Read, Grep, Glob, Write]
+    maxBudgetUsd: 4
+    prompt: |
+      Usa la skill judgment-day sobre
+      docs/abogado/fidelizacion/02-verificacion.md
+
+      Trabaja SOLO con las objeciones CONFIRMADA o PARCIAL.
+      Descarta SIN EVIDENCIA y FALSA — ya murieron.
+
+      Conteo de la pasada anterior:
+        confirmadas: $verificar.output.confirmadas
+        parciales:   $verificar.output.parciales
+        total:       $verificar.output.total
+
+      Tesis original:
+      "Carni-mvp puede operar un programa de fidelización por niveles y un
+      programa de afiliados con código QR y link de invitación, con sus
+      parámetros económicos editables desde el dashboard administrativo,
+      sin que un cliente pueda extraer valor por encima del tope
+      configurado, y sin que un administrador pueda desactivar por error
+      las defensas que lo impiden."
+
+      Para cada objeción sobreviviente:
+      1. ¿Mata la tesis, la reduce, o solo agrega una restricción de
+         implementación?
+      2. Si mata: ¿qué tendría que ser verdad para salvarla?
+      3. Si reduce: ¿cuál es la versión más chica que sobrevive?
+      4. Costo de atenderla: alto / medio / bajo, y por qué.
+
+      ADEMÁS, y esto es propio de esta corrida — separa las objeciones de
+      SEGURIDAD del resto y respóndelas aparte:
+
+      S1. De las objeciones de seguridad confirmadas, ¿cuáles son
+          bloqueantes para salir a producción con dinero real, y cuáles
+          son endurecimientos que pueden venir después?
+      S2. ¿Alguna defensa propuesta en el blueprint da falsa sensación de
+          seguridad — parece proteger pero no protege?
+
+      Al final escribe la TESIS SOBREVIVIENTE: la versión más chica que
+      aguanta todas las objeciones confirmadas. Una frase.
+
+      REGLAS: no código, no soluciones de implementación, no modificar
+      archivos del proyecto.
+
+      SALIDA: docs/abogado/fidelizacion/03-juicio.md
+
+  # ─────────────────────────────────────────────────────────────
+  # DECISIÓN HUMANA
+  # ─────────────────────────────────────────────────────────────
+  - id: decidir
+    depends_on: [juzgar]
+    approval:
+      message: |
+        Presenta la tesis sobreviviente de
+        docs/abogado/fidelizacion/03-juicio.md, y por separado la lista
+        de objeciones de seguridad marcadas como bloqueantes.
+
+        Eduardo clasifica cada objeción en tres cubetas:
+          MATA LA IDEA      -> no se construye; se documenta por qué
+          CAMBIA EL ALCANCE -> se construye más chico o después
+          RUIDO             -> se descarta con una línea de justificación
+
+        No decidas por él. Presenta y espera.
