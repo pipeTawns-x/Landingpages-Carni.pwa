@@ -13,6 +13,9 @@ build/
 .env.local
 .env.*.local
 .devcontainer/.env
+# Los respaldos con fecha no los cubre ninguna regla de arriba: `.env` es
+# exacto y `.env.*.local` exige ese sufijo. Llevan llaves reales.
+.env.bak-*
 !.env.example
 
 
