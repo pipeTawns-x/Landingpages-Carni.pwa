@@ -53,6 +53,50 @@ export interface ScheduledPublication {
   published_at?: string | null;
 }
 
+/**
+ * One line of the order held in React state.
+ *
+ * Distinct from CartLegacyItem: that shape is what gets written to localStorage
+ * for the vanilla cart, while this one is what the React tree renders. `lineId`
+ * exists because the same product can appear twice, so the product id alone is
+ * not a stable React key.
+ */
+export interface OrderLine {
+  lineId: string;
+  /**
+   * Seed products use numeric ids, but the vanilla catalogue in
+   * js/modules/utils/base_dinamica.js uses string slugs ('bisteck_res'). Both
+   * share the same storage key, so a line restored from a pre-migration cart
+   * carries a string. Coercing it with Number() produced NaN, which
+   * JSON.stringify writes as null — silently emptying the id of every item in a
+   * returning customer's cart.
+   */
+  productId: number | string;
+  name: string;
+  pricePerKg: number;
+  quantity: number;
+  image: string;
+  categorySlug: string;
+  /**
+   * How this line is sold. Merchandising goes by the piece and the Ofertas
+   * bundles by the package, so the order cannot assume kilos — otherwise a cap
+   * reads as "1 kg × $250". Mirrors CartLegacyItem.tipo.
+   */
+  unit: 'kg' | 'unidad' | 'paquete';
+  /**
+   * The untouched item this line was restored from, when it came from storage.
+   *
+   * CartLegacyItem carries nine fields React never reads — grosor, basePeso,
+   * orderMode, requestedWeightKg, requestedPieces, requestedBudget,
+   * unitWeightKg, avgPieceWeightKg — and every one is load-bearing in
+   * js/modules/core/cart.js: the quote engine, the price calculation and the
+   * thickness slider all read them. Rebuilding the legacy shape from scratch on
+   * write destroyed a configured premium cut the moment the catalogue mounted.
+   * Keeping the original here lets syncLegacyCart merge instead of overwrite.
+   */
+  legacy?: CartLegacyItem;
+}
+
 export interface CartLegacyItem {
   id: number | string;
   name: string;

@@ -13,7 +13,22 @@ build/
 .env.local
 .env.*.local
 .devcontainer/.env
-!.env.example
+# Los respaldos con fecha no los cubre ninguna regla de arriba: `.env` es
+# exacto y `.env.*.local` exige ese sufijo. Llevan llaves reales.
+.env.bak-*
+
+# La regla dura de docs/brain/security.md prohíbe el archivo de ejemplo: un
+# placeholder puede confundirse con un valor real. La forma del entorno se
+# documenta en prosa, ahí mismo. Esto lo hace cumplir en vez de solo pedirlo.
+.env.example
+
+# Configuración local de agentes. Es donde las herramientas de IA escriben
+# solas, así que un `git add .` se las lleva sin que nadie lo note. El
+# gitignore global de esta máquina ya cubría settings.local.json, pero eso
+# protege a quien lo tiene configurado, no a quien clone el repo: la regla
+# tiene que viajar con el proyecto.
+.mcp.json
+.claude/settings.local.json
 
 
 # IDE and editor files
@@ -61,3 +76,10 @@ __pycache__/
 *.pem
 *.key
 *.crt
+
+# Graphify knowledge-graph artifacts (regenerate with: graphify update .)
+graphify-out/
+
+# Video transcripts — derived data, ~784KB (regenerate with: docs/brain/videos/transcripts/grab.sh)
+docs/brain/videos/transcripts/*.txt
+docs/brain/videos/transcripts/subs/

@@ -1,0 +1,33 @@
+// ProductCard — catalogue card.
+// Compiled with: sass src/components:src/components --no-source-map
+// The component imports the generated styles.css, never this file.
+//
+// Scope note: the `tw-card-shell` shell is NOT owned here on purpose. Those 52
+// rules live in css/pages/_productos.scss and src/styles/redesign.css because
+// the vanilla catalogue renders the same markup, and pulling them into this
+// component would leave the non-React pages unstyled.
+//
+// What this file owns is the `producto-card` layer — the hooks
+// js/modules/ui/search.js filters on, which are React-only and had no styles
+// bound to them at all.
+
+.producto-card {
+  // The search box hides non-matching cards by toggling this attribute. Without
+  // a rule bound to it the filter set the attribute and nothing happened.
+  &[hidden] {
+    display: none;
+  }
+
+  &__title {
+    // The name was rendering in the inherited muted grey over #050505, which
+    // measures below the 4.5:1 body-text floor. The card title is the primary
+    // label on the card and has to read first.
+    color: #f5f5f5;
+  }
+
+  &__description {
+    // Kept deliberately dimmer than the title so the hierarchy holds, but
+    // raised off the previous grey to clear 4.5:1 on the #111111 card surface.
+    color: #b8b8b8;
+  }
+}

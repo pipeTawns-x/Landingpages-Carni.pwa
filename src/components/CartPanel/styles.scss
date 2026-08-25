@@ -1,0 +1,156 @@
+// CartPanel — off-canvas order panel.
+// Compiled with: sass src/components:src/components --no-source-map
+// The component imports the generated styles.css, never this file.
+
+// The panel is fixed to the viewport, so without this the catalogue keeps
+// sitting underneath it and the cards in the right-hand column stop being
+// clickable — the panel swallows their clicks. Reserving the same width as
+// padding pushes the page out from under it instead, which is what keeps the
+// whole catalogue reachable while the order is open.
+//
+// Below 576px the panel is full width by design, so there is nothing to reserve.
+@media (min-width: 576px) {
+  body.cart-is-open {
+    padding-right: 380px;
+  }
+}
+
+.cart-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1040;
+  width: 380px;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  background: #111111;
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: -12px 0 32px rgba(0, 0, 0, 0.45);
+
+  // Off-canvas by default. Only transform and visibility change, so opening and
+  // closing stay on the compositor and never repaint the catalogue behind.
+  transform: translateX(100%);
+  visibility: hidden;
+  transition: transform 0.28s ease, visibility 0s linear 0.28s;
+  will-change: transform;
+
+  // Full width on phones, where a 380px column would leave nothing readable.
+  @media (max-width: 575.98px) {
+    width: 100%;
+  }
+
+  &--open {
+    transform: translateX(0);
+    visibility: visible;
+    transition: transform 0.28s ease, visibility 0s linear 0s;
+  }
+
+  &__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.25rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  &__title {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #f5f5f5;
+  }
+
+  &__count {
+    margin: 0.15rem 0 0;
+    font-size: 0.82rem;
+    color: #a3a3a3;
+  }
+
+  &__close {
+    flex: 0 0 auto;
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.06);
+    color: #f5f5f5;
+    font-size: 1.4rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: transform 0.18s ease;
+
+    &:hover {
+      transform: scale(1.08);
+    }
+
+    &:focus-visible {
+      outline: 2px solid #dc2626;
+      outline-offset: 2px;
+    }
+  }
+
+  // The panel scrolls its own lines. The page underneath keeps its own scroll
+  // position and stays usable.
+  &__body {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    padding: 1.25rem;
+  }
+
+  &__footer {
+    padding: 1.25rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    background: #0d0d0d;
+  }
+
+  &__total-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 0.9rem;
+    color: #a3a3a3;
+    font-size: 0.9rem;
+  }
+
+  &__total {
+    font-size: 1.35rem;
+    color: #f5f5f5;
+  }
+
+  &__checkout {
+    width: 100%;
+    padding: 0.85rem 1rem;
+    border: none;
+    border-radius: 10px;
+    background: #dc2626;
+    color: #ffffff;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.18s ease, opacity 0.18s ease;
+
+    &:hover:not(:disabled) {
+      transform: translateY(-2px);
+    }
+
+    &:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    &:focus-visible {
+      outline: 2px solid #ffffff;
+      outline-offset: 2px;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cart-panel,
+  .cart-panel__close,
+  .cart-panel__checkout {
+    transition: none;
+  }
+}

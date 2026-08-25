@@ -214,7 +214,7 @@ export const productos = {
             categoria: 'premium', 
             tipo: 'corte', 
             basePeso: 0.3,
-            imagen: 'img/carrusel_products/bravette_steak.png'
+            imagen: 'img/products/bravette_steak.webp'
         },
         { 
             id: 'filet_mignon', 
@@ -224,7 +224,7 @@ export const productos = {
             categoria: 'premium', 
             tipo: 'corte', 
             basePeso: 0.25,
-            imagen: 'img/carrusel_products/filet_mignon.png'
+            imagen: 'img/products/filet_mignon.webp'
         },
         { 
             id: 'flank_steak', 
@@ -234,7 +234,7 @@ export const productos = {
             categoria: 'premium', 
             tipo: 'corte', 
             basePeso: 0.4,
-            imagen: 'img/carrusel_products/flak_steak.png'
+            imagen: 'img/products/flak_steak.webp'
         },
         { 
             id: 'new_york_strip', 
@@ -244,7 +244,7 @@ export const productos = {
             categoria: 'premium', 
             tipo: 'corte', 
             basePeso: 0.35,
-            imagen: 'img/carrusel_products/ney_york_strip.png'
+            imagen: 'img/products/ney_york_strip.webp'
         },
         { 
             id: 'porterhouse', 
@@ -254,7 +254,7 @@ export const productos = {
             categoria: 'premium', 
             tipo: 'corte', 
             basePeso: 0.5,
-            imagen: 'img/carrusel_products/porterhouse.png'
+            imagen: 'img/products/porterhouse.webp'
         },
         { 
             id: 'rib_eye', 
@@ -264,7 +264,7 @@ export const productos = {
             categoria: 'premium', 
             tipo: 'corte', 
             basePeso: 0.4,
-            imagen: 'img/carrusel_products/rib-eye.png'
+            imagen: 'img/products/rib-eye.webp'
         },
         { 
             id: 'skirt_steak', 
@@ -274,7 +274,7 @@ export const productos = {
             categoria: 'premium', 
             tipo: 'corte', 
             basePeso: 0.3,
-            imagen: 'img/carrusel_products/skirt_steak.png'
+            imagen: 'img/products/skirt_steak.webp'
         },
         { 
             id: 'tomahawk', 
@@ -284,7 +284,7 @@ export const productos = {
             categoria: 'premium', 
             tipo: 'corte', 
             basePeso: 0.8,
-            imagen: 'img/carrusel_products/tomahawk.png'
+            imagen: 'img/products/tomahawk.webp'
         },
         { 
             id: 'top_sirloin', 
@@ -294,7 +294,7 @@ export const productos = {
             categoria: 'premium', 
             tipo: 'corte', 
             basePeso: 0.35,
-            imagen: 'img/carrusel_products/top_sirloin.png'
+            imagen: 'img/products/top_sirloin.webp'
         }
     ],
     preparadas: [

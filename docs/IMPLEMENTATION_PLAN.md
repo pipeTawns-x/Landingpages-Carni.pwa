@@ -12,8 +12,7 @@
 
 ## Capa agentica local
 
-- `AGENTS.md`: punto de entrada para herramientas
-- `agents/AGENTS.md`: reglas locales del producto
+- `AGENTS.md`: punto de entrada canonico para herramientas y reglas locales del producto (consolida el antiguo `agents/AGENTS.md`)
 - `agents/STITCH_REDESIGN_PROMPT.md`: referencia visual para tareas de UI
 - `agents/orchestrator/`: orquestador local del repo
 - `agents/subagents/`: subagentes por dominio
@@ -22,7 +21,7 @@
 
 ## Regla de capas
 
-- capa local del repo: `AGENTS.md`, `agents/AGENTS.md`, `agents/orchestrator/`, `agents/subagents/`, `agents/skills/`, `agents/workflows/`
+- capa local del repo: `AGENTS.md`, `agents/orchestrator/`, `agents/subagents/`, `agents/skills/`, `agents/workflows/`
 - capa global del usuario: `stack-ia` / `gentle-ai` / `engram`
 - la capa local agrega contexto de Carni-mvp y no reemplaza el orquestador global
 

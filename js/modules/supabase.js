@@ -203,7 +203,10 @@ export async function updateUserProfile(userId, updates) {
 export async function createOrder(orderData) {
   const { data, error } = await supabase.rpc('create_order_with_items', {
     p_delivery_type: orderData.delivery_type || 'pickup',
-    p_address: orderData.delivery_address || null,
+    // La función se llama p_delivery_address, no p_address. Postgres rechaza
+    // la llamada RPC completa cuando recibe un parámetro que no existe, así
+    // que createOrder() falló siempre y ningún pedido llegó nunca a la base.
+    p_delivery_address: orderData.delivery_address || null,
     p_notes: orderData.notes || null,
     p_items: orderData.items
   });

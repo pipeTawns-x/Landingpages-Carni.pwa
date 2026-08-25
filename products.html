@@ -89,21 +89,13 @@
         <a class="navbar-brand" href="index.html">
           <img src="img/recursos_web/logo-user.png" alt="Logo" class="main-header__logo" style="object-fit:contain;max-height:56px;">
         </a>
-        <div class="main-header__brand-lockup d-none d-lg-flex">
-          <strong>El Señor de la Misericordia</strong>
-        </div>
       </div>
-      <div class="desktop-site-nav d-none d-lg-flex" aria-label="Navegación principal">
-        <a class="desktop-site-nav__link" href="index.html">Home</a>
-        <a class="desktop-site-nav__link desktop-site-nav__link--active" href="products.html">Products</a>
-        <a class="desktop-site-nav__link" href="accessweb.html">Club Misericordia</a>
-        <a class="desktop-site-nav__link" href="index.html#sobre-nosotros">About</a>
-      </div>
+      <button class="header-search" type="button" id="searchBtn" aria-label="Buscar productos">
+        <i class="bi bi-search" aria-hidden="true"></i>
+        <span class="header-search__label">Buscar cortes y productos</span>
+      </button>
       <div class="main-header__icons-container d-flex align-items-center gap-2">
-        <button class="header-icon-btn header-icon-btn--round" aria-label="Buscar" id="searchBtn">
-          <i class="bi bi-search"></i>
-        </button>
-        <button class="header-icon-btn header-icon-btn--round position-relative" id="cartBtn" data-bs-toggle="modal" data-bs-target="#cartModal" aria-label="Carrito">
+        <button class="header-icon-btn header-icon-btn--round position-relative" id="cartBtn" aria-label="Carrito">
           <i class="bi bi-cart3"></i>
           <span class="badge bg-danger rounded-pill position-absolute top-0 start-100 translate-middle main-header__cart-count">0</span>
         </button>
@@ -132,9 +124,10 @@
 
     <nav class="mobile-drawer__nav">
       <a href="index.html" class="mobile-drawer__link">Inicio</a>
+      <a href="products.html" class="mobile-drawer__link mobile-drawer__link--active">Productos</a>
+      <a href="accessweb.html" class="mobile-drawer__link">Club Misericordia</a>
       <a href="index.html#sobre-nosotros" class="mobile-drawer__link">Sobre Nosotros</a>
       <a href="index.html#contacto" class="mobile-drawer__link">Contacto</a>
-      <a href="products.html" class="mobile-drawer__link">Productos</a>
     </nav>
 
     <div class="mobile-drawer__section">
@@ -171,77 +164,13 @@
             </ol>
         </nav>
 
-    <!-- Categorías Menu -->
+    <!-- The category chip bar and the nine .categoria-productos grids were
+         removed. Both belonged to the vanilla catalogue, which rendered a
+         second copy of the shop underneath the React one. Categories, chips
+         and cards now come from the seed through src/entry/products.tsx. -->
     <div class="container-fluid px-3 px-lg-5 mb-4 products-top-zone">
-          <div class="categorias-menu mb-4" id="productsCategorySlider">
-            <div class="nav-scroll-wrapper">
-                <button class="scroll-btn prev" aria-label="Categorías anteriores"><i class="bi bi-chevron-left"></i></button>
-                    <div class="nav-scroll">
-                    <button class="btn btn-outline-primary categoria-btn" data-categoria="res">Res</button>
-                    <button class="btn btn-outline-primary categoria-btn" data-categoria="cerdo">Cerdo</button>
-                        <button class="btn btn-outline-primary categoria-btn" data-categoria="pollo">Pollo</button>
-                        <button class="btn btn-outline-primary categoria-btn" data-categoria="embutidos">Embutidos</button>
-                        <button class="btn btn-outline-primary categoria-btn" data-categoria="preparadas">Preparadas</button>
-                    <button class="btn btn-outline-primary categoria-btn" data-categoria="premium">Selección Premium</button>
-                    <button class="btn btn-outline-primary categoria-btn" data-categoria="merch">Merchandising</button>
-                    <button class="btn btn-outline-primary categoria-btn" data-categoria="otros">Otros Productos</button>
-                    <button class="btn btn-outline-primary categoria-btn" data-categoria="ofertas">Ofertas Especiales</button>
-                </div>
-                <button class="scroll-btn next" aria-label="Categorías siguientes"><i class="bi bi-chevron-right"></i></button>
-                        </div>
-                    </div>
-                    
-        <div id="productsReactRoot" class="mb-5"></div>
-
-        <!-- Contenedor de Productos por Categoría -->
-        <div class="productos-container">
-            <!-- Res -->
-            <div id="res" class="categoria-productos d-none">
-                <h3 class="mb-4">Cortes de Res</h3>
-                <div class="row g-4 productos-grid" id="productos-res"></div>
-                        </div>
-            <!-- Cerdo -->
-                    <div id="cerdo" class="categoria-productos d-none">
-                        <h3 class="mb-4">Cortes de Cerdo</h3>
-                <div class="row g-4 productos-grid" id="productos-cerdo"></div>
-                        </div>
-            <!-- Pollo -->
-            <div id="pollo" class="categoria-productos d-none">
-                <h3 class="mb-4">Cortes de Pollo</h3>
-                <div class="row g-4 productos-grid" id="productos-pollo"></div>
-                    </div>
-            <!-- Embutidos -->
-                    <div id="embutidos" class="categoria-productos d-none">
-                        <h3 class="mb-4">Embutidos</h3>
-                <div class="row g-4 productos-grid" id="productos-embutidos"></div>
-                        </div>
-            <!-- Preparadas -->
-            <div id="preparadas" class="categoria-productos d-none">
-                <h3 class="mb-4">Preparadas</h3>
-                <div class="row g-4 productos-grid" id="productos-preparadas"></div>
-                    </div>
-            <!-- Premium -->
-                    <div id="premium" class="categoria-productos d-none">
-                <h3 class="mb-4">Selección Premium</h3>
-                <div class="row g-4 productos-grid" id="productos-premium"></div>
-                        </div>
-            <!-- Merch -->
-            <div id="merch" class="categoria-productos d-none">
-                <h3 class="mb-4">Merchandising</h3>
-                <div class="row g-4 productos-grid" id="productos-merch"></div>
-                    </div>
-            <!-- Otros -->
-            <div id="otros" class="categoria-productos d-none">
-                <h3 class="mb-4">Otros Productos</h3>
-                <div class="row g-4 productos-grid" id="productos-otros"></div>
-            </div>
-            <!-- Ofertas -->
-            <div id="ofertas" class="categoria-productos d-none">
-                <h3 class="mb-4">Ofertas Especiales</h3>
-                <div class="row g-4 productos-grid" id="productos-ofertas"></div>
-                            </div>
-                        </div>
-                    </div>
+      <div id="productsReactRoot" class="mb-5"></div>
+    </div>
   </main>
 
   <!-- Footer -->
@@ -288,24 +217,10 @@
                                     </div>
   </footer>
 
-  <!-- Cart Modal -->
-  <div class="modal fade" id="cartModal" tabindex="-1" aria-labelledby="cartModalLabel" aria-hidden="true" data-bs-backdrop="true" data-bs-keyboard="true">
-    <div class="modal-dialog modal-lg modal-dialog-scrollable">
-      <div class="modal-content">
-        <div class="modal-header bg-danger text-white">
-          <h5 class="modal-title" id="cartModalLabel">🛒 Tu Carrito de Compras</h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                                    </div>
-        <div class="modal-body">
-          <div id="cartItems" style="max-height: 500px; overflow-y: auto;"></div>
-          <div id="cartSummary" class="mt-3 border-top pt-3"></div>
-                                    </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Seguir Comprando</button>
-                    </div>
-                </div>
-            </div>
-        </div>
+  <!-- The Bootstrap cart modal was removed. The order is now rendered by the
+       React CartPanel (src/components/CartPanel), which mounts inside
+       #productsReactRoot. A modal takes the page hostage behind a backdrop; the
+       panel leaves the catalogue scrollable and clickable while it is open. -->
 
   <div class="modal fade" id="premiumOrderModal" tabindex="-1" aria-labelledby="premiumOrderModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-scrollable">
@@ -380,228 +295,15 @@
   <!-- SCRIPT INLINE QUE FUNCIONA - Carga productos directamente -->
   <!-- IMPORTANTE: Los módulos ES6 requieren un servidor local (no funcionan con file:///) -->
   <script type="module">
-    // Manejo de errores para importación
-    let productos = {};
-    let productosCargados = false;
-    
-    /**
-     * Muestra un mensaje de error al usuario indicando que debe usar un servidor local
-     */
-    function mostrarErrorCORS() {
-      const contenedor = document.querySelector('.productos-container');
-      if (contenedor) {
-        const probe = window.__carniServerProbe || { active: false, found: false };
-        const titulo = probe.found ? 'Redirigiendo al servidor local' : 'Servidor local no detectado';
-        const descripcion = probe.found
-          ? 'Se encontró un servidor local y la página intentará abrirse por HTTP automáticamente.'
-          : 'Abriste products.html con file:// y no se encontró un servidor local respondiendo para cargar los módulos del catálogo.';
-        contenedor.innerHTML = `
-          <div class="col-12">
-            <div class="alert alert-danger text-center py-5">
-              <h4 class="mb-3">⚠️ ${titulo}</h4>
-              <p class="mb-3">${descripcion}</p>
-              <div class="bg-light p-3 rounded mb-3">
-                <p class="mb-2"><strong>Soluciones:</strong></p>
-                <ol class="text-start" style="max-width: 600px; margin: 0 auto;">
-                  <li class="mb-2">
-                    <strong>Usa "Go Live" en VS Code:</strong><br>
-                    <small>Haz clic en el botón "Go Live" en la barra inferior de VS Code (puerto 3002)</small>
-                  </li>
-                  <li class="mb-2">
-                    <strong>O ejecuta un servidor local:</strong><br>
-                    <code class="bg-dark text-light px-2 py-1 rounded">cd Carni-mvp && python -m http.server 8000</code><br>
-                    <small>Luego abre: <code>http://localhost:8000/products.html</code></small>
-                  </li>
-                  <li>
-                    <strong>O usa Node.js:</strong><br>
-                    <code class="bg-dark text-light px-2 py-1 rounded">npx http-server -p 8000</code>
-                  </li>
-                </ol>
-                    </div>
-              <p class="text-muted small mb-0">
-                URL correcta: <code>http://127.0.0.1:3002/products.html</code> o <code>http://localhost:8000/products.html</code>
-              </p>
-                                    </div>
-                                </div>
-        `;
-      }
-    }
-    
-    // Función async para cargar productos
-    async function cargarProductos() {
-      try {
-        // Intentar importar módulo ES6 (solo funciona con servidor HTTP/HTTPS)
-        const productosModule = await import('./js/modules/utils/base_dinamica.js');
-        productos = productosModule.productos || {};
-        productosCargados = true;
-        console.log('✅ Productos cargados desde módulo ES6:', Object.keys(productos));
-        
-        // Inicializar después de cargar productos
-        if (document.readyState === 'complete' || document.readyState === 'interactive') {
-          setTimeout(init, 100);
-        }
-      } catch (error) {
-        console.error('❌ Error al cargar productos:', error);
-        console.error('💡 CAUSA: Los módulos ES6 requieren un servidor local (no funcionan con file:///)');
-        console.error('💡 SOLUCIÓN: Usa "Go Live" en VS Code o ejecuta un servidor local');
-        
-        productos = {};
-        productosCargados = true;
-        
-        if (window.location.protocol === 'file:' && window.__carniServerProbe?.active) {
-          return;
-        }
+    // The vanilla catalogue renderer was removed from here: the `productos`
+    // import from base_dinamica.js, mostrarErrorCORS(), cargarProductos(),
+    // renderizarProductos() and cambiarCategoria(). Together they painted the
+    // nine .categoria-productos grids that duplicated the React catalogue.
+    // Categories, chips and cards now come from the seed via products.tsx.
+    //
+    // What follows is the premium order modal, kept on purpose. React does not
+    // replicate its weight / pieces / budget quoting yet — see the handoff note.
 
-        // Mostrar mensaje de error al usuario
-        if (document.readyState === 'loading') {
-          document.addEventListener('DOMContentLoaded', mostrarErrorCORS);
-        } else {
-          mostrarErrorCORS();
-        }
-      }
-    }
-    
-    // Cargar productos inmediatamente
-    cargarProductos();
-    
-    /**
-     * Renderiza los productos de una categoría específica
-     * @param {string} categoria - Nombre de la categoría
-     */
-    function renderizarProductos(categoria) {
-      const contenedor = document.getElementById(`productos-${categoria}`);
-      if (!contenedor) {
-        console.error('❌ Contenedor no encontrado:', categoria);
-        return;
-      }
-      
-      const productosCategoria = productos[categoria] || [];
-      if (productosCategoria.length === 0) {
-        contenedor.innerHTML = '<div class="col-12"><p class="text-center text-muted py-5">No hay productos disponibles en esta categoría</p></div>';
-        return;
-      }
-      
-      let html = '';
-      productosCategoria.forEach(producto => {
-        // Procesar ruta de imagen
-        let imagenSrc = producto.imagen || `img/products/${categoria === 'otros' ? 'otrosproductos' : categoria === 'ofertas' ? 'premium' : categoria}.png`;
-        if (imagenSrc.startsWith('/')) {
-          imagenSrc = imagenSrc.slice(1);
-        }
-        
-        // Generar HTML de precio según tipo
-        let precioHtml = '';
-        if (producto.tipo === 'unidad') {
-          precioHtml = `<div class="precio-kg">$${producto.precioPorUnidad}/pieza</div>`;
-        } else if (producto.tipo === 'paquete') {
-          precioHtml = `<div class="precio-kg">$${producto.precioPorPaquete}/paquete</div>`;
-        } else if (producto.precioPorKg) {
-          const precioLb = producto.precioLb || (producto.precioPorKg / 2.20462).toFixed(2);
-          precioHtml = `
-            <div class="precio-kg">$${producto.precioPorKg}/kg</div>
-            <div class="precio-lb text-muted">$${precioLb}/lb</div>
-          `;
-        }
-        
-        // Escapar comillas en JSON para evitar errores
-        const productoJson = JSON.stringify(producto).replace(/'/g, "&#39;");
-        
-        html += `
-          <div class="col-md-6 col-lg-4 col-xl-3 mb-4">
-            <div class="card product-card h-100 shadow-sm">
-              <img src="${imagenSrc}" 
-                   alt="${producto.nombre}" 
-                   class="card-img-top" 
-                   style="height: 200px; object-fit: cover; width: 100%;"
-                   onerror="this.src='img/products/${categoria === 'otros' ? 'otrosproductos' : categoria === 'ofertas' ? 'premium' : categoria}.png'">
-              <div class="card-body d-flex flex-column">
-                <h5 class="card-title mb-2">${producto.nombre}</h5>
-                <div class="precio-info mb-3">
-                  ${precioHtml}
-                                    </div>
-                <button class="btn btn-danger mt-auto w-100 agregar-carrito-btn" 
-                        data-product-id="${producto.id}"
-                        data-producto='${productoJson}'
-                        data-categoria="${categoria}">
-                  Agregar al Carrito
-                        </button>
-                    </div>
-                </div>
-            </div>
-        `;
-      });
-      
-      contenedor.innerHTML = html;
-      console.log('✅ Renderizados', productosCategoria.length, 'productos en', categoria);
-      
-      // Agregar event listeners a los botones de agregar al carrito
-      contenedor.querySelectorAll('.agregar-carrito-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          try {
-            const productoData = JSON.parse(btn.getAttribute('data-producto'));
-            agregarAlCarrito(productoData);
-          } catch (error) {
-            console.error('Error al parsear producto:', error);
-            alert('Error al agregar producto. Por favor intenta de nuevo.');
-          }
-        });
-      });
-    }
-    
-    /**
-     * Cambia la categoría activa y renderiza sus productos
-     * @param {string} categoria - Nombre de la categoría a mostrar
-     */
-    function cambiarCategoria(categoria) {
-      // Ocultar todas las secciones
-      document.querySelectorAll('.categoria-productos').forEach(s => {
-        s.classList.add('d-none');
-        s.classList.remove('active');
-      });
-      
-      // Actualizar botones y hacer scroll automático
-      const navScroll = document.querySelector('.nav-scroll');
-      let botonActivo = null;
-      
-      document.querySelectorAll('.categoria-btn').forEach(btn => {
-        btn.classList.remove('active', 'btn-primary');
-        btn.classList.add('btn-outline-primary');
-        if (btn.getAttribute('data-categoria') === categoria) {
-          btn.classList.add('active', 'btn-primary');
-          btn.classList.remove('btn-outline-primary');
-          botonActivo = btn;
-        }
-      });
-      
-      // Scroll automático para mostrar el botón activo
-      if (botonActivo && navScroll) {
-        const scrollContainer = navScroll;
-        const buttonLeft = botonActivo.offsetLeft;
-        const buttonWidth = botonActivo.offsetWidth;
-        const containerWidth = scrollContainer.offsetWidth;
-        
-        // Calcular posición para centrar el botón
-        const targetScroll = buttonLeft - (containerWidth / 2) + (buttonWidth / 2);
-        
-        scrollContainer.scrollTo({
-          left: Math.max(0, targetScroll),
-          behavior: 'smooth'
-        });
-      }
-      
-      // Mostrar sección de la categoría
-      const seccion = document.getElementById(categoria);
-      if (seccion) {
-        seccion.classList.remove('d-none');
-        seccion.classList.add('active');
-        renderizarProductos(categoria);
-      } else {
-        console.error('❌ Sección no encontrada:', categoria);
-      }
-    }
-    
     const PREMIUM_MODE_META = {
       weight: { label: 'Peso solicitado', unit: 'kg', min: 0.1, step: 0.1 },
       price: { label: 'Presupuesto objetivo', unit: 'mxn', min: 50, step: 10 },
@@ -801,148 +503,19 @@
       }
     }
 
-    /**
-     * Agrega un producto al carrito
-     * @param {Object} producto - Objeto del producto a agregar
-     */
-    function agregarAlCarrito(producto) {
-      if (!producto || !producto.id) {
-        console.error('Producto inválido:', producto);
-        return;
-      }
+    // agregarAlCarrito() was removed with the vanilla cards that called it.
+    // React adds to the order through src/entry/products.tsx.
 
-      if (isPremiumCut(producto)) {
-        openPremiumOrderModal(producto);
-        return;
-      }
-      
-      const item = {
-        id: producto.id,
-        name: producto.nombre,
-        price: producto.precioPorKg || producto.precioPorUnidad || producto.precioPorPaquete || 0,
-        img: producto.imagen ? (producto.imagen.startsWith('/') ? producto.imagen.slice(1) : producto.imagen) : `img/products/${producto.categoria === 'otros' ? 'otrosproductos' : producto.categoria === 'ofertas' ? 'premium' : producto.categoria}.png`,
-        categoria: producto.categoria,
-        tipo: producto.tipo,
-        peso: producto.tipo === 'kg' || producto.tipo === 'corte' ? (producto.tipo === 'corte' ? producto.basePeso || 0.3 : 1) : 0,
-        piezas: producto.tipo === 'unidad' || producto.tipo === 'paquete' ? 1 : 0,
-        grosor: producto.tipo === 'corte' ? 1.25 : 0,
-        basePeso: producto.basePeso || 0.3
-      };
-      
-      if (window.CarniCart && typeof window.CarniCart.addItem === 'function') {
-        window.CarniCart.addItem(item);
-      } else {
-        console.error('Carrito no disponible');
-        alert('Error: El carrito no está disponible. Por favor recarga la página.');
-      }
-    }
-    
-    /**
-     * Inicializa la página de productos
-     */
-    function init() {
-      try {
-        initPremiumOrderModal();
-        // Esperar a que los productos estén cargados
-        if (!productosCargados) {
-          setTimeout(init, 200);
-          return;
-        }
-        
-        const urlParams = new URLSearchParams(window.location.search);
-        const categoriaFromUrl = urlParams.get('categoria');
-        const categoriasValidas = ['res', 'cerdo', 'pollo', 'embutidos', 'preparadas', 'premium', 'merch', 'otros', 'ofertas'];
-        const categoriaInicial = (categoriaFromUrl && categoriasValidas.includes(categoriaFromUrl)) ? categoriaFromUrl : 'res';
-        
-        // Agregar event listeners a los botones de categoría
-        document.querySelectorAll('.categoria-btn').forEach(btn => {
-          btn.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            const categoria = btn.getAttribute('data-categoria');
-            if (categoria) {
-              cambiarCategoria(categoria);
-              // Actualizar URL sin recargar
-              const newUrl = new URL(window.location);
-              newUrl.searchParams.set('categoria', categoria);
-              window.history.pushState({ categoria }, '', newUrl);
-            }
-          });
-        });
-        
-        // Cambiar a la categoría inicial
-        cambiarCategoria(categoriaInicial);
-        
-        console.log('✅ Página de productos inicializada');
-      } catch (error) {
-        console.error('❌ Error al inicializar página de productos:', error);
-        // Mostrar mensaje de error al usuario
-        const contenedor = document.querySelector('.productos-container');
-        if (contenedor) {
-          contenedor.innerHTML = '<div class="col-12"><div class="alert alert-danger">Error al cargar los productos. Por favor recarga la página.</div></div>';
-        }
-      }
-    }
-    
-    // Inicializar cuando el DOM esté listo
     if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', () => {
-        // Esperar a que productos se carguen
-        const checkProducts = setInterval(() => {
-          if (productosCargados) {
-            clearInterval(checkProducts);
-            setTimeout(init, 100);
-          }
-        }, 100);
-        
-        // Timeout de seguridad
-        setTimeout(() => {
-          clearInterval(checkProducts);
-          if (productosCargados) {
-            init();
-          }
-        }, 3000);
-      });
+      document.addEventListener('DOMContentLoaded', initPremiumOrderModal);
     } else {
-      // DOM ya está listo, esperar productos
-      const checkProducts = setInterval(() => {
-        if (productosCargados) {
-          clearInterval(checkProducts);
-          setTimeout(init, 100);
-        }
-      }, 100);
-      
-      // Timeout de seguridad
-      setTimeout(() => {
-        clearInterval(checkProducts);
-        if (productosCargados) {
-          init();
-        }
-      }, 3000);
+      initPremiumOrderModal();
     }
   </script>
   
-  <script type="module">
-    // Cargar ProductosManager para scroll buttons
-    (async function() {
-      try {
-        const ProductosManagerModule = await import('./js/modules/core/productos.js');
-        const ProductosManager = ProductosManagerModule.default || ProductosManagerModule.ProductosManager;
-        if (ProductosManager) {
-          if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', () => {
-              window.productosManager = new ProductosManager();
-            });
-          } else {
-            window.productosManager = new ProductosManager();
-          }
-        }
-      } catch (error) {
-        console.warn('⚠️ No se pudo cargar ProductosManager:', error);
-        // No es crítico, los scroll buttons pueden no funcionar pero la página seguirá funcionando
-            }
-    })();
-    </script>
+  <!-- ProductosManager was removed with the chip bar. Its only job was driving
+       the prev/next arrows of #productsCategorySlider, which no longer exists.
+       The React chips wrap instead of scrolling, so there is nothing to drive. -->
   <script type="module" src="/src/entry/products.tsx"></script>
 </body>
 

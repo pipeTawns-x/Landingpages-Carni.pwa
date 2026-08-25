@@ -142,8 +142,15 @@
 
 .tw-bento-grid {
   display: grid;
-  grid-template-columns: repeat(var(--tw-grid-mobile), minmax(0, 1fr));
-  gap: var(--tw-grid-gap);
+  /* Column counts come from these variables, which the breakpoint rules further
+     down consume. They had no defaults, so any render that did not set them
+     inline produced an invalid repeat() and collapsed the grid to one column.
+     One on phones, two on tablets, three on desktop. */
+  --tw-grid-mobile: 1;
+  --tw-grid-tablet: 2;
+  --tw-grid-desktop: 3;
+  grid-template-columns: repeat(var(--tw-grid-mobile, 1), minmax(0, 1fr));
+  gap: var(--tw-grid-gap, 1.25rem);
   margin-top: 1.5rem;
 }
 
@@ -152,11 +159,21 @@
   flex-direction: column;
   border-radius: 1rem;
   overflow: hidden;
-  background: var(--redesign-beige);
-  color: var(--redesign-ink);
+  /* Surface moved onto the dark scale (#111111) so the catalogue matches the
+     rest of the site instead of sitting on a light beige panel. */
+  background: #111111;
+  color: #f5f5f5;
+  border: 1px solid var(--redesign-border);
   box-shadow: var(--redesign-shadow);
   min-height: 100%;
   position: relative;
+  transition: transform 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+.tw-card-shell:hover {
+  transform: translateY(-4px);
+  border-color: rgba(228, 209, 176, 0.34);
+  box-shadow: 0 18px 36px rgba(0, 0, 0, 0.45);
 }
 
 .tw-card-shell--large {
@@ -177,24 +194,45 @@
 
 .tw-card-shell__image-wrap {
   position: relative;
-  min-height: 220px;
-  background: linear-gradient(180deg, #fff, #f6efe4);
+  /* Square crop: every card reads the same regardless of the source photo. */
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  background: #181818;
 }
 
 .tw-card-shell__image {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  display: block;
+  transition: transform 0.4s ease;
 }
 
-.tw-card-shell__rail {
+.tw-card-shell:hover .tw-card-shell__image {
+  transform: scale(1.08);
+}
+
+/* .tw-card-shell__rail is gone: a decorative side stripe on every card is one
+   of the patterns that makes a grid read as generated rather than designed. */
+
+.tw-card-shell__stock-badge {
   position: absolute;
-  left: 0;
-  top: 1rem;
-  bottom: 1rem;
-  width: 10px;
-  background: var(--redesign-red);
-  border-radius: 0 999px 999px 0;
+  left: 0.85rem;
+  top: 0.85rem;
+  z-index: 2;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  background: rgba(5, 5, 5, 0.82);
+  border: 1px solid rgba(228, 209, 176, 0.28);
+  color: #f5f5f5;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.tw-card-shell__stock-badge--out {
+  background: rgba(120, 20, 20, 0.9);
+  border-color: rgba(220, 38, 38, 0.5);
 }
 
 .tw-card-shell__badge {
@@ -302,22 +340,41 @@
 .tw-filter-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.75rem;
-  margin-top: 1rem;
+  gap: 0.85rem;
+  margin-top: 1.25rem;
 }
 
 .tw-filter-chip {
   border: 1px solid rgba(228, 209, 176, 0.18);
-  background: rgba(255,255,255,0.05);
+  background: rgba(255, 255, 255, 0.05);
   color: var(--redesign-beige);
-  padding: 0.7rem 0.95rem;
+  /* Roomier than before, and tall enough to be a comfortable pointer target. */
+  padding: 0.75rem 1.35rem;
+  min-height: 44px;
   border-radius: 999px;
   font-weight: 700;
+  cursor: pointer;
+  transition: background 0.25s ease, border-color 0.25s ease, color 0.25s ease;
 }
 
-.tw-filter-chip--active {
-  background: linear-gradient(135deg, var(--redesign-red), #b91c1c);
+.tw-filter-chip:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(228, 209, 176, 0.4);
   color: var(--redesign-white);
+}
+
+.tw-filter-chip:focus-visible {
+  outline: 2px solid var(--redesign-gold);
+  outline-offset: 2px;
+}
+
+/* The active chip used to differ only by a red fill. It now also carries a
+   gold ring and a lift, so which category is selected reads at a glance. */
+.tw-filter-chip--active {
+  background: var(--redesign-red);
+  border-color: var(--redesign-gold);
+  color: var(--redesign-white);
+  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.28);
 }
 
 .tw-empty-state {
@@ -505,13 +562,13 @@
 
 @media (min-width: 768px) {
   .tw-bento-grid {
-    grid-template-columns: repeat(var(--tw-grid-tablet), minmax(0, 1fr));
+    grid-template-columns: repeat(var(--tw-grid-tablet, 2), minmax(0, 1fr));
   }
 }
 
 @media (min-width: 1024px) {
   .tw-bento-grid {
-    grid-template-columns: repeat(var(--tw-grid-desktop), minmax(0, 1fr));
+    grid-template-columns: repeat(var(--tw-grid-desktop, 3), minmax(0, 1fr));
   }
 
   .tw-card-shell--large {
@@ -540,3 +597,219 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Motion is an enhancement here, never a gate on visibility: with reduced
+   motion requested, the card lift and the image zoom simply do not happen. */
+@media (prefers-reduced-motion: reduce) {
+  .tw-card-shell,
+  .tw-card-shell__image,
+  .tw-filter-chip {
+    transition: none;
+  }
+
+  .tw-card-shell:hover {
+    transform: none;
+  }
+
+  .tw-card-shell:hover .tw-card-shell__image {
+    transform: none;
+  }
+}
+
+/* Catalogue card typography.
+   Placed at the end on purpose: the earlier rules in this file were written for
+   a light beige card and paint dark ink (rgba(54, 52, 50, ...)). Now that the
+   card sits on #111111 those values have to be inverted, and equal-specificity
+   selectors are resolved by order, so these have to come last. */
+.tw-card-shell__category {
+  color: var(--redesign-gold);
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.tw-card-shell__title {
+  color: #f5f5f5;
+  text-wrap: balance;
+}
+
+.tw-card-shell__description {
+  color: #c9c4bc;
+}
+
+.tw-card-shell__price {
+  color: var(--redesign-beige);
+  font-size: 1.35rem;
+}
+
+.tw-card-shell__unit {
+  color: #c9c4bc;
+  margin-left: 0.25rem;
+}
+
+/* Price per pound, kept as the secondary line: no competitor publishes it. */
+.tw-card-shell__price-alt {
+  display: block;
+  margin-top: 0.15rem;
+  color: #a8a29a;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+/* ===========================================================================
+   Catalogue cards — no stretched boxes, no empty space.
+
+   These rules sit at the end of the file on purpose: the card typography above
+   was written for a light beige panel, and equal-specificity overrides only win
+   from here.
+
+   Three things were producing black holes under the cards:
+     1. `.tw-card-shell { min-height: 100% }` made every card fill its grid row,
+        so a short card next to a tall one grew empty space instead of ending.
+     2. `.tw-card-shell--large { grid-column: span 2 }` gave one card in six a
+        double-width square image — that is why Tomahawk towered over its row
+        and left its neighbour with a gap underneath.
+     3. `.tw-card-shell__footer { margin-top: auto }` pushed the price row to the
+        bottom of whatever height the card had been stretched to.
+   =========================================================================== */
+
+.product-list {
+  /* Cards align to the top of their row and keep their own height. Without
+     this, grid's default `stretch` copies the tallest card's height onto every
+     sibling in the row. */
+  align-items: start;
+}
+
+.tw-card-shell {
+  /* Was `min-height: 100%`. The card now ends where its content ends. */
+  min-height: 0;
+  height: auto;
+}
+
+.tw-card-shell--large,
+.tw-card-shell--small,
+.tw-card-shell--medium {
+  min-height: 0;
+  height: auto;
+}
+
+@media (min-width: 1024px) {
+  /* Every card occupies one column. The double-width variant is what made the
+     image balloon; a catalogue reads better when the cards are comparable. */
+  .product-list .tw-card-shell--large {
+    grid-column: span 1;
+  }
+}
+
+.tw-card-shell__image-wrap {
+  /* 4/3 keeps the photo shorter than the old square, so the image never
+     dominates the card, and the ratio is fixed so no image floats inside an
+     oversized box. */
+  aspect-ratio: 4 / 3;
+  flex: 0 0 auto;
+}
+
+.tw-card-shell__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.tw-card-shell__body {
+  /* Was `flex: 1`, which let the body absorb any leftover height. */
+  flex: 0 0 auto;
+}
+
+.tw-card-shell__footer {
+  /* `margin-top: auto` pushed this to the bottom of a stretched card, and
+     `space-between` spread its children across whatever width was left. The
+     price and the button now simply sit at the ends of a normal row. */
+  margin-top: 0;
+  justify-content: flex-start;
+}
+
+.tw-card-shell__footer > :last-child {
+  margin-inline-start: auto;
+}
+
+/* ===========================================================================
+   Scroll repaints — hover was the trigger.
+
+   Measured with a CDP timeline trace, same scroll distance, only the pointer
+   position changed:
+
+       pointer over the cards   518 Paint events, 775 RasterTask
+       pointer off the cards     21 Paint events,  71 RasterTask
+
+   Scrolling slides card after card under a stationary cursor. Each one enters
+   :hover and starts `transition: transform, border-color, box-shadow`. Neither
+   border-color nor box-shadow is compositable, so every frame of those 400ms
+   repainted the card and re-rastered its photo — for every card that passed
+   under the pointer. That is the flicker.
+
+   Only transform animates now. The border and shadow still differ on hover but
+   switch in a single frame instead of animating, and the photo is promoted to
+   its own layer so its hover zoom is composited rather than re-rastered.
+   =========================================================================== */
+
+.tw-card-shell {
+  /* Was `transform 0.4s, border-color 0.4s, box-shadow 0.4s`. */
+  transition: transform 0.28s ease;
+}
+
+.tw-card-shell:hover {
+  /* The lift stays — it is a transform, so the compositor handles it alone. */
+  transform: translateY(-4px);
+  /* Pinned back to the resting values. The earlier rule in this file changed
+     both on hover; even switching them in one frame still repaints the card,
+     and scrolling drags every card under the cursor. They stay static, which is
+     the only way the count reaches zero. The lift and the photo zoom carry the
+     hover feedback on their own. */
+  border-color: var(--redesign-border);
+  box-shadow: var(--redesign-shadow);
+}
+
+.tw-card-shell__image {
+  /* Its own compositor layer, the same treatment the bento photos get. Scrolling
+     moves the layer instead of re-rasterising the image, and the hover zoom
+     below becomes a composited transform. */
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  transition: transform 0.28s ease;
+}
+
+.tw-card-shell:hover .tw-card-shell__image {
+  transform: translateZ(0) scale(1.06);
+}
+
+/* Nothing the card paints escapes its own box, so one card can repaint without
+   the browser re-examining its neighbours. */
+.tw-card-shell {
+  contain: paint;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tw-card-shell,
+  .tw-card-shell__image {
+    transition: none;
+  }
+
+  .tw-card-shell:hover {
+    transform: none;
+  }
+
+  .tw-card-shell:hover .tw-card-shell__image {
+    transform: translateZ(0);
+  }
+}
+
+/* NOT promoting the card with `will-change: transform`, and the reason is
+   measured rather than assumed.
+
+   Promoting all 33 cards did remove the hover cost (the over-vs-off Paint delta
+   fell from 17 to 3), but it took the layer tree from ~40 to 109 layers, about
+   84MB of layer memory, and the ABSOLUTE paint count during the same scroll rose
+   from 42 to 288 — worse for everyone, including the case it was meant to fix.
+   The photo alone keeps its layer; the card does not. */

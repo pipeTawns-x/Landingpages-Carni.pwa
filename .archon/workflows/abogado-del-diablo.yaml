@@ -1,0 +1,336 @@
+name: abogado-del-diablo
+description: |
+  Loop de 3 pasadas para endurecer una tesis antes de escribir specs.
+
+  PRECHECK  -> falla ruidosamente si las skills no están instaladas
+  GENERAR   -> objeciones crudas contra la tesis
+  VERIFICAR -> cada objeción contra el repo, en sesión fresca y a ciegas
+  JUZGAR    -> de las sobrevivientes, cuáles matan la tesis
+  DECIDIR   -> puerta humana; el loop no decide
+
+  Read-only por diseño: ningún nodo escribe código. Solo reportes en
+  docs/abogado/. La decisión final es de Eduardo.
+
+  Uso: archon run abogado-del-diablo
+  Antes de correr, edita la TESIS en el nodo `generar`.
+
+provider: claude
+model: sonnet
+
+# Workflow de análisis: no toca el checkout, no necesita worktree aislado.
+worktree:
+  enabled: false
+mutates_checkout: false
+
+tags: [Analisis, SDD]
+
+nodes:
+
+  # ─────────────────────────────────────────────────────────────
+  # PRECHECK — determinista, sin IA, sin costo.
+  #
+  # La doc de Archon advierte: "No validation — if a named skill doesn't
+  # exist, the SDK may fail silently." Un nodo que corre sin su skill
+  # produce basura sin avisar. Este nodo lo convierte en un fallo ruidoso
+  # antes de gastar un peso.
+  #
+  # Skills solo se descubren de:
+  #   .claude/skills/   (proyecto)
+  #   ~/.claude/skills/ (usuario)
+  # Nada más. opencode/ NO cuenta.
+  # ─────────────────────────────────────────────────────────────
+  - id: precheck-skills
+    bash: |
+      set -e
+      FALTA=0
+      for S in abogado-del-diablo judgment-day; do
+        if [ -f ".claude/skills/$S/SKILL.md" ]; then
+          echo "OK    $S  → .claude/skills/$S (proyecto)"
+        elif [ -f "$HOME/.claude/skills/$S/SKILL.md" ]; then
+          echo "OK    $S  → ~/.claude/skills/$S (usuario)"
+        else
+          echo "FALTA $S  → no está en .claude/skills/ ni en ~/.claude/skills/"
+          FALTA=1
+        fi
+      done
+
+      if [ "$FALTA" = "1" ]; then
+        echo ""
+        echo "──────────────────────────────────────────────────────────"
+        echo "Archon solo descubre skills en .claude/skills/ y"
+        echo "~/.claude/skills/. Una skill ausente NO da error: el nodo"
+        echo "corre sin ella y devuelve resultados pobres en silencio."
+        echo ""
+        echo "judgment-day vive en ~/.config/opencode/skills/gentle-ai/"
+        echo "internal/assets/skills/judgment-day/ — esa ruta NO se lee."
+        echo ""
+        echo "Arréglalo con:"
+        echo "  mkdir -p .claude/skills"
+        echo "  cp -R ~/.config/opencode/skills/gentle-ai/internal/assets/skills/judgment-day .claude/skills/"
+        echo ""
+        echo "Verifica con:  npx skills list"
+        echo "──────────────────────────────────────────────────────────"
+        exit 1
+      fi
+
+      mkdir -p docs/abogado
+      echo "Skills verificadas. docs/abogado/ listo."
+
+  # ─────────────────────────────────────────────────────────────
+  # PASADA 1 — GENERAR
+  # ─────────────────────────────────────────────────────────────
+  - id: generar
+    depends_on: [precheck-skills]
+    skills: [abogado-del-diablo]
+    effort: high
+    output_type: findings
+    allowed_tools: [Read, Grep, Glob, Write]
+    maxBudgetUsd: 3
+    prompt: |
+      Usa la skill abogado-del-diablo contra esta tesis:
+
+      TESIS:
+      "Un cliente de Carni-mvp puede referir a otro cliente y cobrar una
+      recompensa, sin que exista una forma rentable de defraudar el sistema."
+
+      ═══ CONTEXTO VERIFICADO — no asumas nada fuera de esto ═══
+
+      Repo ~/Desktop/Carni-mvp (pipeTawns-x/Landingpages-Carni.pwa).
+      Schema real: supabase/migrations/202604100001_initial_schema.sql
+      7 tablas: profiles, categories, products, orders, order_items,
+      favorites, promotions.
+
+        profiles: id UUID (= auth.uid), full_name,
+                  phone TEXT CHECK(char_length = 10), address JSONB,
+                  role ∈ {customer, admin}, points INTEGER
+        orders:   user_id, total, delivery_type, delivery_address, notes,
+                  status ∈ {pending, confirmed, preparing, ready,
+                            delivered, cancelled}
+        products: category_id, name, price_per_kg, price_per_lb, stock,
+                  is_active, metadata JSONB — 14 productos en seed.sql
+
+      Funciones (202604100003_functions.sql): handle_new_user(),
+      protect_profile_system_fields(), create_order_with_items(),
+      cancel_order(), apply_promotion(), add_points(),
+      update_order_status(), y 3 RPC de favoritos.
+      RLS por tabla con helpers get_user_role() e is_admin().
+
+      NO EXISTE HOY: affiliates, referrals, tips_ledger, tier_settings,
+      track_score en profiles, ni server/routes/affiliate.ts.
+      El único route del proyecto es server/routes/buildads.ts.
+
+      Alcance propuesto en docs/blueprints/module-scopes.md,
+      sección "Affiliate program":
+        affiliates (profile_id, referral_code UNIQUE, status,
+                    total_referred, total_rewarded)
+        referrals  (referrer_id, referred_profile_id, first_order_id,
+                    reward_status ∈ {pending, granted, void}, created_at)
+
+      Negocio: carnicería familiar real en San Luis Potosí. Dinero real.
+      La recompensa sale del bolsillo del dueño. Márgenes de carnicería.
+
+      Competencia verificada: Carnívoros (carnivoros.mx) corre en Shopify,
+      vende por pieza y paquete, solo acepta PayPal, sin programa de lealtad.
+
+      ═══ RESTRICCIONES DURAS ═══
+      React 18 + Vite 7 + TypeScript + Express 5 + SCSS 7-1.
+      Sin Next.js, sin Tailwind, sin rutas nuevas de página.
+      Supabase MCP en read_only: no ejecutes escrituras.
+
+      ═══ QUÉ ATACAR ═══
+      1. La premisa — ¿resuelve un problema real de ESTA carnicería, o se
+         copia porque otros lo tienen?
+      2. El fraude — cuenta falsa, auto-referido con segundo teléfono,
+         farmeo de primeras compras mínimas, colusión entre dos clientes,
+         referido que cancela después de otorgada la recompensa.
+         El CHECK de 10 dígitos en profiles.phone, ¿alcanza como identidad
+         única en México, donde un chip de prepago cuesta 50 pesos?
+      3. La dependencia oculta — qué no puede existir sin Track Score, sin
+         orders escribiendo de verdad, o sin medio de pago cerrado.
+      4. El trigger protect_profile_system_fields() — si la recompensa
+         escribe en profiles, ¿lo bloquea?
+      5. El mantenimiento — quién vigila el fraude mientras el dueño corta
+         carne, y cómo se revoca una recompensa ya pagada.
+      6. La economía — ¿de dónde sale la recompensa y en qué punto exacto
+         el programa pierde dinero?
+
+      ═══ REGLAS ═══
+      - NO propongas soluciones. Solo objeciones.
+      - NO escribas código. NO modifiques archivos del proyecto.
+      - Ordena de más letal a menos.
+      - Marca lo especulativo como especulativo.
+
+      ═══ FORMATO DE SALIDA ═══
+      Escribe docs/abogado/01-objeciones.md con esta estructura exacta
+      por cada objeción:
+
+        ## Objeción N: <título en una línea>
+        - Supuesto que rompe:
+        - Evidencia que la sostiene: <archivo, tabla o columna concretos>
+        - Consecuencia si nadie la atiende:
+        - Confianza: alta | media | especulativa
+
+      Termina el archivo con el total de objeciones.
+
+  # ─────────────────────────────────────────────────────────────
+  # PASADA 2 — VERIFICAR (a ciegas)
+  #
+  # context: fresh es lo que hace funcionar el loop: sesión nueva, así que
+  # este nodo NO ve el razonamiento de `generar`, solo su archivo.
+  #
+  # El propio nodo emite el veredicto de continuidad como campo del
+  # output_format. Así el `when:` de abajo es una comparación simple de
+  # string — la sintaxis de Archon no soporta aritmética ni paréntesis.
+  # ─────────────────────────────────────────────────────────────
+  - id: verificar
+    depends_on: [generar]
+    context: fresh
+    settingSources: ['project']
+    effort: high
+    output_type: findings
+    allowed_tools: [Read, Grep, Glob, Write]
+    maxBudgetUsd: 3
+    prompt: |
+      Eres verificador. Alguien más escribió las objeciones de
+      docs/abogado/01-objeciones.md. No sabes quién ni cómo llegó a ellas,
+      y no te importa. Tu único trabajo es comprobar si cada una se
+      sostiene con evidencia real de este repositorio.
+
+      Repo: ~/Desktop/Carni-mvp
+
+      FUENTES DE VERDAD — solo estas cuentan como evidencia:
+        supabase/migrations/202604100001_initial_schema.sql
+        supabase/migrations/202604100002_rls_policies.sql
+        supabase/migrations/202604100003_functions.sql
+        supabase/seed.sql
+        src/, server/, package.json
+        docs/blueprints/module-scopes.md
+        docs/brain/vision.md
+
+      Para CADA objeción, en orden:
+
+      1. Abre los archivos que cita. Si no cita ninguno, márcala
+         inmediatamente como SIN EVIDENCIA.
+      2. Verifica que la tabla, columna, función o archivo EXISTA.
+         Pega la línea exacta que lo prueba.
+      3. Verifica que la consecuencia se siga de esa evidencia y no de
+         una suposición sobre cómo funciona el sistema.
+      4. Emite uno de estos veredictos:
+
+         CONFIRMADA    — la evidencia existe y sostiene la objeción
+         PARCIAL       — la evidencia existe pero la consecuencia está
+                         exagerada
+         SIN EVIDENCIA — no cita nada verificable, o lo que cita no existe
+         FALSA         — lo que afirma es contradicho por el repo
+
+      5. Si el veredicto es FALSA, pega la línea que la contradice.
+
+      REGLAS
+      - No agregues objeciones nuevas. No es tu trabajo.
+      - No propongas soluciones.
+      - No modifiques archivos del proyecto.
+      - Si no puedes verificar algo, escribe NO VERIFICABLE y di qué
+        necesitarías. No adivines.
+
+      SALIDA: docs/abogado/02-verificacion.md
+      Termina el archivo con el conteo por categoría.
+
+      ═══ VEREDICTO DE CONTINUIDAD ═══
+      Calcula: (sin_evidencia + falsas) contra el total.
+
+      Si esa suma es MAYOR a la mitad del total, el problema es el prompt
+      de la pasada 1, no la tesis. En ese caso devuelve
+      veredicto = "PROMPT_DEFECTUOSO".
+
+      En cualquier otro caso devuelve veredicto = "CONTINUAR".
+
+      Devuelve el JSON estructurado con los conteos y el veredicto.
+
+    output_format:
+      type: object
+      properties:
+        confirmadas:     { type: integer }
+        parciales:       { type: integer }
+        sin_evidencia:   { type: integer }
+        falsas:          { type: integer }
+        no_verificables: { type: integer }
+        total:           { type: integer }
+        veredicto:
+          type: string
+          enum: [CONTINUAR, PROMPT_DEFECTUOSO]
+      required: [confirmadas, parciales, sin_evidencia, falsas, total, veredicto]
+
+  # ─────────────────────────────────────────────────────────────
+  # PUERTA — corta el run si el prompt de la pasada 1 fue el problema.
+  # Comparación de string simple: es lo único que soporta `when:`.
+  # ─────────────────────────────────────────────────────────────
+  - id: prompt-defectuoso
+    depends_on: [verificar]
+    when: "$verificar.output.veredicto == 'PROMPT_DEFECTUOSO'"
+    cancel: >
+      Más de la mitad de las objeciones no se sostienen contra el repo.
+      El problema es el prompt del nodo `generar`, no la tesis.
+      Reescríbelo con contexto más específico antes de volver a correr.
+      NO corras otra pasada con el mismo prompt — revisa
+      docs/abogado/02-verificacion.md para ver qué inventó.
+
+  # ─────────────────────────────────────────────────────────────
+  # PASADA 3 — JUZGAR
+  # ─────────────────────────────────────────────────────────────
+  - id: juzgar
+    depends_on: [verificar]
+    when: "$verificar.output.veredicto == 'CONTINUAR'"
+    context: fresh
+    skills: [judgment-day]
+    effort: max
+    output_type: plan
+    allowed_tools: [Read, Grep, Glob, Write]
+    maxBudgetUsd: 4
+    prompt: |
+      Usa la skill judgment-day sobre docs/abogado/02-verificacion.md
+
+      Trabaja SOLO con las objeciones marcadas CONFIRMADA o PARCIAL.
+      Descarta las SIN EVIDENCIA y las FALSAS — ya murieron.
+
+      Conteo de la pasada anterior:
+        confirmadas: $verificar.output.confirmadas
+        parciales:   $verificar.output.parciales
+        de un total de $verificar.output.total
+
+      Tesis original:
+      "Un cliente de Carni-mvp puede referir a otro cliente y cobrar una
+      recompensa, sin que exista una forma rentable de defraudar el sistema."
+
+      Para cada objeción sobreviviente responde:
+
+      1. ¿Mata la tesis, la reduce, o solo agrega una restricción de
+         implementación?
+      2. Si mata: ¿qué tendría que ser verdad para que la tesis se salvara?
+      3. Si reduce: ¿cuál es la versión más chica de la tesis que sobrevive
+         a esta objeción?
+      4. Costo de atenderla: alto / medio / bajo, y por qué.
+
+      Al final, y SOLO al final, escribe la TESIS SOBREVIVIENTE: la versión
+      más chica que aguanta todas las objeciones confirmadas. Una frase.
+
+      REGLAS: no código, no soluciones de implementación, no modificar
+      archivos del proyecto.
+
+      SALIDA: docs/abogado/03-juicio.md
+
+  # ─────────────────────────────────────────────────────────────
+  # DECISIÓN HUMANA — el loop no decide
+  # ─────────────────────────────────────────────────────────────
+  - id: decidir
+    depends_on: [juzgar]
+    approval:
+      message: |
+        Presenta la tesis sobreviviente de docs/abogado/03-juicio.md junto
+        con las objeciones confirmadas que la recortaron.
+
+        Eduardo clasifica cada objeción en tres cubetas:
+          MATA LA IDEA      -> no se construye; se documenta por qué
+          CAMBIA EL ALCANCE -> se construye más chico o después
+          RUIDO             -> se descarta con una línea de justificación
+
+        No decidas por él. Presenta y espera.

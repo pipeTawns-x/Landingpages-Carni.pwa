@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { mountReactNode, fetchProducts, categoryLabel } from './shared';
-import { ProductCard } from '@src/components/ProductCard';
+import { ProductCard } from '@src/components/ProductCard/ProductCard';
 import { BentoGrid } from '@src/components/BentoGrid';
 import { useCart } from '@src/hooks/useCart';
 import type { Product } from '@src/types/database';
@@ -11,7 +11,7 @@ function HomeShowcase(): JSX.Element {
   const { addToCart, count, total } = useCart();
 
   useEffect(() => {
-    void fetchProducts().then((items) => setProducts(items.slice(0, 6)));
+    void fetchProducts().then(({ products: items }) => setProducts(items.slice(0, 6)));
   }, []);
 
   const featured = products[0];
@@ -24,12 +24,12 @@ function HomeShowcase(): JSX.Element {
         <h2>Bienvenido a tu mesa de cortes, antojos y pedidos de confianza</h2>
         <p>
           Descubre los cortes favoritos de la casa, arma tu pedido sin complicarte y encuentra
-          recomendaciones pensadas para el cliente de todos los dias, con sabor de carniceria real.
+          recomendaciones pensadas para el cliente de todos los días, con sabor de carnicería real.
         </p>
         <div className="tw-summary-strip">
           <div className="tw-summary-pill"><strong>{products.length || '--'}</strong><span>Cortes recomendados hoy</span></div>
           <div className="tw-summary-pill"><strong>{count}</strong><span>Productos apartados</span></div>
-          <div className="tw-summary-pill"><strong>${Math.round(total)}</strong><span>Total de tu seleccion</span></div>
+          <div className="tw-summary-pill"><strong>${Math.round(total)}</strong><span>Total de tu selección</span></div>
           <div className="tw-summary-pill"><strong>24h</strong><span>Pedidos listos para entrega</span></div>
         </div>
       </div>
@@ -38,9 +38,9 @@ function HomeShowcase(): JSX.Element {
         <div className="tw-hero-grid">
           <div className="tw-hero-grid__primary">
             <article className="tw-highlight-card">
-              <img src={featured.image_url ?? 'img/products/premium.png'} alt={featured.name} />
+              <img src={featured.image_url ?? '/img/products/premium.png'} alt={featured.name} />
               <div className="tw-highlight-card__content">
-                <p className="tw-kicker">Recomendacion del carnicero</p>
+                <p className="tw-kicker">Recomendación del carnicero</p>
                 <h2>{featured.name}</h2>
                 <p>{featured.description}</p>
                 <button type="button" className="tw-button tw-button--primary" onClick={() => addToCart(featured, 1)}>
@@ -52,7 +52,7 @@ function HomeShowcase(): JSX.Element {
           <div className="tw-hero-grid__secondary">
             {secondary.map((product) => (
               <article className="tw-highlight-card" key={product.id}>
-                <img src={product.image_url ?? 'img/products/res.png'} alt={product.name} />
+                <img src={product.image_url ?? '/img/products/res.png'} alt={product.name} />
                 <div className="tw-highlight-card__content">
                   <p className="tw-kicker">{categoryLabel(product)}</p>
                   <h3>{product.name}</h3>

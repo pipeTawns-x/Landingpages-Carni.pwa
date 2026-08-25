@@ -8,7 +8,7 @@ function DashboardStudio(): JSX.Element {
   const [products, setProducts] = useState<Product[]>([]);
 
   useEffect(() => {
-    void fetchProducts().then((items) => setProducts(items.slice(0, 10)));
+    void fetchProducts().then(({ products: items }) => setProducts(items.slice(0, 10)));
   }, []);
 
   return (

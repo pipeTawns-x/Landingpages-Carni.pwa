@@ -1,0 +1,93 @@
+// OrderList — the order lines inside the side panel.
+// Compiled with: sass src/components:src/components --no-source-map
+// The component imports the generated styles.css, never this file.
+
+.order-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+
+  &__item {
+    display: grid;
+    grid-template-columns: 48px 1fr auto auto;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.6rem;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  &__thumb {
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+    object-fit: cover;
+  }
+
+  &__info {
+    min-width: 0;
+  }
+
+  &__name {
+    margin: 0;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #f5f5f5;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__meta {
+    margin: 0;
+    font-size: 0.78rem;
+    color: #a3a3a3;
+  }
+
+  &__line-total {
+    font-size: 0.9rem;
+    color: #f5f5f5;
+    white-space: nowrap;
+  }
+
+  &__remove {
+    width: 28px;
+    height: 28px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(220, 38, 38, 0.16);
+    color: #ff8f8f;
+    font-size: 1.1rem;
+    line-height: 1;
+    cursor: pointer;
+    // Only transform is animated so the compositor can handle the hover on its
+    // own, the same rule the bento tiles follow.
+    transition: transform 0.18s ease;
+
+    &:hover {
+      transform: scale(1.12);
+    }
+
+    &:focus-visible {
+      outline: 2px solid #ff8f8f;
+      outline-offset: 2px;
+    }
+  }
+
+  &__empty {
+    margin: 0;
+    color: #a3a3a3;
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .order-list__remove {
+    transition: none;
+  }
+}
