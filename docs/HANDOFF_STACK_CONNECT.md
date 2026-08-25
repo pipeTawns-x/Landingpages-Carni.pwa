@@ -66,8 +66,8 @@ graphify query "BuildAds campaign flow" --budget 500
 **What remains is the owner's job and it is NOT optional:**
 
 1. **Rotate the key** at `apify.com/account/integrations`. Redaction cleans up copies; it does not invalidate a key that already sat in plaintext. Only rotation does.
-2. Put the **new** key in `.env` — already gitignored at `.gitignore:12`. Never in a tracked file.
-3. Add only the variable *name* (`APIFY_TOKEN=`) to `.env.example`, never the value.
+2. Put the **new** key in `.env`, which is gitignored. Never in a tracked file.
+3. **Do not create a `.env.example`.** This repo forbids that file outright — see `docs/brain/security.md`, "Never create a `.env.example`". A placeholder can be mistaken for a real value, so the shape of the environment is documented in prose there instead, and `.gitignore` enforces it. An earlier version of this handoff said to add the variable name to that file; it was wrong and contradicted the hard rule.
 
 ### Concept — a secret does not go in `.gitignore`
 
@@ -76,7 +76,7 @@ graphify query "BuildAds campaign flow" --budget 500
 The correct pattern is always the same:
 
 - **Secret values** live in `.env` → gitignored
-- **Variable names** live in `.env.example` → tracked, so the team knows what to set
+- **Variable names** live in prose, in `docs/brain/security.md` → so the team knows what to set without a file that could carry a real value by accident
 - **Documentation** references the variable name, never the value
 
 Delegate any future secret handling to the `security-guardian` agent (`agents/agents/security-guardian.agent.md`), which already exists in this repo.
