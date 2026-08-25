@@ -9,7 +9,7 @@ This is the dependency-ordered plan for taking Carni-mvp from current state to f
 **Dependency**: owner actions only.
 
 - [ ] Owner: approve Supabase MCP OAuth in Claude Code TUI
-- [ ] Owner: rotate leaked Apify key before adding it anywhere (see [[security]])
+- [x] Owner: rotate leaked Apify keys — done 2026-08-25, both dead (see [[security]])
 - [ ] Fix broken main branch (`5a752b3e` regression) — surgical revert or cherry-pick onto a repair branch
 - [ ] Run `/sdd-init` on Carni-mvp to cache stack + testing capabilities
 

@@ -23,7 +23,7 @@ Dos cosas urgentes salen de aquí:
 1. **`217cacd1` no está en ningún remoto.** Es el único trabajo sin respaldo.
 2. **`docs/` entero está untracked.** Todo el brain, los blueprints y el triage viven solo en el disco. Si se pierde el disco, se pierde el pensamiento del proyecto.
 
-La Fase 1 del roadmap está prácticamente cerrada: la regresión ya no está en main. Lo que queda de esa fase es rotar la llave de Apify y correr `/sdd-init`.
+La Fase 1 del roadmap está prácticamente cerrada: la regresión ya no está en main y las llaves de Apify se rotaron el 2026-08-25. Lo único que queda de esa fase es correr `/sdd-init`.
 
 ---
 
@@ -163,7 +163,7 @@ El transcript del video de SaleAds que mandaste **ya está en el repo**: `docs/b
 4. Texto de entrega con rutas verificadas contra el repo ya subido.
 
 **Después — arrancar producto**
-5. Rotar llave de Apify y correr `/sdd-init` (cierra Fase 1).
+5. Correr `/sdd-init` — cierra Fase 1. La rotación de Apify ya se hizo el 2026-08-25.
 6. Instalar `tododeia-animaciones`.
 7. Abogado del diablo sobre la tesis de Fase 2, luego SDD, luego implementación con validación por screenshots a 320/768/1024.
 
@@ -176,6 +176,6 @@ Honestidad sobre los límites de este documento:
 - **No leí `SKILL.md` de `abogado-del-diablo`.** Está fuera de las carpetas conectadas a Cowork. El paso a paso de arriba es protocolo de encadenado, no el contrato de la skill.
 - **No leí el Figma.** El link requiere sesión.
 - **No abrí los reels de Facebook.** Login + video.
-- **No verifiqué si la llave de Apify sigue sin rotar.** El triage lo marca como pendiente; no lo comprobé.
+- ~~No verifiqué si la llave de Apify sigue sin rotar.~~ Resuelto: el dueño rotó las dos el 2026-08-25.
 - **No leí `vision.md`, `architecture.md`, `agentic-stack.md` ni `module-scopes.md` completos.** Leí `roadmap.md`, `web-redesign.md`, `triage.md` y el arranque de `competitor-scan.md`.
 - **No corrí nada.** Ningún build, ningún test, ninguna captura.

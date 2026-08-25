@@ -11,7 +11,7 @@ Foundation phase rule: **this vault contains no features, only knowledge.**
 - [[agentic-stack]] — orchestrator, agents, subagents, skills, MCP inventory
 - [[roadmap]] — the 8-phase sequenced delivery plan
 - [[glossary]] — definitions of domain terms (BuildAds, Track Score, Tip Out, Pedido Trifásico, Kanban, HITL, etc.)
-- [[security]] — hard rules: no `.env.example`, leaked Apify key rotation, pnpm + ignore-scripts, HITL before publish, RLS
+- [[security]] — hard rules: no `.env.example`, ignored agent config, Apify keys rotated and the rule that outlives them, the publishable key vs RLS, pnpm + ignore-scripts, HITL before publish
 
 ## Video / source notes
 

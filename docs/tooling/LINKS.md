@@ -178,5 +178,14 @@ AGENTES: Engram Cloud"* — Gentleman Programming. El resto sin ver.
 
 ## Nota de seguridad
 
-La llave `apify_api_jkZn...` está filtrada y **no debe usarse**. Rotar antes de
-conectar cualquier MCP de Apify. Ver `docs/tooling/triage.md:172`.
+Las dos llaves de Apify que se filtraron en sesiones anteriores fueron
+**rotadas por el dueño el 2026-08-25 y ya no sirven**. La vigente se llama
+`Carniweb` y no vive en este repositorio.
+
+La regla sigue en pie: **ninguna llave de Apify vuelve a escribirse acá** —ni
+en `.env`, ni en un documento, ni en un mensaje de commit, ni en la memoria de
+un agente. Cuando se conecte el MCP de Apify, la llave la aporta el dueño por
+variable de entorno en tiempo de ejecución.
+
+Ver `docs/brain/security.md`, sección "Apify keys — rotated, and the rule that
+outlives them", para el detalle de qué se aprendió del incidente.

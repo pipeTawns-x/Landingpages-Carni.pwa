@@ -41,9 +41,18 @@ What must **never** appear in the browser, the repo, or a commit message:
 
 Those belong in the server environment or in the operator's hands, never behind a `VITE_` prefix.
 
-## Leaked Apify key — rotation required
+## Apify keys — rotated, and the rule that outlives them
 
-A previous session leaked an Apify API key. **Before adding Apify anywhere** (MCP config, code, docs), the owner must rotate the key at apify.com. This is flagged SECURITY CRITICAL in [[agentic-stack]] → Blockers. Do not reference the old key value anywhere, including in this vault.
+Two Apify API keys leaked in earlier sessions: one written in plaintext into a documentation file, the other into an agent's memory. **Both were rotated by the owner on 2026-08-25 and are dead.** The key in use is named `Carniweb`, it lives only in the owner's hands, and it is not in this repository — not in `.env`, not in a doc, not in a config file.
+
+That closes the incident. It does not close the rule, which is the part worth keeping:
+
+**No Apify key is ever written into this repository again.** Not in code, not in documentation, not in a commit message, not in `.env`, and not in an agent's memory. When the Apify MCP is eventually connected, the key is supplied through the environment at run time by the owner, and nothing else ever sees it.
+
+Two lessons from how this played out, both verified rather than assumed:
+
+- **Rotation is the only fix.** Redacting a key from files and from memory cleans up copies; it does nothing to a credential that already sat in plaintext. The redaction was done first, in July, and the key stayed live for a month afterwards because nobody had rotated it.
+- **Measure the blast radius before cleaning.** When the leak was traced, the full key turned out to be in three places: one documentation file and two engram observations. It had **never** reached git history, confirmed with `git log --all -S`. Knowing that saved a history rewrite that would have been useless. Agent memory is the location people forget to check.
 
 ## Supply Chain Defense
 

@@ -8,20 +8,13 @@ Estados: `abierto` · `en curso` · `congelado`
 
 Última revisión: 2026-08-25
 
-> **Aviso de techo.** Este archivo llegó a 20 pendientes abiertos. Según la regla del propio proyecto, pasar de ~20 no es un problema del archivo: es señal de que se están acumulando decisiones sin tomar. La tanda 1 debería cerrarse antes de agregar nada nuevo.
+> **Aviso de techo.** Este archivo ronda los 19 pendientes abiertos. Según la regla del propio proyecto, pasar de ~20 no es un problema del archivo: es señal de que se están acumulando decisiones sin tomar. La tanda 1 debería cerrarse antes de agregar nada nuevo.
 
 ---
 
 ## 🔴 Seguridad — bloquean el merge a `main`
 
-### P-02 · Dos llaves de Apify filtradas sin rotar
-**Estado:** abierto · **Evidencia:** `docs/tooling/LINKS.md:181`
-
-`apify_api_jkZn…` está expuesta desde antes. El 25 de agosto apareció una **segunda**, `apify_api_jEMaz…`, que vivía suelta dentro del `.env` sin nombre de variable y quedó impresa en un registro de sesión. Ya se borró del archivo, pero **sigue siendo válida en Apify**.
-
-Ninguna de las dos servía para nada ahí: Vite solo expone al navegador las variables que empiezan con `VITE_`.
-
-**Arreglo:** rotar ambas en Apify. Rotar, no borrar del archivo — borrarlas del archivo no las invalida.
+Al 2026-08-25 **no queda ningún 🔴 vivo**. Lo único en esta sección está congelado con su módulo.
 
 ### P-03 · Dos huecos en `server/routes/buildads.ts`
 **Estado:** congelado con el módulo · **Evidencia:** `server/routes/buildads.ts`
@@ -29,13 +22,6 @@ Ninguna de las dos servía para nada ahí: Vite solo expone al navegador las var
 `voice_id` sin validar se concatena a una ruta, con la API key adjunta. Y los errores del servicio externo se reenvían crudos al navegador.
 
 Congelado porque BuildAds lo está. **Se descongela junto con el módulo, no después.**
-
-### P-17 · Los respaldos de `.env` quedaron en el árbol de trabajo
-**Estado:** abierto · **Evidencia:** `.env.bak-20260824-180520`, `.env.bak-20260825-022313`
-
-Se crearon al corregir el `.env` y contienen la llave de Groq y las de Supabase. **`.gitignore:12` solo cubre `.env` exacto, no `.env.bak-*`**, así que un `git add .` los subiría.
-
-**Arreglo:** borrarlos ahora que el `.env` funciona, y agregar `.env.bak-*` al `.gitignore` para la próxima.
 
 ---
 
@@ -202,7 +188,6 @@ Congelado hasta que el dueño de la carnicería entregue márgenes reales. **Con
 ## Orden de ataque
 
 ```
-TANDA 0   P-17, P-02              limpiar llaves antes de cualquier git add
 TANDA 1   P-18, P-04              el sitio público por fin muestra el trabajo
           P-05, P-06                 ← sin P-18 no tiene sentido desplegar
 TANDA 2   P-19, P-20              modelar unidad de venta, pieza y despiece
@@ -216,4 +201,10 @@ TANDA 6   P-10, P-15, P-16        modal premium, animación, color
 `P-11`, `P-12`, `P-13` se resuelven de paso cuando se toque cada archivo. No merecen tanda propia.
 `P-24` se resuelve en cuanto haya sesión de GGA viva.
 
-**Cerrados el 2026-08-25:** P-01 (el precio del pedido lo ponía el cliente). El arreglo está en `supabase/migrations/202608210001_precio_server_side.sql` y verificado en producción. Su rastro vive en el commit, no aquí.
+**Cerrados el 2026-08-25:**
+
+- **P-01** — el precio del pedido lo ponía el cliente. Arreglado en `supabase/migrations/202608210001_precio_server_side.sql`, verificado en producción.
+- **P-02** — las dos llaves de Apify filtradas. Rotadas por el dueño en apify.com. Las anteriores ya no son válidas; la vigente se llama `Carniweb` y no vive en el repo.
+- **P-17** — los respaldos `.env.bak-*` sueltos en el árbol de trabajo. Borrados, y la regla `.env.bak-*` quedó en el `.gitignore`. De paso se eliminó `.env.example`, que llevaba rastreado desde `10f64909` contra la regla dura de `docs/brain/security.md:5`.
+
+Su rastro vive en los commits `ba3e025f`, `b6ce68e9` y `de277ccb`, no aquí.

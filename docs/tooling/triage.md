@@ -169,7 +169,7 @@ Stack constraint: keep bento + maximalism aesthetic; no new CSS framework.
 | Resource | Action | Installed? | Rationale |
 |----------|--------|-----------|-----------|
 | `ScrapeGraphAI/Scrapegraph-ai` | `[MCP]` | **UNKNOWN — verify** | AI-powered scraping; MCP server requires install + API key via env var — verify connection. |
-| `Apify` | `[MCP]` | **UNKNOWN — verify** | Web scraping and research platform; MCP requires a freshly rotated `APIFY_TOKEN` env var (the previously leaked key `apify_api_jkZn...` MUST NOT be used). |
+| `Apify` | `[MCP]` | **Not connected** | Web scraping and research platform. Keys rotated 2026-08-25; no longer blocked. To connect, the owner supplies `APIFY_TOKEN` through the environment at run time — never into a file. |
 
 ---
 
@@ -239,7 +239,7 @@ Skills to create with `skill-creator`:
 MCP servers to connect (status unknown):
 
 - `ScrapeGraphAI/Scrapegraph-ai` — needs install + API key
-- `Apify` — needs freshly rotated `APIFY_TOKEN` (see blockers below)
+- `Apify` — keys rotated 2026-08-25. Needs the owner to supply `APIFY_TOKEN` via the environment when connecting.
 - `czlonkowski/n8n-mcp` — verify with `claude mcp list`
 - `davideast/stitch-mcp` — verify with `claude mcp list`
 
@@ -249,7 +249,7 @@ MCP servers to connect (status unknown):
 
 | Blocker | Detail |
 |---------|--------|
-| **Apify key rotation** | The previous key (redacted 2026-07-25) **leaked in plaintext and must never be used**. Owner must rotate it at apify.com/account/integrations. The replacement goes in `.env` as `APIFY_TOKEN` — never in a tracked file. Do **not** add it to a `.env.example`: this repo forbids that file, see `docs/brain/security.md`. The variable is documented in prose there. |
+| ~~**Apify key rotation**~~ | **RESUELTO 2026-08-25.** Las dos llaves filtradas fueron rotadas por el dueño y están muertas. La vigente no vive en el repo y se aporta por variable de entorno al conectar. Ver `docs/brain/security.md`. |
 | **MCP auth — open-design** | `open-design` skill is installed but the MCP server (`nexu-io/open-design`) needs OAuth / API key authorization from the owner. |
 | **MCP auth — Scrapegraph-ai** | Requires an API key; owner must supply via env var before the MCP can be connected. |
 | **MCP status check** | Run `claude mcp list` to confirm whether `n8n-mcp`, `stitch-mcp`, and `playwright` are connected or need re-auth. |

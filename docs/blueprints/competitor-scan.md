@@ -129,7 +129,7 @@ These could not be confirmed from public markup via WebFetch and require an auth
 2. **Carnes San Francisco full catalog + pricing + any B2B/mayoreo account program** — catalog is behind WhatsApp; needs interactive scraping. FOLLOW-UP (needs Playwright/Apify).
 3. **La Carnicería Virtual account area** — confirm whether a loyalty/points or subscription program exists once logged in. FOLLOW-UP (needs Playwright/Apify, possibly authenticated).
 4. **Carnicero MX cart/checkout interaction** — confirm tip option (none observed) and exact payment methods at checkout. FOLLOW-UP (needs Playwright/Apify).
-5. **Live price benchmarking table** (per-kg by cut: arrachera, ribeye, t-bone, molida) across all MX competitors for competitive pricing of our catalog. Needs repeatable scraping. FOLLOW-UP (needs Playwright/Apify). NOTE: the previously leaked Apify key must be rotated and supplied via env var before any Apify run.
+5. **Live price benchmarking table** (per-kg by cut: arrachera, ribeye, t-bone, molida) across all MX competitors for competitive pricing of our catalog. Needs repeatable scraping. FOLLOW-UP (needs Playwright/Apify). NOTE: the leaked Apify keys were rotated 2026-08-25. Any Apify run still needs the owner to supply `APIFY_TOKEN` via env var — the key never enters the repo.
 
 ## Sources
 

@@ -31,7 +31,7 @@ Reference docs already in the repo:
 | 9 YouTube transcripts | **Downloaded** | 783 KB via yt-dlp; HTTP 429 no longer blocks |
 | Graphify graph | **Built** | 831 nodes / 966 edges / 91 communities in `graphify-out/` |
 | `.gitignore` | **Updated** | `graphify-out/` ignored |
-| Apify key redaction | **Done** | 0 occurrences in engram or files; never in git history. Rotation still pending — see step 3 |
+| Apify key redaction **and rotation** | **Done** | 0 occurrences in engram or files; never in git history. Both leaked keys rotated by the owner 2026-08-25 and now dead |
 | Agentic layer audit | **Exists** | orchestrator + 3 agents + 3 subagents + 9 skills + 1 workflow under `agents/` |
 
 Verify before assuming otherwise:
