@@ -10,6 +10,12 @@ export interface CategoryCardProps {
    * array index, so reordering in the database moves the tile.
    */
   position: number;
+  /**
+   * Position in the reveal sequence, 0-based. Becomes the `--reveal-delay`
+   * custom property so the tiles cascade instead of all landing at once.
+   * The stylesheet ignores it entirely under `prefers-reduced-motion`.
+   */
+  revealIndex?: number;
 }
 
 /**
@@ -46,30 +52,45 @@ function pngFallback(path: string): string {
   return path.replace(/\.webp$/i, '.png');
 }
 
-export function CategoryCard({ category, position }: CategoryCardProps): JSX.Element {
+export function CategoryCard({
+  category,
+  position,
+  revealIndex = 0
+}: CategoryCardProps): JSX.Element {
   const { icon, description } = PRESENTATION[category.slug] ?? FALLBACK_PRESENTATION;
   const image = category.image_url ?? '/img/products/otrosproductos.webp';
 
   return (
-    <article className={`category-card category-card-${position}`}>
-      <picture>
-        <source srcSet={image} type="image/webp" />
-        <img src={pngFallback(image)} alt={category.name} className="category-img" />
-      </picture>
-      <div className="category-body">
-        <div>
-          <h3 className="category-title">
-            <i className={`bi ${icon} me-2`} style={{ color: '#d22222' }} />
-            {category.name}
-          </h3>
-          <p className="category-desc">{description}</p>
+    // The `<article>` owns the grid slot and the hover target, and it never
+    // moves. Everything that animates lives on `__lift` inside it. Lifting the
+    // article itself slid it out from under the cursor, which dropped the
+    // hover, which put it back, which caught the cursor again — the flicker
+    // recorded as P-09. The pointer area has to stay still.
+    <article
+      className={`category-card category-card-${position}`}
+      style={{ '--reveal-delay': `${revealIndex * 70}ms` } as React.CSSProperties}
+    >
+      <div className="category-card__lift">
+        <picture>
+          <source srcSet={image} type="image/webp" />
+          <img src={pngFallback(image)} alt={category.name} className="category-img" />
+        </picture>
+        <div className="category-body">
+          <div>
+            <h3 className="category-title">
+              <i className={`bi ${icon} me-2`} style={{ color: '#d22222' }} />
+              {category.name}
+            </h3>
+            <p className="category-desc">{description}</p>
+          </div>
+          {/* products.tsx reads `?categoria=` and matches it against the
+              product's own slug. These now emit the real database slug, so the
+              alias map that translated the old hand-written values is no
+              longer in play. */}
+          <a href={`products.html?categoria=${category.slug}`} className="btn btn-danger w-100">
+            Ver Productos
+          </a>
         </div>
-        {/* products.tsx reads `?categoria=` and matches it against the product's
-            own slug. These now emit the real database slug, so the alias map
-            that translated the old hand-written values is no longer in play. */}
-        <a href={`products.html?categoria=${category.slug}`} className="btn btn-danger w-100">
-          Ver Productos
-        </a>
       </div>
     </article>
   );

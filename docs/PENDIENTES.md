@@ -94,13 +94,6 @@ Vite copia `img/*` a la raíz de `dist/`, así que `dist/img` no existe y las ru
 
 ## 🟠 Migración a React — landing
 
-### P-09 · Las tarjetas del bento parpadean al pasar el cursor
-**Estado:** abierto · **Evidencia:** `css/pages/_bento-main.scss:159-160`
-
-`&:hover { transform: translateY(-6px) }` mueve la tarjeta fuera del cursor: se acaba el hover, vuelve a bajar, empieza el hover. Bucle.
-
-**Arreglo:** el `:hover` se queda en `.category-card`; el `translateY` se aplica a un hijo interior, para que el área sensible no cambie de lugar.
-
 ### P-10 · Modal de corte premium huérfano
 **Estado:** abierto · **Evidencia:** `products.html:415`
 
