@@ -27,14 +27,48 @@ Congelado porque BuildAds lo está. **Se descongela junto con el módulo, no des
 
 ## 🟠 Despliegue — el sitio público no muestra tu trabajo
 
-### P-04 · No existe despliegue automático: GitHub Pages sirve el repo crudo
-**Estado:** abierto · **Evidencia:** `.github/workflows/ci.yml:1-38`
+### P-04 · GitHub Pages publica otra rama, y publica el repo crudo
+**Estado:** abierto · **Evidencia:** *Settings → Pages* del repositorio, verificado el 2026-08-25
 
-El único flujo de trabajo se llama *Carni CI* y **solo valida**: instala, corre `node --check`, hace `npm run build` y comprueba que existan cinco archivos en `dist/`. No publica nada. No hay rama `gh-pages` y `dist/` no está rastreado por git.
+La configuración dice, textual:
 
-Consecuencia directa: **mergear a `main` no publica nada.** El sitio en vivo seguirá sirviendo el HTML crudo del repo, con `.png` en vez de `.webp` y diciendo "Selección Premium". React nunca ha corrido en el sitio público.
+```
+Source: Deploy from a branch
+Branch: practicas-ebac   /(root)
+```
 
-**Arreglo:** un flujo de trabajo aparte que construya y publique con `actions/deploy-pages`. **Depende de P-18** — sin las variables no sirve de nada publicar.
+Son **dos defectos en uno**, y por eso el sitio público lleva meses sin moverse:
+
+1. **Publica desde `practicas-ebac`, no desde `main`.** Mergear a `main` no toca el sitio. Se comprobó: el merge del PR #6 no disparó ningún despliegue.
+2. **Publica la raíz del repositorio tal cual, sin construir.** Por eso el navegador recibe un `.tsx` crudo, que ningún navegador ejecuta.
+
+Comprobado en vivo el 2026-08-25 sobre `https://pipetawns-x.github.io/Landingpages-Carni.pwa/`: nueve tarjetas fijas, el texto "Selección Premium" todavía presente, y React sin arrancar.
+
+**Ojo:** cambiar la rama a `main` no basta y empeora las cosas — seguiría sirviendo el repo crudo, ahora con la versión que además espera un backend. Hay que pasar a *GitHub Actions* como fuente y publicar `dist/` con `actions/deploy-pages`.
+
+**Depende de P-18** — sin las variables, el `dist/` publicado arranca lanzando un error.
+
+### P-25 · El CI lleva rojo desde el 19 de agosto
+**Estado:** abierto · **Evidencia:** *Carni CI* corridas #17 a #25, todas en fallo
+
+Nueve corridas seguidas fallando, incluida la del merge a `main`. Falla siempre en el mismo sitio, a los 10 segundos:
+
+```
+npm error code EUSAGE
+npm ci can only install packages when your package.json and
+package-lock.json are in sync.
+Missing: sass@1.103.1 from lock file
+Missing: chokidar@5.0.0 from lock file
+Missing: immutable@5.1.9 from lock file
+```
+
+Alguien agregó `sass` a `package.json` y nunca commiteó el `package-lock.json` actualizado. `npm ci` —a diferencia de `npm install`— se niega a instalar si los dos archivos no coinciden, que es justo para lo que sirve.
+
+Consecuencia: **el CI dejó de proteger nada.** Un rojo permanente se vuelve ruido y se ignora, que es exactamente lo que pasó al mergear el PR #6.
+
+**Arreglo:** `npm install` en local y commitear el `package-lock.json` resultante. Un comando.
+
+**Nota aparte:** `docs/brain/security.md:15` declara **pnpm** como gestor del proyecto, pero el repo usa `package-lock.json` y el CI corre `npm ci`. Otra regla que la realidad contradice. Decidir cuál gana antes de tocar el lockfile.
 
 ### P-18 · El build de producción no tiene credenciales de Supabase
 **Estado:** abierto · **Evidencia:** `.github/workflows/ci.yml:30`, `js/modules/supabase.js:10-14`
@@ -59,16 +93,6 @@ Vite copia `img/*` a la raíz de `dist/`, así que `dist/img` no existe y las ru
 ---
 
 ## 🟠 Migración a React — landing
-
-### P-07 · El bento de categorías es HTML escrito a mano
-**Estado:** abierto · **Evidencia:** `index.html:225-345`
-
-Nueve `<article class="category-card">` con nombres e imágenes fijos. No leen ningún dato, por eso siguen diciendo "Selección Premium".
-
-### P-08 · React se monta al final de la landing
-**Estado:** abierto · **Evidencia:** `index.html:455`
-
-`#homeReactRoot` va después de Sobre Nosotros y Contacto. Lo mejor de la página está debajo de lo peor.
 
 ### P-09 · Las tarjetas del bento parpadean al pasar el cursor
 **Estado:** abierto · **Evidencia:** `css/pages/_bento-main.scss:159-160`
@@ -150,6 +174,20 @@ El arreglo de `p_address` se commiteó con `--no-verify` porque la sesión de GG
 
 **Arreglo:** `/login` en Claude Code y correr GGA sobre ese archivo.
 
+### P-26 · El slug de categoría no pasa por `encodeURIComponent`
+**Estado:** abierto · **Evidencia:** `src/components/CategoryCard/CategoryCard.tsx`
+
+El `href` arma `products.html?categoria=${slug}` interpolando el slug crudo. Hoy no explota porque solo un admin crea categorías y los slugs reales son `[a-z-]`, sin caracteres que necesiten escaparse. Pero la seguridad descansa en una convención, no en el código.
+
+**Arreglo:** envolver el slug en `encodeURIComponent()`. Un cambio de una línea; se anotó en vez de hacerlo para no mezclarlo con la migración del bento.
+
+### P-27 · GGA lleva tres sesiones sin poder correr
+**Estado:** abierto · **Evidencia:** commits `58134436` y el del bento
+
+`Failed to authenticate: OAuth session expired and could not be refreshed`. Falla determinista, tres intentos, en dos sesiones distintas. **Nunca llega a ver el diff**: no es que rechace código, es que no arranca. Hay `gga` 2.8.1 instalado y existe la 2.10.1.
+
+**Arreglo:** probar `brew update && brew upgrade gga`. Si sigue igual, revisar dónde guarda su credencial, que parece ser aparte de la de Claude Code.
+
 ---
 
 ## 🔵 Diseño — mejoras planeadas
@@ -168,7 +206,7 @@ Ahora tiene sentido hacerlo: con el backend conectado, `products.image_url` se c
 **Estado:** abierto
 
 *Scroll-driven animations*, *sticky sections*, *parallax*, *staggered reveals*. Skill `tododeia-animaciones` sin instalar. AOS resuelve la parte de scroll con tres líneas — ver `docs/blueprints/dashboard-admin.md:148`.
-**Depende de P-07:** animar el bento antes de migrarlo es trabajo que se tira.
+Ya se puede tomar: el bento se migró a React el 2026-08-25, así que animarlo ya no es trabajo que se tire.
 
 ### P-16 · Escalas de 10 tonos por color
 **Estado:** abierto · **Referencia:** `docs/blueprints/direccion-rediseno-2026.md:38`
@@ -192,7 +230,7 @@ TANDA 1   P-18, P-04              el sitio público por fin muestra el trabajo
           P-05, P-06                 ← sin P-18 no tiene sentido desplegar
 TANDA 2   P-19, P-20              modelar unidad de venta, pieza y despiece
           P-21                       ← el dashboard sale de ahí
-TANDA 3   P-07, P-08, P-09        la landing deja de mentir
+TANDA 3   P-09                    el parpadeo del bento
 TANDA 4   P-14                    video e imágenes propias, en una sesión
 TANDA 5   P-22, P-23              entorno de pruebas y respaldos
 TANDA 6   P-10, P-15, P-16        modal premium, animación, color

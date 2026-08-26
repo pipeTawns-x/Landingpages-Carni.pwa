@@ -221,125 +221,20 @@
       </div>
     </section>
 
-    <!-- SECCIÓN 2: CATEGORÍAS CON BENTO GRID DINÁMICO -->
+    <!-- SECCIÓN 2: CATEGORÍAS — React, leídas de public.categories -->
     <section class="categories-section py-5" style="background: linear-gradient(135deg, var(--carni-charcoal) 0%, var(--carni-dark) 100%);">
       <div class="container-fluid px-2 px-md-3 px-lg-5 home-shell">
         <h2 class="text-center fw-bold mb-5" style="color: var(--carni-gold); font-size: 2rem;">Nuestras Categorías</h2>
 
-        <!-- Bento Grid: 10 Categorías -->
-        <div class="bento-categories-grid">
-          <!-- 1: Cortes de Res -->
-          <article class="category-card category-card-1">
-            <picture><source srcset="img/products/res.webp" type="image/webp"><img src="img/products/res.png" alt="Cortes de Res" class="category-img"></picture>
-            <div class="category-body">
-              <div>
-                <h3 class="category-title"><i class="bi bi-fire me-2" style="color: #d22222;"></i>Cortes de Res</h3>
-                <p class="category-desc">Selección premium para parrilla y asados</p>
-              </div>
-              <a href="products.html?categoria=res" class="btn btn-danger w-100">Ver Productos</a>
-            </div>
-          </article>
-
-          <!-- 2: Cerdo -->
-          <article class="category-card category-card-2">
-            <picture><source srcset="img/products/cerdo.webp" type="image/webp"><img src="img/products/cerdo.png" alt="Cerdo" class="category-img"></picture>
-            <div class="category-body">
-              <div>
-                <h3 class="category-title"><i class="bi bi-piggy-bank me-2" style="color: #d22222;"></i>Cerdo</h3>
-                <p class="category-desc">Variedad para asados y especialidades</p>
-              </div>
-              <a href="products.html?categoria=cerdo" class="btn btn-danger w-100">Ver Productos</a>
-            </div>
-          </article>
-
-          <!-- 3: Pollo -->
-          <article class="category-card category-card-3">
-            <picture><source srcset="img/products/pollo.webp" type="image/webp"><img src="img/products/pollo.png" alt="Pollo" class="category-img"></picture>
-            <div class="category-body">
-              <div>
-                <h3 class="category-title"><i class="bi bi-egg-fried me-2" style="color: #d22222;"></i>Pollo</h3>
-                <p class="category-desc">Fresco y de excelente calidad</p>
-              </div>
-              <a href="products.html?categoria=pollo" class="btn btn-danger w-100">Ver Productos</a>
-            </div>
-          </article>
-
-          <!-- 4: Preparadas -->
-          <article class="category-card category-card-4">
-            <picture><source srcset="img/products/preparadas.webp" type="image/webp"><img src="img/products/preparadas.png" alt="Preparadas" class="category-img"></picture>
-            <div class="category-body">
-              <div>
-                <h3 class="category-title"><i class="bi bi-clock-fill me-2" style="color: #d22222;"></i>Preparadas</h3>
-                <p class="category-desc">Carnes listas para cocinar y servir</p>
-              </div>
-              <a href="products.html?categoria=preparadas" class="btn btn-danger w-100">Ver Productos</a>
-            </div>
-          </article>
-
-          <!-- 5: Embutidos -->
-          <article class="category-card category-card-5">
-            <picture><source srcset="img/products/embutidos.webp" type="image/webp"><img src="img/products/embutidos.png" alt="Embutidos" class="category-img"></picture>
-            <div class="category-body">
-              <div>
-                <h3 class="category-title"><i class="bi bi-link-45deg me-2" style="color: #d22222;"></i>Embutidos</h3>
-                <p class="category-desc">Variedad artesanal y sabores únicos</p>
-              </div>
-              <a href="products.html?categoria=embutidos" class="btn btn-danger w-100">Ver Productos</a>
-            </div>
-          </article>
-
-          <!-- 6: Selección Premium -->
-          <article class="category-card category-card-6">
-            <picture><source srcset="img/products/premium.webp" type="image/webp"><img src="img/products/premium.png" alt="Selección Premium" class="category-img"></picture>
-            <div class="category-body">
-              <div>
-                <h3 class="category-title"><i class="bi bi-star-fill me-2" style="color: #d22222;"></i>Selección Premium
-                </h3>
-                <p class="category-desc">Cortes exclusivos y gourmet</p>
-              </div>
-              <a href="products.html?categoria=premium" class="btn btn-danger w-100">Ver Productos</a>
-            </div>
-          </article>
-
-          <!-- 7: Merchandising -->
-          <article class="category-card category-card-7">
-            <picture><source srcset="img/products/merch.webp" type="image/webp"><img src="img/products/merch.png" alt="Merchandising" class="category-img"></picture>
-            <div class="category-body">
-              <div>
-                <h3 class="category-title"><i class="bi bi-bag-fill me-2" style="color: #d22222;"></i>Merchandising</h3>
-                <p class="category-desc">Gorras, playeras y accesorios</p>
-              </div>
-              <a href="products.html?categoria=merch" class="btn btn-danger w-100">Ver Productos</a>
-            </div>
-          </article>
-
-          <!-- 8: Otros Productos -->
-          <article class="category-card category-card-8">
-            <picture><source srcset="img/products/otrosproductos.webp" type="image/webp"><img src="img/products/otrosproductos.png" alt="Otros Productos" class="category-img"></picture>
-            <div class="category-body">
-              <div>
-                <h3 class="category-title"><i class="bi bi-box me-2" style="color: #d22222;"></i>Otros Productos</h3>
-                <p class="category-desc">Variedad de opciones para tu cocina</p>
-              </div>
-              <a href="products.html?categoria=otros" class="btn btn-danger w-100">Ver Productos</a>
-            </div>
-          </article>
-
-          <!-- 9: Ofertas Especiales -->
-          <article class="category-card category-card-9">
-            <picture><source srcset="img/products/premium.webp" type="image/webp"><img src="img/products/premium.png" alt="Ofertas Especiales" class="category-img"></picture>
-            <div class="category-body">
-              <div>
-                <h3 class="category-title"><i class="bi bi-tag-fill me-2" style="color: #d22222;"></i>Ofertas Especiales
-                </h3>
-                <p class="category-desc">Descuentos exclusivos y paquetes</p>
-              </div>
-              <a href="products.html?categoria=ofertas" class="btn btn-danger w-100">Ver Productos</a>
-            </div>
-          </article>
-
-        </div>
+        <!-- Las nueve tarjetas estaban escritas a mano aquí y sus nombres ya no
+             coincidían con la base. Ahora las monta src/entry/home.tsx. -->
+        <div id="categoriesReactRoot"></div>
       </div>
+    </section>
+
+    <!-- SECCIÓN 2b: DESTACADOS — estaba debajo del footer, nadie lo veía -->
+    <section class="container-fluid px-2 px-md-3 px-lg-5 py-5">
+      <div id="homeReactRoot"></div>
     </section>
 
     <!-- SECCIÓN 3: SOBRE NOSOTROS + UBICACIÓN -->
@@ -451,9 +346,6 @@
     </section>
   </main>
 
-  <section class="container-fluid px-2 px-md-3 px-lg-5 py-5">
-    <div id="homeReactRoot"></div>
-  </section>
 
   <!-- FOOTER -->
   <footer class="main-footer" style="background: var(--carni-charcoal); color: white; padding: 3rem 0 1rem;">

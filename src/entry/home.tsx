@@ -1,10 +1,49 @@
 import { useEffect, useState } from 'react';
-import { mountReactNode, fetchProducts, categoryLabel } from './shared';
+import { mountReactNode, fetchProducts, fetchCategories, categoryLabel } from './shared';
+import type { Category } from './shared';
 import { ProductCard } from '@src/components/ProductCard/ProductCard';
+import { CategoryCard } from '@src/components/CategoryCard/CategoryCard';
 import { BentoGrid } from '@src/components/BentoGrid';
 import { useCart } from '@src/hooks/useCart';
 import type { Product } from '@src/types/database';
 import '@src/styles/redesign.css';
+
+/**
+ * The nine category tiles on the landing page.
+ *
+ * These used to be written by hand in index.html, and had drifted: the markup
+ * said "Selección Premium", "Merchandising" and "Ofertas Especiales" while the
+ * database said "Cortes Especiales", "Merch" and "Ofertas". Nothing kept them in
+ * step because nothing connected them.
+ *
+ * BentoGrid is deliberately not used here. It is a generic wrapper that lays out
+ * `ReactNode[]` on its own column rules, and this grid is not generic: each tile
+ * has a hand-placed `grid-area` in `css/pages/_bento-main.scss`, keyed by
+ * `category-card-N`. Wrapping it would fight that layout. The markup below is
+ * the same `.bento-categories-grid` the CSS already targets.
+ */
+function CategoryBento(): JSX.Element {
+  const [categories, setCategories] = useState<Category[]>([]);
+
+  useEffect(() => {
+    void fetchCategories().then(({ categories: items }) => setCategories(items));
+  }, []);
+
+  return (
+    <div className="bento-categories-grid">
+      {categories.map((category, index) => (
+        <CategoryCard
+          key={category.slug}
+          category={category}
+          // `order` decides the tile's slot. It falls back to the array
+          // position so a row with a null order still lands somewhere real
+          // instead of collapsing onto `category-card-undefined`.
+          position={category.order ?? index + 1}
+        />
+      ))}
+    </div>
+  );
+}
 
 function HomeShowcase(): JSX.Element {
   const [products, setProducts] = useState<Product[]>([]);
@@ -86,4 +125,5 @@ function HomeShowcase(): JSX.Element {
   );
 }
 
+mountReactNode('#categoriesReactRoot', <CategoryBento />);
 mountReactNode('#homeReactRoot', <HomeShowcase />);
