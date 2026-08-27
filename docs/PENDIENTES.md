@@ -199,6 +199,89 @@ Por eso las nueve skills de `agents/skills/` se **movieron** a `.claude/skills/`
 
 ---
 
+### P-29 · Remotion es de pago si la carnicería pasa de tres empleados
+**Estado:** abierto · **Bloquea:** P-14 · **Evidencia:** `LICENSE.md` del repositorio, leído el 2026-08-27
+
+Remotion no es software libre sin condiciones. Textual de su `LICENSE.md`:
+
+> *"Individuals and small companies are allowed to use Remotion to create videos for free (even commercial), while a company license is required for for-profit organizations of a certain size."*
+
+Gratis para individuos, organizaciones de **hasta tres empleados** y sin fines de lucro. Por encima de eso hace falta licencia comercial de pago.
+
+**Por qué importa:** P-14 es video de fondo para la landing y el login de un negocio con fines de lucro. Si la carnicería tiene cuatro empleados o más, adoptar Remotion sin licencia es incumplimiento, no un descuido técnico. Y no se descubre al final: se descubre al contar.
+
+**Qué falta:** que Eduardo cuente los empleados. Si son tres o menos, adelante. Si son más, se paga la licencia o se resuelve P-14 con otra herramienta —Higgsfield ya está conectado y es candidato.
+
+La restricción también vive dentro de `.claude/skills/video-remotion/SKILL.md`, para que aparezca cuando la skill se dispare y no solo cuando alguien lea este archivo.
+
+---
+
+### P-30 · `agent-teams-lite` está archivado y sigue gobernando el orquestador
+**Estado:** abierto · **Evidencia:** `gh api repos/Gentleman-Programming/agent-teams-lite` el 2026-08-27
+
+El repositorio está **archivado** por su autor, último push el 2026-03-26. Sus instrucciones son la base de las reglas del orquestador que este stack usa en cada sesión.
+
+No deja de funcionar —es Markdown puro, sin dependencias— pero **no va a recibir arreglos**. Cualquier incompatibilidad futura con Claude Code se resuelve aquí o no se resuelve.
+
+**Qué falta:** decidir si se congela la copia local como propia y se mantiene desde el repo, o si se busca reemplazo. No urge; sí conviene saberlo antes de que algo se rompa y se busque el arreglo aguas arriba.
+
+---
+
+### P-31 · La skill `vercel-deploy` dice que este repo publica en GitHub Pages, y no
+**Estado:** abierto · **Evidencia:** `netlify.toml` en la raíz + `gh api repos/pipeTawns-x/Carni-mvp/pages` → 404, el 2026-08-27
+
+La skill global `vercel-deploy` (del paquete `claude-webkit`) lleva esto en su propia descripción:
+
+> *"Ojo: este repo publica en GitHub Pages, no en Vercel."*
+
+Las dos mitades fallan. GitHub Pages devuelve **404**: no está habilitado. Y el repositorio tiene un `netlify.toml` completo —build, functions, edge-functions, CSP, redirects de SPA—. **El destino real es Netlify.**
+
+**Por qué importa:** es una skill que se dispara con la palabra "desplegar" y afirma un hecho falso sobre este proyecto. Un agente que la cargue va a razonar sobre el host equivocado.
+
+**Qué falta:** el archivo vive en `~/.claude/skills/claude-webkit/vercel-deploy/SKILL.md`, fuera del repositorio, dentro de un paquete de terceros. Corregirlo ahí se pierde en la próxima actualización del paquete. Entra en el mismo problema que P-32: skills globales sin versionar.
+
+Además, **no hay ninguna skill que sepa desplegar a Netlify**, que es a donde este proyecto realmente publica.
+
+---
+
+### P-32 · Las skills globales viven sin versionar en `~/.claude/skills/`
+**Estado:** abierto · **Evidencia:** `~/.claude/skills` no está bajo control de versiones, comprobado el 2026-08-27
+
+De las 63 skills del registro, la mayoría vive en `~/.claude/skills/`, fuera de cualquier repositorio. Se comprobó que no hay carpeta de dotfiles (`~/dotfiles`, `~/.dotfiles`) ni repositorio propio en GitHub que las contenga.
+
+**Por qué importa:** son el criterio de trabajo del stack entero. Hoy existen en un solo disco, sin historia, sin copia y sin forma de saber qué cambió ni cuándo. Un `rm -rf` distraído las borra sin rastro. Y las 19 descripciones que se escribieron el 2026-08-27 para desmutear skills están exactamente ahí.
+
+**Criterio para repartirlas:**
+
+- Las que hablan de **Carni-mvp** → al repositorio, en `.claude/skills/`
+- Las **generales** (diseño, investigación, escritura) → global está bien, pero necesitan un hogar versionado propio
+
+**Qué falta:** decidir si se crea un repositorio de skills personales. **No se creó nada** — la decisión es de Eduardo, no de un agente.
+
+P-31 es un caso concreto de este problema: una skill de terceros con un dato falso que no se puede corregir de forma duradera.
+
+---
+
+### P-33 · `$HOME` es un repositorio de git por accidente
+**Estado:** abierto · **Riesgo: alto** · **Evidencia:** `git -C ~ rev-parse` el 2026-08-27
+
+El directorio personal contiene un `.git`. No se tocó nada; solo se leyó:
+
+- **Sin remoto** configurado
+- **Cero commits** y **cero archivos rastreados**
+- Rama actual: `feat-mvp-preparar-ecommerce-para-pruebas-con-delivery-0001` — un nombre de rama **de Carni-mvp**
+- `~/.gitignore` contiene una sola línea: `node_modules`
+
+El nombre de la rama delata el origen: un `git checkout -b` corrido con el `cwd` equivocado en alguna sesión anterior.
+
+**Por qué es alto:** un `git add -A` o un `git add .` ejecutado desde `$HOME` —o por cualquier agente que se despiste de directorio— dejaría en escena `~/.ssh`, `~/.aws`, `~/.config`, todos los `.env` de todos los proyectos y los perfiles del navegador. Con `~/.gitignore` frenando únicamente `node_modules`. Es exactamente la clase de accidente que ya costó dos llaves de Apify.
+
+**Qué falta:** Eduardo decide. Lo natural es borrar `~/.git`, pero **eso no lo hace un agente** y no se hizo. Se comprobó primero que no hubiera nada que perder: cero commits, cero archivos rastreados, así que no contiene historia de nadie.
+
+Refuerza la regla que ya está en `AGENTS.md`: nunca `git add .`, siempre archivo por archivo, siempre verificado con `git diff --cached --name-only`.
+
+---
+
 ## 🔵 Diseño — mejoras planeadas
 
 ### P-14 · Video de fondo con IA e imágenes propias de producto
