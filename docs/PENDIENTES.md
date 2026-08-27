@@ -181,6 +181,22 @@ El `href` arma `products.html?categoria=${slug}` interpolando el slug crudo. Hoy
 
 **Arreglo:** probar `brew update && brew upgrade gga`. Si sigue igual, revisar dónde guarda su credencial, que parece ser aparte de la de Claude Code.
 
+**Actualización 2026-08-27:** se actualizó a 2.10.1. El error cambió, no se resolvió: ahora dice `❌ No provider configured · Run 'gga init'`. La versión nueva no lee el `~/.config/gga/config` que declara `PROVIDER="claude"`. `gga init` es config global y lo corre Eduardo.
+
+### P-28 · `gentle-ai` no sigue enlaces simbólicos; Claude Code sí
+**Estado:** abierto · **Evidencia:** experimento del 2026-08-27, `gentle-ai` 1.39.4
+
+Se probó si una misma skill puede vivir en un solo archivo y exponerse a varias herramientas mediante un enlace simbólico. Se creó `.claude/skills/PRUEBA-symlink-carni-node-ebac` apuntando a `agents/skills/carni-node-ebac`, y el resultado quedó partido:
+
+- **Claude Code SÍ la descubre.** La listó entre las skills disponibles, con su descripción cargada desde el destino del enlace. Evidencia directa del harness, no de un archivo de configuración.
+- **`gentle-ai skill-registry refresh --force` NO la ve.** El registro siguió reportando 50 skills, sin rastro de la enlazada ni por su nombre de enlace ni por el del destino.
+
+**Por qué importa:** cierra la puerta a compartir una skill entre Cursor, opencode y Claude sin duplicarla. Una skill enlazada queda **invocable pero ausente del índice**, y ese índice es justo lo que el orquestador lee para decidir a quién delegar. Medio funcionando es peor que las dos puntas: se dispara sola y nadie sabe que existe.
+
+Por eso las nueve skills de `agents/skills/` se **movieron** a `.claude/skills/` en vez de enlazarse.
+
+**Arreglo posible:** que `gentle-ai` resuelva enlaces al escanear, o que el registro acepte carpetas adicionales por configuración. Hasta entonces, `.claude/skills/` es la única fuente y una skill compartida entre herramientas hay que duplicarla.
+
 ---
 
 ## 🔵 Diseño — mejoras planeadas
