@@ -30,27 +30,22 @@ Congelado porque BuildAds lo está. **Se descongela junto con el módulo, no des
 
 ## 🟠 Despliegue — el sitio público no muestra tu trabajo
 
-### P-04 · GitHub Pages publica otra rama, y publica el repo crudo
+### P-04 · GitHub Pages sigue publicando `practicas-ebac` por su cuenta
 
-**Estado:** abierto · **Evidencia:** _Settings → Pages_ del repositorio, verificado el 2026-08-25
+**Estado:** cambia de raíz · **Evidencia:** _Settings → Pages_ del repositorio; deploy preview #7 de Netlify verificado el 2026-09-01
 
-La configuración dice, textual:
+El sitio real ya vive en **Netlify** (`carniwebpwa`), construido con Vite y publicado desde `dist/`. El plan viejo —pasar Pages a GitHub Actions como fuente y publicar `dist/` con `actions/deploy-pages`— **queda descartado**: no hay que montar ningún workflow.
+
+Lo que sigue vivo es Pages por su lado. Su configuración sigue diciendo, textual:
 
 ```
 Source: Deploy from a branch
 Branch: practicas-ebac   /(root)
 ```
 
-Son **dos defectos en uno**, y por eso el sitio público lleva meses sin moverse:
+Publica la raíz del repositorio tal cual, sin construir: nueve tarjetas fijas, React sin arrancar, meses sin moverse. Nadie lo usa como sitio del negocio, pero ahí sigue, visible y desactualizado.
 
-1. **Publica desde `practicas-ebac`, no desde `main`.** Mergear a `main` no toca el sitio. Se comprobó: el merge del PR #6 no disparó ningún despliegue.
-2. **Publica la raíz del repositorio tal cual, sin construir.** Por eso el navegador recibe un `.tsx` crudo, que ningún navegador ejecuta.
-
-Comprobado en vivo el 2026-08-25 sobre `https://pipetawns-x.github.io/Landingpages-Carni.pwa/`: nueve tarjetas fijas, el texto "Selección Premium" todavía presente, y React sin arrancar.
-
-**Ojo:** cambiar la rama a `main` no basta y empeora las cosas — seguiría sirviendo el repo crudo, ahora con la versión que además espera un backend. Hay que pasar a _GitHub Actions_ como fuente y publicar `dist/` con `actions/deploy-pages`.
-
-**Depende de P-18** — sin las variables, el `dist/` publicado arranca lanzando un error.
+**Decisión pendiente de Eduardo:** apagar GitHub Pages (_Settings → Pages → Source: None_) o dejarlo como escaparate de las prácticas EBAC, sabiendo que no es el sitio del negocio. El sitio del negocio es Netlify, y publica en cuanto se mergee el PR #7.
 
 ### P-25 · El CI lleva rojo desde el 19 de agosto
 
@@ -75,15 +70,13 @@ Consecuencia: **el CI dejó de proteger nada.** Un rojo permanente se vuelve rui
 
 **Nota aparte:** `docs/brain/security.md:15` declara **pnpm** como gestor del proyecto, pero el repo usa `package-lock.json` y el CI corre `npm ci`. Otra regla que la realidad contradice. Decidir cuál gana antes de tocar el lockfile.
 
-### P-18 · El build de producción no tiene credenciales de Supabase
+### P-18 · Credenciales de build — resuelto en Netlify; la trampa estaba en `netlify.toml`
 
-**Estado:** abierto · **Evidencia:** `.github/workflows/ci.yml:30`, `js/modules/supabase.js:10-14`
+**Estado:** resuelto · **Evidencia:** variables en el panel de Netlify y `netlify.toml` corregido, 2026-09-01
 
-Vite incrusta las variables `VITE_*` **en el momento de construir**, leyéndolas del `.env` local. Ese archivo está en `.gitignore` y no llega a GitHub, y el flujo de trabajo no define ninguna. Así que el `dist/` que produce el CI sale sin URL ni llave, y `supabase.js` lanza `Supabase configuration missing` al cargar.
+El planteamiento viejo (guardar las `VITE_*` como _repository secrets_ para un workflow de Actions) ya no aplica: el build corre en Netlify, y `VITE_SUPABASE_URL` y `VITE_SUPABASE_ANON_KEY` ya viven en su panel, con el mismo valor que el `.env` local.
 
-O sea: aunque hubiera despliegue, el sitio público quedaría **peor** que hoy — hoy al menos cae al catálogo del código.
-
-**Arreglo:** guardar `VITE_SUPABASE_URL` y `VITE_SUPABASE_ANON_KEY` como _repository secrets_ y pasarlas como `env:` al paso de build. La llave publishable es pública por diseño; lo que protege los datos es RLS, no el secreto de la llave.
+Hallazgo del 2026-09-01: los bloques `[context.production.environment]` y `[context.deploy-preview.environment]` de `netlify.toml` llevaban valores de plantilla (`your-project-ref.supabase.co`) y **pisaban los valores reales del panel** — Netlify da prioridad al `netlify.toml` sobre la UI. El bundle salía con la URL falsa incrustada aunque el panel estuviera bien. Esos bloques se eliminaron: la fuente de verdad queda en el panel de Netlify para el deploy y en `.env` para local. La llave publishable es pública por diseño; lo que protege los datos es RLS, no el secreto de la llave.
 
 ### P-05 · Rutas absolutas que rompen bajo subcarpeta
 
@@ -91,14 +84,28 @@ O sea: aunque hubiera despliegue, el sitio público quedaría **peor** que hoy �
 
 `/src/entry/home.tsx` y `/js/modules/utils/service-worker.js` apuntan a la raíz del dominio, pero el sitio vive en `/Landingpages-Carni.pwa/`. Además un `.tsx` crudo no lo ejecuta ningún navegador.
 
-### P-06 · `publicDir: 'img'` deja el build sin imágenes
+### P-06 · CERRADO el 2026-08-31 — las imágenes rotas del build
+**Estado:** cerrado · **Evidencia:** `content-type` medido antes y después
 
-**Estado:** abierto · **Evidencia:** `vite.config.js:38`
+`vite.config.js` tenía `publicDir: 'img'`. Vite copia el CONTENIDO de esa carpeta a la raíz de `dist/`, no la carpeta: los `.webp` acababan en `dist/products/` y la ruta `/img/products/…` que pide el código no existía. Caía en el respaldo de SPA y el navegador recibía `index.html` con `content-type: text/html` en vez de una imagen. Las nueve fotos del bento quedaban en 0×0 en producción y funcionaban en local, porque en desarrollo Vite sirve los archivos del proyecto tal cual.
 
-Vite copia `img/*` a la raíz de `dist/`, así que `dist/img` no existe y las rutas `/img/products/…` fallan. En desarrollo no se nota porque Vite sirve el árbol del proyecto tal cual — el fallo solo aparece en el build.
-**Ojo:** `publicDir: false` NO es el arreglo — desactiva la copia entera. Mover a `public/img/` y usar `publicDir: 'public'`.
+Arreglado moviendo la carpeta a `public/img/` con `git mv` y cambiando a `publicDir: 'public'`. Ahora lo copiado es `img/`, así que `/img/…` sigue siendo `/img/…`. Las 169 referencias del proyecto son URLs y no hubo que tocar ninguna: el barrido no encontró ni un `url()` de SCSS, ni un import, ni una ruta de archivo fuera de la propia configuración.
+
+Verificado: `dist/img/products/` con sus 18 `.webp`, `content-type: image/webp` en cinco rutas distintas, y las nueve imágenes del bento a 1287×748 en el navegador.
+
+**`publicDir: false` no era el arreglo** —desactiva la copia entera— y ya se había intentado.
+
+**La lección que vale**: el video sí cargaba porque está referenciado desde el HTML y Vite reescribe su ruta a `/assets/…`. Las fotos llegan de la base en tiempo de ejecución, así que Vite nunca las ve. Toda ruta construida en tiempo de ejecución tiene que existir tal cual en `dist/`.
 
 ---
+
+### P-34 · Tres sitios de Netlify colgando del mismo repositorio
+**Estado:** abierto · **Evidencia:** `gh pr checks 7` el 2026-08-31
+
+Los checks del PR muestran `carni-pwa`, `carniwebpwa` y `pwacarniweb`, los tres construyendo en cada push. Producción es `carniwebpwa.netlify.app`.
+
+**Qué falta:** decidir cuál se queda. No se toca nada desde aquí — borrar un sitio de Netlify no se deshace, y esa decisión es de Eduardo.
+
 
 ## 🟠 Migración a React — landing
 

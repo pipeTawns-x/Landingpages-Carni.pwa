@@ -152,7 +152,8 @@ npm run dev             # Vite dev server
 - **Las fotos del catálogo son miniaturas.** `filet_mignon.webp` mide 248×193 px. Por eso la diapositiva se parte en dos columnas desde 1024 en vez de ir a sangre completa: a todo el ancho se vería como una mancha. Se arregla con fotografía real, no con CSS.
 - **Pagos**: sin pasarela integrada. Los pedidos se crean con status `pending`.
 - **n8n/Automatización**: sin workflows en producción.
-- **El video del hero pesa 14 MB** y `vite.config.js:38` sigue con `publicDir: 'img'`, así que en el build la ruta `img/Videos/` no existirá. Funciona en local y muere al publicar: **P-06**.
+- **El sitio publicado vive en Netlify**, no en GitHub Pages. Pages sigue publicando la rama `practicas-ebac` por su cuenta y sirve la raíz sin construir, así que ahí React no se ejecuta. Queda decidir qué se hace con esa publicación: **P-04**.
+- **Hay tres sitios de Netlify** colgando de este mismo repositorio. Los tres construyen en cada push.
 - **BuildAds y ProductAds están congelados** por `docs/DECISION_ALCANCE_2026-08-13.md` hasta que el dueño entregue márgenes reales. Hay un blueprint con las decisiones abiertas, sin una línea de implementación.
 
 ---
@@ -257,6 +258,12 @@ Aunque este repo hoy combina frontend estático con auth y lógica de cliente, l
 | **SCSS 7-1 Pattern**        | Organización de estilos por dominio. **`css/styles.css` es compilado**: ver más abajo |
 | **Bootstrap 5.3.7**         | Rejilla, carrusel y utilidades. Cargado por `<script>`, no empaquetado |
 | **PWA APIs**                | Manifest, cache offline y experiencia instalable                     |
+
+**Las imágenes viven en `public/img/`, no en `img/`.** Vite copia el *contenido* de `publicDir` a la raíz de `dist/`, no la carpeta en sí. Con `publicDir: 'img'` los `.webp` acababan en `dist/products/` y la ruta `/img/products/…` que pide el código dejaba de existir: caía en el respaldo de SPA y el navegador recibía `index.html` con `content-type: text/html` en vez de una imagen. Las nueve fotos del bento quedaban en 0×0 **solo en producción**.
+
+Con la carpeta en `public/img/`, lo que se copia es `img/`, así que `/img/…` sigue siendo `/img/…` después del build. **`publicDir: false` no es el arreglo** — desactiva la copia entera y deja el sitio sin imágenes.
+
+Y la distinción que explica por qué el video sí cargaba y las fotos no: **el video está referenciado desde el HTML**, así que Vite lo procesa y reescribe su ruta a `/assets/…` con hash. **Las fotos del catálogo llegan de la base de datos, como cadenas en tiempo de ejecución.** Vite nunca las ve y nunca las reescribe. Cualquier ruta que se construya en tiempo de ejecución tiene que existir tal cual en `dist/`.
 
 **El CSS se compila a mano.** No hay script de npm para esto y `sass` no está en `node_modules`:
 
