@@ -53,30 +53,55 @@
   </div>
 
   <!-- Main Header Maximalista Unificado -->
-  <header class="main-header" id="mainHeader" role="banner">
-    <nav class="navbar navbar-expand-lg main-header__nav-container container-fluid px-3 px-lg-5">
-      <button class="hamburger-btn" type="button" id="menuToggle" aria-label="Abrir menú de navegación">
-        <span></span>
-        <span></span>
-        <span></span>
-      </button>
-      <div class="main-header__logo-container">
-        <a class="navbar-brand" href="index.html">
-          <img src="img/recursos_web/logo-user.png" alt="Logo" class="main-header__logo" style="object-fit:contain;max-height:56px;">
+  <!-- `--over-media` solo en la landing: es la única página con video detrás.
+       En products.html y accessweb.html el encabezado conserva su fondo sólido,
+       porque ahí no hay nada que dejar ver. -->
+  <header class="main-header main-header--over-media" id="mainHeader" role="banner">
+    <!-- Tres zonas, no cuatro elementos sueltos. Izquierda y derecha ocupan lo
+         que necesitan; el centro se lleva el resto y ahí el logo queda centrado
+         de verdad, sin cuentas ni posiciones absolutas. -->
+    <nav class="navbar main-header__nav-container container-fluid px-2 px-md-3 px-lg-5">
+
+      <!-- ── Izquierda: menú y búsqueda ── -->
+      <div class="header-zone header-zone--left">
+        <button class="hamburger-btn" type="button" id="menuToggle" aria-label="Abrir menú de navegación">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+        <button class="header-search" type="button" id="searchBtn" aria-label="Buscar productos">
+          <i class="bi bi-search" aria-hidden="true"></i>
+          <!-- La etiqueta solo aparece cuando hay sitio. En móvil el icono
+               basta: nadie necesita que le expliquen qué hace una lupa. -->
+          <span class="header-search__label">Buscar cortes y productos</span>
+        </button>
+      </div>
+
+      <!-- ── Centro: el logo ── -->
+      <div class="header-zone header-zone--center">
+        <a class="navbar-brand main-header__logo-container" href="index.html">
+          <img src="img/recursos_web/logo-user.png" alt="Carnicería El Señor de La Misericordia" class="main-header__logo">
         </a>
       </div>
-      <button class="header-search" type="button" id="searchBtn" aria-label="Buscar productos">
-        <i class="bi bi-search" aria-hidden="true"></i>
-        <span class="header-search__label">Buscar cortes y productos</span>
-      </button>
-      <div class="main-header__icons-container d-flex align-items-center gap-2">
-        <button class="header-icon-btn header-icon-btn--round position-relative" id="cartBtn" data-bs-toggle="modal" data-bs-target="#cartModal" aria-label="Carrito">
+
+      <!-- ── Derecha: carrito, cuenta y clima ── -->
+      <div class="header-zone header-zone--right">
+        <button class="header-icon-btn header-icon-btn--round position-relative" id="cartBtn" aria-label="Carrito">
           <i class="bi bi-cart3"></i>
           <span class="badge bg-danger rounded-pill position-absolute top-0 start-100 translate-middle main-header__cart-count">0</span>
         </button>
-        <a href="accessweb.html" class="header-icon-btn header-icon-btn--round" aria-label="Usuario">
+        <a href="accessweb.html" class="header-icon-btn header-icon-btn--round" aria-label="Entrar o registrarse">
           <i class="bi bi-person"></i>
         </a>
+        <!-- Clima: solo icono y temperatura.
+             La descripción y la humedad se retiraron el 2026-08-31: en el
+             encabezado competían con el buscador y los iconos, y en móvil
+             empujaban la fila hasta romperla. El dato que la gente mira antes
+             de encender el asador es la temperatura; lo demás era ruido. -->
+        <div class="main-header__weather" id="weatherWidget">
+          <i class="bi bi-sun weather-icon" aria-hidden="true"></i>
+          <span class="weather-temp">--°C</span>
+        </div>
       </div>
     </nav>
   </header>
@@ -131,94 +156,28 @@
   </aside>
 
   <main>
-    <!-- SECCIÓN 1: CAROUSEL HERO + CARDS LATERALES -->
-    <section class="hero-section home-hero-section py-4 py-lg-5 dark-premium" style="background: linear-gradient(135deg, var(--carni-charcoal) 0%, var(--carni-dark) 100%);">
-      <div class="container-fluid px-2 px-md-3 px-lg-5 home-shell">
-        <!-- Mobile Title -->
-        <div class="d-lg-none text-center mb-4">
-          <h1 class="fw-bold" style="color: var(--carni-gold); font-size: 1.8rem; margin: 0;">CARNICERÍA</h1>
-          <p class="small" style="color: var(--carni-text-muted);">El Señor de La Misericordia</p>
-        </div>
+    <!-- SECCIÓN 1: HERO — video de fondo + logo. Sin título textual (el logo ya
+         lo dice) y sin botones: Ver Productos y Fidelidad ya viven en el header
+         y en las categorías. -->
+    <section class="hero-section home-hero-section home-hero-video dark-premium" aria-label="Presentación">
+      <!-- El video pesaba 13.4 MB a 7.5 Mbps: un bitrate de master para un fondo
+           mudo de 15 segundos en bucle. Recomprimido el 2026-08-31 sin pista de
+           audio —el elemento va `muted`— queda en 2.0 MB el MP4 y 1.2 MB el
+           WebM. 91% menos por la ruta que toman los navegadores modernos.
 
-        <!-- Layout Grid: Carousel (Left) + Cards (Right) -->
-        <div class="row g-3 g-lg-4">
-          <!-- Carousel (8 cols en desktop) -->
-          <div class="col-12 col-lg-8">
-            <div id="mainCarousel" class="carousel slide rounded-3 overflow-hidden home-hero-carousel" data-bs-ride="carousel"
-              style="box-shadow: 0 4px 16px rgba(0,0,0,0.1); min-height: 400px;">
-              <div class="carousel-inner" style="height: 400px;">
-                <div class="carousel-item active h-100">
-                  <picture><source srcset="img/products/ney_york_strip.webp" type="image/webp"><img src="img/products/ney_york_strip.png" class="d-block w-100 h-100" style="object-fit:cover;" alt="New York Strip"></picture>
-                  <div class="carousel-caption d-none d-md-block">
-                    <h5 class="fw-bold">New York Strip</h5>
-                    <p>Balance perfecto entre marmoleado y textura firme</p>
-                  </div>
-                </div>
-                <div class="carousel-item h-100">
-                  <picture><source srcset="img/products/filet_mignon.webp" type="image/webp"><img src="img/products/filet_mignon.png" class="d-block w-100 h-100" style="object-fit:cover;" alt="Filet Mignon"></picture>
-                  <div class="carousel-caption d-none d-md-block">
-                    <h5 class="fw-bold">Filet Mignon</h5>
-                    <p>La corte más tierna y delicada del mercado</p>
-                  </div>
-                </div>
-                <div class="carousel-item h-100">
-                  <picture><source srcset="img/products/porterhouse.webp" type="image/webp"><img src="img/products/porterhouse.png" class="d-block w-100 h-100" style="object-fit:cover;" alt="Porterhouse"></picture>
-                  <div class="carousel-caption d-none d-md-block">
-                    <h5 class="fw-bold">Porterhouse</h5>
-                    <p>Lo mejor de dos mundos: filet y lomo</p>
-                  </div>
-                </div>
-                <div class="carousel-item h-100">
-                  <picture><source srcset="img/products/rib-eye.webp" type="image/webp"><img src="img/products/rib-eye.png" class="d-block w-100 h-100" style="object-fit:cover;" alt="Rib Eye"></picture>
-                  <div class="carousel-caption d-none d-md-block">
-                    <h5 class="fw-bold">Rib Eye Premium</h5>
-                    <p>Jugosidad y sabor intenso garantizados</p>
-                  </div>
-                </div>
-              </div>
-              <button class="carousel-control-prev" type="button" data-bs-target="#mainCarousel" data-bs-slide="prev">
-                <i class="bi bi-chevron-left fs-5"></i>
-              </button>
-              <button class="carousel-control-next" type="button" data-bs-target="#mainCarousel" data-bs-slide="next">
-                <i class="bi bi-chevron-right fs-5"></i>
-              </button>
-            </div>
-          </div>
+           El WebM va primero porque el navegador elige la primera fuente que
+           sabe reproducir. `+faststart` en el MP4 mueve el índice al principio
+           del archivo para que empiece a verse sin descargarlo entero.
 
-          <!-- Cards Laterales (4 cols en desktop) -->
-          <div class="col-12 col-lg-4">
-            <!-- Card: Clima -->
-            <!-- The brand card that used to sit above repeated the shop name a
-                 third time on the first screen; the weather card inherits its
-                 space because it carries information the header does not. -->
-            <div class="mb-3">
-              <div class="card border-0 rounded-3 home-side-card home-side-card--weather" style="box-shadow: 0 4px 16px rgba(0,0,0,0.08); padding: 1.5rem;">
-                <div class="text-center">
-                  <i class="bi bi-cloud-sun weather-icon" style="font-size: 2.5rem; color: #ff9800;"></i>
-                  <h4 class="fw-bold mt-2 mb-0 weather-temp" style="color: #363432; font-size: 1.8rem;">--°C</h4>
-                  <small class="weather-desc" style="color: #999; font-size: 0.85rem;">Cargando clima...</small>
-                  <small class="weather-humidity d-block mt-1" style="color: #999; font-size: 0.75rem;">Humedad:
-                    --</small>
-                </div>
-              </div>
-            </div>
-
-            <!-- Card: Botones -->
-            <div>
-              <div class="card border-0 rounded-3 home-side-card home-side-card--actions" style="box-shadow: 0 4px 16px rgba(0,0,0,0.08); padding: 1.5rem;">
-                <div class="d-flex flex-column gap-2">
-                  <a href="products.html" class="btn btn-danger fw-bold rounded-2">
-                    <i class="bi bi-eye me-2"></i>Ver Productos
-                  </a>
-                  <a href="accessweb.html" class="btn btn-outline-danger fw-bold rounded-2">
-                    <i class="bi bi-gift me-2"></i>Fidelidad
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+           El poster es el primer fotograma real del video, no una foto de
+           producto: así lo que se ve antes de que cargue es lo mismo que se
+           verá después, sin salto. -->
+      <video class="home-hero-video__media" autoplay muted loop playsinline preload="metadata"
+        poster="img/Videos/VideoCarniwebP01-poster.jpg" aria-hidden="true" tabindex="-1">
+        <source src="img/Videos/VideoCarniwebP01.webm" type="video/webm">
+        <source src="img/Videos/VideoCarniwebP01.mp4" type="video/mp4">
+      </video>
+      <div class="home-hero-video__overlay" aria-hidden="true"></div>
     </section>
 
     <!-- SECCIÓN 2: CATEGORÍAS — React, leídas de public.categories -->
@@ -232,8 +191,14 @@
       </div>
     </section>
 
-    <!-- SECCIÓN 3: SOBRE NOSOTROS + UBICACIÓN -->
-    <section id="sobre-nosotros" class="about-section py-5"
+    <!-- SECCIÓN 3: VITRINA — carrusel + cuatro fichas.
+         La monta src/components/Showcase/Showcase.tsx con producto real de
+         `public.products`. NO usa la tabla `promotions`: está vacía y además
+         es de cupones de descuento, no de tarjetas promocionales. -->
+    <div id="showcaseReactRoot"></div>
+
+    <!-- SECCIÓN 4: SOBRE NOSOTROS + UBICACIÓN -->
+    <section id="sobre-nosotros" class="about-section py-5 reveal"
       style="background: linear-gradient(135deg, var(--carni-charcoal) 0%, var(--carni-dark) 100%);">
       <div class="container-fluid px-2 px-md-3 px-lg-5">
         <h2 class="text-center fw-bold mb-5" style="color: var(--carni-gold); font-size: 2rem;">Sobre Nosotros</h2>
@@ -293,7 +258,7 @@
     </section>
 
     <!-- SECCIÓN 4: CONTACTO DIRECTO -->
-    <section id="contacto" class="contact-section py-5" style="background: var(--carni-dark);">
+    <section id="contacto" class="contact-section py-5 reveal" style="background: var(--carni-dark);">
       <div class="container-fluid px-2 px-md-3 px-lg-5">
         <h2 class="text-center fw-bold mb-5" style="color: var(--carni-gold); font-size: 2rem;">Contacto Directo</h2>
 
@@ -343,7 +308,7 @@
 
 
   <!-- FOOTER -->
-  <footer class="main-footer" style="background: var(--carni-charcoal); color: white; padding: 3rem 0 1rem;">
+  <footer class="main-footer reveal" style="background: var(--carni-charcoal); color: white; padding: 3rem 0 1rem;">
     <div class="container-fluid px-2 px-md-3 px-lg-5">
       <div class="row g-4 mb-4">
         <!-- Column 1: Empresa -->
@@ -436,7 +401,14 @@
   <script type="module" src="js/modules/core/loyalty.js"></script>
   <script type="module" src="js/modules/ui/search.js"></script>
   <script type="module" src="js/modules/ui/weather.js"></script>
-  <script type="module" src="/src/entry/home.tsx"></script>
+  <script type="module" src="js/modules/ui/hero-video.js"></script>
+  <!-- El estado del encabezado al hacer scroll lo lleva ahora
+       src/components/HeaderScroll/HeaderScroll.tsx, dentro del paquete que
+       Vite sí controla. Como script suelto la pestaña se quedó con una copia
+       vieja en caché y ninguna edición llegaba a ejecutarse. -->
+  <div id="headerScrollRoot" hidden></div>
+  <script type="module" src="js/modules/ui/scroll-reveal.js"></script>
+  <script type="module" src="./src/entry/home.tsx"></script>
 </body>
 
 </html>
