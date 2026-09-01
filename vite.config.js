@@ -35,5 +35,20 @@ export default defineConfig({
       }
     }
   },
-  publicDir: 'img'
+  // `public`, no `img`.
+  //
+  // Vite copia el CONTENIDO de publicDir a la raiz de `dist/`, no la carpeta en
+  // si. Con `publicDir: 'img'`, `img/products/res.webp` acababa en
+  // `dist/products/res.webp` y la ruta `/img/products/res.webp` que pide el
+  // codigo dejaba de existir: caia en el respaldo SPA y el navegador recibia
+  // `index.html` con content-type text/html en vez de una imagen. Las nueve
+  // fotos del bento quedaban en 0x0. Era P-06.
+  //
+  // Con la carpeta en `public/img/`, el contenido copiado es `img/`, asi que
+  // `/img/...` sigue siendo `/img/...` despues del build. Las 169 referencias
+  // del proyecto son URLs y no hay que tocar ninguna.
+  //
+  // NO uses `publicDir: false`: desactiva la copia entera y deja el sitio sin
+  // imagenes. Ya se intento.
+  publicDir: 'public'
 });
