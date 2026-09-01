@@ -83,3 +83,5 @@ graphify-out/
 # Video transcripts — derived data, ~784KB (regenerate with: docs/brain/videos/transcripts/grab.sh)
 docs/brain/videos/transcripts/*.txt
 docs/brain/videos/transcripts/subs/
+# Local AI runtime state
+.atl/

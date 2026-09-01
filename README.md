@@ -2,12 +2,12 @@
 
 ![Banner Carni-mvp](img/recursos_web/banercarnimvp.png)
 
-> MVP frontend para Carnicería El Señor de La Misericordia. El repositorio ya contiene landing, catálogo, auth, carrito, dashboard base y PWA; además documenta la arquitectura objetivo para evolucionar hacia una plataforma comercial completa con datos, automatización e IA sin vender como implementado lo que todavía es roadmap.
+> Primera versión navegable de la tienda de Carnicería El Señor de La Misericordia, con backend real y frontend moderno. Landing rediseñada, catálogo, autenticación, carrito con persistencia, dashboard de administración y PWA, todo contra una base Supabase con RLS, triggers y funciones transaccionales. Este README documenta también la arquitectura objetivo, **sin vender como implementado lo que todavía es hoja de ruta** — cada tabla distingue lo que existe de lo que falta.
 
-[![Estado](https://img.shields.io/badge/Estado-MVP%20Frontend-blue)](https://github.com/pipeTawns-x/Landingpages-Carni.pwa)
-[![Stack](https://img.shields.io/badge/Stack-Vanilla%20JS%20%7C%20SCSS%207--1%20%7C%20Bootstrap%205%20%7C%20Supabase-orange)](https://github.com/pipeTawns-x/Landingpages-Carni.pwa)
+[![Estado](https://img.shields.io/badge/Estado-v1%20navegable-blue)](https://github.com/pipeTawns-x/Landingpages-Carni.pwa)
+[![Stack](https://img.shields.io/badge/Stack-Vite%207%20%7C%20React%2018%20%7C%20TypeScript%20%7C%20SCSS%207--1%20%7C%20Supabase-orange)](https://github.com/pipeTawns-x/Landingpages-Carni.pwa)
 [![PWA](https://img.shields.io/badge/PWA-Ready-green)](manifest.json)
-[![Responsive](https://img.shields.io/badge/Responsive-320→768→1024-brightgreen)](https://github.com/pipeTawns-x/Landingpages-Carni.pwa)
+[![Responsive](https://img.shields.io/badge/Responsive-375%E2%86%92768%E2%86%921440-brightgreen)](https://github.com/pipeTawns-x/Landingpages-Carni.pwa)
 [![Branch](https://img.shields.io/badge/Branch-main-purple)](https://github.com/pipeTawns-x/Landingpages-Carni.pwa/tree/main)
 
 ## Entrega EBAC React
@@ -23,6 +23,7 @@
 ### Resumen ejecutivo
 
 - **Existe hoy**: frontend navegable con landing, catálogo, auth (Supabase), carrito con persistencia a BD, PWA, dashboard admin con stats reales y panel de pedidos.
+- **Frontend híbrido, a propósito**: las páginas siguen siendo HTML servido por Vite, y las partes que necesitan datos vivos se montan como islas de React sobre ellas (`src/entry/*.tsx` → `mountReactNode`). No es una SPA y no pretende serlo: cada página carga solo el JavaScript de sus islas.
 - **Backend operativo**: Supabase local con migrations, RLS, triggers, RPCs y seed data. Auth basado en `profiles.role`, protección de admin pages, y función transaccional `create_order_with_items`.
 - **Existe hoy para EBAC Phase 1**: script Node.js en raíz con `CommonJS`, `axios`, `dotenv` y `chalk`, separado del frontend.
 - **Todavía no existe dentro del repo**: dashboard cliente real, flujos n8n, campañas Meta Ads activas, search dinámico y automatizaciones operativas.
@@ -32,7 +33,10 @@
 
 | Módulo                              | Estado       | Detalle                                                                                                                    |
 | ----------------------------------- | ------------ | -------------------------------------------------------------------------------------------------------------------------- |
-| **Landing page**                    | ✅ Funcional | Navegación principal, hero y secciones comerciales                                                                         |
+| **Landing page**                    | ✅ Funcional | Encabezado pegado que va de transparente sobre el video a negro sólido, video hero, bento de categorías, vitrina y secciones comerciales |
+| **Encabezado**                      | ✅ Funcional | Tres zonas con el logo centrado —0px de desvío medido a 375, 414, 768 y 1024—. El clima se oculta por debajo de 576px porque no cabe |
+| **Bento de categorías**             | ✅ Funcional | Nueve baldosas leídas de `public.categories`, revelado escalonado por `IntersectionObserver`, y la ficha completa al pasar el cursor. En táctil va siempre abierta: sin `:hover` no hay nada que revelar |
+| **Vitrina ("Lo que se lleva la gente")** | ✅ Funcional | Carrusel de Bootstrap con seis cortes y cuatro fichas de producto, todo leído de `public.products`. No usa la tabla `promotions`: está vacía y además es de cupones de descuento, no de tarjetas |
 | **Catálogo webcommerce**            | ✅ Funcional | Cards por categoría, filtros y render dinámico                                                                             |
 | **Carrito de compras**              | ✅ Funcional | `localStorage` + persistencia a Supabase vía RPC `create_order_with_items`, delivery o pickup                              |
 | **Auth (Login/Registro)**           | ✅ Funcional | Supabase Auth, trigger `handle_new_user` crea profile, role-based admin check                                              |
@@ -141,11 +145,16 @@ npm run dev             # Vite dev server
 
 ### Limitaciones conocidas (v1)
 
-- **Búsqueda**: El módulo `search.js` usa datos estáticos, no está conectado a Supabase aún.
-- **Dashboard cliente**: `dashboard.js` está implementado pero su contenedor HTML (`.dashboard-container`) no tiene página dedicada todavía.
-- **Imágenes productos**: El seed usa rutas `/img/products/*.webp` — verificar que las imágenes existan.
-- **Pagos**: No hay pasarela de pago integrada. Los pedidos se crean con status `pending`.
-- **n8n/Automatización**: Sin workflows en producción aún.
+- **Dos carritos conviven.** `js/modules/core/cart.js` es un modal centrado y lo cargan las dos páginas; `src/components/CartPanel/` es un cajón lateral en React montado solo en el catálogo. Comparten la misma llave de almacenamiento, `carni_cart_v1`, así que no hay carrito fantasma — pero el objetivo es dejar solo el cajón, y eso no está hecho.
+- **Pedido trifásico: la interfaz antes que los datos.** Por peso funciona (`price_per_kg`) y en libras también (`price_per_lb`). Por precio es derivable pero nadie decidió cómo redondear al pesar. **Por pieza y por grosor no tienen columna en ninguna migración**: P-19 y P-20.
+- **Búsqueda**: la lupa manda a `products.html`; no hay panel de sugerencias en la landing.
+- **Dashboard cliente**: `dashboard.js` existe pero su contenedor HTML no tiene página dedicada.
+- **Las fotos del catálogo son miniaturas.** `filet_mignon.webp` mide 248×193 px. Por eso la diapositiva se parte en dos columnas desde 1024 en vez de ir a sangre completa: a todo el ancho se vería como una mancha. Se arregla con fotografía real, no con CSS.
+- **Pagos**: sin pasarela integrada. Los pedidos se crean con status `pending`.
+- **n8n/Automatización**: sin workflows en producción.
+- **El sitio publicado vive en Netlify**, no en GitHub Pages. Pages sigue publicando la rama `practicas-ebac` por su cuenta y sirve la raíz sin construir, así que ahí React no se ejecuta. Queda decidir qué se hace con esa publicación: **P-04**.
+- **Hay tres sitios de Netlify** colgando de este mismo repositorio. Los tres construyen en cada push.
+- **BuildAds y ProductAds están congelados** por `docs/DECISION_ALCANCE_2026-08-13.md` hasta que el dueño entregue márgenes reales. Hay un blueprint con las decisiones abiertas, sin una línea de implementación.
 
 ---
 
@@ -243,11 +252,36 @@ Aunque este repo hoy combina frontend estático con auth y lógica de cliente, l
 
 | Tecnología                  | Uso                                                                  |
 | --------------------------- | -------------------------------------------------------------------- |
-| **Vanilla JS (ES modules)** | Lógica modular del MVP                                               |
-| **SCSS 7-1 Pattern**        | Organización de estilos por dominio                                  |
-| **Bootstrap 5.3.7**         | Base visual y layout                                                 |
+| **Vite 7**                  | Servidor de desarrollo y empaquetado. Puerto 3002                    |
+| **React 18 + TypeScript**   | Islas montadas sobre el HTML: bento, vitrina, panel del carrito y listas del catálogo. Entradas en `src/entry/` |
+| **Vanilla JS (ES modules)** | Lo que no necesita estado de React: carrito heredado, clima, cajón móvil, buscador |
+| **SCSS 7-1 Pattern**        | Organización de estilos por dominio. **`css/styles.css` es compilado**: ver más abajo |
+| **Bootstrap 5.3.7**         | Rejilla, carrusel y utilidades. Cargado por `<script>`, no empaquetado |
 | **PWA APIs**                | Manifest, cache offline y experiencia instalable                     |
-| **Vite**                    | Tooling del proyecto, pendiente de uso canónico dentro de contenedor |
+
+**Las imágenes viven en `public/img/`, no en `img/`.** Vite copia el *contenido* de `publicDir` a la raíz de `dist/`, no la carpeta en sí. Con `publicDir: 'img'` los `.webp` acababan en `dist/products/` y la ruta `/img/products/…` que pide el código dejaba de existir: caía en el respaldo de SPA y el navegador recibía `index.html` con `content-type: text/html` en vez de una imagen. Las nueve fotos del bento quedaban en 0×0 **solo en producción**.
+
+Con la carpeta en `public/img/`, lo que se copia es `img/`, así que `/img/…` sigue siendo `/img/…` después del build. **`publicDir: false` no es el arreglo** — desactiva la copia entera y deja el sitio sin imágenes.
+
+Y la distinción que explica por qué el video sí cargaba y las fotos no: **el video está referenciado desde el HTML**, así que Vite lo procesa y reescribe su ruta a `/assets/…` con hash. **Las fotos del catálogo llegan de la base de datos, como cadenas en tiempo de ejecución.** Vite nunca las ve y nunca las reescribe. Cualquier ruta que se construya en tiempo de ejecución tiene que existir tal cual en `dist/`.
+
+**El CSS se compila a mano.** No hay script de npm para esto y `sass` no está en `node_modules`:
+
+```bash
+npx sass css/styles.scss css/styles.css --no-source-map
+```
+
+Suelta advertencias de obsolescencia por `@import` y `darken()`. Son advertencias, no errores; migrar a `@use` es un pendiente aparte. **Editar el `.scss` sin compilar no cambia nada de lo que ve el navegador.**
+
+### Cómo está construido el frontend
+
+Tres decisiones que explican casi todo el código y conviene conocer antes de tocarlo:
+
+**Móvil primero de verdad.** La base son estilos de teléfono y las pantallas grandes *agregan* con `min-width`. Nunca `max-width` quitando cosas. Cuando aparece un `max-width` suele ser deuda, y está anotado como tal.
+
+**Se mide sobre la composición, no sobre la capa.** El texto del bento va sobre un velo `rgba` encima de una fotografía. Medir su contraste contra el color del velo da un número tranquilizador y falso —ya pasó: 8.2:1 sobre el papel, ilegible en pantalla—. Se muestrea el píxel real detrás de cada letra en la baldosa más clara y se calcula desde ahí. Pisos: 3:1 en títulos, 4.5:1 en descripciones.
+
+**Lo que se anima, se anima en el compositor.** Solo `transform` y `opacity`. Un degradado de siete paradas repintado en cada fotograma sobre una foto es caro y se nota. Y todo lo que se mueve tiene su camino bajo `prefers-reduced-motion`, donde se apaga el movimiento pero **nunca el contraste**.
 
 ### Rediseño objetivo
 

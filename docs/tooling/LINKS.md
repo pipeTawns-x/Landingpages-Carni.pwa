@@ -4,8 +4,11 @@ Fuente única de los links que Eduardo ha compartido para el stack agéntico.
 Vive en el repo para que deje de perderse en el chat. Si aparece un link nuevo,
 se agrega aquí primero.
 
-Estado de verificación: **la mayoría NO ha sido verificada.** Ver
-`docs/tooling/triage.md` para lo que sí se comprobó.
+Estado de verificación: el 2026-08-27 se pasaron **los 73 repositorios de
+GitHub por `gh api`**. Todos responden, ninguno es fork ni port, dos están
+archivados (`agent-teams-lite`, `get-shit-done`). Eso verifica que existen y
+están vivos — **no** que se hayan evaluado uno por uno. Ver
+`docs/tooling/triage.md` para lo que sí se leyó a fondo.
 
 ---
 
@@ -22,7 +25,9 @@ Estado de verificación: **la mayoría NO ha sido verificada.** Ver
   MITM/TPROXY transparente que **instala una CA en el almacén de confianza
   del sistema**. Para un proyecto con llaves reales de Supabase, eso se decide
   a conciencia, no por inercia.
-- https://github.com/rtk-ai/rtk
+- https://github.com/rtk-ai/rtk — **auditado y skill escrita** el 2026-08-27:
+  `rtk-token-proxy`. Sin MITM, sin CA, sin sudo, no toca el perfil de shell;
+  escribe solo en `$HOME/.local/bin`. Apache-2.0. NO instalado — decide Eduardo.
 - https://github.com/juliusbrussee/caveman
 
 ## Directorios de recursos
@@ -59,7 +64,10 @@ Estado de verificación: **la mayoría NO ha sido verificada.** Ver
 
 - https://github.com/Alan-TheGentleman
 - https://github.com/Gentleman-Programming/gentleman-guardian-angel
-- https://github.com/Gentleman-Programming/agent-teams-lite
+- https://github.com/Gentleman-Programming/agent-teams-lite — **ARCHIVADO**
+  por su autor, último push 2026-03-26. Sigue siendo la base de las
+  instrucciones del orquestador. No deja de funcionar, pero no va a recibir
+  arreglos. Verificado con `gh api` el 2026-08-27.
 - https://github.com/Gentleman-Programming/Gentleman-Skills
 - https://www.youtube.com/@gentlemanprogramming/videos
 
@@ -74,7 +82,8 @@ Estado de verificación: **la mayoría NO ha sido verificada.** Ver
 - https://github.com/Hainrixz/the-architect
 - https://github.com/obra/superpowers
 - https://github.com/BloopAI/vibe-kanban
-- https://github.com/gsd-build/get-shit-done
+- https://github.com/gsd-build/get-shit-done — **ARCHIVADO**, último push
+  2026-05-31. 64.6k estrellas y congelado. Verificado el 2026-08-27.
 - https://github.com/EvoMap/evolver
 - https://github.com/multica-ai/multica
 
@@ -87,6 +96,20 @@ Estado de verificación: **la mayoría NO ha sido verificada.** Ver
 - https://github.com/hardikpandya/stop-slop
 - https://github.com/shanraisshan/claude-code-best-practice
 - https://github.com/affaan-m/ECC
+- https://github.com/Hainrixz/cyber-neo — **skill escrita** el 2026-08-27:
+  `cyber-neo-auditoria`. Auditoría OWASP 2025 / CWE Top 25 de solo lectura,
+  con semgrep, trivy y gitleaks. No duplica a `ci-security-and-governance`
+  (solo TruffleHog) ni a `supply-chain-defense` (solo `npm audit`).
+  NO instalado — decide Eduardo.
+
+### Rechazado
+
+- https://github.com/Hainrixz/all-deploy — **no se adopta.** Enruta a
+  Vercel, Railway, Docker+SSH y cloudflared. Los archivos de despliegue
+  que reconoce son `vercel.json`, `railway.toml`, `fly.toml`, `Dockerfile`
+  y `render.yaml` (su `SKILL.md:107`). **`netlify.toml` no está en la
+  lista**, y este proyecto publica en Netlify. No detectaría ni su propia
+  configuración. Escalón 5: queda anotado, no se escribe skill.
 
 ## Diseño y UI
 
@@ -148,6 +171,7 @@ Estado de verificación: **la mayoría NO ha sido verificada.** Ver
 Verificado: `JPZkbGgJNUQ` = *"La EVOLUCIÓN del contexto compartido entre
 AGENTES: Engram Cloud"* — Gentleman Programming. El resto sin ver.
 
+- https://www.youtube.com/live/-a58SJXxrmk — **nuevo el 2026-08-27**, sin ver
 - https://youtu.be/JPZkbGgJNUQ
 - https://youtu.be/UoS_LP-PCG8
 - https://youtu.be/6ChZMEMJ8hA

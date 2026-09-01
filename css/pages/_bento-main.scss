@@ -29,6 +29,25 @@
 .bento-categories-grid {
   display: grid;
   grid-template-columns: 1fr;
+  // Piso de altura desde la BASE, no desde 1024px. Antes esto solo existía
+  // dentro de `@media (min-width: 1024px)`, así que el escritorio le regalaba
+  // altura a la fila y el móvil se quedaba sin ninguna: las tarjetas colapsaban
+  // a 2px, que eran sus dos bordes. Mobile first es esto, y no llevarlo puesto
+  // costó que la web estuviera rota justo donde más se usa.
+  // 280px, no 180. Y el número sale de una medición, no del gusto.
+  //
+  // Con 180 la baldosa acababa midiendo 193px de alto y el contenido —título,
+  // descripción y botón, que en teléfono van SIEMPRE abiertos— la llenaba
+  // entera: el título caía al 86% de la altura y la descripción al 67%, justo
+  // donde el velo está diseñado para ser casi transparente. Medido sobre la
+  // composición real en la baldosa de Cerdo: 1.17:1 en el título y 1.20:1 en la
+  // descripción. Ilegible.
+  //
+  // La salida NO es empinar el degradado: una rampa que cubra el 86% de una
+  // tarjeta de 193px sube a 0.012 de alpha por píxel, tres veces el paso de 8
+  // bits, y vuelve a bandear. Es dar altura, para que el texto caiga abajo,
+  // donde el velo ya es denso, y de paso la foto respire.
+  grid-auto-rows: minmax(280px, auto);
   gap: 1rem;
   width: 100%;
 
@@ -55,10 +74,11 @@
 
 // CARD: Dark Premium style
 .category-card {
-  background: #111111;
+  background: rgba(255, 255, 255, 0.08);
   border-radius: 14px;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.35),
+              inset 0 1px 0 rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.08);
   display: flex;
   flex-direction: column;
@@ -98,33 +118,94 @@
     backface-visibility: hidden;
   }
 
-  // Dark veil, heaviest at the bottom, so the copy stays legible over any photo.
-  &::before {
+  // ═════════════════════════════════════════════════════════════
+  // EL VELO — uno solo, sobre TODA la tarjeta, y sin costura
+  // ═════════════════════════════════════════════════════════════
+  //
+  // El velo vivía en el fondo de `.category-body`, y ahí estaba el defecto:
+  // `.category-body` es una CAJA que empieza a media tarjeta, así que su
+  // degradado arrancaba de golpe en su borde superior. Esa línea horizontal es
+  // lo que hacía que se leyera como un rectángulo negro pegado sobre la foto en
+  // vez de una sombra naciendo de ella.
+  //
+  // Un velo que arranca a media altura SIEMPRE va a tener un borde donde
+  // arranca. Por eso este cubre `inset: 0` — la tarjeta entera— y el body se
+  // queda sin fondo propio.
+  //
+  // SEIS PARADAS, NO DOS. Un degradado de dos paradas produce banda visible
+  // sobre fotografía: la pendiente es constante y el ojo detecta el CAMBIO DE
+  // PENDIENTE, no el color. Las paradas intermedias curvan esa pendiente y la
+  // transición deja de tener principio.
+  //
+  // Y llega a 0 exacto arriba, no a un residuo: un 0.05 cortado contra la foto
+  // también se lee como línea.
+  //
+  // LOS VALORES SALEN DE MEDIR, no del gusto. La primera curva daba 0.29 de
+  // alpha al 59% de altura y 0.52 al 46%, que es donde caen el título y la
+  // descripción en teléfono. Sobre las dos fotos más pálidas —Cerdo y Pollo—
+  // eso componía en 2.09:1 y 2.51:1, por debajo del piso. Esta sube la banda
+  // media a 0.60 y 0.73 y las dos pasan.
+  //
+  // Siete paradas en vez de seis: la pendiente máxima queda en 0.016 por cada
+  // 1% de altura, que en una baldosa de 280px son 0.0057 de alpha por píxel.
+  // El paso de 8 bits es 0.0039, así que el `blur(0.4px)` de abajo es lo que
+  // termina de borrar el escalón.
+  .category-card__lift::before {
     content: '';
     position: absolute;
     inset: 0;
     z-index: 1;
     background: linear-gradient(
       to top,
-      rgba(5, 5, 5, 0.94) 0%,
-      rgba(5, 5, 5, 0.78) 38%,
-      rgba(5, 5, 5, 0.34) 68%,
-      rgba(5, 5, 5, 0.08) 100%
+      rgba(0, 0, 0, 0.94) 0%,
+      rgba(0, 0, 0, 0.88) 20%,
+      rgba(0, 0, 0, 0.80) 38%,
+      rgba(0, 0, 0, 0.66) 55%,
+      rgba(0, 0, 0, 0.40) 72%,
+      rgba(0, 0, 0, 0.16) 87%,
+      rgba(0, 0, 0, 0) 100%
     );
+    // Contra el escalonado de 8 bits. Un degradado largo sobre negro se
+    // cuantiza en bandas de 1/255; medio píxel de desenfoque las promedia. El
+    // filtro solo toca al pseudo-elemento —la foto vive en otra capa y no
+    // pierde nitidez.
+    filter: blur(0.4px);
     pointer-events: none;
+    transition: opacity 0.35s ease;
   }
 
-  // Contenido: se apoya sobre el velo, alineado al fondo de la tarjeta.
+  // El texto. SIN FONDO PROPIO: el velo de arriba hace todo el trabajo.
+  //
+  // CUIDADO AL AJUSTAR. El texto necesita su ratio contra el píxel COMPUESTO,
+  // no contra el color del velo. Un `rgba` sobre una foto clara —Cerdo, Merch y
+  // Otros son las más luminosas— compone en tono medio y el texto se disuelve.
+  // Ya pasó el 26 de agosto: se midió 8.2:1 sobre el papel y en pantalla no se
+  // leía. Se mide muestreando el píxel real detrás de cada letra.
   .category-body {
     position: relative;
     z-index: 2;
-    padding: 1.25rem;
+    padding: 3rem 1.25rem 1.25rem;
     display: flex;
     flex-direction: column;
-    flex: 1;
-    justify-content: flex-end; // was space-between, which pushed the CTA away
     gap: 0.85rem;
-    min-height: 190px;
+    transition: padding-top 0.35s ease;
+  }
+
+  // El bloque que se pliega. En la BASE está abierto: un teléfono no tiene
+  // `:hover`, y esconder el nombre y el botón detrás de un gesto que no existe
+  // deja la tarjeta muda justo donde más se usa.
+  .category-reveal {
+    display: grid;
+    grid-template-rows: 1fr;
+    transition: grid-template-rows 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .category-reveal__inner {
+    overflow: hidden;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
   }
 
   // Título
@@ -136,15 +217,32 @@
   }
 
   // Descripción
+  // Blanco con opacidad, NO gris sólido.
+  //
+  // Era `#A3A3A3` — rgb(163,163,163)— y el píxel de la foto detrás en la
+  // baldosa de Cerdo mide rgb(160,154,140). Casi la misma luminancia: por eso
+  // se disolvía. Un gris sólido sobre fotografía es exactamente lo que
+  // `impeccable` prohíbe ("gray text on colored backgrounds").
+  //
+  // Blanco al 82% sube el contraste y conserva la jerarquía frente al título,
+  // que va a blanco pleno.
   .category-desc {
     font-size: 0.9rem;
-    color: #A3A3A3;
+    color: rgba(255, 255, 255, 0.82);
     margin: 0 0 1rem 0;
     flex: 1;
   }
 
-  // Botón: rojo, prominente
+  // Botón: rojo SÓLIDO en reposo.
+  //
+  // Antes solo declaraba tipografía y espaciado, y el color lo ponía
+  // `.btn-danger` de Bootstrap. Cuando esa hoja pierde la cascada el botón se
+  // queda en `background-color: rgba(0, 0, 0, 0)` — transparente sobre una
+  // foto, o sea invisible. El relleno se declara aquí y no se delega.
   .btn {
+    background-color: #dc2626;
+    border-color: #dc2626;
+    color: #fff;
     font-weight: 600;
     border-radius: 8px;
     // `all` animated every changed property, including the non-compositable
@@ -153,16 +251,271 @@
     padding: 0.75rem 1.5rem;
   }
 
+  // ── Revelado al entrar en pantalla ──
+  // La clase la pone un IntersectionObserver en home.tsx, una sola vez por
+  // tarjeta. El escalonado sale de --reveal-delay, que escribe CategoryCard.
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.45s ease var(--reveal-delay, 0ms),
+              transform 0.45s ease var(--reveal-delay, 0ms);
+
+  &.is-visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  // ── El envoltorio que sí se mueve ──
+  // Aquí está el arreglo de P-09. El `translateY` vivía en `.category-card`,
+  // que es el mismo elemento que dispara el `:hover`: al levantarse se salía
+  // de debajo del cursor, perdía el hover, volvía a su sitio, lo recuperaba.
+  // Bucle. Ahora el artículo no se mueve nunca y el área sensible al puntero
+  // se queda quieta; lo que sube es este hijo.
+  //
+  // EN FLUJO, no `absolute`. Estuvo `position: absolute; inset: 0` y eso dejaba
+  // la tarjeta sin nada que la midiera: todo el contenido colgaba de un
+  // envoltorio fuera de flujo, así que la tarjeta colapsaba a sus dos bordes —
+  // 2px reales en teléfono y tablet, verificado el 2026-08-28. A 1280 no se
+  // notaba porque `grid-auto-rows` le daba altura a la fila.
+  //
+  // Lo que arregla el parpadeo de P-09 NO es que esté absoluto: es que el
+  // `translateY` del hover viva en ESTE hijo y no en `.category-card`. Mientras
+  // el artículo no se mueva, el área sensible al cursor se queda quieta y el
+  // bucle no vuelve. Sacarlo de `absolute` no toca esa garantía.
+  .category-card__lift {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    // La franja de texto se pega abajo y todo lo de arriba es foto limpia.
+    justify-content: flex-end;
+    flex: 1 1 auto;
+    min-height: 0;
+    transition: transform 0.25s ease;
+    will-change: transform;
+  }
+
   // HOVER
-  // box-shadow and border-color still change here, but they are no longer
-  // transitioned: they switch in one step instead of repainting for 280ms.
+  // box-shadow y border-color siguen cambiando, pero sin transición: pasan de
+  // un golpe en vez de repintar durante 280ms.
   &:hover {
-    transform: translateY(-6px);
     box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45);
     border-color: rgba(220, 38, 38, 0.35);
 
+    // AQUI VIVIA `.category-card__lift { transform: translateY(-6px) }`.
+    // Retirado el 2026-08-31 porque se volvió defecto al cambiar el contexto.
+    //
+    // Ese `translateY` en el HIJO era el arreglo de P-09: cuando el hijo era
+    // `absolute; inset: 0` llenaba la tarjeta entera, subirlo no descubría
+    // nada, y el artículo —que es quien dispara el `:hover`— se quedaba quieto.
+    //
+    // Al sacar `__lift` de `absolute` y ponerlo en flujo, el mismo `translateY`
+    // pasó a levantar TODO el contenido y dejar 6px del fondo de la tarjeta al
+    // descubierto abajo. Esa era la línea que se veía al pasar el cursor.
+    //
+    // La elevación ya la dan la sombra de arriba y el zoom de la foto. Los 6px
+    // no aportaban nada y costaban dos cosas: el hueco, y el riesgo de que el
+    // parpadeo volviera por otra vía.
+
+    // El marco no se mueve: el zoom ocurre dentro, contenido por el
+    // `overflow: hidden` de la tarjeta.
     .category-img {
-      transform: scale(1.05);
+      transform: scale(1.08);
+    }
+
+    // La franja se cierra un poco y sube: el texto gana contraste justo
+    // cuando el lector está mirando esta tarjeta. Apunta a `.category-body`
+    // porque el velo general ya no existe.
+    .category-body {
+      background: linear-gradient(
+        to top,
+        rgba(5, 5, 5, 0.98) 0%,
+        rgba(5, 5, 5, 0.96) 52%,
+        rgba(5, 5, 5, 0.88) 78%,
+        rgba(5, 5, 5, 0.52) 92%,
+        rgba(5, 5, 5, 0) 100%
+      );
+    }
+
+    // El hover INTENSIFICA el rojo que ya estaba; no lo inventa.
+    .btn {
+      background-color: #ef4444;
+      border-color: #ef4444;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(220, 38, 38, 0.45);
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// EL REVELADO AL PASAR EL CURSOR
+// ═══════════════════════════════════════════════════════════════════
+//
+// En reposo la baldosa muestra la FOTO y el nombre, nada más. La foto de la
+// carne es el producto; taparla con un panel permanente para poder escribir
+// encima resuelve el problema por el lado caro. Al acercar el cursor baja la
+// descripción y el botón, y el velo se cierra para sostener el contraste.
+//
+// `@media (hover: hover) and (pointer: fine)` NO es decoración defensiva: es
+// lo que impide que esto llegue a un teléfono. En una pantalla táctil no
+// existe `:hover` —o peor, se queda pegado tras el primer toque— y el nombre y
+// el botón quedarían detrás de un gesto que el dedo no puede hacer. La base de
+// arriba deja todo abierto; esto se AGREGA solo donde hay cursor de verdad.
+@media (hover: hover) and (pointer: fine) {
+  .category-card {
+
+    // En reposo el velo se AFLOJA para que la foto respire. No se cambia el
+    // degradado —eso repinta— sino su opacidad, que el compositor mueve solo.
+    .category-card__lift::before {
+      opacity: 0.82;
+    }
+
+    .category-body {
+      padding-top: 1.5rem;
+    }
+
+    // Plegado. `0fr` colapsa la fila del grid a cero y anima suave, sin el
+    // `max-height` con número mágico que se queda corto en cuanto alguien
+    // escribe una descripción más larga.
+    .category-reveal {
+      grid-template-rows: 0fr;
+    }
+
+    .category-reveal__inner {
+      opacity: 0;
+      transition: opacity 0.28s ease;
+    }
+
+    // `:focus-within` no es un extra: sin él, quien navega con teclado llega
+    // al botón y el botón sigue invisible y sin altura. Con él, tabular abre
+    // la tarjeta igual que el cursor.
+    &:hover,
+    &:focus-within {
+      // El velo se cierra a pleno. Animar `opacity` y no `background` es lo que
+      // mantiene esto en el compositor: un degradado de seis paradas repintado
+      // 60 veces por segundo sobre una foto es caro y se nota.
+      .category-card__lift::before {
+        opacity: 1;
+      }
+
+      .category-body {
+        padding-top: 3rem;
+      }
+
+      .category-reveal {
+        grid-template-rows: 1fr;
+      }
+
+      .category-reveal__inner {
+        opacity: 1;
+        transition: opacity 0.3s ease 0.08s;
+      }
+    }
+  }
+}
+
+// Quien pidió menos movimiento ve la tarjeta ABIERTA y quieta, no plegada:
+// plegar sin animación es un salto brusco, que es justo lo que la preferencia
+// intenta evitar.
+@media (prefers-reduced-motion: reduce) {
+  .category-card {
+    .category-reveal {
+      grid-template-rows: 1fr;
+      transition: none;
+    }
+
+    .category-reveal__inner {
+      opacity: 1;
+      transition: none;
+    }
+
+    // EL VELO SE QUEDA, a plena opacidad. Eso es legibilidad, no decoración:
+    // quien pide menos movimiento no está pidiendo menos contraste. Lo único
+    // que se apaga es la transición y el zoom.
+    .category-card__lift::before {
+      opacity: 1;
+      transition: none;
+    }
+
+    .category-img {
+      transition: none;
+    }
+
+    .category-body {
+      transition: none;
+    }
+  }
+}
+
+// ── Jerarquía tipográfica por tamaño de baldosa ──
+//
+// El mapa de spans ya reparte superficie desigual —4, 3, 2 y 1 unidades— pero
+// hasta ahora las nueve tarjetas usaban el mismo cuerpo de letra. Una baldosa
+// del doble de tamaño con el mismo título no se lee como más importante: se lee
+// como la misma tarjeta estirada, y el ojo no encuentra dónde caer.
+//
+// Esto es lo que Impeccable llama "identical card grids" y prohíbe. La escala
+// se hereda del área real, no de la posición en la lista.
+//
+// Solo aplica en desktop: en móvil las nueve caen en una columna y todas valen
+// lo mismo, así que forzar contraste de tamaño ahí sería ruido.
+@media (min-width: 1024px) {
+  // Grandes: 4 unidades. Carnes Rojas, Cortes Especiales, Pollo.
+  // La 6 salió de este grupo al permutarse con la 2.
+  .category-card-1,
+  .category-card-2,
+  .category-card-4 {
+    .category-title {
+      font-size: 1.6rem;
+      letter-spacing: -0.01em;
+    }
+
+    .category-desc {
+      font-size: 1rem;
+      max-width: 34ch; // el ojo pierde el renglón pasando de ~70 caracteres
+    }
+
+    .category-body {
+      padding: 1.75rem;
+    }
+  }
+
+  // Media: 3 unidades. Cerdo.
+  .category-card-3 {
+    .category-title {
+      font-size: 1.3rem;
+    }
+  }
+
+  // Compactas: 1 unidad.
+  //
+  // Solo se ajusta el título. La descripción ya la recorta una regla que
+  // existía desde antes: las baldosas que no son de 4 unidades usan
+  // `-webkit-line-clamp: 2`, y esta baja a 1. Recortar es mejor que ocultar
+  // —el lector sigue sabiendo de qué va la categoría— así que se respeta.
+  .category-card-9 .category-title {
+    font-size: 0.95rem;
+  }
+}
+
+// Movimiento reducido: sin revelado, sin desplazamientos, sin zoom.
+// No es una cortesía. A cierta gente el movimiento le provoca náuseas, y el
+// sistema operativo ya lo dijo por ella.
+@media (prefers-reduced-motion: reduce) {
+  .category-card {
+    opacity: 1;
+    transform: none;
+    transition: none;
+
+    .category-card__lift {
+      transition: none;
+    }
+
+    &:hover {
+      .category-card__lift,
+      .category-img,
+      .btn {
+        transform: none;
+      }
     }
   }
 }
@@ -186,9 +539,14 @@
   }
 
   // Card 2: span 1x2 (arriba, columna 3)
+  // Cortes Especiales toma la baldosa grande que tenía Preparadas.
+  //
+  // Es la segunda categoría por orden y tenía 2 unidades, menos que Cerdo,
+  // Pollo y Preparadas. Es un intercambio puro con la 6: las superficies se
+  // permutan, el tiling de 4×6 queda idéntico y no se abre ningún hueco.
   .category-card-2 {
-    grid-column: 3 / 4;
-    grid-row: 1 / 3;
+    grid-column: 1 / 3;
+    grid-row: 5 / 7;
   }
 
   // Card 3: span 1x3 (arriba derecha, columna 4)
@@ -209,10 +567,11 @@
     grid-row: 3 / 5;
   }
 
-  // Card 6: span 2x2 (columna 1, fila 5)
+  // Preparadas toma la baldosa de 2 unidades que tenía Cortes Especiales.
+  // La otra mitad del intercambio; ver la nota en .category-card-2.
   .category-card-6 {
-    grid-column: 1 / 3;
-    grid-row: 5 / 7;
+    grid-column: 3 / 4;
+    grid-row: 1 / 3;
   }
 
   // Card 7: span 1x2 (columna 3, fila 5)
@@ -266,7 +625,7 @@
 }
 
 // 1xN tiles: same button, tighter box.
-.category-card:not(.category-card-1):not(.category-card-4):not(.category-card-6) {
+.category-card:not(.category-card-1):not(.category-card-2):not(.category-card-4) {
   .category-body {
     padding: 1rem;
     gap: 0.5rem;
