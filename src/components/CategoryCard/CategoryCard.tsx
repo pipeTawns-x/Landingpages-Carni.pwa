@@ -76,20 +76,28 @@ export function CategoryCard({
           <img src={pngFallback(image)} alt={category.name} className="category-img" />
         </picture>
         <div className="category-body">
-          <div>
-            <h3 className="category-title">
-              <i className={`bi ${icon} me-2`} style={{ color: '#d22222' }} />
-              {category.name}
-            </h3>
-            <p className="category-desc">{description}</p>
+          <h3 className="category-title">
+            <i className={`bi ${icon} me-2`} style={{ color: '#d22222' }} />
+            {category.name}
+          </h3>
+          {/* Everything inside `category-reveal` is hidden at rest on
+              pointer devices and expands on hover, so the photo — which is
+              the product — is what the tile shows first. On touch screens
+              there is no hover, so the stylesheet leaves it open. The
+              collapse animates `grid-template-rows` from 0fr to 1fr, which
+              is why this wrapper exists: it needs a single grid child. */}
+          <div className="category-reveal">
+            <div className="category-reveal__inner">
+              <p className="category-desc">{description}</p>
+              {/* products.tsx reads `?categoria=` and matches it against the
+                  product's own slug. These now emit the real database slug, so
+                  the alias map that translated the old hand-written values is
+                  no longer in play. */}
+              <a href={`products.html?categoria=${category.slug}`} className="btn btn-danger w-100">
+                Ver Productos
+              </a>
+            </div>
           </div>
-          {/* products.tsx reads `?categoria=` and matches it against the
-              product's own slug. These now emit the real database slug, so the
-              alias map that translated the old hand-written values is no
-              longer in play. */}
-          <a href={`products.html?categoria=${category.slug}`} className="btn btn-danger w-100">
-            Ver Productos
-          </a>
         </div>
       </div>
     </article>
