@@ -3,7 +3,7 @@ import { CartPanel } from '@src/components/CartPanel/CartPanel';
 import { ProductList } from '@src/components/ProductList/ProductList';
 import { SEED_PRODUCTS } from '@src/data/seedProducts';
 import type { CartLegacyItem, OrderLine, Product } from '@src/types/database';
-import { fetchProducts, mountReactNode, categoryLabel, categorySlugOf } from './shared';
+import { fetchProducts, mountReactNode, categoryLabel, categorySlugOf, assetUrl } from './shared';
 import '@src/styles/redesign.css';
 
 const LEGACY_CART_KEY = 'carni_cart_v1';
@@ -184,7 +184,7 @@ function toOrderLine(product: Product): OrderLine {
     name: product.name,
     pricePerKg: product.price_per_kg,
     quantity: 1,
-    image: (product.image_url ?? '/img/products/res.webp').replace(/\.webp$/i, '.png'),
+    image: assetUrl((product.image_url ?? '/img/products/res.webp').replace(/\.webp$/i, '.png')),
     categorySlug: slug,
     // Merchandising is priced per piece and the Ofertas bundles per package.
     // Matches ProductCard.priceUnit(), which decides the same thing for display.

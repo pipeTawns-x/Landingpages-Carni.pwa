@@ -3,6 +3,27 @@ import { getProducts, getCategories } from '../../js/modules/supabase.js';
 import { SEED_PRODUCTS } from '@src/data/seedProducts';
 import type { Product } from '@src/types/database';
 
+/**
+ * Resolves a site-absolute asset path against the deployment base.
+ *
+ * The site ships to two destinations that differ only in the path they are
+ * served from: Netlify from the domain root, GitHub Pages from
+ * `/Landingpages-Carni.pwa/`. Vite rewrites the asset paths it can see in HTML
+ * and CSS, but `public.categories.image_url` and `public.products.image_url`
+ * arrive from the database as runtime strings — Vite never sees them, so it
+ * never rewrites them. This applies the same base by hand.
+ *
+ * On Netlify `BASE_URL` is `/`, so the result is byte-identical to the input
+ * and the production site is unaffected.
+ */
+export function assetUrl(path: string): string {
+  if (!path) return path;
+  // Absolute URLs and data URIs are already resolved; leave them alone.
+  if (/^(?:[a-z][a-z0-9+.-]*:|\/\/)/i.test(path)) return path;
+  const base = import.meta.env.BASE_URL.replace(/\/+$/, '');
+  return `${base}/${path.replace(/^\/+/, '')}`;
+}
+
 /** How long the live catalogue gets before the seed wins. */
 const PRODUCTS_TIMEOUT_MS = 2000;
 

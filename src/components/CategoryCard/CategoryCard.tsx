@@ -1,3 +1,4 @@
+import { assetUrl } from '@src/entry/shared';
 import type { Category } from '@src/entry/shared';
 import './styles.css';
 
@@ -72,8 +73,8 @@ export function CategoryCard({
     >
       <div className="category-card__lift">
         <picture>
-          <source srcSet={image} type="image/webp" />
-          <img src={pngFallback(image)} alt={category.name} className="category-img" />
+          <source srcSet={assetUrl(image)} type="image/webp" />
+          <img src={assetUrl(pngFallback(image))} alt={category.name} className="category-img" />
         </picture>
         <div className="category-body">
           <h3 className="category-title">

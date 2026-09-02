@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { fetchProducts, categorySlugOf } from '@src/entry/shared';
+import { fetchProducts, categorySlugOf, assetUrl } from '@src/entry/shared';
 import type { Product } from '@src/types/database';
 
 /**
@@ -224,9 +224,9 @@ export function Showcase(): JSX.Element | null {
               key={product.id}
             >
               <picture>
-                <source srcSet={product.image_url ?? ''} type="image/webp" />
+                <source srcSet={assetUrl(product.image_url ?? '')} type="image/webp" />
                 <img
-                  src={pngFallback(product.image_url ?? '')}
+                  src={assetUrl(pngFallback(product.image_url ?? ''))}
                   className="showcase__slide-img"
                   alt={product.name}
                   loading={index === 0 ? 'eager' : 'lazy'}
@@ -286,9 +286,9 @@ export function Showcase(): JSX.Element | null {
             <a className="showcase-card__link" href="products.html">
               <div className="showcase-card__frame">
                 <picture>
-                  <source srcSet={product.image_url ?? ''} type="image/webp" />
+                  <source srcSet={assetUrl(product.image_url ?? '')} type="image/webp" />
                   <img
-                    src={pngFallback(product.image_url ?? '')}
+                    src={assetUrl(pngFallback(product.image_url ?? ''))}
                     className="showcase-card__img"
                     alt={product.name}
                     loading="lazy"

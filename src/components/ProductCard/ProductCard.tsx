@@ -1,3 +1,4 @@
+import { assetUrl } from '@src/entry/shared';
 import type { Product } from '@src/types/database';
 import './styles.css';
 
@@ -103,10 +104,10 @@ export function ProductCard({ product, size, onAddToCart, isIAContent = false }:
     >
       <div className="tw-card-shell__image-wrap">
         <picture>
-          <source srcSet={image} type="image/webp" />
+          <source srcSet={assetUrl(image)} type="image/webp" />
           <img
             className="tw-card-shell__image"
-            src={pngFallback(image)}
+            src={assetUrl(pngFallback(image))}
             alt={product.name}
             loading="lazy"
             // Explicit dimensions give the image an intrinsic ratio before it
