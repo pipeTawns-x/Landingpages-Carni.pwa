@@ -6,11 +6,11 @@ Los blueprints guardan **decisiones** (por qué se hizo algo). Este archivo guar
 
 Estados: `abierto` · `en curso` · `congelado`
 
-Última revisión: 2026-08-31
+Última revisión: 2026-09-02
 
-> **Aviso de techo.** Este archivo ronda los 19 pendientes abiertos. Según la regla del propio proyecto, pasar de ~20 no es un problema del archivo: es señal de que se están acumulando decisiones sin tomar. La tanda 1 debería cerrarse antes de agregar nada nuevo.
+> **Aviso de techo.** El archivo queda en 20 pendientes abiertos tras cerrar la tanda 1 (contados, no estimados). La regla del proyecto sigue en pie: pasar de ~20 no es un problema del archivo, es señal de que se acumulan decisiones sin tomar.
 
-> **Estado operativo local del 2026-08-31.** La landing de [index.html](index.html) ya usa video de fondo y el catálogo de [products.html](products.html) mantiene la vista de carrito lateral y la lógica de productos premium. El cambio visual quedó concentrado en landing y catálogo, sin tocar el flujo de login ni la base funcional del admin. El sitio público sigue sin reflejar estos cambios porque la rama de despliegue sigue apuntando a `practicas-ebac` y no a `main`.
+> **Estado operativo del 2026-09-02.** El trabajo ya está publicado en los dos destinos y ambos verificados en el navegador: nueve categorías con los nombres de la base, carrusel de seis, video reproduciéndose e imágenes en `image/webp`, a 375, 768 y 1440.
 
 ---
 
@@ -28,84 +28,60 @@ Congelado porque BuildAds lo está. **Se descongela junto con el módulo, no des
 
 ---
 
-## 🟠 Despliegue — el sitio público no muestra tu trabajo
+## 🟠 Despliegue — dos destinos vivos, independientes
 
-### P-04 · GitHub Pages sigue publicando `practicas-ebac` por su cuenta
+El sitio se publica en dos direcciones a la vez. **No se apaga ninguna**, y cada una
+tiene su papel:
 
-**Estado:** cambia de raíz · **Evidencia:** _Settings → Pages_ del repositorio; deploy preview #7 de Netlify verificado el 2026-09-01
+| Dirección | Papel | Construye | Base |
+|---|---|---|---|
+| `carniwebpwa.netlify.app` | **Producción.** Es la que ve un cliente | Netlify, desde `main` | raíz del dominio |
+| `pipetawns-x.github.io/Landingpages-Carni.pwa/` | **Muestrario** y entrega de EBAC | `.github/workflows/deploy-pages.yml`, desde `main` | `/Landingpages-Carni.pwa/` |
 
-El sitio real ya vive en **Netlify** (`carniwebpwa`), construido con Vite y publicado desde `dist/`. El plan viejo —pasar Pages a GitHub Actions como fuente y publicar `dist/` con `actions/deploy-pages`— **queda descartado**: no hay que montar ningún workflow.
+Se diferencian en una sola cosa: la ruta desde la que se sirven. Pages recibe
+`--base=/Landingpages-Carni.pwa/` como argumento del build; Netlify corre
+`npm run build` sin tocar. **Poner `base` fijo en `vite.config.js` rompería
+Netlify** — ese es el error que hay que no cometer.
 
-Lo que sigue vivo es Pages por su lado. Su configuración sigue diciendo, textual:
+### P-05 · El registro del service worker apunta a la raíz del dominio
 
-```
-Source: Deploy from a branch
-Branch: practicas-ebac   /(root)
-```
+**Estado:** abierto · **Evidencia:** `js/modules/core/api.js:8`
 
-Publica la raíz del repositorio tal cual, sin construir: nueve tarjetas fijas, React sin arrancar, meses sin moverse. Nadie lo usa como sitio del negocio, pero ahí sigue, visible y desactualizado.
+`registerServiceWorker()` registra `/js/modules/utils/service-worker.js` con ruta
+absoluta. En Netlify resuelve; en Pages el sitio vive bajo
+`/Landingpages-Carni.pwa/` y esa ruta daría 404.
 
-**Decisión pendiente de Eduardo:** apagar GitHub Pages (_Settings → Pages → Source: None_) o dejarlo como escaparate de las prácticas EBAC, sabiendo que no es el sitio del negocio. El sitio del negocio es Netlify, y publica en cuanto se mergee el PR #7.
+Hoy no rompe nada porque **la función está exportada y nadie la llama** — es
+código muerto. El riesgo es que alguien la conecte y la PWA falle solo en Pages.
 
-### P-25 · El CI lleva rojo desde el 19 de agosto
+**Ojo:** el otro medio de este pendiente estaba mal diagnosticado. `index.html:411`
+apunta a `./src/entry/home.tsx`, y eso es correcto: es el punto de entrada que Vite
+reescribe al construir. Medido sobre el build publicado, hay **cero** referencias a
+`.tsx` ejecutables.
 
-**Estado:** abierto · **Evidencia:** _Carni CI_ corridas #17 a #25, todas en fallo
-
-Nueve corridas seguidas fallando, incluida la del merge a `main`. Falla siempre en el mismo sitio, a los 10 segundos:
-
-```
-npm error code EUSAGE
-npm ci can only install packages when your package.json and
-package-lock.json are in sync.
-Missing: sass@1.103.1 from lock file
-Missing: chokidar@5.0.0 from lock file
-Missing: immutable@5.1.9 from lock file
-```
-
-Alguien agregó `sass` a `package.json` y nunca commiteó el `package-lock.json` actualizado. `npm ci` —a diferencia de `npm install`— se niega a instalar si los dos archivos no coinciden, que es justo para lo que sirve.
-
-Consecuencia: **el CI dejó de proteger nada.** Un rojo permanente se vuelve ruido y se ignora, que es exactamente lo que pasó al mergear el PR #6.
-
-**Arreglo:** `npm install` en local y commitear el `package-lock.json` resultante. Un comando.
-
-**Nota aparte:** `docs/brain/security.md:15` declara **pnpm** como gestor del proyecto, pero el repo usa `package-lock.json` y el CI corre `npm ci`. Otra regla que la realidad contradice. Decidir cuál gana antes de tocar el lockfile.
-
-### P-18 · Credenciales de build — resuelto en Netlify; la trampa estaba en `netlify.toml`
-
-**Estado:** resuelto · **Evidencia:** variables en el panel de Netlify y `netlify.toml` corregido, 2026-09-01
-
-El planteamiento viejo (guardar las `VITE_*` como _repository secrets_ para un workflow de Actions) ya no aplica: el build corre en Netlify, y `VITE_SUPABASE_URL` y `VITE_SUPABASE_ANON_KEY` ya viven en su panel, con el mismo valor que el `.env` local.
-
-Hallazgo del 2026-09-01: los bloques `[context.production.environment]` y `[context.deploy-preview.environment]` de `netlify.toml` llevaban valores de plantilla (`your-project-ref.supabase.co`) y **pisaban los valores reales del panel** — Netlify da prioridad al `netlify.toml` sobre la UI. El bundle salía con la URL falsa incrustada aunque el panel estuviera bien. Esos bloques se eliminaron: la fuente de verdad queda en el panel de Netlify para el deploy y en `.env` para local. La llave publishable es pública por diseño; lo que protege los datos es RLS, no el secreto de la llave.
-
-### P-05 · Rutas absolutas que rompen bajo subcarpeta
-
-**Estado:** abierto · **Evidencia:** `index.html:552`, `js/modules/core/api.js:8`
-
-`/src/entry/home.tsx` y `/js/modules/utils/service-worker.js` apuntan a la raíz del dominio, pero el sitio vive en `/Landingpages-Carni.pwa/`. Además un `.tsx` crudo no lo ejecuta ningún navegador.
-
-### P-06 · CERRADO el 2026-08-31 — las imágenes rotas del build
-**Estado:** cerrado · **Evidencia:** `content-type` medido antes y después
-
-`vite.config.js` tenía `publicDir: 'img'`. Vite copia el CONTENIDO de esa carpeta a la raíz de `dist/`, no la carpeta: los `.webp` acababan en `dist/products/` y la ruta `/img/products/…` que pide el código no existía. Caía en el respaldo de SPA y el navegador recibía `index.html` con `content-type: text/html` en vez de una imagen. Las nueve fotos del bento quedaban en 0×0 en producción y funcionaban en local, porque en desarrollo Vite sirve los archivos del proyecto tal cual.
-
-Arreglado moviendo la carpeta a `public/img/` con `git mv` y cambiando a `publicDir: 'public'`. Ahora lo copiado es `img/`, así que `/img/…` sigue siendo `/img/…`. Las 169 referencias del proyecto son URLs y no hubo que tocar ninguna: el barrido no encontró ni un `url()` de SCSS, ni un import, ni una ruta de archivo fuera de la propia configuración.
-
-Verificado: `dist/img/products/` con sus 18 `.webp`, `content-type: image/webp` en cinco rutas distintas, y las nueve imágenes del bento a 1287×748 en el navegador.
-
-**`publicDir: false` no era el arreglo** —desactiva la copia entera— y ya se había intentado.
-
-**La lección que vale**: el video sí cargaba porque está referenciado desde el HTML y Vite reescribe su ruta a `/assets/…`. Las fotos llegan de la base en tiempo de ejecución, así que Vite nunca las ve. Toda ruta construida en tiempo de ejecución tiene que existir tal cual en `dist/`.
-
----
+**Arreglo:** resolver la ruta contra `import.meta.env.BASE_URL`, igual que hace
+`assetUrl()` en `src/entry/shared.tsx`. O borrar la función si sigue sin usarse.
 
 ### P-34 · Tres sitios de Netlify colgando del mismo repositorio
-**Estado:** abierto · **Evidencia:** `gh pr checks 7` el 2026-08-31
 
-Los checks del PR muestran `carni-pwa`, `carniwebpwa` y `pwacarniweb`, los tres construyendo en cada push. Producción es `carniwebpwa.netlify.app`.
+**Estado:** abierto · **Evidencia:** medido por HTTP el 2026-09-02
 
-**Qué falta:** decidir cuál se queda. No se toca nada desde aquí — borrar un sitio de Netlify no se deshace, y esa decisión es de Eduardo.
+Los tres responden 200 y sirven el mismo sitio, pero no el mismo commit:
 
+```
+carniwebpwa    assets/home-CUh_Ut3U.js   ← producción, al día con main
+carni-pwa      assets/home-CdSRnc4c.js
+pwacarniweb    assets/home-CdSRnc4c.js
+```
+
+`carni-pwa` y `pwacarniweb` comparten paquete entre sí y difieren de producción,
+así que construyen otra cosa: otra rama, u otras variables de entorno inyectadas
+en el paquete. **Desde fuera del panel no se puede saber cuál** — el CLI de
+Netlify no está instalado en esta máquina y tocar su configuración no corresponde.
+
+**Qué falta:** que Eduardo mire en el panel desde qué rama construye cada uno y
+cuál tiene dominio propio, y decida. **No se toca nada desde aquí** — borrar un
+sitio de Netlify no se deshace.
 
 ## 🟠 Migración a React — landing
 
@@ -192,6 +168,25 @@ El arreglo de `p_address` se commiteó con `--no-verify` porque la sesión de GG
 
 **Arreglo:** `/login` en Claude Code y correr GGA sobre ese archivo.
 
+### P-35 · Un error rojo en consola en cada página que no es el login
+
+**Estado:** abierto · **Evidencia:** `js/modules/core/auth.js:73`
+
+```
+❌ authContainer no encontrado en el DOM
+```
+
+`auth.js` da por hecho que existe un `#authContainer` y llama a `console.error`
+cuando no lo encuentra. Ese contenedor solo vive en la página de login, así que
+la landing lo lanza siempre. Medido el 2026-09-02 en los dos destinos
+publicados: es el **único** error de consola de ambos.
+
+No rompe nada, pero un rojo permanente es exactamente lo que enseñó P-25: se
+vuelve ruido, y el día que haya un error de verdad nadie lo va a ver.
+
+**Arreglo:** salir en silencio cuando el contenedor no está — no es un fallo,
+es una página que no tiene login. Un `if` y un `return`.
+
 ### P-26 · El slug de categoría no pasa por `encodeURIComponent`
 
 **Estado:** abierto · **Evidencia:** `src/components/CategoryCard/CategoryCard.tsx`
@@ -200,7 +195,7 @@ El `href` arma `products.html?categoria=${slug}` interpolando el slug crudo. Hoy
 
 **Arreglo:** envolver el slug en `encodeURIComponent()`. Un cambio de una línea; se anotó en vez de hacerlo para no mezclarlo con la migración del bento.
 
-### P-27 · GGA lleva tres sesiones sin poder correr
+### P-27 · GGA no arranca: no tiene proveedor configurado
 
 **Estado:** abierto · **Evidencia:** commits `58134436` y el del bento
 
@@ -209,6 +204,8 @@ El `href` arma `products.html?categoria=${slug}` interpolando el slug crudo. Hoy
 **Arreglo:** probar `brew update && brew upgrade gga`. Si sigue igual, revisar dónde guarda su credencial, que parece ser aparte de la de Claude Code.
 
 **Actualización 2026-08-27:** se actualizó a 2.10.1. El error cambió, no se resolvió: ahora dice `❌ No provider configured · Run 'gga init'`. La versión nueva no lee el `~/.config/gga/config` que declara `PROVIDER="claude"`. `gga init` es config global y lo corre Eduardo.
+
+**Confirmado el 2026-09-02:** sigue igual, palabra por palabra. Los tres commits de ese día salieron con `--no-verify`. **Ojo:** el error de OAuth ya no aparece desde el 27 de agosto — quien lo siga citando está leyendo un histórico viejo.
 
 ### P-28 · `gentle-ai` no sigue enlaces simbólicos; Claude Code sí
 
@@ -259,13 +256,15 @@ No deja de funcionar —es Markdown puro, sin dependencias— pero **no va a rec
 
 ### P-31 · La skill `vercel-deploy` dice que este repo publica en GitHub Pages, y no
 
-**Estado:** abierto · **Evidencia:** `netlify.toml` en la raíz + `gh api repos/pipeTawns-x/Carni-mvp/pages` → 404, el 2026-08-27
+**Estado:** abierto · **Evidencia:** `netlify.toml` en la raíz + `netlify.toml` + `.github/workflows/deploy-pages.yml`, revisado el 2026-09-02
 
 La skill global `vercel-deploy` (del paquete `claude-webkit`) lleva esto en su propia descripción:
 
 > _"Ojo: este repo publica en GitHub Pages, no en Vercel."_
 
-Las dos mitades fallan. GitHub Pages devuelve **404**: no está habilitado. Y el repositorio tiene un `netlify.toml` completo —build, functions, edge-functions, CSP, redirects de SPA—. **El destino real es Netlify.**
+**Actualización del 2026-09-02:** la evidencia de arriba caducó. GitHub Pages ya está habilitado y publicando desde `.github/workflows/deploy-pages.yml`, así que la mitad de la frase dejó de ser falsa — por accidente, no porque la skill acertara.
+
+Lo que sigue mal es lo que importa: la skill afirma un destino **único** y este proyecto tiene **dos**, con producción en Netlify. Un agente que la cargue va a razonar sobre el host equivocado para cualquier cosa que afecte a un cliente.
 
 **Por qué importa:** es una skill que se dispara con la palabra "desplegar" y afirma un hecho falso sobre este proyecto. Un agente que la cargue va a razonar sobre el host equivocado.
 
@@ -354,13 +353,13 @@ Congelado hasta que el dueño de la carnicería entregue márgenes reales. **Con
 ## Orden de ataque
 
 ```
-TANDA 1   P-18, P-04              el sitio público por fin muestra el trabajo
-          P-05, P-06                 ← sin P-18 no tiene sentido desplegar
+TANDA 1   CERRADA el 2026-09-02   los dos destinos publicados y verificados
 TANDA 2   P-19, P-20              modelar unidad de venta, pieza y despiece
           P-21                       ← el dashboard sale de ahí
-TANDA 3   P-09                    parpadeo del bento — RESUELTO en home.tsx:106
-TANDA 4   P-10                    modal premium — RESUELTO; conectado al carrito real
-TANDA 6   P-15, P-16              animación scroll, escalas de 10 tonos
+TANDA 3   P-05, P-35              deuda que dejó el despliegue: ruta absoluta
+                                     del service worker y el rojo de consola
+TANDA 4   P-34                    decidir los tres sitios de Netlify — es de Eduardo
+TANDA 5   P-15, P-16              animación scroll, escalas de 10 tonos
 ```
 
 `P-11`, `P-12`, `P-13` se resuelven de paso cuando se toque cada archivo. No merecen tanda propia.
