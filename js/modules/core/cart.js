@@ -495,6 +495,30 @@
     }
   }
 
+  function openCartFlow() {
+    const modalEl = document.getElementById('cartModal');
+    const hasLegacyModal = !!modalEl && typeof bootstrap !== 'undefined' && bootstrap.Modal;
+
+    if (hasLegacyModal) {
+      const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+      modal.show();
+      return;
+    }
+
+    window.dispatchEvent(new CustomEvent('cart:open'));
+  }
+
+  function closeCartFlow() {
+    const modalEl = document.getElementById('cartModal');
+    if (modalEl && typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+      const modal = bootstrap.Modal.getInstance(modalEl);
+      if (modal) {
+        modal.hide();
+      }
+    }
+    window.dispatchEvent(new CustomEvent('cart:close'));
+  }
+
   /**
    * Actualiza el badge del contador de productos en el header
    * Calcula el total de items considerando piezas para productos por unidad
@@ -528,14 +552,16 @@
     cart.push(item); 
     saveCart(cart); 
     updateBadge(); 
-    
-    // Abrir modal automáticamente después de agregar (pequeño delay para UX)
+
     setTimeout(() => {
       const cartModalEl = document.getElementById('cartModal');
       if (cartModalEl && typeof bootstrap !== 'undefined') {
         const cartModal = bootstrap.Modal.getOrCreateInstance(cartModalEl);
         cartModal.show();
+        return;
       }
+
+      window.dispatchEvent(new CustomEvent('cart:open'));
     }, 100);
   }
 

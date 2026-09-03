@@ -270,12 +270,29 @@ function CatalogExperience(): JSX.Element {
       setIsCartOpen((open) => !open);
     };
 
+    const openSideCart = (): void => {
+      setIsCartOpen(true);
+    };
+
+    const closeSideCart = (): void => {
+      setIsCartOpen(false);
+    };
+
     cartButton.addEventListener('click', toggle);
-    return () => cartButton.removeEventListener('click', toggle);
+    window.addEventListener('cart:open', openSideCart);
+    window.addEventListener('cart:close', closeSideCart);
+
+    return () => {
+      cartButton.removeEventListener('click', toggle);
+      window.removeEventListener('cart:open', openSideCart);
+      window.removeEventListener('cart:close', closeSideCart);
+    };
   }, []);
 
   useEffect(() => {
     document.body.classList.toggle('cart-is-open', isCartOpen);
+    document.body.style.overflow = isCartOpen ? 'hidden' : '';
+    document.body.style.touchAction = isCartOpen ? 'none' : '';
   }, [isCartOpen]);
 
   const filters = useMemo(() => {

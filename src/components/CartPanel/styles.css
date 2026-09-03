@@ -1,8 +1,13 @@
+body.cart-is-open {
+  overflow: hidden;
+}
+
 @media (min-width: 576px) {
   body.cart-is-open {
     padding-right: 380px;
   }
 }
+
 .cart-panel {
   position: fixed;
   top: 0;
@@ -24,6 +29,11 @@
 @media (max-width: 575.98px) {
   .cart-panel {
     width: 100%;
+  }
+
+  body.cart-is-open {
+    overflow: hidden;
+    touch-action: none;
   }
 }
 .cart-panel--open {
