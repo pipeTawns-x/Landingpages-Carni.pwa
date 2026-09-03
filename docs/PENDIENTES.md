@@ -6,9 +6,9 @@ Los blueprints guardan **decisiones** (por qué se hizo algo). Este archivo guar
 
 Estados: `abierto` · `en curso` · `congelado`
 
-Última revisión: 2026-09-02
+Última revisión: 2026-09-02 (segunda pasada)
 
-> **Aviso de techo.** El archivo queda en 20 pendientes abiertos tras cerrar la tanda 1 (contados, no estimados). La regla del proyecto sigue en pie: pasar de ~20 no es un problema del archivo, es señal de que se acumulan decisiones sin tomar.
+> **Aviso de techo.** El archivo queda en 21 pendientes abiertos (contados, no estimados). La regla del proyecto sigue en pie: pasar de ~20 no es un problema del archivo, es señal de que se acumulan decisiones sin tomar.
 
 > **Estado operativo del 2026-09-02.** El trabajo ya está publicado en los dos destinos y ambos verificados en el navegador: nueve categorías con los nombres de la base, carrusel de seis, video reproduciéndose e imágenes en `image/webp`, a 375, 768 y 1440.
 
@@ -117,6 +117,31 @@ El modo **por peso** funciona: `price_per_kg` existe. Los otros dos no tienen de
 Es el diferenciador del proyecto según `docs/INVESTIGACION_Y_PROMPTS.md:87`, y lleva desde el 12 de agosto bloqueado por la misma columna faltante.
 
 **Depende de P-19:** la unidad de venta y la pieza son el mismo modelo de datos. Resolverlos por separado es hacerlo dos veces.
+
+### P-36 · La tabla de grosores por corte necesita la validación de la dueña
+
+**Estado:** abierto · **Evidencia:** `docs/CONTEXTO_TRIFASICO_2026-09-02.md` §2 · fuente: `search.brave.com/ask?q=esto+aplica+con+la+mayoria+de+cortes+premium`
+
+Hay una tabla de grosores recomendados por corte —Rib Eye 1–1.5", Filet Mignon
+1.5–2", T-Bone 1.5–2", Tomahawk 2–3", Arrachera 1" o menos, y los comunes en
+centímetros: milanesa 0.5–1 cm, bistec a la plancha 1.5–2 cm—.
+
+**De dónde salió:** de una respuesta generada por IA en el buscador Brave. La
+propia página lo advierte: *"Texto generado con IA, verifica los datos más
+importantes."*
+
+**Por qué es un pendiente y no un dato:** aquí se corta carne de verdad y se le
+cobra a gente de verdad. La autoridad sobre estos números es **la hermana de
+Eduardo, que maneja la carnicería**, no un buscador.
+
+**Ojo:** ya está tratada correctamente en `docs/PLAN_EJECUCION_TRIFASICO.md`
+(parada E) como **valor por defecto editable desde el panel**, nunca como medida
+obligatoria para el cliente. Lo que falta es la validación humana.
+
+**Falta cobertura, y no se inventa:** no hay números para **pollo, cerdo ni
+embutidos**. Se dejan vacíos y los llena el panel.
+
+**Depende de P-20** — y P-20 **no se cierra con esta tabla: se desbloquea.**
 
 ### P-21 · Los mínimos existen pero no hay dónde editarlos
 
