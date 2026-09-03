@@ -105,6 +105,28 @@ Las reglas del mostrador —la pierna no se vende sin su muslo; media pechuga va
 
 **Arreglo:** modelar la unidad de venta y la composición de las piezas antes de escribir validaciones. Es decisión de diseño de datos, no un parche. **Bloquea P-20.**
 
+**Rescatado el 2026-09-02, antes de borrar `js/modules/utils/base_dinamica.js`:**
+ese archivo —código muerto, catálogo escrito a mano— era el **único lugar del
+repositorio** con un peso por pieza. Nueve valores, todos inventados por quien
+escribió el archivo, ninguno validado en el mostrador:
+
+| Corte | `basePeso` |
+|---|---|
+| Bravette Steak | 0.30 kg |
+| Filet Mignon | 0.25 kg |
+| Flank Steak | 0.40 kg |
+| New York Strip | 0.35 kg |
+| Porterhouse | 0.50 kg |
+| Rib Eye | 0.40 kg |
+| Skirt Steak | 0.30 kg |
+| Tomahawk | 0.80 kg |
+| Top Sirloin | 0.35 kg |
+
+**No son un dato: son un punto de partida.** Sirven para poblar
+`products.metadata` como valor por defecto editable, y necesitan la misma
+validación que la tabla de grosores de [P-36]. Sin este dato, el modo "por pieza"
+del carrito no se puede ofrecer con honestidad.
+
 ### P-20 · El carrito trifásico no tiene datos que lo sostengan
 
 **Estado:** abierto · **Evidencia:** `docs/PLAN_MVP_COMPLETO.md:52`, `supabase/migrations/202604100001_initial_schema.sql:38-50`
