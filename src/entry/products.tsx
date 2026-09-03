@@ -12,8 +12,9 @@ const LEGACY_CART_KEY = 'carni_cart_v1';
  * Reads whatever is already in the shared cart key and turns it into order
  * lines.
  *
- * Three writers share `carni_cart_v1`: this file, src/hooks/useCart.ts and the
- * vanilla js/modules/core/cart.js. The order used to mount empty and immediately
+ * Two writers share `carni_cart_v1`: this file and the vanilla
+ * js/modules/core/cart.js. (A third, src/hooks/useCart.ts, was deleted on
+ * 2026-09-02 — it had zero importers.) The order used to mount empty and immediately
  * overwrite the key, so a cart filled on index.html was destroyed the moment the
  * customer opened the catalogue — and a plain refresh lost it too.
  *
