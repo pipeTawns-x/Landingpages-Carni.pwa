@@ -5,7 +5,6 @@ import './styles.css';
 export interface ProductListProps {
   /** The catalogue to render. Owned by the root component and passed down. */
   products: Product[];
-  onAddToOrder: (product: Product) => void;
 }
 
 /**
@@ -14,7 +13,7 @@ export interface ProductListProps {
  * It holds no state of its own: the array arrives from the root component and
  * this component only decides how each entry looks.
  */
-export function ProductList({ products, onAddToOrder }: ProductListProps): JSX.Element {
+export function ProductList({ products }: ProductListProps): JSX.Element {
   if (products.length === 0) {
     return (
       <div className="tw-empty-state">
@@ -33,7 +32,6 @@ export function ProductList({ products, onAddToOrder }: ProductListProps): JSX.E
           // made one card in six twice as wide, and its row-mates grew empty
           // space to match the taller box.
           size="medium"
-          onAddToCart={() => onAddToOrder(product)}
           isIAContent={Boolean(product.is_promoted)}
         />
       ))}

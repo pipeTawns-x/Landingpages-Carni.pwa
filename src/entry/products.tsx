@@ -316,11 +316,6 @@ function CatalogExperience(): JSX.Element {
     return order.reduce((sum, line) => sum + line.pricePerKg * line.quantity, 0);
   }, [order]);
 
-  const handleAddToOrder = useCallback((product: Product): void => {
-    setOrder((current) => [...current, toOrderLine(product)]);
-    setIsCartOpen(true);
-  }, []);
-
   const handleRemove = useCallback((lineId: string): void => {
     setOrder((current) => current.filter((line) => line.lineId !== lineId));
   }, []);
@@ -352,7 +347,7 @@ function CatalogExperience(): JSX.Element {
         </div>
       </div>
 
-      <ProductList products={filteredProducts} onAddToOrder={handleAddToOrder} />
+      <ProductList products={filteredProducts} />
 
       <CartPanel
         isOpen={isCartOpen}
