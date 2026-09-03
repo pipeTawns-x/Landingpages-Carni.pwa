@@ -766,132 +766,216 @@
    The photo alone keeps its layer; the card does not. */
 
 /* ── Ficha de producto · /producto/:id ───────────────────────────────────────
-   Mobile-first: se diseña a 375 px y se ensancha con min-width, nunca al revés.
-   Los controles de compra son objetivos táctiles: 44 px es el mínimo real para
-   un dedo, no una recomendación decorativa. */
+   Editorial, no de plantilla. La foto manda y la tipografía se calla: por eso
+   las etiquetas van en versalitas con espaciado y el peso tipográfico se guarda
+   para el nombre del corte y el precio. Los bordes son de un píxel y el color
+   solo aparece donde hay que tocar.
 
-.detalle {
-  max-width: 640px;
+   Mobile-first: se diseña a 390 px y a partir de 900 px la foto pasa a columna
+   propia y se queda fija mientras el formulario se desplaza. */
+
+.ficha {
+  --tinta: #f4f1ea;
+  --tenue: rgba(244, 241, 234, 0.62);
+  --linea: rgba(244, 241, 234, 0.14);
+  --acento: #c8302f;
+  --crema: #e2cfa4;
+  max-width: 1180px;
   margin: 0 auto;
-  padding: 1rem 1rem 3rem;
-  color: #f2efe9;
+  padding: 0.5rem 1.25rem 4rem;
+  color: var(--tinta);
 }
 
-.detalle__volver {
+.ficha__volver {
   display: inline-block;
   min-height: 44px;
   line-height: 44px;
-  color: #d9c9a3;
+  color: var(--tenue);
   text-decoration: none;
-  font-weight: 600;
+  font-size: 0.82rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.ficha__volver:hover { color: var(--tinta); }
+
+.ficha__lienzo {
+  margin: 0.5rem 0 1.75rem;
+  background: #131313;
+  border-radius: 2px;
+  overflow: hidden;
 }
 
-.detalle__foto {
+.ficha__foto {
+  display: block;
   width: 100%;
   height: auto;
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 1 / 1;
   object-fit: cover;
-  border-radius: 14px;
-  background: #1a1a1a;
 }
 
-.detalle__titulo { margin: 1rem 0 0.25rem; font-size: 1.6rem; line-height: 1.2; }
-.detalle__precio { margin: 0 0 0.75rem; font-size: 1.35rem; font-weight: 700; color: #e8d9b5; }
-.detalle__unidad { font-size: 0.95rem; font-weight: 500; opacity: 0.75; }
-.detalle__nota   { margin: 0.5rem 0; font-size: 0.95rem; color: rgba(255,255,255,0.82); }
-.detalle__nota--aviso { color: #e8c07d; }
-.detalle__nota--tenue { font-size: 0.85rem; opacity: 0.6; }
-.detalle__pregunta { margin: 1.5rem 0 0.75rem; font-size: 1.1rem; }
+.ficha__marca {
+  margin: 0 0 0.5rem;
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--tenue);
+}
 
-/* Las pestañas de modo. Se envuelven en vez de desbordar: a 375 px con tres
-   modos y textos en español, una sola fila no cabe sin encoger el objetivo
-   táctil por debajo de 44 px. */
-.detalle__modos { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.ficha__titulo {
+  margin: 0 0 0.75rem;
+  font-size: clamp(1.75rem, 6vw, 2.4rem);
+  line-height: 1.1;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
 
-.detalle__modo {
-  flex: 1 1 auto;
-  min-width: 104px;
-  min-height: 44px;
-  padding: 0 1rem;
-  border: 1px solid rgba(255,255,255,0.22);
-  border-radius: 999px;
-  background: transparent;
-  color: #f2efe9;
+.ficha__precio { margin: 0 0 1.25rem; font-size: 1.5rem; font-weight: 600; color: var(--crema); }
+.ficha__unidad { font-size: 0.9rem; font-weight: 400; color: var(--tenue); }
+.ficha__libra  { display: block; margin-top: 0.15rem; font-size: 0.85rem; font-weight: 400; color: var(--tenue); }
+
+.ficha__nota { margin: 0 0 1.25rem; font-size: 0.95rem; line-height: 1.6; color: rgba(244,241,234,0.78); }
+.ficha__nota--aviso { color: var(--crema); }
+.ficha__nota--tenue { font-size: 0.8rem; color: var(--tenue); }
+
+.ficha__pregunta {
+  margin: 2rem 0 0.85rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--tenue);
   font-weight: 600;
-  cursor: pointer;
 }
 
-.detalle__modo--activo { background: #d22222; border-color: #d22222; color: #fff; }
+/* Se envuelven en vez de encogerse: a 390 px con tres modos en español, una
+   fila sola obligaría a bajar el objetivo táctil de 44 px. */
+.ficha__modos { display: flex; flex-wrap: wrap; gap: 0.5rem; }
 
-.detalle__entrada { margin-top: 1.25rem; display: grid; gap: 1rem; }
-.detalle__campo   { display: grid; gap: 0.4rem; font-weight: 600; }
-.detalle__fila    { display: flex; gap: 0.5rem; }
-
-.detalle__campo input[type="number"],
-.detalle__campo select {
+.ficha__modo {
   flex: 1 1 auto;
-  min-width: 0;               /* sin esto un input en flex desborda a 375 px */
-  min-height: 44px;
-  padding: 0 0.75rem;
-  border: 1px solid rgba(255,255,255,0.22);
-  border-radius: 10px;
-  background: #141414;
-  color: #f2efe9;
-  font-size: 1rem;            /* 16 px: por debajo, iOS hace zoom al enfocar */
-}
-
-.detalle__campo input[type="range"] { width: 100%; min-height: 44px; accent-color: #d22222; }
-
-.detalle__resumen {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  margin-top: 1.5rem;
-  padding-top: 1rem;
-  border-top: 1px solid rgba(255,255,255,0.14);
-  font-size: 1.25rem;
-}
-
-.detalle__resumen strong { font-size: 1.6rem; color: #e8d9b5; }
-
-.detalle__accion {
-  width: 100%;
-  min-height: 48px;
-  margin-top: 1rem;
-  border: 0;
-  border-radius: 12px;
-  background: #d22222;
-  color: #fff;
-  font-weight: 700;
+  min-width: 110px;
+  min-height: 46px;
+  padding: 0 1.1rem;
+  border: 1px solid var(--linea);
+  border-radius: 2px;
+  background: transparent;
+  color: var(--tinta);
+  font-size: 0.86rem;
+  letter-spacing: 0.04em;
   cursor: pointer;
+  transition: border-color 0.18s ease, background-color 0.18s ease;
+}
+.ficha__modo:hover { border-color: rgba(244,241,234,0.4); }
+.ficha__modo--activo { background: var(--tinta); border-color: var(--tinta); color: #111; font-weight: 600; }
+
+.ficha__campos { margin-top: 1.5rem; display: grid; gap: 1.35rem; }
+.ficha__campo  { display: grid; gap: 0.5rem; }
+
+.ficha__etiqueta {
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--tenue);
+  font-weight: 600;
 }
 
-/* Esqueleto, no spinner.
-   Un spinner dice "espera"; un esqueleto dice "esto va a llegar y va a tener
-   esta forma", así que el diseño no salta cuando entran los datos. */
-.detalle__esqueleto {
-  border-radius: 12px;
-  background: linear-gradient(90deg, #1b1b1b 25%, #262626 37%, #1b1b1b 63%);
+.ficha__fila { display: flex; gap: 0.5rem; }
+
+.ficha__campo input[type="number"],
+.ficha__campo select,
+.ficha__campo textarea {
+  flex: 1 1 auto;
+  min-width: 0;              /* sin esto un input dentro de flex desborda a 390 px */
+  min-height: 46px;
+  padding: 0.7rem 0.85rem;
+  border: 1px solid var(--linea);
+  border-radius: 2px;
+  background: #101010;
+  color: var(--tinta);
+  font-size: 1rem;           /* 16 px: por debajo, iOS hace zoom al enfocar */
+  font-family: inherit;
+}
+.ficha__campo textarea { resize: vertical; line-height: 1.5; }
+.ficha__campo input:focus-visible,
+.ficha__campo select:focus-visible,
+.ficha__campo textarea:focus-visible { outline: 2px solid var(--crema); outline-offset: 2px; }
+
+.ficha__campo input[type="range"] { width: 100%; min-height: 44px; accent-color: var(--acento); }
+.ficha__escala { display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--tenue); }
+
+/* El aviso de conversión. Se anuncia en color crema y no en rojo: no es un
+   error, es el sistema explicando lo que acaba de hacer. */
+.ficha__conversion {
+  font-size: 0.82rem;
+  color: var(--crema);
+  background: rgba(226, 207, 164, 0.08);
+  border-left: 2px solid var(--crema);
+  padding: 0.5rem 0.7rem;
+}
+
+.ficha__resumen { margin-top: 2rem; padding-top: 1.25rem; border-top: 1px solid var(--linea); }
+.ficha__resumen-linea { display: flex; justify-content: space-between; align-items: baseline; }
+.ficha__resumen-linea span { font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--tenue); }
+.ficha__resumen-linea strong { font-size: 1.9rem; font-weight: 600; color: var(--crema); }
+.ficha__resumen-detalle { margin: 0.5rem 0 0; font-size: 0.85rem; color: var(--tenue); }
+
+.ficha__boton {
+  width: 100%;
+  min-height: 52px;
+  margin-top: 1.25rem;
+  border: 0;
+  border-radius: 2px;
+  background: var(--acento);
+  color: #fff;
+  font-size: 0.86rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: filter 0.18s ease;
+}
+.ficha__boton:hover { filter: brightness(1.1); }
+
+.ficha__confirmacion {
+  margin: 0.75rem 0 0;
+  padding: 0.7rem 0.85rem;
+  font-size: 0.88rem;
+  color: #d6f0d6;
+  background: rgba(60, 140, 70, 0.14);
+  border-left: 2px solid #4c9a5a;
+}
+
+/* Esqueleto, no ruleta.
+   Una ruleta dice "espera"; un esqueleto dice "esto va a llegar y va a tener
+   esta forma", así que la página no salta cuando entran los datos. */
+.ficha__esqueleto {
+  border-radius: 2px;
+  background: linear-gradient(90deg, #161616 25%, #232323 37%, #161616 63%);
   background-size: 400% 100%;
-  animation: detalle-brillo 1.4s ease-in-out infinite;
+  animation: ficha-brillo 1.4s ease-in-out infinite;
 }
+.ficha__esqueleto--foto   { width: 100%; aspect-ratio: 1 / 1; }
+.ficha__esqueleto--titulo { height: 34px; width: 65%; margin-top: 1.5rem; }
+.ficha__esqueleto--linea  { height: 20px; width: 40%; margin-top: 0.9rem; }
 
-.detalle__esqueleto--foto   { width: 100%; aspect-ratio: 4 / 3; }
-.detalle__esqueleto--titulo { height: 32px; width: 70%; margin-top: 1rem; }
-.detalle__esqueleto--linea  { height: 20px; width: 45%; margin-top: 0.75rem; }
+@keyframes ficha-brillo { from { background-position: 100% 0; } to { background-position: 0 0; } }
 
-@keyframes detalle-brillo {
-  0%   { background-position: 100% 0; }
-  100% { background-position: 0 0; }
-}
-
-/* Quien pidió menos movimiento recibe el mismo esqueleto sin la animación.
-   Se quita el movimiento, nunca el contraste ni la información. */
+/* Se quita el movimiento, nunca el contraste ni la información. */
 @media (prefers-reduced-motion: reduce) {
-  .detalle__esqueleto { animation: none; }
+  .ficha__esqueleto { animation: none; }
+  .ficha__modo { transition: none; }
 }
 
-@media (min-width: 768px) {
-  .detalle { max-width: 720px; padding-inline: 1.5rem; }
-  .detalle__titulo { font-size: 2rem; }
+@media (min-width: 900px) {
+  .ficha {
+    display: grid;
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+    grid-template-areas: "volver volver" "foto cuerpo";
+    column-gap: 3.5rem;
+    align-items: start;
+    padding-inline: 2rem;
+  }
+  .ficha__volver { grid-area: volver; }
+  .ficha__lienzo { grid-area: foto; margin-top: 0; position: sticky; top: 96px; }
+  .ficha__cuerpo { grid-area: cuerpo; padding-top: 0.5rem; }
+  .ficha__titulo { font-size: 2.6rem; }
 }
