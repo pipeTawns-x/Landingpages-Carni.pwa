@@ -3,6 +3,8 @@ import { CartPanel } from '@src/components/CartPanel/CartPanel';
 import { ProductList } from '@src/components/ProductList/ProductList';
 import { SEED_PRODUCTS } from '@src/data/seedProducts';
 import type { CartLegacyItem, OrderLine, Product } from '@src/types/database';
+import { HashRouter, Route, Routes } from 'react-router-dom';
+import { ProductoDetalle } from '@src/pages/ProductoDetalle';
 import { fetchProducts, mountReactNode, categoryLabel, categorySlugOf, assetUrl } from './shared';
 import '@src/styles/redesign.css';
 
@@ -363,4 +365,34 @@ function CatalogExperience(): JSX.Element {
   );
 }
 
-mountReactNode('#productsReactRoot', <CatalogExperience />);
+/**
+ * The router, and why it hashes.
+ *
+ * Carni-mvp is not a single-page app: it is a set of HTML pages with React
+ * islands mounted into them. This router lives *inside* the catalogue island
+ * only — index.html, accessweb.html and the admin pages never see it.
+ *
+ * `HashRouter`, not `BrowserRouter`, and that is deliberate. The site ships to
+ * two hosts that serve from different roots: Netlify from `/`, GitHub Pages from
+ * `/Landingpages-Carni.pwa/`. A path router would need a matching `basename` on
+ * each, plus a server rewrite so that `/producto/12` — a URL with no file behind
+ * it — does not 404. Both live sites are healthy today, and a rewrite rule is
+ * exactly what broke them once before: `force = true` in netlify.toml made every
+ * asset come back as index.html.
+ *
+ * A hash never reaches the server. `products.html#/producto/12` is a request for
+ * `products.html` on any host, under any base, with no configuration at all.
+ * The route, `useParams` and `<Link>` work identically either way.
+ */
+function CatalogoConRutas(): JSX.Element {
+  return (
+    <HashRouter>
+      <Routes>
+        <Route path="/" element={<CatalogExperience />} />
+        <Route path="/producto/:id" element={<ProductoDetalle />} />
+      </Routes>
+    </HashRouter>
+  );
+}
+
+mountReactNode('#productsReactRoot', <CatalogoConRutas />);

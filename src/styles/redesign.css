@@ -764,3 +764,134 @@
    84MB of layer memory, and the ABSOLUTE paint count during the same scroll rose
    from 42 to 288 — worse for everyone, including the case it was meant to fix.
    The photo alone keeps its layer; the card does not. */
+
+/* ── Ficha de producto · /producto/:id ───────────────────────────────────────
+   Mobile-first: se diseña a 375 px y se ensancha con min-width, nunca al revés.
+   Los controles de compra son objetivos táctiles: 44 px es el mínimo real para
+   un dedo, no una recomendación decorativa. */
+
+.detalle {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 1rem 1rem 3rem;
+  color: #f2efe9;
+}
+
+.detalle__volver {
+  display: inline-block;
+  min-height: 44px;
+  line-height: 44px;
+  color: #d9c9a3;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.detalle__foto {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 14px;
+  background: #1a1a1a;
+}
+
+.detalle__titulo { margin: 1rem 0 0.25rem; font-size: 1.6rem; line-height: 1.2; }
+.detalle__precio { margin: 0 0 0.75rem; font-size: 1.35rem; font-weight: 700; color: #e8d9b5; }
+.detalle__unidad { font-size: 0.95rem; font-weight: 500; opacity: 0.75; }
+.detalle__nota   { margin: 0.5rem 0; font-size: 0.95rem; color: rgba(255,255,255,0.82); }
+.detalle__nota--aviso { color: #e8c07d; }
+.detalle__nota--tenue { font-size: 0.85rem; opacity: 0.6; }
+.detalle__pregunta { margin: 1.5rem 0 0.75rem; font-size: 1.1rem; }
+
+/* Las pestañas de modo. Se envuelven en vez de desbordar: a 375 px con tres
+   modos y textos en español, una sola fila no cabe sin encoger el objetivo
+   táctil por debajo de 44 px. */
+.detalle__modos { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+
+.detalle__modo {
+  flex: 1 1 auto;
+  min-width: 104px;
+  min-height: 44px;
+  padding: 0 1rem;
+  border: 1px solid rgba(255,255,255,0.22);
+  border-radius: 999px;
+  background: transparent;
+  color: #f2efe9;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.detalle__modo--activo { background: #d22222; border-color: #d22222; color: #fff; }
+
+.detalle__entrada { margin-top: 1.25rem; display: grid; gap: 1rem; }
+.detalle__campo   { display: grid; gap: 0.4rem; font-weight: 600; }
+.detalle__fila    { display: flex; gap: 0.5rem; }
+
+.detalle__campo input[type="number"],
+.detalle__campo select {
+  flex: 1 1 auto;
+  min-width: 0;               /* sin esto un input en flex desborda a 375 px */
+  min-height: 44px;
+  padding: 0 0.75rem;
+  border: 1px solid rgba(255,255,255,0.22);
+  border-radius: 10px;
+  background: #141414;
+  color: #f2efe9;
+  font-size: 1rem;            /* 16 px: por debajo, iOS hace zoom al enfocar */
+}
+
+.detalle__campo input[type="range"] { width: 100%; min-height: 44px; accent-color: #d22222; }
+
+.detalle__resumen {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255,255,255,0.14);
+  font-size: 1.25rem;
+}
+
+.detalle__resumen strong { font-size: 1.6rem; color: #e8d9b5; }
+
+.detalle__accion {
+  width: 100%;
+  min-height: 48px;
+  margin-top: 1rem;
+  border: 0;
+  border-radius: 12px;
+  background: #d22222;
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* Esqueleto, no spinner.
+   Un spinner dice "espera"; un esqueleto dice "esto va a llegar y va a tener
+   esta forma", así que el diseño no salta cuando entran los datos. */
+.detalle__esqueleto {
+  border-radius: 12px;
+  background: linear-gradient(90deg, #1b1b1b 25%, #262626 37%, #1b1b1b 63%);
+  background-size: 400% 100%;
+  animation: detalle-brillo 1.4s ease-in-out infinite;
+}
+
+.detalle__esqueleto--foto   { width: 100%; aspect-ratio: 4 / 3; }
+.detalle__esqueleto--titulo { height: 32px; width: 70%; margin-top: 1rem; }
+.detalle__esqueleto--linea  { height: 20px; width: 45%; margin-top: 0.75rem; }
+
+@keyframes detalle-brillo {
+  0%   { background-position: 100% 0; }
+  100% { background-position: 0 0; }
+}
+
+/* Quien pidió menos movimiento recibe el mismo esqueleto sin la animación.
+   Se quita el movimiento, nunca el contraste ni la información. */
+@media (prefers-reduced-motion: reduce) {
+  .detalle__esqueleto { animation: none; }
+}
+
+@media (min-width: 768px) {
+  .detalle { max-width: 720px; padding-inline: 1.5rem; }
+  .detalle__titulo { font-size: 2rem; }
+}

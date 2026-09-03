@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { assetUrl } from '@src/entry/shared';
 import type { Product } from '@src/types/database';
 import './styles.css';
@@ -141,6 +142,13 @@ export function ProductCard({ product, size, onAddToCart, isIAContent = false }:
               </span>
             ) : null}
           </div>
+          {/* Two actions, and they are not the same thing. "Agregar" takes the
+              default kilo without leaving the grid, for someone who already
+              knows what they want. "Elegir" opens the detail route, where the
+              weight, budget and piece modes live — those do not fit in a card. */}
+          <Link className="tw-button tw-button--ghost" to={`/producto/${product.id}`}>
+            Elegir
+          </Link>
           <button
             className="tw-button tw-button--primary"
             type="button"
