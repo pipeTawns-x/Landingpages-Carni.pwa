@@ -1,3 +1,5 @@
+import { montarCarrito } from '@src/components/CartPanel/montar';
+import { montarLupa } from '@src/components/Lupa/montar';
 import { mountReactNode } from './shared';
 import '@src/styles/redesign.css';
 
@@ -21,3 +23,8 @@ function AuthExperience(): JSX.Element {
 }
 
 mountReactNode('#authExperienceRoot', <AuthExperience />);
+
+// The magnifier behaves the same on all three pages. Without this, tapping it
+// here still threw the customer out to the catalogue before they typed a letter.
+montarLupa();
+montarCarrito();

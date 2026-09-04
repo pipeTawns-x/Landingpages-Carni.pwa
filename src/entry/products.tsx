@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Lupa } from '@src/components/Lupa/Lupa';
 import { usePedido } from '@src/hooks/usePedido';
 import { CarrilCategorias } from '@src/components/CarrilCategorias/CarrilCategorias';
 import { CartPanel } from '@src/components/CartPanel/CartPanel';
 import { ProductList } from '@src/components/ProductList/ProductList';
 import { SEED_PRODUCTS } from '@src/data/seedProducts';
 import type { CartLegacyItem, OrderLine, Product } from '@src/types/database';
-import { HashRouter, Route, Routes, useSearchParams } from 'react-router-dom';
+import { HashRouter, Route, Routes, useNavigate, useSearchParams } from 'react-router-dom';
 import { ProductoDetalle } from '@src/pages/ProductoDetalle';
 import { fetchProducts, mountReactNode, categoryLabel, categorySlugOf, assetUrl } from './shared';
 import '@src/styles/redesign.css';
@@ -389,6 +390,14 @@ function CarritoGlobal(): JSX.Element {
   );
 }
 
+/**
+ * On the catalogue a result routes in place; nothing reloads.
+ */
+function LupaConRuta(): JSX.Element {
+  const navegar = useNavigate();
+  return <Lupa irAlProducto={(id) => navegar(`/producto/${id}`)} />;
+}
+
 function CatalogoConRutas(): JSX.Element {
   return (
     <HashRouter>
@@ -397,6 +406,7 @@ function CatalogoConRutas(): JSX.Element {
         <Route path="/producto/:id" element={<ProductoDetalle />} />
       </Routes>
       <CarritoGlobal />
+      <LupaConRuta />
     </HashRouter>
   );
 }

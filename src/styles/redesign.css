@@ -1062,7 +1062,22 @@
     padding-inline: 2rem;
   }
   .ficha__migas { grid-area: volver; }
-  .ficha__lienzo { grid-area: foto; margin-top: 0; position: sticky; top: 96px; }
+  /* `align-self: start` es lo que lo mantiene en su fila.
+     Un elemento pegajoso se estira a la altura de su area de rejilla, y como la
+     fila crece con la columna de decision, la foto seguia bajando y acababa
+     encima de las sugerencias. Con `start` ocupa solo su alto y se pega dentro
+     de esa fila, sin invadir lo de abajo. */
+  .ficha__lienzo {
+    grid-area: foto;
+    margin-top: 0;
+    position: sticky;
+    top: 96px;
+    align-self: start;
+    max-height: calc(100vh - 120px);
+    overflow: hidden;
+    border-radius: 14px;
+  }
+  .ficha__lienzo .ficha__foto { height: 100%; object-fit: cover; }
   .ficha__cuerpo { grid-area: cuerpo; padding-top: 0.5rem; }
   .ficha .banner { grid-area: banner; }
   .ficha .sugeridos { grid-area: mas; }
@@ -1336,4 +1351,137 @@
    viendo que ahí va a haber algo. */
 @media (prefers-reduced-motion: reduce) {
   .tw-card-esqueleto { animation: none; }
+}
+
+/* ── La lupa · panel de búsqueda ────────────────────────────────────────────
+   Superposición, no salto de página. Antes, tocar la lupa en la landing te
+   expulsaba a products.html antes de escribir una letra. */
+
+.lupa {
+  position: fixed;
+  inset: 0;
+  z-index: 1080;
+  display: flex;
+  flex-direction: column;
+  background: #0b0b0b;
+  animation: lupa-entra 0.22s ease;
+}
+
+@keyframes lupa-entra { from { opacity: 0; } to { opacity: 1; } }
+
+.lupa__barra {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.lupa__campo { flex: 1 1 auto; min-width: 0; }
+
+.lupa__campo input {
+  width: 100%;
+  min-height: 48px;
+  padding: 0 1.1rem;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #f2efe9;
+  font-size: 1rem;        /* 16px: por debajo, iOS hace zoom al enfocar */
+}
+
+.lupa__campo input:focus { outline: 2px solid #e8d9b5; outline-offset: 2px; }
+
+.lupa__cerrar {
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #f2efe9;
+  font-size: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.lupa__cuerpo { flex: 1 1 auto; overflow-y: auto; padding: 1rem 0 3rem; }
+.lupa__seccion { margin-bottom: 2rem; }
+
+.lupa__titulo {
+  margin: 0 1rem 0.85rem;
+  font-size: 0.82rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #e8d9b5;
+}
+
+.lupa__nota {
+  margin-left: 0.5rem;
+  letter-spacing: 0.04em;
+  text-transform: none;
+  color: rgba(255, 255, 255, 0.45);
+  font-weight: 400;
+}
+
+.lupa__terminos { display: flex; flex-wrap: wrap; gap: 0.5rem; padding-inline: 1rem; }
+
+.lupa__termino {
+  min-height: 40px;
+  padding: 0 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.86);
+  cursor: pointer;
+}
+
+/* De borde a borde y pegadas, como cierra LV. El carril se arrastra en el
+   teléfono y se asoma la siguiente, que es la señal de que hay más. */
+.lupa__carril {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 46%;
+  gap: 0;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+
+.lupa__carril::-webkit-scrollbar { display: none; }
+
+.lupa__card {
+  scroll-snap-align: start;
+  display: grid;
+  gap: 0;
+  border: 0;
+  padding: 0 0 1rem;
+  background: transparent;
+  color: #f2efe9;
+  text-align: left;
+  cursor: pointer;
+}
+
+.lupa__foto { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; background: #1a1a1a; }
+.lupa__nombre { padding: 0.7rem 0.9rem 0.15rem; font-weight: 600; font-size: 0.95rem; }
+.lupa__precio { padding: 0 0.9rem; font-size: 0.85rem; color: rgba(255, 255, 255, 0.6); }
+.lupa__vacio { padding: 2rem 1rem; color: rgba(255, 255, 255, 0.7); }
+
+.lupa__esqueleto {
+  aspect-ratio: 4 / 5;
+  background: linear-gradient(90deg, #171717 25%, #232323 37%, #171717 63%);
+  background-size: 400% 100%;
+  animation: detalle-brillo 1.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lupa { animation: none; }
+  .lupa__esqueleto { animation: none; }
+}
+
+@media (min-width: 768px) {
+  .lupa__barra { padding: 1.25rem 2rem; }
+  .lupa__campo input { max-width: 640px; margin: 0 auto; display: block; }
+  .lupa__titulo, .lupa__terminos { padding-inline: 2rem; margin-inline: 0; }
+  .lupa__carril { grid-auto-flow: row; grid-template-columns: repeat(6, 1fr); overflow-x: visible; }
 }

@@ -1,3 +1,5 @@
+import { montarCarrito } from '@src/components/CartPanel/montar';
+import { montarLupa } from '@src/components/Lupa/montar';
 import { useEffect, useRef, useState } from 'react';
 import { mountReactNode, fetchCategories } from './shared';
 import type { Category } from './shared';
@@ -272,6 +274,11 @@ gobernarEncabezado();
 
 mountReactNode('#categoriesReactRoot', <CategoryBento />);
 mountReactNode('#showcaseReactRoot', <Showcase />);
+
+// The magnifier behaves the same on all three pages. Without this, tapping it
+// here still threw the customer out to the catalogue before they typed a letter.
+montarLupa();
+montarCarrito();
 
 // El arranque del carrusel vive ahora en el propio componente Showcase:
 // atarlo a un `setTimeout` desde aquí era una carrera contra la petición de

@@ -24,10 +24,41 @@ const LLAVE_PEDIDO = 'carni_cart_v1';
  * customer ordering "3 rib eye" and getting a weight nobody measured, billed at
  * a price nobody agreed to.
  */
+/**
+ * Per-piece weights, in kilos at the 1.25" reference.
+ *
+ * These came out of a hand-written catalogue deleted on 2026-09-02 —
+ * `js/modules/utils/base_dinamica.js`, the only place in the repo that ever
+ * carried the number. **Whoever wrote that file invented them**, and nobody has
+ * checked them against a scale at the counter.
+ *
+ * They live here as an editable default so the piece mode can exist at all, not
+ * as fact. `products.metadata.peso_por_pieza_kg` overrides any of them, which is
+ * the hook the admin panel uses once the owner measures the real ones. Tracked
+ * as P-19 and P-36.
+ */
+const PESO_POR_PIEZA_SUGERIDO: Record<string, number> = {
+  'bravette steak': 0.3,
+  'filete mignon': 0.25,
+  'filet mignon': 0.25,
+  'flank steak': 0.4,
+  'new york strip': 0.35,
+  porterhouse: 0.5,
+  'rib eye': 0.4,
+  ribeye: 0.4,
+  'skirt steak': 0.3,
+  tomahawk: 0.8,
+  'top sirloin': 0.35,
+  arrachera: 0.35
+};
+
 function pesoPorPieza(p: Product): number | null {
   const meta = (p as unknown as { metadata?: Record<string, unknown> }).metadata;
   const v = meta?.peso_por_pieza_kg;
-  return typeof v === 'number' && v > 0 ? v : null;
+  if (typeof v === 'number' && v > 0) {
+    return v;
+  }
+  return PESO_POR_PIEZA_SUGERIDO[p.name.trim().toLowerCase()] ?? null;
 }
 
 function grosorPorDefecto(p: Product): number {
