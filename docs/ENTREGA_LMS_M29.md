@@ -1,21 +1,38 @@
-Hola, profe Sergio. Espero que se encuentre muy bien.
+¡Hola, profe Sergio! Espero que se encuentre muy bien.
 
-Le comparto la Práctica m29 de React III. Igual que en la m28, la construí
-**dentro del proyecto real** en lugar de como un ejercicio aparte: es la tienda
-en línea de la Carnicería El Señor de La Misericordia, un negocio familiar de San
-Luis Potosí. Los requisitos técnicos se cumplen íntegros; lo que cambia es el
-dominio, no la técnica.
+Le comparto la Práctica m29 de React III. Como en la m28, seguí dándole
+continuidad al mismo proyecto en lugar de hacer un ejercicio aparte: es la
+tienda en línea de la Carnicería El Señor de La Misericordia, un negocio
+familiar de aquí de San Luis Potosí. Los requisitos técnicos se cumplen
+íntegros; lo que cambia es el dominio, no la técnica.
 
-Lo que se puede probar, sin instalar nada:
+Su comentario de la práctica pasada —el de ajustarme a los flujos propuestos
+porque algunas actividades dan continuidad al proyecto anterior— fue justo lo
+que guió esta entrega.
 
-• Catálogo
-  https://carniwebpwa.netlify.app/products.html
 
-• Ficha de producto, que es donde vive todo lo del módulo
-  https://carniwebpwa.netlify.app/products.html#/producto/13
+PARA CORRERLO EN LOCAL
 
-• Pull request con el código
-  https://github.com/pipeTawns-x/Landingpages-Carni.pwa/pull/8
+    git clone -b entrega-react-m29 https://github.com/pipeTawns-x/Landingpages-Carni.pwa.git
+    cd Landingpages-Carni.pwa
+    npm install
+    npm run dev
+
+Abre en http://localhost:3002/products.html
+
+La ficha del producto, que es donde vive todo lo del módulo:
+http://localhost:3002/products.html#/producto/13
+
+Las credenciales de la base son públicas por diseño (la llave anon de Supabase),
+así que el catálogo carga sin configurar nada. Si la red falla, hay un respaldo
+local para que la práctica se pueda revisar igual.
+
+
+TAMBIÉN ESTÁ PUBLICADO
+
+Catálogo:  https://carniwebpwa.netlify.app/products.html
+Ficha:     https://carniwebpwa.netlify.app/products.html#/producto/13
+Código:    https://github.com/pipeTawns-x/Landingpages-Carni.pwa/pull/8
 
 Al tocar cualquier tarjeta del catálogo se abre su ficha: ahí están las dos
 rutas, useParams y Link funcionando.
@@ -50,52 +67,64 @@ DÓNDE SE CUMPLE CADA REQUISITO
    src/components/ProductCard/ProductCard.tsx
 
 
-SOBRE LA ADAPTACIÓN AL PRODUCTO REAL
+SOBRE LA ADAPTACIÓN AL NEGOCIO REAL
 
 El módulo pide un custom hook. La práctica terminó con cuatro, y cada uno existe
-por una de las dos razones que usted explicó en clase: DRY o complejidad.
+por una de las dos razones que usted explicó: DRY o complejidad. Esa segunda
+razón —extraer aunque no se reutilice, solo porque el componente creció— fue la
+que más me sirvió, y es la que casi nadie aplica.
 
-El más interesante es useUnidadInteligente. En una carnicería el precio va por
-kilo, así que quien quiere medio kilo escribe "0.5" — y "0.5 kg" no es como nadie
-pide carne. El hook convierte solo: 0.5 kg pasa a 500 g, 1000 g pasa a 1 kg, y
-avisa lo que hizo. La conversión espera a que el cliente deje de escribir, porque
-convertir a media tecla le cambia el campo bajo los dedos.
+El hook que más me gustó escribir es useUnidadInteligente. En una carnicería el
+precio va por kilo, así que quien quiere medio kilo escribe "0.5", y "0.5 kg" no
+es como nadie pide carne. El hook convierte solo: 0.5 kg pasa a 500 g, 1000 g
+pasa a 1 kg, y avisa lo que hizo para que el cliente lo confirme. La conversión
+espera a que deje de escribir, porque convertir a media tecla le cambia el campo
+bajo los dedos: quien teclea "1000" vería el campo saltar a "0.1 kg" al llegar
+al tercer número.
 
-También quiero comentarle tres defectos reales que salieron al hacerla, porque
-creo que ahí se aprendió más que en el código nuevo. Ninguno se dedujo leyendo:
-los tres se midieron en el navegador.
 
-El primero costaba dinero. La función que decide si un corte se cotiza por grosor
-comparaba contra una categoría que no existe en la base de datos, y además pedía
+LOS TRES DEFECTOS REALES QUE SALIERON
+
+Creo que aquí aprendí más que escribiendo lo nuevo. Ninguno lo deduje leyendo el
+código: los tres los medí en el navegador.
+
+El primero costaba dinero. La función que decide si un corte se cotiza por
+grosor comparaba contra una categoría que no existe en la base, y además pedía
 una etiqueta que el código de React nunca escribe. Fallaba por las dos
-condiciones a la vez, sin un solo error en consola: tres Rib Eye de pulgada y
+condiciones a la vez y sin un solo error en consola: tres Rib Eye de pulgada y
 media se cobraban en $372.00 en lugar de $892.80.
 
-El segundo fue el parpadeo del catálogo. Montaba directo sobre un arreglo de
+El segundo era un parpadeo del catálogo. Montaba directo sobre un arreglo de
 respaldo con 33 productos escritos a mano y un instante después los cambiaba por
 los 53 reales de la base. Por medio segundo el cliente veía productos que la
-carnicería no vende. Se resolvió con un esqueleto de carga desde estado vacío, y
-ahí apliqué algo de la clase 3: el setLoading va en el finally y nunca dentro del
-try, porque si va en la rama del éxito, una petición que falla deja el esqueleto
-girando para siempre y el mensaje de error no llega nunca a verse.
+carnicería no vende. Lo resolví con un esqueleto de carga desde estado vacío, y
+ahí apliqué algo de la clase 3: el setLoading va en el finally y nunca dentro
+del try, porque si va en la rama del éxito, una petición que falla deja el
+esqueleto girando para siempre y el mensaje de error no llega nunca a verse.
 
 El tercero fue un error de lectura mío. Un documento del proyecto afirmaba que
 React estaba tirando nueve campos del carrito. Sembré un producto configurado,
 recargué, y los ocho sobrevivieron: la línea que lo "probaba" era un comentario
-en pasado que describía un bug ya arreglado. Aprendí a comprobar el tiempo verbal
-de un comentario antes de construir encima.
+escrito en pasado que describía un bug ya arreglado. Aprendí a mirar el tiempo
+verbal de un comentario antes de construir encima.
 
-Una decisión técnica que quiero justificar: usé HashRouter y no BrowserRouter. El
-sitio se publica en dos destinos que sirven desde raíces distintas — Netlify desde
-la raíz y GitHub Pages desde un subdirectorio. Un router de ruta necesitaría un
-basename por destino más una regla de reescritura en el servidor para que
-/producto/12 no diera 404. Un hash nunca llega al servidor, y la ruta, useParams
-y Link funcionan igual.
+
+UNA DECISIÓN QUE QUIERO JUSTIFICAR
+
+Usé HashRouter y no BrowserRouter. El sitio se publica en dos destinos que
+sirven desde raíces distintas: Netlify desde la raíz y GitHub Pages desde un
+subdirectorio. Un router de ruta necesitaría un basename distinto por destino,
+más una regla de reescritura en el servidor para que /producto/12 —una URL sin
+archivo detrás— no diera 404. Un hash nunca llega al servidor, y la ruta,
+useParams y Link funcionan exactamente igual.
+
+Si prefiere verlo con BrowserRouter para efectos de la práctica, me dice y hago
+el cambio sin problema.
+
 
 Quedo atento a sus comentarios y a lo que haya que corregir.
 
-Muchas gracias por la revisión y por la retroalimentación de la práctica
-anterior; la de "dar continuidad al proyecto" fue justo lo que guió esta entrega.
+Muchas gracias por la revisión y por la retroalimentación de la anterior.
 
-Saludos cordiales,
+¡Salu2!
 Eduardo Torres Aguilar
