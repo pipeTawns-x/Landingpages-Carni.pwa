@@ -10,6 +10,45 @@
 [![Responsive](https://img.shields.io/badge/Responsive-375%E2%86%92768%E2%86%921440-brightgreen)](https://github.com/pipeTawns-x/Landingpages-Carni.pwa)
 [![Branch](https://img.shields.io/badge/Branch-main-purple)](https://github.com/pipeTawns-x/Landingpages-Carni.pwa/tree/main)
 
+
+## Práctica m29 · React III — dónde se cumple cada requisito
+
+Esta práctica no es un ejercicio aparte: **está construida dentro del producto
+real**, la tienda en línea de la Carnicería El Señor de La Misericordia (San Luis
+Potosí). Los requisitos técnicos se cumplen íntegros; lo que cambió es el
+dominio, no la técnica.
+
+| Requisito de la práctica | Dónde vive | Archivo |
+|---|---|---|
+| **Custom hook** con carga, éxito y error | `useSupabaseQuery` | [`src/hooks/useSupabaseQuery.ts`](src/hooks/useSupabaseQuery.ts) |
+| **Petición GET a una API** | `getProductById` / `getProducts` contra Supabase | [`js/modules/supabase.js:163`](js/modules/supabase.js) |
+| **Formulario controlado** | Modo, cantidad, unidad, grosor y observaciones | [`src/pages/ProductoDetalle.tsx`](src/pages/ProductoDetalle.tsx) |
+| **Renderizado condicional**: cargando · error · vacío | Las tres ramas, más los tres modos de compra | [`src/pages/ProductoDetalle.tsx`](src/pages/ProductoDetalle.tsx) |
+| **Botón de reintentar** | `reintentar()` — un contador en las dependencias del efecto | [`src/hooks/useSupabaseQuery.ts`](src/hooks/useSupabaseQuery.ts) |
+| **Dos rutas con React Router** | `/` y `/producto/:id` | [`src/entry/products.tsx`](src/entry/products.tsx) |
+| **`useParams`** | El id del producto sale de la URL | [`src/pages/ProductoDetalle.tsx`](src/pages/ProductoDetalle.tsx) |
+| **`<Link>` en cada elemento** | De cada tarjeta del catálogo a su ficha | [`src/components/ProductCard/ProductCard.tsx`](src/components/ProductCard/ProductCard.tsx) |
+
+### Custom hooks, más allá del mínimo
+
+El módulo pide un custom hook. La práctica trae **cuatro**, y cada uno existe por
+una de las dos razones que da la clase — reutilización o complejidad:
+
+| Hook | Por qué se extrajo |
+|---|---|
+| [`useSupabaseQuery`](src/hooks/useSupabaseQuery.ts) | **DRY.** Toda petición tiene los mismos tres estados |
+| [`useUnidadInteligente`](src/hooks/useUnidadInteligente.ts) | **Complejidad.** Convierte 0.5 kg → 500 g y 1000 g → 1 kg |
+| [`usePedido`](src/hooks/usePedido.ts) | **DRY.** El pedido lo comparten las tres páginas |
+| [`CarrilCategorias`](src/components/CarrilCategorias/CarrilCategorias.tsx) | Estado de desplazamiento propio |
+
+### Sobre `HashRouter` y no `BrowserRouter`
+
+El sitio se publica en dos destinos que sirven desde raíces distintas: Netlify
+desde `/` y GitHub Pages desde `/Landingpages-Carni.pwa/`. Un router de ruta
+necesitaría un `basename` por destino **más una regla de reescritura en el
+servidor**, para que `/producto/12` —una URL sin archivo detrás— no diera 404.
+Un hash nunca llega al servidor. La ruta, `useParams` y `<Link>` funcionan igual.
+
 ## Entrega EBAC React
 
 - La práctica React alineada a la consigna de EBAC vive en `src/App.js`, `src/components/Header.js`, `src/components/Song.js` y `src/App.css`.
