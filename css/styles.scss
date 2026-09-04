@@ -35,6 +35,7 @@
 @import 'pages/productos';
 @import 'pages/dashboard';
 @import 'pages/bento-main';
+@import 'pages/showcase';
 @import 'pages/access';
 // Never imported before, so its rules only survived as hand-edits in the
 // generated stylesheet. Importing it is what makes the admin pages rebuildable.

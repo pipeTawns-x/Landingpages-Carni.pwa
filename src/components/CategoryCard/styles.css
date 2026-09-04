@@ -1,0 +1,8 @@
+.category-card .category-img,
+.category-card .category-title {
+  cursor: pointer;
+}
+.category-card .category-title > i.bi {
+  display: inline-block;
+  min-width: 1em;
+}

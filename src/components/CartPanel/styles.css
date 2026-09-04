@@ -3,6 +3,12 @@
     padding-right: 380px;
   }
 }
+@media (max-width: 575.98px) {
+  body.cart-is-open {
+    overflow: hidden;
+    touch-action: none;
+  }
+}
 .cart-panel {
   position: fixed;
   top: 0;

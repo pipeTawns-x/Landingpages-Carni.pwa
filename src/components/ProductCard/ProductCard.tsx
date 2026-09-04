@@ -1,10 +1,11 @@
+import { Link } from 'react-router-dom';
+import { assetUrl } from '@src/entry/shared';
 import type { Product } from '@src/types/database';
 import './styles.css';
 
 export interface ProductCardProps {
   product: Product;
   size: 'small' | 'medium' | 'large';
-  onAddToCart: (id: number, qty: number) => void;
   isIAContent?: boolean;
 }
 
@@ -87,7 +88,7 @@ function resolveCategory(product: Product): string {
   return 'Corte especial';
 }
 
-export function ProductCard({ product, size, onAddToCart, isIAContent = false }: ProductCardProps): JSX.Element {
+export function ProductCard({ product, size, isIAContent = false }: ProductCardProps): JSX.Element {
   const badge = product.badge ?? (product.is_promoted ? 'Oferta Especial' : undefined);
   const image = resolveImage(product);
   const inStock = Number(product.stock) > 0;
@@ -103,10 +104,10 @@ export function ProductCard({ product, size, onAddToCart, isIAContent = false }:
     >
       <div className="tw-card-shell__image-wrap">
         <picture>
-          <source srcSet={image} type="image/webp" />
+          <source srcSet={assetUrl(image)} type="image/webp" />
           <img
             className="tw-card-shell__image"
-            src={pngFallback(image)}
+            src={assetUrl(pngFallback(image))}
             alt={product.name}
             loading="lazy"
             // Explicit dimensions give the image an intrinsic ratio before it
@@ -140,13 +141,29 @@ export function ProductCard({ product, size, onAddToCart, isIAContent = false }:
               </span>
             ) : null}
           </div>
-          <button
-            className="tw-button tw-button--primary"
-            type="button"
-            onClick={() => onAddToCart(product.id, 1)}
+          {/* One action, not two.
+              This card used to carry "Elegir" next to "Agregar" and they were the
+              same errand wearing different words. Worse, "Agregar" put a whole
+              kilo in the order without asking — a customer who wants half a kilo
+              had no way to say so, and the counter got a number nobody chose.
+              "Agregar" is the word people look for, so it stays; what changes is
+              where it goes. Nothing reaches the order without passing through the
+              configuration, where the weight, budget and piece modes live. */}
+          {/* Enlace estirado: su `::after` cubre la tarjeta entera, asi que tocar
+              la foto, el nombre o el precio lleva al mismo sitio que tocar el
+              boton. Hay gente que busca el boton y hay gente que toca la foto;
+              las dos aciertan.
+
+              Se hace con UN solo enlace y no envolviendo la tarjeta en otro,
+              porque dos enlaces al mismo destino se anuncian dos veces a un
+              lector de pantalla. */}
+          <Link
+            className="tw-button tw-button--primary tw-card-shell__enlace"
+            to={`/producto/${product.id}`}
+            aria-label={`Configurar y agregar ${product.name}`}
           >
             Agregar
-          </button>
+          </Link>
         </div>
       </div>
     </article>

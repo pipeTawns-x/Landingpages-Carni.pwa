@@ -15,6 +15,22 @@
   }
 }
 
+// The page is locked ONLY on a phone, where the panel covers the screen and
+// scrolling what is behind it scrolls nothing anyone can see.
+//
+// On a wide screen it must never be locked: the whole point of a drawer instead
+// of a modal is that the catalogue stays scrollable and clickable while the
+// order is open. The generated stylesheet had picked up an unconditional
+// `body.cart-is-open { overflow: hidden }` at the top — edited into the .css by
+// hand, never brought back to this source — and it froze the page at every
+// width. That is why the drawer stopped behaving the way it used to.
+@media (max-width: 575.98px) {
+  body.cart-is-open {
+    overflow: hidden;
+    touch-action: none;
+  }
+}
+
 .cart-panel {
   position: fixed;
   top: 0;

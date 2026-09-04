@@ -37,23 +37,6 @@
   font-weight: 700;
 }
 
-.tw-hero-grid {
-  display: grid;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
-  gap: 1.5rem;
-  margin: 2rem 0;
-}
-
-.tw-hero-grid__primary {
-  grid-column: span 8;
-}
-
-.tw-hero-grid__secondary {
-  grid-column: span 4;
-  display: grid;
-  gap: 1rem;
-}
-
 .tw-highlight-card {
   border-radius: 1.25rem;
   overflow: hidden;
@@ -113,31 +96,6 @@
   background: rgba(255,255,255,0.06);
   color: var(--redesign-beige);
   border: 1px solid rgba(228, 209, 176, 0.18);
-}
-
-.tw-summary-strip {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 1rem;
-  margin: 1.5rem 0 0;
-}
-
-.tw-summary-pill {
-  border-radius: 1rem;
-  padding: 1rem;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(228, 209, 176, 0.12);
-}
-
-.tw-summary-pill strong {
-  display: block;
-  font-size: 1.5rem;
-  color: var(--redesign-beige);
-}
-
-.tw-summary-pill span {
-  color: rgba(255,255,255,0.68);
-  font-size: 0.88rem;
 }
 
 .tw-bento-grid {
@@ -337,11 +295,88 @@
   max-width: 64ch;
 }
 
+/* Carril de una sola linea, no rejilla que se envuelve.
+   Con diez categorias y `flex-wrap: wrap`, "Ofertas" caia sola a una segunda
+   fila y el bloque se veia amontonado — Eduardo lo reporto dos veces. Una fila
+   que se arrastra ocupa alto constante y se lee de un vistazo. */
+.tw-filter-carril {
+  position: relative;
+  margin-top: 1.25rem;
+}
+
 .tw-filter-row {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 0.85rem;
-  margin-top: 1.25rem;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  /* Se sale del margen para que el arrastre llegue al borde de la pantalla,
+     como en cualquier app de telefono. */
+  margin-inline: -1rem;
+  padding: 0.25rem 1rem;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.tw-filter-row::-webkit-scrollbar { display: none; }
+
+/* Las capsulas dejan de encogerse: con `nowrap` un flex hijo se comprime hasta
+   volver ilegible su texto. */
+.tw-filter-row > * { flex: 0 0 auto; }
+
+/* Las flechas son de escritorio. En tactil el dedo ya arrastra, y un boton
+   flotante ahi solo tapa una capsula. */
+.tw-filter-flecha { display: none; }
+
+@media (hover: hover) and (min-width: 768px) {
+  /* Las flechas van FUERA del carril, no encima.
+     La primera version las puso en `position: absolute` sobre los extremos y
+     tapaban la primera y la ultima capsula — "Todo el catalogo" y "Ofertas"
+     quedaban ilegibles debajo del boton. Ahora el carril es una rejilla de tres
+     columnas y cada flecha ocupa la suya: nada se sobrepone a nada. */
+  .tw-filter-carril {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .tw-filter-carril .tw-filter-row {
+    margin-inline: 0;
+    padding-inline: 0;
+  }
+
+  .tw-filter-flecha {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border: 1px solid rgba(228, 209, 176, 0.28);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--redesign-beige);
+    cursor: pointer;
+    font-size: 1.25rem;
+    line-height: 1;
+    transition: border-color 0.25s ease, background 0.25s ease, opacity 0.25s ease;
+  }
+
+  .tw-filter-flecha:hover {
+    border-color: var(--redesign-gold);
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  /* Se atenua en vez de desaparecer: si se quitara del flujo, el carril saltaria
+     40 px a los lados cada vez que se llega a un extremo. */
+  .tw-filter-flecha[disabled] { opacity: 0.22; pointer-events: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tw-filter-flecha { transition: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tw-filter-row { scroll-behavior: auto; }
 }
 
 .tw-filter-chip {
@@ -577,21 +612,14 @@
 }
 
 @media (max-width: 1023.98px) {
-  .tw-hero-grid,
   .tw-buildads-grid,
   .tw-auth-strip__grid,
   .tw-admin-ribbon__grid {
     grid-template-columns: 1fr;
   }
-
-  .tw-hero-grid__primary,
-  .tw-hero-grid__secondary {
-    grid-column: span 12;
-  }
 }
 
 @media (max-width: 767.98px) {
-  .tw-summary-strip,
   .tw-panel__split,
   .tw-asset-grid {
     grid-template-columns: 1fr;
@@ -813,3 +841,757 @@
    84MB of layer memory, and the ABSOLUTE paint count during the same scroll rose
    from 42 to 288 — worse for everyone, including the case it was meant to fix.
    The photo alone keeps its layer; the card does not. */
+
+/* ── Ficha de producto · /producto/:id ───────────────────────────────────────
+   Editorial, no de plantilla. La foto manda y la tipografía se calla: por eso
+   las etiquetas van en versalitas con espaciado y el peso tipográfico se guarda
+   para el nombre del corte y el precio. Los bordes son de un píxel y el color
+   solo aparece donde hay que tocar.
+
+   Mobile-first: se diseña a 390 px y a partir de 900 px la foto pasa a columna
+   propia y se queda fija mientras el formulario se desplaza. */
+
+.ficha {
+  --tinta: #f4f1ea;
+  --tenue: rgba(244, 241, 234, 0.62);
+  --linea: rgba(244, 241, 234, 0.14);
+  --acento: #c8302f;
+  --crema: #e2cfa4;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0.5rem 1.25rem 4rem;
+  color: var(--tinta);
+}
+
+.ficha__volver {
+  display: inline-block;
+  min-height: 44px;
+  line-height: 44px;
+  color: var(--tenue);
+  text-decoration: none;
+  font-size: 0.82rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.ficha__volver:hover { color: var(--tinta); }
+
+.ficha__lienzo {
+  margin: 0.5rem 0 1.75rem;
+  background: #131313;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.ficha__foto {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+}
+
+.ficha__marca {
+  margin: 0 0 0.5rem;
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--tenue);
+}
+
+.ficha__titulo {
+  margin: 0 0 0.75rem;
+  font-size: clamp(1.75rem, 6vw, 2.4rem);
+  line-height: 1.1;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.ficha__precio { margin: 0 0 1.25rem; font-size: 1.5rem; font-weight: 600; color: var(--crema); }
+.ficha__unidad { font-size: 0.9rem; font-weight: 400; color: var(--tenue); }
+.ficha__libra  { display: block; margin-top: 0.15rem; font-size: 0.85rem; font-weight: 400; color: var(--tenue); }
+
+.ficha__nota { margin: 0 0 1.25rem; font-size: 0.95rem; line-height: 1.6; color: rgba(244,241,234,0.78); }
+.ficha__nota--aviso { color: var(--crema); }
+.ficha__nota--tenue { font-size: 0.8rem; color: var(--tenue); }
+
+.ficha__pregunta {
+  margin: 2rem 0 0.85rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--tenue);
+  font-weight: 600;
+}
+
+/* Se envuelven en vez de encogerse: a 390 px con tres modos en español, una
+   fila sola obligaría a bajar el objetivo táctil de 44 px. */
+.ficha__modos { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+
+.ficha__modo {
+  flex: 1 1 auto;
+  min-width: 110px;
+  min-height: 46px;
+  padding: 0 1.1rem;
+  border: 1px solid var(--linea);
+  border-radius: 2px;
+  background: transparent;
+  color: var(--tinta);
+  font-size: 0.86rem;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: border-color 0.18s ease, background-color 0.18s ease;
+}
+.ficha__modo:hover { border-color: rgba(244,241,234,0.4); }
+.ficha__modo--activo { background: var(--tinta); border-color: var(--tinta); color: #111; font-weight: 600; }
+
+.ficha__campos { margin-top: 1.5rem; display: grid; gap: 1.35rem; }
+.ficha__campo  { display: grid; gap: 0.5rem; }
+
+.ficha__etiqueta {
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--tenue);
+  font-weight: 600;
+}
+
+.ficha__fila { display: flex; gap: 0.5rem; }
+
+.ficha__campo input[type="number"],
+.ficha__campo select,
+.ficha__campo textarea {
+  flex: 1 1 auto;
+  min-width: 0;              /* sin esto un input dentro de flex desborda a 390 px */
+  min-height: 46px;
+  padding: 0.7rem 0.85rem;
+  border: 1px solid var(--linea);
+  border-radius: 2px;
+  background: #101010;
+  color: var(--tinta);
+  font-size: 1rem;           /* 16 px: por debajo, iOS hace zoom al enfocar */
+  font-family: inherit;
+}
+.ficha__campo textarea { resize: vertical; line-height: 1.5; }
+.ficha__campo input:focus-visible,
+.ficha__campo select:focus-visible,
+.ficha__campo textarea:focus-visible { outline: 2px solid var(--crema); outline-offset: 2px; }
+
+.ficha__campo input[type="range"] { width: 100%; min-height: 44px; accent-color: var(--acento); }
+.ficha__escala { display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--tenue); }
+
+/* El aviso de conversión. Se anuncia en color crema y no en rojo: no es un
+   error, es el sistema explicando lo que acaba de hacer. */
+.ficha__conversion {
+  font-size: 0.82rem;
+  color: var(--crema);
+  background: rgba(226, 207, 164, 0.08);
+  border-left: 2px solid var(--crema);
+  padding: 0.5rem 0.7rem;
+}
+
+.ficha__resumen { margin-top: 2rem; padding-top: 1.25rem; border-top: 1px solid var(--linea); }
+.ficha__resumen-linea { display: flex; justify-content: space-between; align-items: baseline; }
+.ficha__resumen-linea span { font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--tenue); }
+.ficha__resumen-linea strong { font-size: 1.9rem; font-weight: 600; color: var(--crema); }
+.ficha__resumen-detalle { margin: 0.5rem 0 0; font-size: 0.85rem; color: var(--tenue); }
+
+.ficha__boton {
+  width: 100%;
+  min-height: 52px;
+  margin-top: 1.25rem;
+  border: 0;
+  border-radius: 2px;
+  background: var(--acento);
+  color: #fff;
+  font-size: 0.86rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: filter 0.18s ease;
+}
+.ficha__boton:hover { filter: brightness(1.1); }
+
+.ficha__confirmacion {
+  margin: 0.75rem 0 0;
+  padding: 0.7rem 0.85rem;
+  font-size: 0.88rem;
+  color: #d6f0d6;
+  background: rgba(60, 140, 70, 0.14);
+  border-left: 2px solid #4c9a5a;
+}
+
+/* Esqueleto, no ruleta.
+   Una ruleta dice "espera"; un esqueleto dice "esto va a llegar y va a tener
+   esta forma", así que la página no salta cuando entran los datos. */
+.ficha__esqueleto {
+  border-radius: 2px;
+  background: linear-gradient(90deg, #161616 25%, #232323 37%, #161616 63%);
+  background-size: 400% 100%;
+  animation: ficha-brillo 1.4s ease-in-out infinite;
+}
+.ficha__esqueleto--foto   { width: 100%; aspect-ratio: 1 / 1; }
+.ficha__esqueleto--titulo { height: 34px; width: 65%; margin-top: 1.5rem; }
+.ficha__esqueleto--linea  { height: 20px; width: 40%; margin-top: 0.9rem; }
+
+@keyframes ficha-brillo { from { background-position: 100% 0; } to { background-position: 0 0; } }
+
+/* Se quita el movimiento, nunca el contraste ni la información. */
+@media (prefers-reduced-motion: reduce) {
+  .ficha__esqueleto { animation: none; }
+  .ficha__modo { transition: none; }
+}
+
+@media (min-width: 900px) {
+  /* Las dos columnas son SOLO para la foto y la decision. El banner y las
+     sugerencias son franjas de ancho completo debajo.
+     Sin declararles area, se auto-colocaban dentro de las columnas: el banner
+     quedaba bajo la foto, las sugerencias apretadas contra el borde derecho y
+     medio lienzo negro vacio en medio. Una rejilla con `grid-template-areas`
+     coloca sola a cualquier hijo que no tenga area asignada — es la trampa. */
+  .ficha {
+    display: grid;
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+    grid-template-areas:
+      "volver volver"
+      "foto   cuerpo"
+      "banner banner"
+      "mas    mas";
+    column-gap: 3.5rem;
+    align-items: start;
+    padding-inline: 2rem;
+  }
+  .ficha__migas { grid-area: volver; }
+  /* `align-self: start` es lo que lo mantiene en su fila.
+     Un elemento pegajoso se estira a la altura de su area de rejilla, y como la
+     fila crece con la columna de decision, la foto seguia bajando y acababa
+     encima de las sugerencias. Con `start` ocupa solo su alto y se pega dentro
+     de esa fila, sin invadir lo de abajo. */
+  /* La foto se queda QUIETA.
+     Estuvo `position: sticky` y no funciono: seguia a la columna de decision
+     hacia abajo y acababa invadiendo el banner y las sugerencias. Eduardo lo
+     reporto tres veces —"se sobrepone", "se ve mal", "sigues dejando suelta la
+     img"—. Una foto que persigue al lector no ayuda a decidir: se queda donde
+     esta y se acabo. */
+  .ficha__lienzo {
+    grid-area: foto;
+    margin-top: 0;
+    position: static;
+    align-self: start;
+    border-radius: 14px;
+    overflow: hidden;
+  }
+  .ficha__lienzo .ficha__foto { height: 100%; object-fit: cover; }
+  .ficha__cuerpo { grid-area: cuerpo; padding-top: 0.5rem; }
+  .ficha .banner { grid-area: banner; }
+  .ficha .sugeridos { grid-area: mas; }
+  .ficha__titulo { font-size: 2.6rem; }
+}
+
+/* ── Migas de la ficha ──────────────────────────────────────────────────────
+   Dos caminos de vuelta. El cercano —la categoría de la que vino— es el que
+   más se usa: quien entró a Porterhouse desde Cortes Especiales quiere el resto
+   de esa vitrina, no el tope del catálogo. */
+
+.ficha__migas {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.ficha__migas-sep { opacity: 0.35; }
+
+.ficha__volver--cerca {
+  color: #e8d9b5;
+  font-weight: 600;
+}
+
+/* ── Sugeridos ──────────────────────────────────────────────────────────────
+   Carril que se arrastra en el teléfono y se acomoda en fila en pantalla ancha.
+   Cuatro tarjetas apretadas en 390 px son cuatro miniaturas ilegibles. */
+
+.sugeridos {
+  margin: 3.5rem auto 0;
+  max-width: 1180px;
+  padding-inline: 1rem;
+}
+
+.sugeridos__encabezado {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.sugeridos__titulo {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #e8d9b5;
+}
+
+.sugeridos__todos {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  color: rgba(255, 255, 255, 0.72);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(232, 217, 181, 0.4);
+  font-size: 0.9rem;
+}
+
+/* De borde a borde y sin separacion, como Louis Vuitton cierra su ficha: las
+   fotos se tocan y forman una tira, en vez de cuatro cajas flotando con hueco
+   entre ellas. La primera version tenia `gap` y esquinas redondeadas y se veia
+   como un carrusel de plantilla. */
+.sugeridos__carril {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 62%;
+  gap: 0;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  margin-inline: -1rem;
+  padding: 0;
+  scrollbar-width: none;
+}
+
+.sugeridos__carril::-webkit-scrollbar { display: none; }
+
+.sugeridos__card {
+  scroll-snap-align: start;
+  display: grid;
+  gap: 0;
+  text-decoration: none;
+  color: #f2efe9;
+  overflow: hidden;
+}
+
+/* El texto respira dentro de la celda, no fuera: asi las fotos siguen pegadas
+   y el nombre no queda flotando en el fondo. */
+.sugeridos__card > span { padding-inline: 0.9rem; }
+.sugeridos__card > span:first-of-type { padding-top: 0.75rem; }
+.sugeridos__card > span:last-child { padding-bottom: 1.25rem; }
+
+.sugeridos__foto {
+  width: 100%;
+  aspect-ratio: 4 / 5;      /* retrato, no cuadrado: es la proporcion editorial */
+  object-fit: cover;
+  background: #1a1a1a;
+  transition: transform 0.6s ease;
+}
+
+.sugeridos__card:hover .sugeridos__foto { transform: scale(1.03); }
+
+.sugeridos__nombre { font-weight: 600; font-size: 0.98rem; }
+.sugeridos__precio { font-size: 0.9rem; color: rgba(255, 255, 255, 0.68); }
+
+.sugeridos__esqueleto {
+  aspect-ratio: 4 / 5;
+  background: linear-gradient(90deg, #1b1b1b 25%, #262626 37%, #1b1b1b 63%);
+  background-size: 400% 100%;
+  animation: detalle-brillo 1.4s ease-in-out infinite;
+}
+
+/* ── Banner de cierre ───────────────────────────────────────────────────────
+   Una imagen, una frase, un destino. No es una franja de promociones: es un
+   punto final. */
+
+/* Rompe el padding lateral de la ficha para llegar a los dos bordes. Un banner
+   editorial con margen a los lados deja de ser una franja y pasa a ser otra
+   tarjeta mas. */
+.banner {
+  position: relative;
+  margin-top: 4rem;
+  margin-inline: -1.25rem;
+  min-height: 420px;
+  display: grid;
+  align-items: end;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.banner__foto {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -2;
+}
+
+/* Rampa de varias paradas, no de dos. El ojo detecta el cambio de pendiente,
+   no el color: una rampa de dos colores siempre deja costura sobre una foto.
+   Y llega a cero puro arriba — un 0.05 residual también se ve como línea. */
+.banner__velo {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.92) 0%,
+    rgba(0, 0, 0, 0.86) 18%,
+    rgba(0, 0, 0, 0.62) 38%,
+    rgba(0, 0, 0, 0.3) 58%,
+    rgba(0, 0, 0, 0.1) 76%,
+    rgba(0, 0, 0, 0) 100%
+  );
+}
+
+.banner__texto {
+  padding: 2rem 1.25rem 2.5rem;
+  max-width: 620px;
+}
+
+.banner__antetitulo {
+  margin: 0 0 0.5rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #d9c9a3;
+}
+
+.banner__titulo {
+  margin: 0 0 0.6rem;
+  font-size: 1.9rem;
+  line-height: 1.15;
+  color: #fff;
+}
+
+.banner__linea {
+  margin: 0 0 1.25rem;
+  color: rgba(255, 255, 255, 0.86);
+  font-size: 1rem;
+}
+
+.banner__accion {
+  display: inline-flex;
+  align-items: center;
+  min-height: 48px;
+  padding: 0 1.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  border-radius: 999px;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.banner__accion:hover { background: #fff; color: #111; }
+
+@media (prefers-reduced-motion: reduce) {
+  .sugeridos__esqueleto { animation: none; }
+  .sugeridos__foto,
+  .banner__accion { transition: none; }
+  .sugeridos__card:hover .sugeridos__foto { transform: none; }
+}
+
+@media (min-width: 768px) {
+  .sugeridos { padding-inline: 1.5rem; }
+  .sugeridos__carril {
+    grid-auto-flow: row;
+    grid-template-columns: repeat(4, 1fr);
+    overflow-x: visible;
+    margin-inline: 0;
+  }
+  .banner { min-height: 520px; }
+  .banner__texto { padding: 3rem 3rem 3.5rem; }
+  .banner__titulo { font-size: 2.6rem; }
+}
+
+/* ── Tarjeta entera clicable ────────────────────────────────────────────────
+   El botón sigue ahí para quien lo busca, pero tocar la foto, el nombre o el
+   precio hace lo mismo. En la landing, la sección de "lo que la gente se lleva"
+   ya se comporta así y el catálogo no: la misma tarjeta respondía distinto en
+   dos páginas del mismo sitio. */
+
+.tw-card-shell { position: relative; }
+
+.tw-card-shell__enlace::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  /* Sin fondo: es un área de toque, no una capa visible. */
+}
+
+/* Lo que va por encima del área de toque tiene que seguir siendo suyo. Las
+   insignias no son clicables, pero si quedaran debajo, el navegador dibujaría
+   el foco del enlace sobre ellas. */
+.tw-card-shell__stock-badge,
+.tw-card-shell__badge { z-index: 2; }
+
+/* El foco del teclado tiene que verse en la TARJETA, no solo en el botón: es la
+   tarjeta entera la que responde. */
+.tw-card-shell:focus-within {
+  outline: 2px solid var(--redesign-gold);
+  outline-offset: 3px;
+}
+
+/* ── Esqueleto del catálogo ─────────────────────────────────────────────────
+   El catálogo arrancaba pintando la semilla —33 productos escritos a mano, con
+   nombres que no existen en la base— y un instante después los cambiaba por los
+   53 reales. Ese era el flasheo, y era peor que un parpadeo: por un momento el
+   cliente miraba productos que la carnicería no vende.
+
+   Ahora ocupa el mismo espacio que van a ocupar las tarjetas de verdad, así que
+   cuando llegan no salta nada. */
+
+.tw-card-esqueleto {
+  aspect-ratio: 3 / 4;
+  border-radius: 16px;
+  background: linear-gradient(90deg, #171717 25%, #232323 37%, #171717 63%);
+  background-size: 400% 100%;
+  animation: detalle-brillo 1.4s ease-in-out infinite;
+}
+
+/* Se quita el movimiento, nunca el contraste: quien pidió menos animación sigue
+   viendo que ahí va a haber algo. */
+@media (prefers-reduced-motion: reduce) {
+  .tw-card-esqueleto { animation: none; }
+}
+
+/* ── La lupa · panel de búsqueda ────────────────────────────────────────────
+   Superposición, no salto de página. Antes, tocar la lupa en la landing te
+   expulsaba a products.html antes de escribir una letra. */
+
+.lupa {
+  position: fixed;
+  inset: 0;
+  z-index: 1080;
+  display: flex;
+  flex-direction: column;
+  background: #0b0b0b;
+  animation: lupa-entra 0.22s ease;
+}
+
+@keyframes lupa-entra { from { opacity: 0; } to { opacity: 1; } }
+
+.lupa__barra {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.lupa__campo { flex: 1 1 auto; min-width: 0; }
+
+.lupa__campo input {
+  width: 100%;
+  min-height: 48px;
+  padding: 0 1.1rem;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #f2efe9;
+  font-size: 1rem;        /* 16px: por debajo, iOS hace zoom al enfocar */
+}
+
+.lupa__campo input:focus { outline: 2px solid #e8d9b5; outline-offset: 2px; }
+
+.lupa__cerrar {
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #f2efe9;
+  font-size: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.lupa__cuerpo { flex: 1 1 auto; overflow-y: auto; padding: 1rem 0 3rem; }
+.lupa__seccion { margin-bottom: 2rem; }
+
+.lupa__titulo {
+  margin: 0 1rem 0.85rem;
+  font-size: 0.82rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #e8d9b5;
+}
+
+.lupa__nota {
+  margin-left: 0.5rem;
+  letter-spacing: 0.04em;
+  text-transform: none;
+  color: rgba(255, 255, 255, 0.45);
+  font-weight: 400;
+}
+
+.lupa__terminos { display: flex; flex-wrap: wrap; gap: 0.5rem; padding-inline: 1rem; }
+
+.lupa__termino {
+  min-height: 40px;
+  padding: 0 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.86);
+  cursor: pointer;
+}
+
+/* De borde a borde y pegadas, como cierra LV. El carril se arrastra en el
+   teléfono y se asoma la siguiente, que es la señal de que hay más. */
+.lupa__carril {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 46%;
+  gap: 0;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+
+.lupa__carril::-webkit-scrollbar { display: none; }
+
+.lupa__card {
+  scroll-snap-align: start;
+  display: grid;
+  gap: 0;
+  border: 0;
+  padding: 0 0 1rem;
+  background: transparent;
+  color: #f2efe9;
+  text-align: left;
+  cursor: pointer;
+}
+
+.lupa__foto { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; background: #1a1a1a; }
+.lupa__nombre { padding: 0.7rem 0.9rem 0.15rem; font-weight: 600; font-size: 0.95rem; }
+.lupa__precio { padding: 0 0.9rem; font-size: 0.85rem; color: rgba(255, 255, 255, 0.6); }
+.lupa__vacio { padding: 2rem 1rem; color: rgba(255, 255, 255, 0.7); }
+
+.lupa__esqueleto {
+  aspect-ratio: 4 / 5;
+  background: linear-gradient(90deg, #171717 25%, #232323 37%, #171717 63%);
+  background-size: 400% 100%;
+  animation: detalle-brillo 1.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lupa { animation: none; }
+  .lupa__esqueleto { animation: none; }
+}
+
+@media (min-width: 768px) {
+  .lupa__barra { padding: 1.25rem 2rem; }
+  .lupa__campo input { max-width: 640px; margin: 0 auto; display: block; }
+  .lupa__titulo, .lupa__terminos { padding-inline: 2rem; margin-inline: 0; }
+  .lupa__carril { grid-auto-flow: row; grid-template-columns: repeat(6, 1fr); overflow-x: visible; }
+}
+
+/* ── Testimonios · carrusel de reseñas reales de Google ─────────────────────
+   Siete de sesenta y una. El 4.7 y el total quedan a la vista con enlace al
+   perfil: mostrar una selección junto al promedio real es honesto; esconder el
+   promedio no lo sería.
+
+   Las reglas de movimiento salen del patrón de carrusel de la ARIA Authoring
+   Practices Guide: para en el hover, para al recibir foco y NO se reanuda solo,
+   y el botón de pausa es obligatorio.
+   https://www.w3.org/WAI/ARIA/apg/patterns/carousel/ */
+
+.resenas { padding: 4rem 1rem 3rem; max-width: 1180px; margin: 0 auto; overflow-x: clip; }
+.resenas__encabezado { text-align: center; margin-bottom: 1.75rem; }
+
+.resenas__antetitulo {
+  margin: 0 0 0.6rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.55);
+}
+
+.resenas__nota { margin: 0 0 0.35rem; display: flex; align-items: center; justify-content: center; gap: 0.6rem; }
+.resenas__numero { font-size: 2.6rem; line-height: 1; color: #f2efe9; font-weight: 700; }
+.resenas__estrellas { font-size: 1.3rem; color: #e8b64c; letter-spacing: 0.08em; }
+
+.resenas__enlace {
+  display: inline-block; min-height: 44px; line-height: 44px;
+  color: rgba(255,255,255,0.72); font-size: 0.92rem; text-decoration: none;
+  border-bottom: 1px solid rgba(232,217,181,0.35);
+}
+.resenas__enlace:hover { color: #e8d9b5; }
+
+/* Las siete se apilan en la MISMA celda de la rejilla. Así la sección conserva
+   el alto de la más larga y nunca salta al cambiar de testimonio: una tarjeta
+   que brinca mientras alguien la lee es peor que no animar nada. */
+.resenas__escenario { display: grid; }
+.resenas__escenario > * { grid-area: 1 / 1; }
+
+.resena {
+  margin: 0;
+  padding: 2rem 1.5rem;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 16px;
+  background: rgba(255,255,255,0.035);
+  display: flex; flex-direction: column; gap: 1rem;
+  text-align: center;
+  opacity: 0;
+  transform: translateY(10px) scale(0.985);
+  transition: opacity 0.55s ease, transform 0.55s ease;
+  pointer-events: none;
+}
+
+.resena--activa { opacity: 1; transform: none; pointer-events: auto; }
+
+.resena__estrellas { margin: 0; color: #e8b64c; letter-spacing: 0.12em; }
+.resena__texto { margin: 0; font-size: 1.05rem; line-height: 1.6; color: rgba(255,255,255,0.9); }
+.resena__autor { display: grid; gap: 0.2rem; font-weight: 600; color: #e8d9b5; }
+.resena__opiniones { font-weight: 400; font-size: 0.8rem; color: rgba(255,255,255,0.45); }
+
+.resenas__mandos { display: flex; align-items: center; justify-content: center; gap: 0.75rem; margin-top: 1.5rem; }
+
+.resenas__flecha {
+  width: 44px; height: 44px;         /* objetivo táctil real, no decorativo */
+  display: grid; place-items: center;
+  border: 1px solid rgba(228,209,176,0.28); border-radius: 999px;
+  background: transparent; color: #e8d9b5; font-size: 1.3rem; cursor: pointer;
+}
+.resenas__flecha:hover { border-color: #e8d9b5; }
+
+.resenas__puntos { display: flex; gap: 0.5rem; }
+
+/* El punto se ve de 8px pero el área que responde al dedo mide 44. Un punto de
+   ocho píxeles es imposible de acertar en un teléfono. */
+.resenas__punto {
+  width: 44px; height: 44px; padding: 0; border: 0; background: none; cursor: pointer;
+  display: grid; place-items: center;
+}
+.resenas__punto::before {
+  content: ''; width: 8px; height: 8px; border-radius: 999px;
+  background: rgba(255,255,255,0.28); transition: background 0.3s ease, transform 0.3s ease;
+}
+.resenas__punto--activo::before { background: #e8d9b5; transform: scale(1.4); }
+
+.resenas__pausa {
+  display: block; margin: 0.75rem auto 0; min-height: 40px; padding: 0 1.1rem;
+  border: 1px solid rgba(255,255,255,0.16); border-radius: 999px;
+  background: transparent; color: rgba(255,255,255,0.6); font-size: 0.82rem; cursor: pointer;
+}
+.resenas__pausa:hover { color: #f2efe9; border-color: rgba(255,255,255,0.3); }
+
+/* Sin movimiento, la sección sigue completa: las siete se apilan una tras otra
+   y se leen todas. No se esconde información, se quita la animación. */
+@media (prefers-reduced-motion: reduce) {
+  .resenas__escenario { display: grid; gap: 1rem; }
+  .resenas__escenario > * { grid-area: auto; }
+  .resena { opacity: 1; transform: none; transition: none; pointer-events: auto; }
+  .resenas__punto::before { transition: none; }
+}
+
+@media (min-width: 768px) {
+  .resenas { padding-inline: 2rem; }
+  .resena { padding: 2.5rem 3rem; }
+  .resena__texto { font-size: 1.2rem; }
+}
+
