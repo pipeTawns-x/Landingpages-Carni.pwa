@@ -97,10 +97,16 @@ export function Lupa({ irAlProducto }: LupaProps): JSX.Element | null {
   // The magnifier lives in the static HTML header on all three pages, so it is
   // bound by id rather than through a prop.
   useEffect(() => {
-    const botones = [
-      document.getElementById('searchBtn'),
-      ...Array.from(document.querySelectorAll('.header-search'))
-    ].filter(Boolean) as HTMLElement[];
+    // A Set, because the header button carries BOTH the id and the class — the
+    // same element came back twice and got two listeners on the same click.
+    const botones = Array.from(
+      new Set(
+        [
+          document.getElementById('searchBtn'),
+          ...Array.from(document.querySelectorAll('.header-search'))
+        ].filter(Boolean) as HTMLElement[]
+      )
+    );
 
     const alClic = (e: Event): void => {
       e.preventDefault();
@@ -110,6 +116,18 @@ export function Lupa({ irAlProducto }: LupaProps): JSX.Element | null {
     botones.forEach((b) => b.addEventListener('click', alClic));
     return () => botones.forEach((b) => b.removeEventListener('click', alClic));
   }, [abrir]);
+
+  /**
+   * The body class is cleaned up on unmount, not only on close.
+   *
+   * `cerrar()` removes it, but a route change unmounts the panel without ever
+   * calling it — and the class was left behind, so the header magnifier stayed
+   * invisible and the search looked jammed. Eduardo had to open the cart and use
+   * *its* close button to get out.
+   */
+  useEffect(() => {
+    return () => document.body.classList.remove('lupa-abierta');
+  }, []);
 
   useEffect(() => {
     if (!abierta) return;

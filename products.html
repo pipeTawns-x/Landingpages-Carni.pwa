@@ -58,7 +58,10 @@
     </script>
     <script src="js/modules/ui/header.js" type="module"></script>
     <script src="js/modules/core/cart.js" type="module"></script>
-    <script src="js/modules/ui/search.js" type="module"></script>
+    <!-- ui/search.js se elimino el 2026-09-04. Enganchaba el MISMO #searchBtn
+       que el panel de React y hacia window.location.href a products.html, asi que
+       los dos peleaban por el clic: a veces ganaba el salto y el panel "no salia".
+       La busqueda vive ahora en src/components/Lupa/. -->
     <!-- El clima vive en el encabezado, y el encabezado es el mismo en las dos
          páginas. Sin esto el catálogo mostraría "--°C" para siempre. -->
     <script src="js/modules/ui/weather.js" type="module"></script>
