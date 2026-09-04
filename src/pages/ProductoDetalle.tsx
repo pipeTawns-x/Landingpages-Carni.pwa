@@ -360,8 +360,12 @@ export function ProductoDetalle(): JSX.Element {
         </p>
       </div>
 
-      <Relacionados producto={producto} />
+      {/* El orden lo fijo Eduardo mirando como cierran Louis Vuitton y carnivoros:
+          primero se decide el pedido, luego respira una imagen a todo lo ancho, y
+          al final las cuatro sugerencias. Al reves, las tarjetas competian con la
+          decision que el cliente vino a tomar. */}
       <BannerEditorial />
+      <Relacionados producto={producto} />
     </section>
   );
 }

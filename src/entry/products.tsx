@@ -208,7 +208,21 @@ function CatalogExperience(): JSX.Element {
   // Starts from the seed so the grid paints on the very first render. It used to
   // start empty and wait for Supabase, which on an unreachable host meant 7.4
   // seconds of blank page before a single card appeared.
-  const [products, setProducts] = useState<Product[]>(SEED_PRODUCTS);
+  /**
+   * The grid starts EMPTY and shows a skeleton, not the seed.
+   *
+   * It used to mount straight into SEED_PRODUCTS. That painted 33 hand-written
+   * products — "Ribeye", "T-Bone", names that do not exist in Supabase — and a
+   * moment later swapped them for the 53 real ones. Different count, different
+   * names, different height: that is the flash, and it is worse than a flicker,
+   * because for an instant the customer is looking at products the shop does not
+   * sell.
+   *
+   * The seed still earns its place, but as what it was meant to be: the floor
+   * under a request that never answers. It lands on timeout, not on first paint.
+   */
+  const [products, setProducts] = useState<Product[]>([]);
+  const [cargando, setCargando] = useState<boolean>(true);
   // Hydrated from the shared cart key. Mounting empty and then writing through
   // to that key is what used to wipe a cart filled elsewhere on the site.
   const [order, setOrder] = useState<OrderLine[]>(() => readLegacyCart());
@@ -236,19 +250,26 @@ function CatalogExperience(): JSX.Element {
   }, [slugPedido, products]);
 
   useEffect(() => {
-    void fetchProducts().then(({ products: loaded, live }) => {
-      // The seed is already on screen; only a real response is worth a re-render.
-      if (!live) {
-        return;
-      }
+    void fetchProducts()
+      .then(({ products: loaded, live }) => {
+        // `fetchProducts` already falls back to the seed when the request times
+        // out, so `loaded` is never empty. What `live` says is whether these are
+        // the real ones — and either way they are what the customer gets, so
+        // both go on screen. Returning early here was what kept the seed
+        // visible.
+        setProducts(loaded);
 
-      setProducts(loaded);
-
-      const fromUrl = filterFromUrl(loaded);
-      if (fromUrl) {
-        setActiveFilter(fromUrl);
-      }
-    });
+        const fromUrl = filterFromUrl(loaded, slugPedido);
+        if (fromUrl) {
+          setActiveFilter(fromUrl);
+        }
+      })
+      .finally(() => {
+        // In `finally`, never inside the success branch: a rejected request
+        // would leave the skeleton shimmering forever with no way out.
+        setCargando(false);
+      });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Runs on every change to the order, including the first render and the
@@ -365,7 +386,7 @@ function CatalogExperience(): JSX.Element {
         />
       </div>
 
-      <ProductList products={filteredProducts} />
+      <ProductList products={filteredProducts} cargando={cargando} />
 
       <CartPanel
         isOpen={isCartOpen}

@@ -329,27 +329,50 @@
 .tw-filter-flecha { display: none; }
 
 @media (hover: hover) and (min-width: 768px) {
+  /* Las flechas van FUERA del carril, no encima.
+     La primera version las puso en `position: absolute` sobre los extremos y
+     tapaban la primera y la ultima capsula — "Todo el catalogo" y "Ofertas"
+     quedaban ilegibles debajo del boton. Ahora el carril es una rejilla de tres
+     columnas y cada flecha ocupa la suya: nada se sobrepone a nada. */
+  .tw-filter-carril {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .tw-filter-carril .tw-filter-row {
+    margin-inline: 0;
+    padding-inline: 0;
+  }
+
   .tw-filter-flecha {
     display: grid;
     place-items: center;
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
     width: 40px;
     height: 40px;
-    z-index: 2;
     border: 1px solid rgba(228, 209, 176, 0.28);
     border-radius: 999px;
-    background: rgba(10, 10, 10, 0.92);
+    background: rgba(255, 255, 255, 0.04);
     color: var(--redesign-beige);
     cursor: pointer;
-    font-size: 1.1rem;
+    font-size: 1.25rem;
     line-height: 1;
+    transition: border-color 0.25s ease, background 0.25s ease, opacity 0.25s ease;
   }
-  .tw-filter-flecha:hover { border-color: var(--redesign-gold); }
-  .tw-filter-flecha[disabled] { opacity: 0; pointer-events: none; }
-  .tw-filter-flecha--izq { left: -8px; }
-  .tw-filter-flecha--der { right: -8px; }
+
+  .tw-filter-flecha:hover {
+    border-color: var(--redesign-gold);
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  /* Se atenua en vez de desaparecer: si se quitara del flujo, el carril saltaria
+     40 px a los lados cada vez que se llega a un extremo. */
+  .tw-filter-flecha[disabled] { opacity: 0.22; pointer-events: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tw-filter-flecha { transition: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1020,17 +1043,29 @@
 }
 
 @media (min-width: 900px) {
+  /* Las dos columnas son SOLO para la foto y la decision. El banner y las
+     sugerencias son franjas de ancho completo debajo.
+     Sin declararles area, se auto-colocaban dentro de las columnas: el banner
+     quedaba bajo la foto, las sugerencias apretadas contra el borde derecho y
+     medio lienzo negro vacio en medio. Una rejilla con `grid-template-areas`
+     coloca sola a cualquier hijo que no tenga area asignada — es la trampa. */
   .ficha {
     display: grid;
     grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
-    grid-template-areas: "volver volver" "foto cuerpo";
+    grid-template-areas:
+      "volver volver"
+      "foto   cuerpo"
+      "banner banner"
+      "mas    mas";
     column-gap: 3.5rem;
     align-items: start;
     padding-inline: 2rem;
   }
-  .ficha__volver { grid-area: volver; }
+  .ficha__migas { grid-area: volver; }
   .ficha__lienzo { grid-area: foto; margin-top: 0; position: sticky; top: 96px; }
   .ficha__cuerpo { grid-area: cuerpo; padding-top: 0.5rem; }
+  .ficha .banner { grid-area: banner; }
+  .ficha .sugeridos { grid-area: mas; }
   .ficha__titulo { font-size: 2.6rem; }
 }
 
@@ -1148,9 +1183,13 @@
    Una imagen, una frase, un destino. No es una franja de promociones: es un
    punto final. */
 
+/* Rompe el padding lateral de la ficha para llegar a los dos bordes. Un banner
+   editorial con margen a los lados deja de ser una franja y pasa a ser otra
+   tarjeta mas. */
 .banner {
   position: relative;
   margin-top: 4rem;
+  margin-inline: -1.25rem;
   min-height: 420px;
   display: grid;
   align-items: end;
@@ -1245,4 +1284,56 @@
   .banner { min-height: 520px; }
   .banner__texto { padding: 3rem 3rem 3.5rem; }
   .banner__titulo { font-size: 2.6rem; }
+}
+
+/* ── Tarjeta entera clicable ────────────────────────────────────────────────
+   El botón sigue ahí para quien lo busca, pero tocar la foto, el nombre o el
+   precio hace lo mismo. En la landing, la sección de "lo que la gente se lleva"
+   ya se comporta así y el catálogo no: la misma tarjeta respondía distinto en
+   dos páginas del mismo sitio. */
+
+.tw-card-shell { position: relative; }
+
+.tw-card-shell__enlace::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  /* Sin fondo: es un área de toque, no una capa visible. */
+}
+
+/* Lo que va por encima del área de toque tiene que seguir siendo suyo. Las
+   insignias no son clicables, pero si quedaran debajo, el navegador dibujaría
+   el foco del enlace sobre ellas. */
+.tw-card-shell__stock-badge,
+.tw-card-shell__badge { z-index: 2; }
+
+/* El foco del teclado tiene que verse en la TARJETA, no solo en el botón: es la
+   tarjeta entera la que responde. */
+.tw-card-shell:focus-within {
+  outline: 2px solid var(--redesign-gold);
+  outline-offset: 3px;
+}
+
+/* ── Esqueleto del catálogo ─────────────────────────────────────────────────
+   El catálogo arrancaba pintando la semilla —33 productos escritos a mano, con
+   nombres que no existen en la base— y un instante después los cambiaba por los
+   53 reales. Ese era el flasheo, y era peor que un parpadeo: por un momento el
+   cliente miraba productos que la carnicería no vende.
+
+   Ahora ocupa el mismo espacio que van a ocupar las tarjetas de verdad, así que
+   cuando llegan no salta nada. */
+
+.tw-card-esqueleto {
+  aspect-ratio: 3 / 4;
+  border-radius: 16px;
+  background: linear-gradient(90deg, #171717 25%, #232323 37%, #171717 63%);
+  background-size: 400% 100%;
+  animation: detalle-brillo 1.4s ease-in-out infinite;
+}
+
+/* Se quita el movimiento, nunca el contraste: quien pidió menos animación sigue
+   viendo que ahí va a haber algo. */
+@media (prefers-reduced-motion: reduce) {
+  .tw-card-esqueleto { animation: none; }
 }

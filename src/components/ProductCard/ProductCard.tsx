@@ -149,7 +149,19 @@ export function ProductCard({ product, size, isIAContent = false }: ProductCardP
               "Agregar" is the word people look for, so it stays; what changes is
               where it goes. Nothing reaches the order without passing through the
               configuration, where the weight, budget and piece modes live. */}
-          <Link className="tw-button tw-button--primary" to={`/producto/${product.id}`}>
+          {/* Enlace estirado: su `::after` cubre la tarjeta entera, asi que tocar
+              la foto, el nombre o el precio lleva al mismo sitio que tocar el
+              boton. Hay gente que busca el boton y hay gente que toca la foto;
+              las dos aciertan.
+
+              Se hace con UN solo enlace y no envolviendo la tarjeta en otro,
+              porque dos enlaces al mismo destino se anuncian dos veces a un
+              lector de pantalla. */}
+          <Link
+            className="tw-button tw-button--primary tw-card-shell__enlace"
+            to={`/producto/${product.id}`}
+            aria-label={`Configurar y agregar ${product.name}`}
+          >
             Agregar
           </Link>
         </div>
