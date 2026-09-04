@@ -1490,145 +1490,108 @@
   .lupa__carril { grid-auto-flow: row; grid-template-columns: repeat(6, 1fr); overflow-x: visible; }
 }
 
-/* ── Testimonios · reseñas reales de Google ─────────────────────────────────
-   Siete de sesenta y una. El 4.7 y el total quedan a la vista, con enlace al
+/* ── Testimonios · carrusel de reseñas reales de Google ─────────────────────
+   Siete de sesenta y una. El 4.7 y el total quedan a la vista con enlace al
    perfil: mostrar una selección junto al promedio real es honesto; esconder el
-   promedio sería publicidad engañosa. Con un 4.7 de verdad no hay nada que
-   maquillar. */
+   promedio no lo sería.
 
-.resenas { padding: 4rem 1rem 3rem; max-width: 1180px; margin: 0 auto; }
+   Las reglas de movimiento salen del patrón de carrusel de la ARIA Authoring
+   Practices Guide: para en el hover, para al recibir foco y NO se reanuda solo,
+   y el botón de pausa es obligatorio.
+   https://www.w3.org/WAI/ARIA/apg/patterns/carousel/ */
 
-.resenas__encabezado { text-align: center; margin-bottom: 2rem; }
+.resenas { padding: 4rem 1rem 3rem; max-width: 1180px; margin: 0 auto; overflow-x: clip; }
+.resenas__encabezado { text-align: center; margin-bottom: 1.75rem; }
 
 .resenas__antetitulo {
-  margin: 0 0 0.5rem;
+  margin: 0 0 0.6rem;
   font-size: 0.78rem;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.55);
+  color: rgba(255,255,255,0.55);
 }
 
-.resenas__titulo {
-  margin: 0 0 0.4rem;
-  font-size: 2.6rem;
-  line-height: 1;
-  color: #f2efe9;
-}
-
-.resenas__estrellas { font-size: 1.4rem; color: #e8b64c; letter-spacing: 0.1em; }
+.resenas__nota { margin: 0 0 0.35rem; display: flex; align-items: center; justify-content: center; gap: 0.6rem; }
+.resenas__numero { font-size: 2.6rem; line-height: 1; color: #f2efe9; font-weight: 700; }
+.resenas__estrellas { font-size: 1.3rem; color: #e8b64c; letter-spacing: 0.08em; }
 
 .resenas__enlace {
-  display: inline-block;
-  min-height: 44px;
-  line-height: 44px;
-  color: rgba(255, 255, 255, 0.72);
-  font-size: 0.92rem;
-  border-bottom: 1px solid rgba(232, 217, 181, 0.35);
-  text-decoration: none;
+  display: inline-block; min-height: 44px; line-height: 44px;
+  color: rgba(255,255,255,0.72); font-size: 0.92rem; text-decoration: none;
+  border-bottom: 1px solid rgba(232,217,181,0.35);
 }
-
 .resenas__enlace:hover { color: #e8d9b5; }
 
-/* Carril que se arrastra en el teléfono; se asoma la siguiente, que es la señal
-   de que hay más. En pantalla ancha se acomodan en tres columnas. */
-/* `overflow-x: clip` en la sección impide que el margen negativo del carril
-   empuje la barra de desplazamiento de la página entera. */
-.resenas { overflow-x: clip; }
+/* Las siete se apilan en la MISMA celda de la rejilla. Así la sección conserva
+   el alto de la más larga y nunca salta al cambiar de testimonio: una tarjeta
+   que brinca mientras alguien la lee es peor que no animar nada. */
+.resenas__escenario { display: grid; }
+.resenas__escenario > * { grid-area: 1 / 1; }
 
-.resenas__carril {
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: 80%;
-  gap: 1rem;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  margin-inline: -1rem;
-  padding: 0.5rem 1rem 1rem;
-  scrollbar-width: none;
-}
-
-.resenas__carril::-webkit-scrollbar { display: none; }
-
-.resenas__card {
-  scroll-snap-align: start;
+.resena {
   margin: 0;
-  padding: 1.5rem;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.035);
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-/* La animación es una MEJORA, no un requisito para leer.
-   La primera versión ponía `opacity: 0` por defecto y lo levantaba con una clase
-   que agrega el IntersectionObserver. Si el observador no dispara —una pestaña
-   en segundo plano, un navegador sin soporte— la sección entera queda invisible.
-   Eso ya pasó en este proyecto: fue P-09, nueve tarjetas del bento en el DOM con
-   `opacity: 0` y nadie observándolas.
-   Ahora se lee siempre, y solo se oculta cuando React confirma que va a animar. */
-.resenas--animar .resenas__card {
+  padding: 2rem 1.5rem;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 16px;
+  background: rgba(255,255,255,0.035);
+  display: flex; flex-direction: column; gap: 1rem;
+  text-align: center;
   opacity: 0;
-  transform: translateY(14px);
-  transition: opacity 0.5s ease var(--retraso, 0ms), transform 0.5s ease var(--retraso, 0ms);
+  transform: translateY(10px) scale(0.985);
+  transition: opacity 0.55s ease, transform 0.55s ease;
+  pointer-events: none;
 }
 
-.resenas--animar.resenas--visible .resenas__card { opacity: 1; transform: none; }
+.resena--activa { opacity: 1; transform: none; pointer-events: auto; }
 
-.resenas__texto {
-  margin: 0;
-  flex: 1 1 auto;
-  color: rgba(255, 255, 255, 0.88);
-  font-size: 1rem;
-  line-height: 1.55;
+.resena__estrellas { margin: 0; color: #e8b64c; letter-spacing: 0.12em; }
+.resena__texto { margin: 0; font-size: 1.05rem; line-height: 1.6; color: rgba(255,255,255,0.9); }
+.resena__autor { display: grid; gap: 0.2rem; font-weight: 600; color: #e8d9b5; }
+.resena__opiniones { font-weight: 400; font-size: 0.8rem; color: rgba(255,255,255,0.45); }
+
+.resenas__mandos { display: flex; align-items: center; justify-content: center; gap: 0.75rem; margin-top: 1.5rem; }
+
+.resenas__flecha {
+  width: 44px; height: 44px;         /* objetivo táctil real, no decorativo */
+  display: grid; place-items: center;
+  border: 1px solid rgba(228,209,176,0.28); border-radius: 999px;
+  background: transparent; color: #e8d9b5; font-size: 1.3rem; cursor: pointer;
 }
+.resenas__flecha:hover { border-color: #e8d9b5; }
 
-.resenas__autor {
-  display: grid;
-  gap: 0.15rem;
-  font-weight: 600;
-  color: #e8d9b5;
-  font-size: 0.95rem;
+.resenas__puntos { display: flex; gap: 0.5rem; }
+
+/* El punto se ve de 8px pero el área que responde al dedo mide 44. Un punto de
+   ocho píxeles es imposible de acertar en un teléfono. */
+.resenas__punto {
+  width: 44px; height: 44px; padding: 0; border: 0; background: none; cursor: pointer;
+  display: grid; place-items: center;
 }
-
-/* Cuántas reseñas ha escrito esa persona. Es lo que separa a un cliente real de
-   una cuenta abierta para dejar una estrella. */
-.resenas__opiniones {
-  font-weight: 400;
-  font-size: 0.8rem;
-  color: rgba(255, 255, 255, 0.45);
+.resenas__punto::before {
+  content: ''; width: 8px; height: 8px; border-radius: 999px;
+  background: rgba(255,255,255,0.28); transition: background 0.3s ease, transform 0.3s ease;
 }
+.resenas__punto--activo::before { background: #e8d9b5; transform: scale(1.4); }
 
-/* Se quita el movimiento, nunca el contenido. */
+.resenas__pausa {
+  display: block; margin: 0.75rem auto 0; min-height: 40px; padding: 0 1.1rem;
+  border: 1px solid rgba(255,255,255,0.16); border-radius: 999px;
+  background: transparent; color: rgba(255,255,255,0.6); font-size: 0.82rem; cursor: pointer;
+}
+.resenas__pausa:hover { color: #f2efe9; border-color: rgba(255,255,255,0.3); }
+
+/* Sin movimiento, la sección sigue completa: las siete se apilan una tras otra
+   y se leen todas. No se esconde información, se quita la animación. */
 @media (prefers-reduced-motion: reduce) {
-  .resenas--animar .resenas__card { opacity: 1; transform: none; transition: none; }
+  .resenas__escenario { display: grid; gap: 1rem; }
+  .resenas__escenario > * { grid-area: auto; }
+  .resena { opacity: 1; transform: none; transition: none; pointer-events: auto; }
+  .resenas__punto::before { transition: none; }
 }
 
 @media (min-width: 768px) {
   .resenas { padding-inline: 2rem; }
-  .resenas__carril {
-    grid-auto-flow: row;
-    grid-template-columns: repeat(3, 1fr);
-    overflow-x: visible;
-    margin-inline: 0;
-    padding-inline: 0;
-  }
+  .resena { padding: 2.5rem 3rem; }
+  .resena__texto { font-size: 1.2rem; }
 }
 
-/* ── Una sola lupa a la vez ─────────────────────────────────────────────────
-   Con el panel abierto, la lupa del encabezado no hace nada que el campo ya
-   enfocado no haga. Se atenúa en vez de desaparecer, para que el encabezado no
-   salte de ancho al abrir y cerrar. */
-
-body.lupa-abierta #searchBtn,
-body.lupa-abierta .header-search {
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.2s ease;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  body.lupa-abierta #searchBtn,
-  body.lupa-abierta .header-search { transition: none; }
-}
