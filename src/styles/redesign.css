@@ -1067,15 +1067,19 @@
      fila crece con la columna de decision, la foto seguia bajando y acababa
      encima de las sugerencias. Con `start` ocupa solo su alto y se pega dentro
      de esa fila, sin invadir lo de abajo. */
+  /* La foto se queda QUIETA.
+     Estuvo `position: sticky` y no funciono: seguia a la columna de decision
+     hacia abajo y acababa invadiendo el banner y las sugerencias. Eduardo lo
+     reporto tres veces —"se sobrepone", "se ve mal", "sigues dejando suelta la
+     img"—. Una foto que persigue al lector no ayuda a decidir: se queda donde
+     esta y se acabo. */
   .ficha__lienzo {
     grid-area: foto;
     margin-top: 0;
-    position: sticky;
-    top: 96px;
+    position: static;
     align-self: start;
-    max-height: calc(100vh - 120px);
-    overflow: hidden;
     border-radius: 14px;
+    overflow: hidden;
   }
   .ficha__lienzo .ficha__foto { height: 100%; object-fit: cover; }
   .ficha__cuerpo { grid-area: cuerpo; padding-top: 0.5rem; }
@@ -1610,4 +1614,21 @@
     margin-inline: 0;
     padding-inline: 0;
   }
+}
+
+/* ── Una sola lupa a la vez ─────────────────────────────────────────────────
+   Con el panel abierto, la lupa del encabezado no hace nada que el campo ya
+   enfocado no haga. Se atenúa en vez de desaparecer, para que el encabezado no
+   salte de ancho al abrir y cerrar. */
+
+body.lupa-abierta #searchBtn,
+body.lupa-abierta .header-search {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.lupa-abierta #searchBtn,
+  body.lupa-abierta .header-search { transition: none; }
 }

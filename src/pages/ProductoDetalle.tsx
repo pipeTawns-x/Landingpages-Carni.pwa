@@ -58,7 +58,46 @@ function pesoPorPieza(p: Product): number | null {
   if (typeof v === 'number' && v > 0) {
     return v;
   }
-  return PESO_POR_PIEZA_SUGERIDO[p.name.trim().toLowerCase()] ?? null;
+  const nombre = p.name.trim().toLowerCase();
+  if (PESO_POR_PIEZA_SUGERIDO[nombre]) {
+    return PESO_POR_PIEZA_SUGERIDO[nombre];
+  }
+  return porFamilia(nombre);
+}
+
+/**
+ * Falls back to what the counter sells by the piece.
+ *
+ * Eduardo listed them: bistec, chicken leg — with its thigh, they are not split —
+ * breast, and sausage sold in links. A whole category cannot answer this: a
+ * chicken breast goes by the piece and a chicken stew does not, and both are
+ * `pollo`. So it matches on the word the shop uses in the product name.
+ *
+ * Every number here is an ESTIMATE waiting for the owner's scale, same as the
+ * table above. What it buys today is that the mode exists for the products where
+ * a customer would actually ask for it — "deme cuatro bisteces" is how people
+ * order, and until now the page had no way to hear it.
+ */
+function porFamilia(nombre: string): number | null {
+  const familias: Array<[RegExp, number]> = [
+    [/bistec|bisteck|milanesa/, 0.12],
+    [/pierna y muslo|pierna con muslo|pierna/, 0.35],
+    [/media pechuga/, 0.3],
+    [/pechuga/, 0.55],
+    [/muslo/, 0.18],
+    [/ala|alita/, 0.09],
+    [/chorizo|longaniza/, 0.25],
+    [/salchicha/, 0.06],
+    [/chuleta/, 0.22],
+    [/costilla/, 0.4]
+  ];
+
+  for (const [patron, kg] of familias) {
+    if (patron.test(nombre)) {
+      return kg;
+    }
+  }
+  return null;
 }
 
 function grosorPorDefecto(p: Product): number {
@@ -357,7 +396,7 @@ export function ProductoDetalle(): JSX.Element {
 
         {pesoPieza === null ? (
           <p className="ficha__nota ficha__nota--aviso">
-            Este corte todavía no se puede pedir por pieza: falta registrar cuánto pesa cada una.
+            Este producto todavía no se puede pedir por pieza: falta registrar cuánto pesa cada una.
           </p>
         ) : null}
 

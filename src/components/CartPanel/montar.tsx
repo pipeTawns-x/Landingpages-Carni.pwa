@@ -3,6 +3,18 @@ import { CartPanel } from './CartPanel';
 import { usePedido } from '@src/hooks/usePedido';
 import { leerPedidoGuardado } from '@src/lib/pedidoStorage';
 
+/**
+ * The order follows the customer between pages.
+ *
+ * `index.html`, `products.html` and `accessweb.html` are three separate HTML
+ * documents, so nothing survives the jump in memory. What does survive is the
+ * `carni_cart_v1` key, and `usePedido` reads it on every mount — so a cut added
+ * on the landing is already in the ticket when the catalogue opens, and the
+ * other way round.
+ *
+ * The `storage` event covers the rest: a second tab writing the key updates this
+ * one without a reload.
+ */
 function CarritoGlobal(): JSX.Element {
   const pedido = usePedido({ leer: leerPedidoGuardado });
   return (

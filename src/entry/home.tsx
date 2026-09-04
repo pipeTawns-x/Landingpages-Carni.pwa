@@ -1,3 +1,4 @@
+import '@src/styles/redesign.css';
 import { Testimonios } from '@src/components/Testimonios/Testimonios';
 import { montarCarrito } from '@src/components/CartPanel/montar';
 import { montarLupa } from '@src/components/Lupa/montar';

@@ -78,9 +78,14 @@ export function Lupa({ irAlProducto }: LupaProps): JSX.Element | null {
     disparador.current = document.activeElement;
     setRecientes(leerRecientes());
     setAbierta(true);
+    // Two magnifiers on screen at once is one too many. The header keeps its
+    // own, and while the panel is open the page's is redundant — the field is
+    // already focused and waiting.
+    document.body.classList.add('lupa-abierta');
   }, []);
 
   const cerrar = useCallback(() => {
+    document.body.classList.remove('lupa-abierta');
     setAbierta(false);
     setTexto('');
     setConsulta('');
