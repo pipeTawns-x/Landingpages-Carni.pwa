@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { usePedido } from '@src/hooks/usePedido';
 import { CarrilCategorias } from '@src/components/CarrilCategorias/CarrilCategorias';
 import { CartPanel } from '@src/components/CartPanel/CartPanel';
 import { ProductList } from '@src/components/ProductList/ProductList';
@@ -234,7 +235,6 @@ function CatalogExperience(): JSX.Element {
   const [activeFilter, setActiveFilter] = useState<string>(
     () => filterFromUrl(SEED_PRODUCTS, slugPedido) ?? 'all'
   );
-  const [isCartOpen, setIsCartOpen] = useState<boolean>(false);
 
   // Coming back from a product page is a route change, not a mount: the filter
   // was resolved once in the useState initializer and never looked again, so
@@ -306,42 +306,7 @@ function CatalogExperience(): JSX.Element {
   }, []);
 
   // The cart button lives in the static header, outside this tree, so it is
-  // bound here instead of through a React prop.
-  useEffect(() => {
-    const cartButton = document.getElementById('cartBtn');
-    if (!cartButton) {
-      return;
-    }
-
-    const toggle = (event: Event): void => {
-      event.preventDefault();
-      setIsCartOpen((open) => !open);
-    };
-
-    const openSideCart = (): void => {
-      setIsCartOpen(true);
-    };
-
-    const closeSideCart = (): void => {
-      setIsCartOpen(false);
-    };
-
-    cartButton.addEventListener('click', toggle);
-    window.addEventListener('cart:open', openSideCart);
-    window.addEventListener('cart:close', closeSideCart);
-
-    return () => {
-      cartButton.removeEventListener('click', toggle);
-      window.removeEventListener('cart:open', openSideCart);
-      window.removeEventListener('cart:close', closeSideCart);
-    };
-  }, []);
-
-  useEffect(() => {
-    document.body.classList.toggle('cart-is-open', isCartOpen);
-    document.body.style.overflow = isCartOpen ? 'hidden' : '';
-    document.body.style.touchAction = isCartOpen ? 'none' : '';
-  }, [isCartOpen]);
+  // bound in usePedido now, which owns the drawer for every route.
 
   const filters = useMemo(() => {
     const labels = new Set<string>();
@@ -356,18 +321,6 @@ function CatalogExperience(): JSX.Element {
 
     return products.filter((product) => categoryLabel(product) === activeFilter);
   }, [activeFilter, products]);
-
-  const total = useMemo(() => {
-    return order.reduce((sum, line) => sum + line.pricePerKg * line.quantity, 0);
-  }, [order]);
-
-  const handleRemove = useCallback((lineId: string): void => {
-    setOrder((current) => current.filter((line) => line.lineId !== lineId));
-  }, []);
-
-  const handleClose = useCallback((): void => {
-    setIsCartOpen(false);
-  }, []);
 
   return (
     <section className="tw-redesign-root tw-catalog-shell">
@@ -388,13 +341,6 @@ function CatalogExperience(): JSX.Element {
 
       <ProductList products={filteredProducts} cargando={cargando} />
 
-      <CartPanel
-        isOpen={isCartOpen}
-        onClose={handleClose}
-        onRemove={handleRemove}
-        order={order}
-        total={total}
-      />
     </section>
   );
 }
@@ -418,6 +364,31 @@ function CatalogExperience(): JSX.Element {
  * `products.html` on any host, under any base, with no configuration at all.
  * The route, `useParams` and `<Link>` work identically either way.
  */
+/**
+ * The drawer sits OUTSIDE `<Routes>` on purpose.
+ *
+ * Inside, it would unmount and remount on every navigation — and it only existed
+ * on the catalogue route at all, so opening a product left the cart button with
+ * nothing to open. Out here it survives the route change: the customer can
+ * configure a cut, add it, and the ticket is still there.
+ */
+function CarritoGlobal(): JSX.Element {
+  const pedido = usePedido({
+    leer: readLegacyCart,
+    estaSincronizando: () => isSyncingLegacyCart
+  });
+
+  return (
+    <CartPanel
+      isOpen={pedido.abierto}
+      onClose={pedido.cerrar}
+      onRemove={pedido.quitar}
+      order={pedido.lineas}
+      total={pedido.total}
+    />
+  );
+}
+
 function CatalogoConRutas(): JSX.Element {
   return (
     <HashRouter>
@@ -425,6 +396,7 @@ function CatalogoConRutas(): JSX.Element {
         <Route path="/" element={<CatalogExperience />} />
         <Route path="/producto/:id" element={<ProductoDetalle />} />
       </Routes>
+      <CarritoGlobal />
     </HashRouter>
   );
 }
