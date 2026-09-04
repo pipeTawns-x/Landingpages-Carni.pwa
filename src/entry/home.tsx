@@ -1,3 +1,4 @@
+import { Testimonios } from '@src/components/Testimonios/Testimonios';
 import { montarCarrito } from '@src/components/CartPanel/montar';
 import { montarLupa } from '@src/components/Lupa/montar';
 import { useEffect, useRef, useState } from 'react';
@@ -274,6 +275,7 @@ gobernarEncabezado();
 
 mountReactNode('#categoriesReactRoot', <CategoryBento />);
 mountReactNode('#showcaseReactRoot', <Showcase />);
+mountReactNode('#resenasReactRoot', <Testimonios />);
 
 // The magnifier behaves the same on all three pages. Without this, tapping it
 // here still threw the customer out to the catalogue before they typed a letter.

@@ -197,6 +197,12 @@
          es de cupones de descuento, no de tarjetas promocionales. -->
     <div id="showcaseReactRoot"></div>
 
+    <!-- Reseñas reales del perfil de Google del negocio. Van justo antes de
+         "Sobre Nosotros": primero habla el cliente, después la carnicería. Los
+         textos viven en src/data/resenas.ts, no dentro del componente, para
+         poder actualizarlos sin tocar React. -->
+    <div id="resenasReactRoot"></div>
+
     <!-- SECCIÓN 4: SOBRE NOSOTROS + UBICACIÓN -->
     <section id="sobre-nosotros" class="about-section py-5 reveal"
       style="background: linear-gradient(135deg, var(--carni-charcoal) 0%, var(--carni-dark) 100%);">

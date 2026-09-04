@@ -1485,3 +1485,129 @@
   .lupa__titulo, .lupa__terminos { padding-inline: 2rem; margin-inline: 0; }
   .lupa__carril { grid-auto-flow: row; grid-template-columns: repeat(6, 1fr); overflow-x: visible; }
 }
+
+/* ── Testimonios · reseñas reales de Google ─────────────────────────────────
+   Siete de sesenta y una. El 4.7 y el total quedan a la vista, con enlace al
+   perfil: mostrar una selección junto al promedio real es honesto; esconder el
+   promedio sería publicidad engañosa. Con un 4.7 de verdad no hay nada que
+   maquillar. */
+
+.resenas { padding: 4rem 1rem 3rem; max-width: 1180px; margin: 0 auto; }
+
+.resenas__encabezado { text-align: center; margin-bottom: 2rem; }
+
+.resenas__antetitulo {
+  margin: 0 0 0.5rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.resenas__titulo {
+  margin: 0 0 0.4rem;
+  font-size: 2.6rem;
+  line-height: 1;
+  color: #f2efe9;
+}
+
+.resenas__estrellas { font-size: 1.4rem; color: #e8b64c; letter-spacing: 0.1em; }
+
+.resenas__enlace {
+  display: inline-block;
+  min-height: 44px;
+  line-height: 44px;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.92rem;
+  border-bottom: 1px solid rgba(232, 217, 181, 0.35);
+  text-decoration: none;
+}
+
+.resenas__enlace:hover { color: #e8d9b5; }
+
+/* Carril que se arrastra en el teléfono; se asoma la siguiente, que es la señal
+   de que hay más. En pantalla ancha se acomodan en tres columnas. */
+/* `overflow-x: clip` en la sección impide que el margen negativo del carril
+   empuje la barra de desplazamiento de la página entera. */
+.resenas { overflow-x: clip; }
+
+.resenas__carril {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 80%;
+  gap: 1rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  margin-inline: -1rem;
+  padding: 0.5rem 1rem 1rem;
+  scrollbar-width: none;
+}
+
+.resenas__carril::-webkit-scrollbar { display: none; }
+
+.resenas__card {
+  scroll-snap-align: start;
+  margin: 0;
+  padding: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.035);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* La animación es una MEJORA, no un requisito para leer.
+   La primera versión ponía `opacity: 0` por defecto y lo levantaba con una clase
+   que agrega el IntersectionObserver. Si el observador no dispara —una pestaña
+   en segundo plano, un navegador sin soporte— la sección entera queda invisible.
+   Eso ya pasó en este proyecto: fue P-09, nueve tarjetas del bento en el DOM con
+   `opacity: 0` y nadie observándolas.
+   Ahora se lee siempre, y solo se oculta cuando React confirma que va a animar. */
+.resenas--animar .resenas__card {
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 0.5s ease var(--retraso, 0ms), transform 0.5s ease var(--retraso, 0ms);
+}
+
+.resenas--animar.resenas--visible .resenas__card { opacity: 1; transform: none; }
+
+.resenas__texto {
+  margin: 0;
+  flex: 1 1 auto;
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 1rem;
+  line-height: 1.55;
+}
+
+.resenas__autor {
+  display: grid;
+  gap: 0.15rem;
+  font-weight: 600;
+  color: #e8d9b5;
+  font-size: 0.95rem;
+}
+
+/* Cuántas reseñas ha escrito esa persona. Es lo que separa a un cliente real de
+   una cuenta abierta para dejar una estrella. */
+.resenas__opiniones {
+  font-weight: 400;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+/* Se quita el movimiento, nunca el contenido. */
+@media (prefers-reduced-motion: reduce) {
+  .resenas--animar .resenas__card { opacity: 1; transform: none; transition: none; }
+}
+
+@media (min-width: 768px) {
+  .resenas { padding-inline: 2rem; }
+  .resenas__carril {
+    grid-auto-flow: row;
+    grid-template-columns: repeat(3, 1fr);
+    overflow-x: visible;
+    margin-inline: 0;
+    padding-inline: 0;
+  }
+}
