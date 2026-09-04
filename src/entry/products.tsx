@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { CarrilCategorias } from '@src/components/CarrilCategorias/CarrilCategorias';
 import { CartPanel } from '@src/components/CartPanel/CartPanel';
 import { ProductList } from '@src/components/ProductList/ProductList';
 import { SEED_PRODUCTS } from '@src/data/seedProducts';
@@ -356,18 +357,12 @@ function CatalogExperience(): JSX.Element {
           Aquí reunimos los productos más buscados de la carnicería para que cualquier cliente pueda
           encontrar res, pollo, cerdo y especiales con una navegación clara y directa.
         </p>
-        <div className="tw-filter-row">
-          {filters.map((filter) => (
-            <button
-              className={`tw-filter-chip ${activeFilter === filter ? 'tw-filter-chip--active' : ''}`}
-              key={filter}
-              type="button"
-              onClick={() => setActiveFilter(filter)}
-            >
-              {filter === 'all' ? 'Todo el catálogo' : filter}
-            </button>
-          ))}
-        </div>
+        <CarrilCategorias
+          filtros={filters}
+          activo={activeFilter}
+          onElegir={setActiveFilter}
+          etiqueta={(f) => (f === 'all' ? 'Todo el catálogo' : f)}
+        />
       </div>
 
       <ProductList products={filteredProducts} />
