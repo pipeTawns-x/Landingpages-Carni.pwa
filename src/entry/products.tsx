@@ -3,7 +3,7 @@ import { CartPanel } from '@src/components/CartPanel/CartPanel';
 import { ProductList } from '@src/components/ProductList/ProductList';
 import { SEED_PRODUCTS } from '@src/data/seedProducts';
 import type { CartLegacyItem, OrderLine, Product } from '@src/types/database';
-import { HashRouter, Route, Routes } from 'react-router-dom';
+import { HashRouter, Route, Routes, useSearchParams } from 'react-router-dom';
 import { ProductoDetalle } from '@src/pages/ProductoDetalle';
 import { fetchProducts, mountReactNode, categoryLabel, categorySlugOf, assetUrl } from './shared';
 import '@src/styles/redesign.css';
@@ -146,8 +146,16 @@ const SLUG_ALIASES: Record<string, string> = {
  * two are matched through the products themselves rather than a hand-written
  * table that would drift from the seed.
  */
-function filterFromUrl(products: Product[]): string | null {
-  const raw = new URLSearchParams(window.location.search).get('categoria');
+function filterFromUrl(products: Product[], slugExplicito?: string | null): string | null {
+  // Two places can carry the category, and both are legitimate.
+  //
+  // The bento tiles on index.html link to `products.html?categoria=<slug>` — a
+  // real query string, because they are plain anchors leaving one HTML page for
+  // another. Inside the catalogue the router is a HashRouter, so its own links
+  // put the query after the `#` and `window.location.search` comes back empty.
+  // Reading only the search string made the "back to Cortes Especiales" link
+  // navigate and then show all 53 products.
+  const raw = slugExplicito ?? new URLSearchParams(window.location.search).get('categoria');
   if (!raw) {
     return null;
   }
@@ -206,10 +214,25 @@ function CatalogExperience(): JSX.Element {
   // The nine bento tiles on index.html and the drawer chips deep-link into a
   // category, so the filter is resolved from the URL during the first render
   // rather than after a round trip.
+  const [parametros] = useSearchParams();
+  const slugPedido = parametros.get('categoria');
   const [activeFilter, setActiveFilter] = useState<string>(
-    () => filterFromUrl(SEED_PRODUCTS) ?? 'all'
+    () => filterFromUrl(SEED_PRODUCTS, slugPedido) ?? 'all'
   );
   const [isCartOpen, setIsCartOpen] = useState<boolean>(false);
+
+  // Coming back from a product page is a route change, not a mount: the filter
+  // was resolved once in the useState initializer and never looked again, so
+  // returning to a category left the chip on "Todo el catálogo".
+  useEffect(() => {
+    if (!slugPedido) {
+      return;
+    }
+    const etiqueta = filterFromUrl(products, slugPedido);
+    if (etiqueta) {
+      setActiveFilter(etiqueta);
+    }
+  }, [slugPedido, products]);
 
   useEffect(() => {
     void fetchProducts().then(({ products: loaded, live }) => {

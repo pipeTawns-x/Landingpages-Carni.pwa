@@ -979,3 +979,210 @@
   .ficha__cuerpo { grid-area: cuerpo; padding-top: 0.5rem; }
   .ficha__titulo { font-size: 2.6rem; }
 }
+
+/* ── Migas de la ficha ──────────────────────────────────────────────────────
+   Dos caminos de vuelta. El cercano —la categoría de la que vino— es el que
+   más se usa: quien entró a Porterhouse desde Cortes Especiales quiere el resto
+   de esa vitrina, no el tope del catálogo. */
+
+.ficha__migas {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.ficha__migas-sep { opacity: 0.35; }
+
+.ficha__volver--cerca {
+  color: #e8d9b5;
+  font-weight: 600;
+}
+
+/* ── Sugeridos ──────────────────────────────────────────────────────────────
+   Carril que se arrastra en el teléfono y se acomoda en fila en pantalla ancha.
+   Cuatro tarjetas apretadas en 390 px son cuatro miniaturas ilegibles. */
+
+.sugeridos {
+  margin: 3.5rem auto 0;
+  max-width: 1180px;
+  padding-inline: 1rem;
+}
+
+.sugeridos__encabezado {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.sugeridos__titulo {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #e8d9b5;
+}
+
+.sugeridos__todos {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  color: rgba(255, 255, 255, 0.72);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(232, 217, 181, 0.4);
+  font-size: 0.9rem;
+}
+
+.sugeridos__carril {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 68%;          /* se asoma la siguiente: invita a arrastrar */
+  gap: 1rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  /* El carril se sale del margen para que el arrastre llegue al borde de la
+     pantalla, como en cualquier app de teléfono. */
+  margin-inline: -1rem;
+  padding: 0 1rem 0.5rem;
+  scrollbar-width: none;
+}
+
+.sugeridos__carril::-webkit-scrollbar { display: none; }
+
+.sugeridos__card {
+  scroll-snap-align: start;
+  display: grid;
+  gap: 0.4rem;
+  text-decoration: none;
+  color: #f2efe9;
+}
+
+.sugeridos__foto {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 12px;
+  background: #1a1a1a;
+  transition: transform 0.4s ease;
+}
+
+.sugeridos__card:hover .sugeridos__foto { transform: scale(1.03); }
+
+.sugeridos__nombre { font-weight: 600; font-size: 0.98rem; }
+.sugeridos__precio { font-size: 0.9rem; color: rgba(255, 255, 255, 0.68); }
+
+.sugeridos__esqueleto {
+  aspect-ratio: 1 / 1;
+  border-radius: 12px;
+  background: linear-gradient(90deg, #1b1b1b 25%, #262626 37%, #1b1b1b 63%);
+  background-size: 400% 100%;
+  animation: detalle-brillo 1.4s ease-in-out infinite;
+}
+
+/* ── Banner de cierre ───────────────────────────────────────────────────────
+   Una imagen, una frase, un destino. No es una franja de promociones: es un
+   punto final. */
+
+.banner {
+  position: relative;
+  margin-top: 4rem;
+  min-height: 420px;
+  display: grid;
+  align-items: end;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.banner__foto {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -2;
+}
+
+/* Rampa de varias paradas, no de dos. El ojo detecta el cambio de pendiente,
+   no el color: una rampa de dos colores siempre deja costura sobre una foto.
+   Y llega a cero puro arriba — un 0.05 residual también se ve como línea. */
+.banner__velo {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.92) 0%,
+    rgba(0, 0, 0, 0.86) 18%,
+    rgba(0, 0, 0, 0.62) 38%,
+    rgba(0, 0, 0, 0.3) 58%,
+    rgba(0, 0, 0, 0.1) 76%,
+    rgba(0, 0, 0, 0) 100%
+  );
+}
+
+.banner__texto {
+  padding: 2rem 1.25rem 2.5rem;
+  max-width: 620px;
+}
+
+.banner__antetitulo {
+  margin: 0 0 0.5rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #d9c9a3;
+}
+
+.banner__titulo {
+  margin: 0 0 0.6rem;
+  font-size: 1.9rem;
+  line-height: 1.15;
+  color: #fff;
+}
+
+.banner__linea {
+  margin: 0 0 1.25rem;
+  color: rgba(255, 255, 255, 0.86);
+  font-size: 1rem;
+}
+
+.banner__accion {
+  display: inline-flex;
+  align-items: center;
+  min-height: 48px;
+  padding: 0 1.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  border-radius: 999px;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.banner__accion:hover { background: #fff; color: #111; }
+
+@media (prefers-reduced-motion: reduce) {
+  .sugeridos__esqueleto { animation: none; }
+  .sugeridos__foto,
+  .banner__accion { transition: none; }
+  .sugeridos__card:hover .sugeridos__foto { transform: none; }
+}
+
+@media (min-width: 768px) {
+  .sugeridos { padding-inline: 1.5rem; }
+  .sugeridos__carril {
+    grid-auto-flow: row;
+    grid-template-columns: repeat(4, 1fr);
+    overflow-x: visible;
+    margin-inline: 0;
+    padding-inline: 0;
+  }
+  .banner { min-height: 520px; }
+  .banner__texto { padding: 3rem 3rem 3.5rem; }
+  .banner__titulo { font-size: 2.6rem; }
+}

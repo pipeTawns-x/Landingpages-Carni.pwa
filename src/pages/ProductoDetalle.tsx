@@ -6,6 +6,8 @@ import { cotizar } from '../../js/modules/core/quote.js';
 import { useSupabaseQuery } from '@src/hooks/useSupabaseQuery';
 import { useUnidadInteligente } from '@src/hooks/useUnidadInteligente';
 import { claveDeVariante } from '@src/lib/lineaPedido';
+import { Relacionados } from '@src/components/Relacionados/Relacionados';
+import { BannerEditorial } from '@src/components/BannerEditorial/BannerEditorial';
 import { assetUrl } from '@src/entry/shared';
 import type { Product } from '@src/types/database';
 
@@ -159,6 +161,13 @@ export function ProductoDetalle(): JSX.Element {
     );
   }
 
+  const cats = (producto as unknown as {
+    categories?: { slug?: string; name?: string } | Array<{ slug?: string; name?: string }>;
+  }).categories;
+  const cat = Array.isArray(cats) ? cats[0] : cats;
+  const slugCategoria = cat?.slug ?? '';
+  const nombreCategoria = cat?.name ?? '';
+
   const modos: Array<{ clave: Modo; etiqueta: string }> = [
     { clave: 'weight', etiqueta: 'Por peso' },
     { clave: 'price', etiqueta: 'Por precio' }
@@ -167,7 +176,21 @@ export function ProductoDetalle(): JSX.Element {
 
   return (
     <section className="ficha">
-      <Link className="ficha__volver" to="/">← Todo el catálogo</Link>
+      {/* Two ways back, and the near one matters more. Somebody who opened
+          Porterhouse from Cortes Especiales wants the rest of that case, not the
+          top of the catalogue — sending them to the root makes them navigate the
+          categories all over again. */}
+      <nav className="ficha__migas" aria-label="Dónde estás">
+        <Link className="ficha__volver" to="/">Todo el catálogo</Link>
+        {slugCategoria ? (
+          <>
+            <span className="ficha__migas-sep" aria-hidden="true">/</span>
+            <Link className="ficha__volver ficha__volver--cerca" to={`/?categoria=${slugCategoria}`}>
+              {nombreCategoria}
+            </Link>
+          </>
+        ) : null}
+      </nav>
 
       <div className="ficha__lienzo">
         <img
@@ -336,6 +359,9 @@ export function ProductoDetalle(): JSX.Element {
           El total definitivo lo calcula el servidor con el precio del día.
         </p>
       </div>
+
+      <Relacionados producto={producto} />
+      <BannerEditorial />
     </section>
   );
 }
