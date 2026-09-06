@@ -25,6 +25,7 @@ const GlobalStyles = createGlobalStyle`
   @media (max-width: 575.98px) {
     body.cart-is-open {
       overflow: hidden;
+      touch-action: none;
     }
   }
 
