@@ -1,9 +1,0 @@
-.producto-card[hidden] {
-  display: none;
-}
-.producto-card__title {
-  color: #f5f5f5;
-}
-.producto-card__description {
-  color: #b8b8b8;
-}

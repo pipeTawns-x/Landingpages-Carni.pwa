@@ -1,12 +1,33 @@
+import styled from 'styled-components';
 import { ProductCard } from '@src/components/ProductCard/ProductCard';
 import type { Product } from '@src/types/database';
-import './styles.css';
 
 export interface ProductListProps {
   /** The catalogue to render. Owned by the root component and passed down. */
   products: Product[];
   onAddToOrder: (product: Product) => void;
 }
+
+/**
+ * Rejilla del catálogo (antes en ProductList/styles.css, 24 líneas).
+ * La regla `.cart-is-open .product-list` — que cede una columna en desktop con
+ * el carrito abierto — vive en GlobalStyles porque cruza el árbol: el estado se
+ * anuncia en <body>, no en este componente.
+ */
+const Grid = styled.div`
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  width: 100%;
+
+  @media (min-width: ${({ theme }) => theme.breakpoints.md}) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (min-width: ${({ theme }) => theme.breakpoints.xl}) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+`;
 
 /**
  * Renders the catalogue it receives through props.
@@ -24,7 +45,7 @@ export function ProductList({ products, onAddToOrder }: ProductListProps): JSX.E
   }
 
   return (
-    <div className="product-list">
+    <Grid className="product-list">
       {products.map((product) => (
         <ProductCard
           key={product.id}
@@ -37,6 +58,6 @@ export function ProductList({ products, onAddToOrder }: ProductListProps): JSX.E
           isIAContent={Boolean(product.is_promoted)}
         />
       ))}
-    </div>
+    </Grid>
   );
 }

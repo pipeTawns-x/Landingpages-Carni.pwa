@@ -1,8 +1,12 @@
 import { useEffect, useState } from 'react';
+import { ThemeProvider } from 'styled-components';
 import { mountReactNode, fetchProducts, categoryLabel } from './shared';
 import { ProductCard } from '@src/components/ProductCard/ProductCard';
 import { BentoGrid } from '@src/components/BentoGrid';
+import { Lupa } from '@src/components/Lupa/Lupa';
 import { useCart } from '@src/hooks/useCart';
+import { carniTheme } from '@src/theme/carniTheme';
+import GlobalStyles from '@src/styles/globalStyles';
 import type { Product } from '@src/types/database';
 import '@src/styles/redesign.css';
 
@@ -19,6 +23,11 @@ function HomeShowcase(): JSX.Element {
 
   return (
     <section className="tw-redesign-root tw-catalog-shell">
+      <Lupa
+        onPickProduct={(product) => {
+          window.location.href = `products.html?q=${encodeURIComponent(product.name)}`;
+        }}
+      />
       <div className="tw-catalog-shell__header">
         <p className="tw-kicker">Edición 2026</p>
         <h2>Bienvenido a tu mesa de cortes, antojos y pedidos de confianza</h2>
@@ -38,7 +47,16 @@ function HomeShowcase(): JSX.Element {
         <div className="tw-hero-grid">
           <div className="tw-hero-grid__primary">
             <article className="tw-highlight-card">
-              <img src={featured.image_url ?? '/img/products/premium.png'} alt={featured.name} />
+              <img
+                src={featured.image_url ?? '/img/products/premium.png'}
+                alt={featured.name}
+                // Reserved 4:3 box, same as ProductCard: the hero image is
+                // 215 KB–1.6 MB and used to resize the card as it downloaded,
+                // which shifted the layout below it once per page load (the
+                // visible "flash" on index.html).
+                width={800}
+                height={600}
+              />
               <div className="tw-highlight-card__content">
                 <p className="tw-kicker">Recomendación del carnicero</p>
                 <h2>{featured.name}</h2>
@@ -52,7 +70,14 @@ function HomeShowcase(): JSX.Element {
           <div className="tw-hero-grid__secondary">
             {secondary.map((product) => (
               <article className="tw-highlight-card" key={product.id}>
-                <img src={product.image_url ?? '/img/products/res.png'} alt={product.name} />
+                <img
+                  src={product.image_url ?? '/img/products/res.png'}
+                  alt={product.name}
+                  // Same reserved 4:3 box as the hero and ProductCard; without
+                  // it each secondary card resized on image arrival.
+                  width={800}
+                  height={600}
+                />
                 <div className="tw-highlight-card__content">
                   <p className="tw-kicker">{categoryLabel(product)}</p>
                   <h3>{product.name}</h3>
@@ -86,4 +111,10 @@ function HomeShowcase(): JSX.Element {
   );
 }
 
-mountReactNode('#homeReactRoot', <HomeShowcase />);
+mountReactNode(
+  '#homeReactRoot',
+  <ThemeProvider theme={carniTheme}>
+    <GlobalStyles />
+    <HomeShowcase />
+  </ThemeProvider>
+);

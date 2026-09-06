@@ -344,6 +344,30 @@
   margin-top: 1.25rem;
 }
 
+/* Filtro vivo de la Lupa: una línea tranquila que no compite con los chips. */
+.tw-filter-row__hint {
+  margin: 0.9rem 0 0;
+  font-size: 0.85rem;
+  color: rgba(228, 209, 176, 0.72);
+
+  strong {
+    color: var(--redesign-beige);
+    font-weight: 700;
+  }
+
+  button {
+    border: none;
+    background: none;
+    padding: 0;
+    margin-left: 0.5rem;
+    color: var(--redesign-gold);
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+}
+
 .tw-filter-chip {
   border: 1px solid rgba(228, 209, 176, 0.18);
   background: rgba(255, 255, 255, 0.05);

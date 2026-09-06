@@ -1,5 +1,5 @@
+import styled from 'styled-components';
 import type { Product } from '@src/types/database';
-import './styles.css';
 
 export interface ProductCardProps {
   product: Product;
@@ -7,6 +7,32 @@ export interface ProductCardProps {
   onAddToCart: (id: number, qty: number) => void;
   isIAContent?: boolean;
 }
+
+/**
+ * Reglas propias vendrían de ProductCard/styles.css (9 líneas) y ahora viven
+ * aquí. El look real de la tarjeta lo sigue dando la capa global `tw-*`
+ * (redesign.css + _productos.scss): este styled-component solo cubre lo que el
+ * componente considera suyo, y las variantes de tamaño/IA se pasan como props
+ * transitorias ($size, $isIAContent) que alimentan las clases globales sin
+ * filtrarse al DOM.
+ */
+const Shell = styled.article<{ $size: ProductCardProps['size']; $isIAContent: boolean }>`
+  /* 'tw-card-shell--' + $size y 'tw-card-shell--ia' se resuelven abajo en el
+     className: los estilos de esas variantes son de la capa global. Las props
+     transitorias existen para que el estilo propio y el global lean la misma
+     fuente de verdad. */
+  &[hidden] {
+    display: none;
+  }
+
+  .producto-card__title {
+    color: ${({ theme }) => theme.colors.text};
+  }
+
+  .producto-card__description {
+    color: #b8b8b8;
+  }
+`;
 
 function formatPrice(price: number): string {
   return new Intl.NumberFormat('es-MX', {
@@ -92,14 +118,16 @@ export function ProductCard({ product, size, onAddToCart, isIAContent = false }:
   const image = resolveImage(product);
   const inStock = Number(product.stock) > 0;
 
-  return (
-    // `producto-card` and `data-categoria` are the hooks js/modules/ui/search.js
-    // filters on. They used to live on the vanilla cards; those are gone, so the
-    // React card carries them or the search box stops filtering. No CSS is bound
-    // to these class names — they exist purely so the search keeps working.
-    <article
+return (
+    // `producto-card` y `data-categoria` eran los hooks sobre los que filtraba
+    // js/modules/ui/search.js (removido en la Práctica 4). Se conservan porque
+    // no hay CSS ligado a ellos y así el DOM sigue siendo estable para
+    // herramientas o tests que los consulten.
+    <Shell
       className={`tw-card-shell tw-card-shell--${size} ${isIAContent ? 'tw-card-shell--ia' : ''} producto-card`}
       data-categoria={categorySlug(product)}
+      $size={size}
+      $isIAContent={isIAContent}
     >
       <div className="tw-card-shell__image-wrap">
         <picture>
@@ -149,6 +177,6 @@ export function ProductCard({ product, size, onAddToCart, isIAContent = false }:
           </button>
         </div>
       </div>
-    </article>
+    </Shell>
   );
 }

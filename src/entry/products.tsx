@@ -1,12 +1,18 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { ThemeProvider } from 'styled-components';
 import { CartPanel } from '@src/components/CartPanel/CartPanel';
 import { ProductList } from '@src/components/ProductList/ProductList';
+import { Lupa } from '@src/components/Lupa/Lupa';
 import { SEED_PRODUCTS } from '@src/data/seedProducts';
+import { carniTheme } from '@src/theme/carniTheme';
+import GlobalStyles from '@src/styles/globalStyles';
 import type { CartLegacyItem, OrderLine, Product } from '@src/types/database';
 import { fetchProducts, mountReactNode, categoryLabel, categorySlugOf } from './shared';
 import '@src/styles/redesign.css';
 
 const LEGACY_CART_KEY = 'carni_cart_v1';
+/** Estado abierto del panel del pedido, persistido entre visitas (Práctica 4). */
+const CART_OPEN_KEY = 'carni_cart_abierto_v1';
 
 /**
  * Reads whatever is already in the shared cart key and turns it into order
@@ -206,7 +212,24 @@ function CatalogExperience(): JSX.Element {
   const [activeFilter, setActiveFilter] = useState<string>(
     () => filterFromUrl(SEED_PRODUCTS) ?? 'all'
   );
-  const [isCartOpen, setIsCartOpen] = useState<boolean>(false);
+  const [isCartOpen, setIsCartOpen] = useState<boolean>(() => {
+    // El panel queda donde el cliente lo dejó: si cerró el pedido en products
+    // y volvió desde la landing, se abre igual que se cerró.
+    try {
+      return window.localStorage.getItem(CART_OPEN_KEY) === '1';
+    } catch {
+      return false;
+    }
+  });
+  // Filtro vivo de la Lupa: llega por ?q= (desde la landing o el acceso) o al
+  // elegir un resultado dentro del propio catálogo.
+  const [searchTerm, setSearchTerm] = useState<string>(() => {
+    try {
+      return new URLSearchParams(window.location.search).get('q') ?? '';
+    } catch {
+      return '';
+    }
+  });
 
   useEffect(() => {
     void fetchProducts().then(({ products: loaded, live }) => {
@@ -278,6 +301,32 @@ function CatalogExperience(): JSX.Element {
     document.body.classList.toggle('cart-is-open', isCartOpen);
   }, [isCartOpen]);
 
+  // Persistencia del panel abierto: el almacenamiento es el canal entre
+  // páginas, igual que hace el carrito con carni_cart_v1.
+  useEffect(() => {
+    try {
+      if (isCartOpen) {
+        window.localStorage.setItem(CART_OPEN_KEY, '1');
+      } else {
+        window.localStorage.removeItem(CART_OPEN_KEY);
+      }
+    } catch {
+      /* almacenamiento no disponible: el panel se abre cerrado */
+    }
+  }, [isCartOpen]);
+
+  // Otra pestaña abrió o cerró el pedido: el panel la sigue.
+  useEffect(() => {
+    const syncOpen = (event: StorageEvent): void => {
+      if (event.key === CART_OPEN_KEY) {
+        setIsCartOpen(event.newValue === '1');
+      }
+    };
+
+    window.addEventListener('storage', syncOpen);
+    return () => window.removeEventListener('storage', syncOpen);
+  }, []);
+
   const filters = useMemo(() => {
     const labels = new Set<string>();
     products.forEach((product) => labels.add(categoryLabel(product)));
@@ -285,12 +334,23 @@ function CatalogExperience(): JSX.Element {
   }, [products]);
 
   const filteredProducts = useMemo(() => {
-    if (activeFilter === 'all') {
-      return products;
+    const byCategory =
+      activeFilter === 'all' ? products : products.filter((product) => categoryLabel(product) === activeFilter);
+
+    const term = searchTerm.trim().toLowerCase();
+    if (term.length === 0) {
+      return byCategory;
     }
 
-    return products.filter((product) => categoryLabel(product) === activeFilter);
-  }, [activeFilter, products]);
+    return byCategory.filter((product) => {
+      const label = categoryLabel(product).toLowerCase();
+      return (
+        product.name.toLowerCase().includes(term) ||
+        product.description.toLowerCase().includes(term) ||
+        label.includes(term)
+      );
+    });
+  }, [activeFilter, products, searchTerm]);
 
   const total = useMemo(() => {
     return order.reduce((sum, line) => sum + line.pricePerKg * line.quantity, 0);
@@ -311,6 +371,19 @@ function CatalogExperience(): JSX.Element {
 
   return (
     <section className="tw-redesign-root tw-catalog-shell">
+      <Lupa
+        onPickProduct={(product) => {
+          // Mismo documento: el catálogo filtra por el corte elegido y la
+          // búsqueda queda visible en el estado del grid.
+          setActiveFilter('all');
+          setSearchTerm(product.name);
+          try {
+            window.history.replaceState(null, '', `products.html?q=${encodeURIComponent(product.name)}`);
+          } catch {
+            /* URL sin cambios: el filtro ya vive en el estado */
+          }
+        }}
+      />
       <div className="tw-catalog-shell__header">
         <p className="tw-kicker">Catálogo Maestro</p>
         <h2>Elige tu corte, compara opciones y arma tu pedido sin perder tiempo</h2>
@@ -330,6 +403,14 @@ function CatalogExperience(): JSX.Element {
             </button>
           ))}
         </div>
+        {searchTerm.trim().length > 0 ? (
+          <p className="tw-filter-row__hint">
+            Buscando: <strong>{searchTerm}</strong>{' '}
+            <button type="button" onClick={() => setSearchTerm('')}>
+              Limpiar búsqueda
+            </button>
+          </p>
+        ) : null}
       </div>
 
       <ProductList products={filteredProducts} onAddToOrder={handleAddToOrder} />
@@ -345,4 +426,10 @@ function CatalogExperience(): JSX.Element {
   );
 }
 
-mountReactNode('#productsReactRoot', <CatalogExperience />);
+mountReactNode(
+  '#productsReactRoot',
+  <ThemeProvider theme={carniTheme}>
+    <GlobalStyles />
+    <CatalogExperience />
+  </ThemeProvider>
+);

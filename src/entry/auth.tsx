@@ -1,9 +1,18 @@
+import { ThemeProvider } from 'styled-components';
 import { mountReactNode } from './shared';
+import { Lupa } from '@src/components/Lupa/Lupa';
+import { carniTheme } from '@src/theme/carniTheme';
+import GlobalStyles from '@src/styles/globalStyles';
 import '@src/styles/redesign.css';
 
 function AuthExperience(): JSX.Element {
   return (
     <section className="tw-redesign-root tw-auth-strip">
+      <Lupa
+        onPickProduct={(product) => {
+          window.location.href = `products.html?q=${encodeURIComponent(product.name)}`;
+        }}
+      />
       <div className="tw-auth-strip__content">
         <p className="tw-kicker">Acceso Premium</p>
         <h2>Login y registro con identidad editorial, confianza y claridad móvil</h2>
@@ -20,4 +29,10 @@ function AuthExperience(): JSX.Element {
   );
 }
 
-mountReactNode('#authExperienceRoot', <AuthExperience />);
+mountReactNode(
+  '#authExperienceRoot',
+  <ThemeProvider theme={carniTheme}>
+    <GlobalStyles />
+    <AuthExperience />
+  </ThemeProvider>
+);
