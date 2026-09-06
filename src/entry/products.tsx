@@ -406,7 +406,14 @@ function CatalogExperience(): JSX.Element {
         {searchTerm.trim().length > 0 ? (
           <p className="tw-filter-row__hint">
             Buscando: <strong>{searchTerm}</strong>{' '}
-            <button type="button" onClick={() => setSearchTerm('')}>
+            <button
+              type="button"
+              onClick={() => {
+                setSearchTerm('');
+                // El filtro no debe reaparecer al recargar: limpia también ?q=
+                history.replaceState(null, '', 'products.html');
+              }}
+            >
               Limpiar búsqueda
             </button>
           </p>
