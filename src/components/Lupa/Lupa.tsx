@@ -560,7 +560,7 @@ export function Lupa({ onPickProduct }: LupaProps): JSX.Element {
       <Backdrop $open={open} aria-hidden="true" onClick={() => setOpen(false)} />
       <Popin $open={open} id="lupa-popin" role="search" aria-label="Búsqueda de productos">
         <Inner>
-          <SearchForm onSubmit={handleSubmit} role="search">
+          <SearchForm onSubmit={handleSubmit}>
             <SearchIcon
               aria-hidden="true"
               width="20"
