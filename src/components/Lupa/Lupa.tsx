@@ -96,12 +96,15 @@ function rememberTerm(term: string): string[] {
 }
 
 /**
- * Escapa los comodines de LIKE. PostgREST envía la búsqueda parametrizada a
- * PostgreSQL, pero `%` y `_` son comodines del patrón: un término que los
- * contenga ampliaría la búsqueda en vez de buscarlos al pie de la letra.
+ * Escapa los comodines de LIKE y los separadores del `.or()` de PostgREST.
+ * PostgREST envía la búsqueda parametrizada a PostgreSQL, pero `%` y `_` son
+ * comodines del patrón: un término que los contenga ampliaría la búsqueda en
+ * vez de buscarlos al pie de la letra. Además, `.or()` usa comas para separar
+ * condiciones y paréntesis para agruparlas: un término con `,` o `()` rompería
+ * la sintaxis del filtro (400 silencioso que degrada al seed).
  */
 function escapeIlkce(term: string): string {
-  return term.replace(/[\\%_]/g, (char) => `\\${char}`);
+  return term.replace(/[\\%_,()]/g, (char) => `\\${char}`);
 }
 
 function searchSeed(term: string): Product[] {
