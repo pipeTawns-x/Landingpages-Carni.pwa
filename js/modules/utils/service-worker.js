@@ -10,7 +10,6 @@ const ASSETS_TO_CACHE = [
   '/js/modules/core/cart.js',
   '/js/modules/core/auth.js',
   '/js/modules/ui/header.js',
-  '/js/modules/ui/search.js',
   '/img/recursos_web/logo-user.png',
   '/img/products/res.png',
   '/img/products/cerdo.png',
