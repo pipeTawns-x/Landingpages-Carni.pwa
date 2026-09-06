@@ -79,6 +79,13 @@ Nueve `<article class="category-card">` con nombres e imágenes fijos. No leen n
 
 `openPremiumOrderModal()` está definida y nadie la llama — el renderizador vanilla que la invocaba se fue con la migración. Hoy no hay forma de configurar un corte premium.
 
+### P-10.1 · `getProducts` expone stock y metadatos al navegador anónimo
+**Estado:** abierto · **Evidencia:** `js/modules/supabase.js:79-134`
+
+`getProducts()` hace `select('*, categories(...)')`: stock, precios internos y metadatos viajan al navegador anónimo porque RLS filtra filas, no columnas. La Lupa (Práctica 4) ya usa un `select` restringido — pero el catálogo y los dashboards siguen pasando por `getProducts`.
+
+**Arreglo:** vista pública o función `SECURITY DEFINER` con columnas mínimas, y migrar lectores a ella.
+
 ---
 
 ## 🟡 Calidad — hallazgos de GGA ya triageados
