@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import styled from 'styled-components';
 import { OrderList } from '@src/components/OrderList/OrderList';
 import type { OrderLine } from '@src/types/database';
@@ -197,7 +198,23 @@ export function CartPanel({ isOpen, order, total, onClose, onRemove }: CartPanel
 
   const itemCount = order.length;
 
-  return (
+  /**
+   * El cajón se dibuja en `body`, no donde lo pongan.
+   *
+   * En products.html el panel colgaba de un `div.container-fluid` con
+   * `position: relative; z-index: 20`. Eso abre un CONTEXTO DE APILAMIENTO: el
+   * `z-index: 1040` del panel deja de compararse con el resto de la página y
+   * pasa a ordenarse solo entre sus hermanos, mientras la caja entera compite
+   * con el encabezado como si valiera 20. Resultado en un teléfono: el header
+   * (z-index 1035) tapaba el título del pedido y su botón de cerrar, así que el
+   * cliente no podía ni leer ni cerrar su propio cajón.
+   *
+   * Subirlo por `z-index` sería perseguir el número equivocado — el problema no
+   * es cuánto vale, es contra quién compite. El portal lo saca del árbol de
+   * cajas sin sacarlo del árbol de React: los eventos siguen subiendo hasta
+   * aquí, y el panel ya no depende de dónde lo monten.
+   */
+  return createPortal(
     <Panel
       aria-hidden={!isOpen}
       aria-label="Tu pedido"
@@ -238,6 +255,7 @@ export function CartPanel({ isOpen, order, total, onClose, onRemove }: CartPanel
           Continuar con el pedido
         </button>
       </footer>
-    </Panel>
+    </Panel>,
+    document.body
   );
 }
