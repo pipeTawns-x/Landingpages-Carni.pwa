@@ -32,7 +32,7 @@ This is the inventory of agentic tooling already in place for Carni-mvp, plus wh
 - Kanban board module in `src/`
 - Track Score / Fidelización React module
 - WhatsApp bot n8n workflows
-- Apify MCP — blocked, see [[security]] (leaked key must be rotated first)
+- Apify MCP — not connected. No longer blocked: the leaked keys were rotated 2026-08-25. Connecting it needs the owner to supply `APIFY_TOKEN` through the environment at run time. See [[security]].
 
 ## Resource-to-action mapping
 
@@ -69,7 +69,7 @@ Deferred, non-blocking. See [[index]] → Video / source notes, and individual n
 ## Blockers requiring owner action
 
 1. **Supabase MCP OAuth** — open Claude Code TUI → accept the browser popup. Blocking all DB-touching work.
-2. **Apify leaked key rotation** — rotate at apify.com BEFORE adding it anywhere. See [[security]]. Security critical.
+2. ~~**Apify leaked key rotation**~~ — **DONE 2026-08-25.** Both leaked keys rotated by the owner; the live one never enters the repo. See [[security]].
 3. **n8n MCP package** — owner must confirm exact npm package name/version. Needed for the WhatsApp bot phase.
 4. **stitch-mcp** — owner must add to `.mcp.json`. Needed for bento-redesign mockup generation.
 5. **gbrain install** — `bun install -g github:garrytan/gbrain` (owner already authorized).

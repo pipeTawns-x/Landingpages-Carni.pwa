@@ -1,0 +1,75 @@
+# GitHub Pages deployment — the showcase copy of the site.
+#
+# This repository publishes to two independent destinations:
+#
+#   Netlify  https://carniwebpwa.netlify.app/            production, served from the domain root
+#   Pages    https://pipetawns-x.github.io/Landingpages-Carni.pwa/   showcase and EBAC delivery
+#
+# They differ in exactly one thing: the path the site is served from. Netlify
+# keeps `npm run build` untouched, so the base stays `/`. Pages needs
+# `/Landingpages-Carni.pwa/`, and that is passed here as a build argument
+# instead of being hardcoded in vite.config.js — a fixed `base` there would
+# break Netlify.
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+  # Manual trigger, so the site can be republished without an empty commit.
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Queue overlapping runs instead of cancelling them: a cancelled deploy can
+# leave Pages serving a half-published artifact.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Pinned to the same version netlify.toml declares, so the two
+      # destinations cannot drift apart on the toolchain.
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20.19.0"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Without these the app throws "Supabase configuration missing" on boot
+      # and the catalogue never renders.
+      - name: Build for GitHub Pages
+        run: npm run build -- --base=/Landingpages-Carni.pwa/
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    name: Deploy
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

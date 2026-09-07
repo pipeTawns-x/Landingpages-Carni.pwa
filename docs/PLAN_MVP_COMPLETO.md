@@ -148,7 +148,7 @@ mantenimiento y el modo de fraude o abuso. No propongas soluciones.
 
 La regresión `5a752b3e` **ya no está en main** (verificado). Lo que queda:
 
-- Rotar la llave de Apify antes de usarla en ningún lado
+- ~~Rotar la llave de Apify~~ — hecho el 2026-08-25; las filtradas están muertas
 - Correr `/sdd-init` para cachear stack y capacidades de testing
 
 **Puerta**: SDD inicializado, sin llaves comprometidas en el árbol.
@@ -375,7 +375,7 @@ Se instalan **antes de su fase**, no todas de golpe.
 ```
 HOY          Fase 0 — push + commit de docs/
 ESTA SEMANA  Fase EBAC — 3 huecos de la P2, entrega
-             Fase 1 — rotar Apify, /sdd-init
+             Fase 1 — Apify rotado ✅, falta /sdd-init
 LUEGO        Fase 2 — rediseño (instalar tododeia-animaciones)
              Fase 3 — carrito trifásico  ← el corazón
              Fase 4 — Kanban
@@ -395,7 +395,7 @@ Fases 3 y 4 son las que convierten esto de sitio bonito en negocio operando. Si 
 - **`SKILL.md` de `abogado-del-diablo`**: fuera de las carpetas conectadas a Cowork. El protocolo de la sección 4 es de encadenado, no el contrato de la skill
 - **El Figma** del Dashboard Redesign: requiere sesión
 - **Los reels de Facebook**: login y video; no se leyeron ni se van a raspar
-- **Si la llave de Apify sigue sin rotar**: el triage lo marca pendiente, no lo comprobé
+- ~~Si la llave de Apify sigue sin rotar~~ — resuelto: el dueño las rotó el 2026-08-25
 - **`vision.md` leído completo**; `architecture.md`, `agentic-stack.md`, `security.md`, `glossary.md` y `module-scopes.md` solo parcialmente
 - **`competitor-scan.md`**: leídas las primeras 3 fichas de competidor
 - **No corrí nada**: ni build, ni tests, ni capturas, ni migraciones

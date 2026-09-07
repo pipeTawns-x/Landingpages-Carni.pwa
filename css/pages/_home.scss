@@ -923,6 +923,89 @@
   align-items: stretch;
 }
 
+// --- Hero con video de fondo (P-14, 2026-08) ---
+// Una sola columna: video + overlay + logo. El carrusel y las cards laterales
+// se retiraron; sus estilos quedan abajo sin uso hasta la limpieza del redesign.
+// EL VIDEO ES 16:9 APAISADO — 1280x720, medido con ffprobe el 2026-08-31.
+//
+// En un teléfono de 375px de ancho, un `object-fit: cover` con 420px de alto
+// obligado recorta MÁS DE LA MITAD del encuadre: se veía una mano y el borde
+// de un celular, sin contexto. El plano es de una carnicería y no se entendía
+// que lo fuera.
+//
+// La base ahora respeta la proporción del archivo y muestra el cuadro COMPLETO.
+// El alto sale de `aspect-ratio`, no de un `min-height` inventado.
+.home-hero-video {
+
+  position: relative;
+  overflow: hidden;
+  padding: 0 !important;
+  // OJO CON EL ORDEN DE ESTAS TRES LÍNEAS.
+  //
+  // `aspect-ratio` deriva la dimensión que falta. Con un `min-height: 240px`
+  // puesto y sin ancho fijado, derivó el ANCHO desde el alto: 240 x 16/9 =
+  // 426.66px sobre un viewport de 375. El hero salía 52px más ancho que la
+  // pantalla y arrastraba a toda la página al desborde horizontal.
+  //
+  // `width: 100%` fija el ancho primero, y entonces `aspect-ratio` calcula el
+  // alto, que es lo que se quería: 375 de ancho -> 211 de alto.
+  width: 100%;
+  max-width: 100%;
+  aspect-ratio: 16 / 9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #050505;
+
+  // Desde tablet hay ancho de sobra para recortar sin perder el plano, así que
+  // vuelve el encuadre a sangre, que es lo que da presencia de héroe.
+  @media (min-width: 768px) {
+    aspect-ratio: auto;
+    min-height: clamp(420px, 62vh, 640px);
+  }
+}
+
+.home-hero-video__media {
+
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  // `contain` en teléfono: el cuadro entra entero, con banda negra arriba y
+  // abajo si hace falta. Vale más ver la carnicería completa que un primer
+  // plano de algo que no se identifica.
+  object-fit: contain;
+  filter: saturate(0.95) contrast(1.02);
+
+  @media (min-width: 768px) {
+    object-fit: cover;
+  }
+}
+
+.home-hero-video__overlay {
+
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(9, 9, 9, 0.45) 0%, rgba(9, 9, 9, 0.25) 45%, rgba(9, 9, 9, 0.7) 100%);
+  pointer-events: none;
+}
+
+.home-hero-video__content {
+
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  padding: 3rem 1rem;
+}
+
+.home-hero-video__logo {
+
+  width: clamp(180px, 26vw, 320px);
+  height: auto;
+  filter: drop-shadow(0 12px 32px rgba(0, 0, 0, 0.55));
+}
+
 .home-hero-carousel {
 
   border-radius: 28px !important;

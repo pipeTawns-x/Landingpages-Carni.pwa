@@ -64,10 +64,11 @@ export interface ScheduledPublication {
 export interface OrderLine {
   lineId: string;
   /**
-   * Seed products use numeric ids, but the vanilla catalogue in
-   * js/modules/utils/base_dinamica.js uses string slugs ('bisteck_res'). Both
-   * share the same storage key, so a line restored from a pre-migration cart
-   * carries a string. Coercing it with Number() produced NaN, which
+   * Seed products use numeric ids, but the hand-written catalogue this project
+   * ran on before Supabase used string slugs ('bisteck_res'). That file —
+   * js/modules/utils/base_dinamica.js — was deleted on 2026-09-02, but deleting
+   * it does not delete the carts it wrote: a returning customer's localStorage
+   * still holds those string ids under the same key. This union stays. Coercing it with Number() produced NaN, which
    * JSON.stringify writes as null — silently emptying the id of every item in a
    * returning customer's cart.
    */

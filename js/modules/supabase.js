@@ -129,8 +129,35 @@ export async function getProducts(options = {}) {
 }
 
 /**
+ * Get the active categories, in display order
+ *
+ * The bento on the landing page used to be nine hand-written tiles. Their names
+ * had drifted from the database — the markup said "Selección Premium" while the
+ * table said "Cortes Especiales" — because nothing kept them in sync.
+ *
+ * `order` is quoted: it is a reserved word in SQL, and the column is named after
+ * it on purpose, since it is what decides the position of each tile in the grid.
+ *
+ * @returns {Promise<Array>} Active categories sorted by their `order` column
+ */
+export async function getCategories() {
+  const { data, error } = await supabase
+    .from('categories')
+    .select('id, name, slug, image_url, "order"')
+    .eq('is_active', true)
+    .order('order', { ascending: true });
+
+  if (error) {
+    console.error('Error fetching categories:', error);
+    throw error;
+  }
+
+  return data;
+}
+
+/**
  * Get product by ID
- * @param {string} productId 
+ * @param {string} productId
  * @returns {Promise<Product>}
  */
 export async function getProductById(productId) {
@@ -203,7 +230,10 @@ export async function updateUserProfile(userId, updates) {
 export async function createOrder(orderData) {
   const { data, error } = await supabase.rpc('create_order_with_items', {
     p_delivery_type: orderData.delivery_type || 'pickup',
-    p_address: orderData.delivery_address || null,
+    // La función se llama p_delivery_address, no p_address. Postgres rechaza
+    // la llamada RPC completa cuando recibe un parámetro que no existe, así
+    // que createOrder() falló siempre y ningún pedido llegó nunca a la base.
+    p_delivery_address: orderData.delivery_address || null,
     p_notes: orderData.notes || null,
     p_items: orderData.items
   });

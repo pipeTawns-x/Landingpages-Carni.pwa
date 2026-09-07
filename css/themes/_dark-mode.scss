@@ -173,9 +173,21 @@
     color: var(--carni-text);
   }
 
-  .category-desc {
-    color: var(--carni-text-muted);
-  }
+  // La descripción del bento NO usa el gris apagado del tema.
+  //
+  // `--carni-text-muted` sirve sobre fondo plano. Aquí el texto va sobre una
+  // FOTOGRAFÍA con un velo encima, y en la baldosa de Cerdo el píxel de la foto
+  // detrás mide rgb(170,168,160) — prácticamente la misma luminancia que el
+  // gris. El texto se disolvía.
+  //
+  // Es lo que `impeccable` llama "gray text on colored backgrounds" y prohíbe.
+  // El color lo pone `css/pages/_bento-main.scss`: blanco al 82%, que mantiene
+  // la jerarquía frente al título sin perder contraste.
+  //
+  // Esta regla vale 0,3,0 y la del bento 0,2,0, así que dejarla aquí ganaba
+  // siempre. Se quita de raíz en vez de subir especificidad al otro lado: una
+  // sola fuente para el color.
+  // (aqui vivia `.category-desc { color: var(--carni-text-muted) }`)
 }
 
 // Product cards

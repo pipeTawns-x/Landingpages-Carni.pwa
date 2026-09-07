@@ -17,6 +17,8 @@
  * @version 1.0.0
  * @since 2026-01-09
 */
+import { esCortePremium, GROSOR_REFERENCIA_IN } from './premium-cuts.js';
+
 (function(){
   // Clave para almacenamiento en localStorage
   const LS_KEY = 'carni_cart_v1';
@@ -73,15 +75,27 @@
     return '$' + Number(n).toFixed(2); 
   }
 
-  const PREMIUM_REFERENCE_GROSOR = 1.25;
+  // Vive en premium-cuts.js porque el panel de administración va a tener que poder
+  // cambiarla: el 1.25" salió de una recomendación general, no de la carnicería.
+  const PREMIUM_REFERENCE_GROSOR = GROSOR_REFERENCIA_IN;
 
   function roundValue(value, decimals = 3) {
     const factor = 10 ** decimals;
     return Math.round((Number(value) || 0) * factor) / factor;
   }
 
+  /**
+   * Delega en premium-cuts.js, que es la única fuente de verdad.
+   *
+   * Antes comparaba `categoria === 'premium'` contra un slug que Supabase NO
+   * produce —los reales son `cortes-especiales`, `carnes-rojas`, `cerdo`…— y
+   * además exigía `tipo === 'corte'`, que React nunca escribe. Fallaba por las
+   * dos condiciones, así que `quotePremium()` no corría jamás con datos reales y
+   * cada corte caía en la rama simple. Medido: 3 Rib Eye de 1.5" se cobraban a
+   * $372.00 en vez de $892.80.
+   */
   function isPremiumCutItem(item) {
-    return item?.tipo === 'corte' && item?.categoria === 'premium';
+    return esCortePremium(item);
   }
 
   function getPremiumUnitWeight(basePeso, grosor) {
@@ -495,6 +509,30 @@
     }
   }
 
+  function openCartFlow() {
+    const modalEl = document.getElementById('cartModal');
+    const hasLegacyModal = !!modalEl && typeof bootstrap !== 'undefined' && bootstrap.Modal;
+
+    if (hasLegacyModal) {
+      const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+      modal.show();
+      return;
+    }
+
+    window.dispatchEvent(new CustomEvent('cart:open'));
+  }
+
+  function closeCartFlow() {
+    const modalEl = document.getElementById('cartModal');
+    if (modalEl && typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+      const modal = bootstrap.Modal.getInstance(modalEl);
+      if (modal) {
+        modal.hide();
+      }
+    }
+    window.dispatchEvent(new CustomEvent('cart:close'));
+  }
+
   /**
    * Actualiza el badge del contador de productos en el header
    * Calcula el total de items considerando piezas para productos por unidad
@@ -528,14 +566,16 @@
     cart.push(item); 
     saveCart(cart); 
     updateBadge(); 
-    
-    // Abrir modal automáticamente después de agregar (pequeño delay para UX)
+
     setTimeout(() => {
       const cartModalEl = document.getElementById('cartModal');
       if (cartModalEl && typeof bootstrap !== 'undefined') {
         const cartModal = bootstrap.Modal.getOrCreateInstance(cartModalEl);
         cartModal.show();
+        return;
       }
+
+      window.dispatchEvent(new CustomEvent('cart:open'));
     }, 100);
   }
 

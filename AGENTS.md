@@ -6,7 +6,13 @@ Este es el unico archivo canonico de reglas de agentes para Carni-mvp (consolida
 La capa global del usuario (`stack-ia` / `gentle-ai`) sigue siendo la base principal y su orquestador debe permanecer activo.
 La capa local de Carni-mvp solo agrega contexto especifico del producto, del repo y del human-in-the-loop.
 
-La capa local de agentes, subagentes, skills y workflows del repo vive dentro de `agents/`.
+La capa local vive repartida en cuatro sitios, y cada uno tiene una razon distinta:
+
+- `AGENTS.md` (este archivo): las reglas. Lo lee cualquier herramienta que entre al repo, y GGA lo usa como criterio de revision de codigo — su `RULES_FILE` apunta aqui. Cambiar este archivo cambia como se revisa todo.
+- `.claude/skills/`: los procedimientos que Claude Code descubre e invoca.
+- `.claude/agents/`: los agentes y subagentes que Claude Code descubre.
+- `.atl/skill-registry.md`: el indice que unifica las ocho carpetas de skills del sistema. Lo genera `gentle-ai skill-registry refresh`; no se edita a mano.
+
 La carpeta `.github/` queda reservada solo para integraciones que GitHub exige por convencion, como CI.
 
 ## Prioridad de Capas
@@ -24,11 +30,11 @@ La meta local es evolucionar el producto sin romper la base funcional actual.
 
 ## Estructura agentica local
 
-- `agents/orchestrator/`: orquestador local que coordina el trabajo del repo sin reemplazar stack-ia.
-- `agents/agents/`: agentes de rol para seguridad, DevOps e integraciones IA.
-- `agents/subagents/`: especialistas de implementacion por dominio.
-- `agents/skills/`: workflows reutilizables y guardrails locales.
-- `agents/workflows/`: flujos documentados y reglas operativas locales.
+- `.claude/agents/`: los nueve agentes y subagentes. **Es la unica carpeta que Claude Code descubre**, junto con `~/.claude/agents/`, y la busca de forma recursiva. Un frontmatter mal formado se salta en silencio, sin avisar.
+- `.claude/skills/`: los procedimientos propios del repo, incluidas las nueve que antes vivian en `agents/skills/`.
+- `.atl/skill-registry.md`: el indice generado, no se edita a mano.
+
+La antigua carpeta `agents/` de la raiz **ya no la lee ninguna herramienta**. Su contenido se movio el 2026-08-27: las nueve skills a `.claude/skills/`, el blueprint visual a `docs/blueprints/STITCH_REDESIGN_PROMPT.md`, y el resto a `docs/archivo/agents-sin-usar/`, conservado y buscable, no borrado.
 
 ## Roles locales
 
@@ -41,6 +47,8 @@ La meta local es evolucionar el producto sin romper la base funcional actual.
 - `ai-engineer`: aterriza integraciones IA, n8n, prompts y automatizacion local.
 
 ## Skills activos
+
+Viven en `.claude/skills/<nombre>/SKILL.md`. Estuvieron en `agents/skills/` hasta el 2026-08-26; ahi no las veia nadie, porque el registro escanea ocho carpetas y esa no es ninguna.
 
 | Skill                            | Trigger                          | Uso principal                            |
 | --------------------------------- | --------------------------------- | ------------------------------------------ |
@@ -95,7 +103,8 @@ Si no arranca, leer `/tmp/vite.log` antes de reintentar. Dos fallos seguidos sig
 ## Reglas para Agentes, MCPs y Herramientas de IA
 
 - No crear una segunda plataforma agentica dentro del repo.
-- Toda la capa local de agentes, subagentes, skills y workflows del repo debe vivir dentro de `agents/`.
+- La capa local vive en `.claude/agents/` y `.claude/skills/`, que son las carpetas que las herramientas descubren de verdad. No crear carpetas agenticas paralelas: una skill fuera de esas rutas es invisible aunque este bien escrita.
+- Toda skill lleva frontmatter con `name` y `description` no vacia. Una skill sin descripcion nunca se dispara: existe en disco y nadie la invoca jamas.
 - `.github/` solo puede usarse para integraciones que GitHub requiere por convencion, por ejemplo `workflows/`.
 - Mantener esa capa minima, enfocada en Carni-mvp y compatible con `gentle-ai`.
 - Usar estas reglas locales solo para restricciones del producto y del repo.
@@ -143,20 +152,20 @@ Los agentes y skills locales deben permanecer pequenos, especificos y orientados
 - `docs/index.md`
 - `docs/TASK_PLAN.md`
 - `docs/IMPLEMENTATION_PLAN.md`
-- `agents/STITCH_REDESIGN_PROMPT.md`
-- `agents/orchestrator/carni-orchestrator.agent.md`
-- `agents/agents/*.agent.md`
-- `agents/subagents/*.agent.md`
-- `agents/skills/*/SKILL.md`
-- `agents/workflows/*.md`
+- `docs/blueprints/STITCH_REDESIGN_PROMPT.md`
+- `.claude/agents/carni-orchestrator.md`
+- `.claude/agents/*.md`
+- `.claude/skills/*/SKILL.md`
+- `.atl/skill-registry.md`
+- `docs/archivo/agents-sin-usar/` (historico, no operativo)
 
 Lee primero:
 
 1. `README.md`
 2. `docs/TASK_PLAN.md`
 3. `docs/IMPLEMENTATION_PLAN.md`
-4. `agents/orchestrator/carni-orchestrator.agent.md`
+4. `.claude/agents/carni-orchestrator.md`
 
-Si la tarea es de rediseño visual, consultar tambien `agents/STITCH_REDESIGN_PROMPT.md`.
+Si la tarea es de rediseño visual, consultar tambien `docs/blueprints/STITCH_REDESIGN_PROMPT.md`.
 
 Si una regla local entra en conflicto con la capa global del usuario, prevalece la capa global y la regla local debe simplificarse.

@@ -1,0 +1,30 @@
+// CategoryCard — one tile of the landing bento.
+// Compiled with: npm run css:components
+// The component imports the generated styles.css, never this file.
+//
+// Scope note: the tile's own look — `.category-card`, `.category-img`,
+// `.category-body`, `.category-title`, `.category-desc` — and the whole grid
+// placement of `.category-card-1` through `-9` live in
+// `css/pages/_bento-main.scss`. They are NOT duplicated here on purpose: this
+// migration changes where the data comes from, not how the section looks, and
+// copying those rules would be the fastest way to make the two drift apart.
+//
+// What belongs here is what the React version needs and the hand-written markup
+// never did.
+
+.category-card {
+  // The tiles are links to the catalogue, so the whole surface should say so.
+  // The old markup only had a cursor over the button.
+  .category-img,
+  .category-title {
+    cursor: pointer;
+  }
+
+  // React renders the icon as a self-closing element with no text inside it.
+  // Bootstrap Icons sizes from the font, so an empty `<i>` collapses to zero
+  // width and the gap from `me-2` disappears with it.
+  .category-title > i.bi {
+    display: inline-block;
+    min-width: 1em;
+  }
+}

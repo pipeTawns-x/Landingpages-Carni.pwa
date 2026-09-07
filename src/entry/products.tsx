@@ -1,25 +1,28 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ThemeProvider } from 'styled-components';
+import { Lupa } from '@src/components/Lupa/Lupa';
+import { usePedido } from '@src/hooks/usePedido';
+import { CarrilCategorias } from '@src/components/CarrilCategorias/CarrilCategorias';
 import { CartPanel } from '@src/components/CartPanel/CartPanel';
 import { ProductList } from '@src/components/ProductList/ProductList';
-import { Lupa } from '@src/components/Lupa/Lupa';
 import { SEED_PRODUCTS } from '@src/data/seedProducts';
+import type { CartLegacyItem, OrderLine, Product } from '@src/types/database';
+import { HashRouter, Route, Routes, useNavigate, useSearchParams } from 'react-router-dom';
+import { ProductoDetalle } from '@src/pages/ProductoDetalle';
+import { fetchProducts, mountReactNode, categoryLabel, categorySlugOf, assetUrl } from './shared';
 import { carniTheme } from '@src/theme/carniTheme';
 import GlobalStyles from '@src/styles/globalStyles';
-import type { CartLegacyItem, OrderLine, Product } from '@src/types/database';
-import { fetchProducts, mountReactNode, categoryLabel, categorySlugOf } from './shared';
 import '@src/styles/redesign.css';
 
 const LEGACY_CART_KEY = 'carni_cart_v1';
-/** Estado abierto del panel del pedido, persistido entre visitas (Práctica 4). */
-const CART_OPEN_KEY = 'carni_cart_abierto_v1';
 
 /**
  * Reads whatever is already in the shared cart key and turns it into order
  * lines.
  *
- * Three writers share `carni_cart_v1`: this file, src/hooks/useCart.ts and the
- * vanilla js/modules/core/cart.js. The order used to mount empty and immediately
+ * Two writers share `carni_cart_v1`: this file and the vanilla
+ * js/modules/core/cart.js. (A third, src/hooks/useCart.ts, was deleted on
+ * 2026-09-02 — it had zero importers.) The order used to mount empty and immediately
  * overwrite the key, so a cart filled on index.html was destroyed the moment the
  * customer opened the catalogue — and a plain refresh lost it too.
  *
@@ -149,8 +152,16 @@ const SLUG_ALIASES: Record<string, string> = {
  * two are matched through the products themselves rather than a hand-written
  * table that would drift from the seed.
  */
-function filterFromUrl(products: Product[]): string | null {
-  const raw = new URLSearchParams(window.location.search).get('categoria');
+function filterFromUrl(products: Product[], slugExplicito?: string | null): string | null {
+  // Two places can carry the category, and both are legitimate.
+  //
+  // The bento tiles on index.html link to `products.html?categoria=<slug>` — a
+  // real query string, because they are plain anchors leaving one HTML page for
+  // another. Inside the catalogue the router is a HashRouter, so its own links
+  // put the query after the `#` and `window.location.search` comes back empty.
+  // Reading only the search string made the "back to Cortes Especiales" link
+  // navigate and then show all 53 products.
+  const raw = slugExplicito ?? new URLSearchParams(window.location.search).get('categoria');
   if (!raw) {
     return null;
   }
@@ -190,7 +201,7 @@ function toOrderLine(product: Product): OrderLine {
     name: product.name,
     pricePerKg: product.price_per_kg,
     quantity: 1,
-    image: (product.image_url ?? '/img/products/res.webp').replace(/\.webp$/i, '.png'),
+    image: assetUrl((product.image_url ?? '/img/products/res.webp').replace(/\.webp$/i, '.png')),
     categorySlug: slug,
     // Merchandising is priced per piece and the Ofertas bundles per package.
     // Matches ProductCard.priceUnit(), which decides the same thing for display.
@@ -202,27 +213,40 @@ function CatalogExperience(): JSX.Element {
   // Starts from the seed so the grid paints on the very first render. It used to
   // start empty and wait for Supabase, which on an unreachable host meant 7.4
   // seconds of blank page before a single card appeared.
-  const [products, setProducts] = useState<Product[]>(SEED_PRODUCTS);
+  /**
+   * The grid starts EMPTY and shows a skeleton, not the seed.
+   *
+   * It used to mount straight into SEED_PRODUCTS. That painted 33 hand-written
+   * products — "Ribeye", "T-Bone", names that do not exist in Supabase — and a
+   * moment later swapped them for the 53 real ones. Different count, different
+   * names, different height: that is the flash, and it is worse than a flicker,
+   * because for an instant the customer is looking at products the shop does not
+   * sell.
+   *
+   * The seed still earns its place, but as what it was meant to be: the floor
+   * under a request that never answers. It lands on timeout, not on first paint.
+   */
+  const [products, setProducts] = useState<Product[]>([]);
+  const [cargando, setCargando] = useState<boolean>(true);
   // Hydrated from the shared cart key. Mounting empty and then writing through
   // to that key is what used to wipe a cart filled elsewhere on the site.
   const [order, setOrder] = useState<OrderLine[]>(() => readLegacyCart());
   // The nine bento tiles on index.html and the drawer chips deep-link into a
   // category, so the filter is resolved from the URL during the first render
   // rather than after a round trip.
+  const [parametros] = useSearchParams();
+  const slugPedido = parametros.get('categoria');
   const [activeFilter, setActiveFilter] = useState<string>(
-    () => filterFromUrl(SEED_PRODUCTS) ?? 'all'
+    () => filterFromUrl(SEED_PRODUCTS, slugPedido) ?? 'all'
   );
-  const [isCartOpen, setIsCartOpen] = useState<boolean>(() => {
-    // El panel queda donde el cliente lo dejó: si cerró el pedido en products
-    // y volvió desde la landing, se abre igual que se cerró.
-    try {
-      return window.localStorage.getItem(CART_OPEN_KEY) === '1';
-    } catch {
-      return false;
-    }
-  });
-  // Filtro vivo de la Lupa: llega por ?q= (desde la landing o el acceso) o al
-  // elegir un resultado dentro del propio catálogo.
+  /**
+   * Filtro vivo de la Lupa.
+   *
+   * Llega por `?q=` — una cadena de consulta REAL, antes del `#`, porque la
+   * landing y el acceso no tienen router y solo pueden mandar al cliente aquí
+   * con un enlace normal. Por eso se lee de `window.location.search` y no del
+   * `useSearchParams` del HashRouter, que solo ve lo que va detras del `#`.
+   */
   const [searchTerm, setSearchTerm] = useState<string>(() => {
     try {
       return new URLSearchParams(window.location.search).get('q') ?? '';
@@ -231,20 +255,40 @@ function CatalogExperience(): JSX.Element {
     }
   });
 
+  // Coming back from a product page is a route change, not a mount: the filter
+  // was resolved once in the useState initializer and never looked again, so
+  // returning to a category left the chip on "Todo el catálogo".
   useEffect(() => {
-    void fetchProducts().then(({ products: loaded, live }) => {
-      // The seed is already on screen; only a real response is worth a re-render.
-      if (!live) {
-        return;
-      }
+    if (!slugPedido) {
+      return;
+    }
+    const etiqueta = filterFromUrl(products, slugPedido);
+    if (etiqueta) {
+      setActiveFilter(etiqueta);
+    }
+  }, [slugPedido, products]);
 
-      setProducts(loaded);
+  useEffect(() => {
+    void fetchProducts()
+      .then(({ products: loaded, live }) => {
+        // `fetchProducts` already falls back to the seed when the request times
+        // out, so `loaded` is never empty. What `live` says is whether these are
+        // the real ones — and either way they are what the customer gets, so
+        // both go on screen. Returning early here was what kept the seed
+        // visible.
+        setProducts(loaded);
 
-      const fromUrl = filterFromUrl(loaded);
-      if (fromUrl) {
-        setActiveFilter(fromUrl);
-      }
-    });
+        const fromUrl = filterFromUrl(loaded, slugPedido);
+        if (fromUrl) {
+          setActiveFilter(fromUrl);
+        }
+      })
+      .finally(() => {
+        // In `finally`, never inside the success branch: a rejected request
+        // would leave the skeleton shimmering forever with no way out.
+        setCargando(false);
+      });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Runs on every change to the order, including the first render and the
@@ -281,51 +325,7 @@ function CatalogExperience(): JSX.Element {
   }, []);
 
   // The cart button lives in the static header, outside this tree, so it is
-  // bound here instead of through a React prop.
-  useEffect(() => {
-    const cartButton = document.getElementById('cartBtn');
-    if (!cartButton) {
-      return;
-    }
-
-    const toggle = (event: Event): void => {
-      event.preventDefault();
-      setIsCartOpen((open) => !open);
-    };
-
-    cartButton.addEventListener('click', toggle);
-    return () => cartButton.removeEventListener('click', toggle);
-  }, []);
-
-  useEffect(() => {
-    document.body.classList.toggle('cart-is-open', isCartOpen);
-  }, [isCartOpen]);
-
-  // Persistencia del panel abierto: el almacenamiento es el canal entre
-  // páginas, igual que hace el carrito con carni_cart_v1.
-  useEffect(() => {
-    try {
-      if (isCartOpen) {
-        window.localStorage.setItem(CART_OPEN_KEY, '1');
-      } else {
-        window.localStorage.removeItem(CART_OPEN_KEY);
-      }
-    } catch {
-      /* almacenamiento no disponible: el panel se abre cerrado */
-    }
-  }, [isCartOpen]);
-
-  // Otra pestaña abrió o cerró el pedido: el panel la sigue.
-  useEffect(() => {
-    const syncOpen = (event: StorageEvent): void => {
-      if (event.key === CART_OPEN_KEY) {
-        setIsCartOpen(event.newValue === '1');
-      }
-    };
-
-    window.addEventListener('storage', syncOpen);
-    return () => window.removeEventListener('storage', syncOpen);
-  }, []);
+  // bound in usePedido now, which owns the drawer for every route.
 
   const filters = useMemo(() => {
     const labels = new Set<string>();
@@ -334,56 +334,23 @@ function CatalogExperience(): JSX.Element {
   }, [products]);
 
   const filteredProducts = useMemo(() => {
-    const byCategory =
-      activeFilter === 'all' ? products : products.filter((product) => categoryLabel(product) === activeFilter);
+    const termino = searchTerm.trim().toLowerCase();
+    const porCategoria =
+      activeFilter === 'all'
+        ? products
+        : products.filter((product) => categoryLabel(product) === activeFilter);
 
-    const term = searchTerm.trim().toLowerCase();
-    if (term.length === 0) {
-      return byCategory;
+    if (termino.length === 0) {
+      return porCategoria;
     }
 
-    return byCategory.filter((product) => {
-      const label = categoryLabel(product).toLowerCase();
-      return (
-        product.name.toLowerCase().includes(term) ||
-        product.description.toLowerCase().includes(term) ||
-        label.includes(term)
-      );
-    });
+    return porCategoria.filter((product) =>
+      `${product.name} ${product.description ?? ''}`.toLowerCase().includes(termino)
+    );
   }, [activeFilter, products, searchTerm]);
-
-  const total = useMemo(() => {
-    return order.reduce((sum, line) => sum + line.pricePerKg * line.quantity, 0);
-  }, [order]);
-
-  const handleAddToOrder = useCallback((product: Product): void => {
-    setOrder((current) => [...current, toOrderLine(product)]);
-    setIsCartOpen(true);
-  }, []);
-
-  const handleRemove = useCallback((lineId: string): void => {
-    setOrder((current) => current.filter((line) => line.lineId !== lineId));
-  }, []);
-
-  const handleClose = useCallback((): void => {
-    setIsCartOpen(false);
-  }, []);
 
   return (
     <section className="tw-redesign-root tw-catalog-shell">
-      <Lupa
-        onPickProduct={(product) => {
-          // Mismo documento: el catálogo filtra por el corte elegido y la
-          // búsqueda queda visible en el estado del grid.
-          setActiveFilter('all');
-          setSearchTerm(product.name);
-          try {
-            window.history.replaceState(null, '', `products.html?q=${encodeURIComponent(product.name)}`);
-          } catch {
-            /* URL sin cambios: el filtro ya vive en el estado */
-          }
-        }}
-      />
       <div className="tw-catalog-shell__header">
         <p className="tw-kicker">Catálogo Maestro</p>
         <h2>Elige tu corte, compara opciones y arma tu pedido sin perder tiempo</h2>
@@ -391,18 +358,12 @@ function CatalogExperience(): JSX.Element {
           Aquí reunimos los productos más buscados de la carnicería para que cualquier cliente pueda
           encontrar res, pollo, cerdo y especiales con una navegación clara y directa.
         </p>
-        <div className="tw-filter-row">
-          {filters.map((filter) => (
-            <button
-              className={`tw-filter-chip ${activeFilter === filter ? 'tw-filter-chip--active' : ''}`}
-              key={filter}
-              type="button"
-              onClick={() => setActiveFilter(filter)}
-            >
-              {filter === 'all' ? 'Todo el catálogo' : filter}
-            </button>
-          ))}
-        </div>
+        <CarrilCategorias
+          filtros={filters}
+          activo={activeFilter}
+          onElegir={setActiveFilter}
+          etiqueta={(f) => (f === 'all' ? 'Todo el catálogo' : f)}
+        />
         {searchTerm.trim().length > 0 ? (
           <p className="tw-filter-row__hint">
             Buscando: <strong>{searchTerm}</strong>{' '}
@@ -410,8 +371,9 @@ function CatalogExperience(): JSX.Element {
               type="button"
               onClick={() => {
                 setSearchTerm('');
-                // El filtro no debe reaparecer al recargar: limpia también ?q=
-                history.replaceState(null, '', 'products.html');
+                // El filtro no debe reaparecer al recargar: limpia tambien ?q=,
+                // conservando el hash para no sacar al cliente de su ruta.
+                history.replaceState(null, '', `products.html${window.location.hash}`);
               }}
             >
               Limpiar búsqueda
@@ -420,16 +382,74 @@ function CatalogExperience(): JSX.Element {
         ) : null}
       </div>
 
-      <ProductList products={filteredProducts} onAddToOrder={handleAddToOrder} />
+      <ProductList products={filteredProducts} cargando={cargando} />
 
-      <CartPanel
-        isOpen={isCartOpen}
-        onClose={handleClose}
-        onRemove={handleRemove}
-        order={order}
-        total={total}
-      />
     </section>
+  );
+}
+
+/**
+ * The router, and why it hashes.
+ *
+ * Carni-mvp is not a single-page app: it is a set of HTML pages with React
+ * islands mounted into them. This router lives *inside* the catalogue island
+ * only — index.html, accessweb.html and the admin pages never see it.
+ *
+ * `HashRouter`, not `BrowserRouter`, and that is deliberate. The site ships to
+ * two hosts that serve from different roots: Netlify from `/`, GitHub Pages from
+ * `/Landingpages-Carni.pwa/`. A path router would need a matching `basename` on
+ * each, plus a server rewrite so that `/producto/12` — a URL with no file behind
+ * it — does not 404. Both live sites are healthy today, and a rewrite rule is
+ * exactly what broke them once before: `force = true` in netlify.toml made every
+ * asset come back as index.html.
+ *
+ * A hash never reaches the server. `products.html#/producto/12` is a request for
+ * `products.html` on any host, under any base, with no configuration at all.
+ * The route, `useParams` and `<Link>` work identically either way.
+ */
+/**
+ * The drawer sits OUTSIDE `<Routes>` on purpose.
+ *
+ * Inside, it would unmount and remount on every navigation — and it only existed
+ * on the catalogue route at all, so opening a product left the cart button with
+ * nothing to open. Out here it survives the route change: the customer can
+ * configure a cut, add it, and the ticket is still there.
+ */
+function CarritoGlobal(): JSX.Element {
+  const pedido = usePedido({
+    leer: readLegacyCart,
+    estaSincronizando: () => isSyncingLegacyCart
+  });
+
+  return (
+    <CartPanel
+      isOpen={pedido.abierto}
+      onClose={pedido.cerrar}
+      onRemove={pedido.quitar}
+      order={pedido.lineas}
+      total={pedido.total}
+    />
+  );
+}
+
+/**
+ * On the catalogue a result routes in place; nothing reloads.
+ */
+function LupaConRuta(): JSX.Element {
+  const navegar = useNavigate();
+  return <Lupa onPickProduct={(producto) => navegar(`/producto/${producto.id}`)} />;
+}
+
+function CatalogoConRutas(): JSX.Element {
+  return (
+    <HashRouter>
+      <Routes>
+        <Route path="/" element={<CatalogExperience />} />
+        <Route path="/producto/:id" element={<ProductoDetalle />} />
+      </Routes>
+      <CarritoGlobal />
+      <LupaConRuta />
+    </HashRouter>
   );
 }
 
@@ -437,6 +457,6 @@ mountReactNode(
   '#productsReactRoot',
   <ThemeProvider theme={carniTheme}>
     <GlobalStyles />
-    <CatalogExperience />
+    <CatalogoConRutas />
   </ThemeProvider>
 );

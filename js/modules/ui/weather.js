@@ -37,7 +37,14 @@ async function fetchWeather() {
     if (tempElement) tempElement.textContent = `${temp}°C`;
     if (descElement) descElement.textContent = weatherDesc.text;
     if (iconElement) {
-      iconElement.className = `bi ${weatherDesc.icon} fs-3 me-2 weather-icon`;
+      // Solo se cambia el icono, no su tamaño ni su margen.
+      //
+      // Antes esta línea reescribía la clase entera con `fs-3 me-2`, así que en
+      // cuanto llegaba el clima el icono saltaba a 1.75rem y se separaba del
+      // grado. En un encabezado compacto eso desalinea la fila y en móvil la
+      // rompe. El tamaño lo decide la hoja de estilos, que es donde vive esa
+      // decisión; aquí solo se dice qué clima hace.
+      iconElement.className = `bi ${weatherDesc.icon} weather-icon`;
       iconElement.style.color = '#ff9800';
     }
     if (humidityElement) humidityElement.textContent = `${humidity}% Humedad`;

@@ -6,51 +6,45 @@
     const miniHeader = document.querySelector('.mini-header');
     const body = document.body;
 
-    if (header) {
-        // Distance the pointer must travel in one direction before the header is
-        // allowed to change state. Momentum and trackpad scrolling report constant
-        // one-pixel reversals; without a deadzone every one of them flipped the
-        // class and the header snapped in and out over the content below.
-        const DIRECTION_DEADZONE = 8;
-        const COLLAPSE_AFTER = 90;
+    // EL ESTADO DEL ENCABEZADO AL HACER SCROLL YA NO VIVE AQUI.
+    //
+    // Este bloque escondía el encabezado al bajar —`header.classList.toggle(
+    // 'scrolled')`, y `.main-header.scrolled` lo sube con
+    // `transform: translateY(-100%)` hasta sacarlo de pantalla— y lo devolvía
+    // al subir. Retirado el 2026-08-31 por dos motivos:
+    //
+    // 1. No es lo que se pidió. La referencia es Louis Vuitton, donde la barra
+    //    NUNCA se va: se queda arriba y cambia de transparente a blanca. Un
+    //    encabezado que aparece y desaparece según la dirección del dedo es el
+    //    patrón contrario.
+    // 2. Peleaba con `js/modules/ui/header-scroll.js`. Dos módulos escribiendo
+    //    clases sobre el mismo elemento en el mismo evento, cada uno con su
+    //    propia idea de cuál es el estado correcto.
+    //
+    // Ahora el estado del encabezado tiene UN solo dueño: `header-scroll.js`.
+    // Este archivo se queda con el cajón móvil, que es lo suyo.
+    if (miniHeader) {
+        // El mini-header sí conserva su plegado: es una barra secundaria y
+        // esconderla al bajar no le quita nada a la navegación.
+        let plegado = false;
+        let encolado = false;
 
-        let lastScroll = window.pageYOffset;
-        let anchor = lastScroll;      // last position where direction actually changed
-        let collapsed = false;
-        let queued = false;
-
-        function applyScrollState() {
-            queued = false;
-            const currentScroll = window.pageYOffset;
-            const delta = currentScroll - anchor;
-
-            if (Math.abs(delta) < DIRECTION_DEADZONE) {
-                lastScroll = currentScroll;
-                return;
-            }
-
-            const shouldCollapse = delta > 0 && currentScroll > COLLAPSE_AFTER;
-            anchor = currentScroll;
-            lastScroll = currentScroll;
-
-            // Writing a class that is already present still costs an attribute
-            // mutation on every scroll event. Only touch the DOM when the state
-            // genuinely changes.
-            if (shouldCollapse === collapsed) return;
-            collapsed = shouldCollapse;
-
-            header.classList.toggle('scrolled', collapsed);
-            miniHeader?.classList.toggle('mini-header--hidden', collapsed);
-            body.classList.toggle('header-collapsed', collapsed);
+        function estadoMiniHeader() {
+            encolado = false;
+            const debePlegarse = window.pageYOffset > 90;
+            if (debePlegarse === plegado) return;
+            plegado = debePlegarse;
+            miniHeader.classList.toggle('mini-header--hidden', plegado);
+            body.classList.toggle('header-collapsed', plegado);
         }
 
-        // Scroll fires far more often than the screen refreshes. Coalescing into
-        // one animation frame keeps style work off the scrolling path.
         window.addEventListener('scroll', () => {
-            if (queued) return;
-            queued = true;
-            requestAnimationFrame(applyScrollState);
+            if (encolado) return;
+            encolado = true;
+            requestAnimationFrame(estadoMiniHeader);
         }, { passive: true });
+
+        estadoMiniHeader();
     }
 
     // Mobile drawer functionality (hamburger menu mejorado)

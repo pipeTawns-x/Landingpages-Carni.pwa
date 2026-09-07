@@ -5,28 +5,392 @@
 }
 
 .main-header {
-  --header-height: 72px;
+  // `--header-height: 72px` borrado el 2026-08-28. Vivía aquí y SOMBREABA la
+  // declaración responsiva de `:root` (56/64/72): todo lo que cuelga del
+  // encabezado leía 72 en los tres anchos, mientras el héroe —que es su
+  // HERMANO, no su descendiente— leía el valor bueno de `:root`. A 375 el
+  // encabezado medía 72 y el héroe subía 56: banda vacía de 16px sobre el
+  // video. A 768, 8px. Solo cuadraba a 1280, por coincidencia.
+  //
+  // La variable se declara en UN solo sitio, abajo, en `:root`.
   position: sticky;
   top: 0;
-  background: rgba(52, 58, 64, 0.98);
+  background: rgba(0, 0, 0, 0.85); /* LV negro al cargar */
   color: #fff;
   z-index: 1035;
   width: 100%;
   box-shadow: 0 2px 12px rgba(0,0,0,0.2);
-  // backdrop-filter removed. On a sticky element it re-samples whatever
-  // scrolls underneath on every frame, so the browser invalidates and repaints
-  // across the whole viewport while scrolling — that is what made the bento
-  // images flicker, and what left the page looking blurred mid-scroll.
-  // A solid-enough background gives the same separation for free.
-  background: rgba(52, 58, 64, 0.98);
-  // The collapse used to snap in one frame, which reads as a flash over the
-  // content underneath. Only transform and opacity are animated, so the
-  // compositor handles the whole thing without a repaint.
-  transition: transform 0.25s ease, opacity 0.25s ease;
-  // The header is the one element on the page that actually moves during
-  // scroll, so it earns its own compositor layer.
+  transition: transform 0.25s ease, opacity 0.25s ease, background-color 0.3s ease;
   will-change: transform;
+  backdrop-filter: none; /* LV no usa backdrop-filter — evita parpadeo */
 }
+
+// ═══════════════════════════════════════════════════════════════════
+// Encabezado sobre el video — la técnica de Louis Vuitton
+// ═══════════════════════════════════════════════════════════════════
+//
+// Arriba del todo el encabezado es transparente y el video se ve completo
+// detrás. No hay una barra negra cortando el plano: la marca flota sobre la
+// imagen, que es lo que hace que se sienta caro.
+//
+// El problema de flotar sobre video es que el video cambia. Un logo blanco
+// sobre una toma clara desaparece. Por eso hay dos defensas:
+//
+//   1. Un degradado de arriba hacia abajo, muy sutil, que oscurece solo la
+//      franja donde viven los iconos. No se percibe como una barra.
+//   2. Al pasar el cursor, el fondo se vuelve sólido. El lector que va a tocar
+//      algo obtiene contraste completo en ese momento, y solo en ese momento.
+//
+// Cuando la página baja, `scrolled-dark` / `scrolled-light` toman el relevo:
+// esas clases las escribe el JavaScript según lo que haya debajo.
+
+// NO SIMPLIFIQUES ESTE SELECTOR. Se escribe así por una razón medida.
+//
+// El rival es `.dark-premium .main-header { background: rgba(17,17,17,.98) }`,
+// que vive en `themes/_dark-mode.scss`. Ese archivo se importa en
+// `styles.scss:45` y este en la 18, así que el rival SIEMPRE sale después en el
+// CSS compilado.
+//
+// La versión anterior de esta regla era `.dark-premium .main-header--over-media`
+// y solo empataba en 0,2,0. Con empate desempata el orden del archivo, y el que
+// va después gana: el encabezado salía opaco en los tres anchos. Verificado en
+// el navegador el 2026-08-28.
+//
+// Encadenando las dos clases en el MISMO elemento se llega a 0,3,0 y se gana por
+// peso, no por posición. Eso lo hace estable el día que alguien reordene un
+// import: el arreglo no depende de dónde caiga el archivo.
+//
+// Se conserva la variante sin `.dark-premium` para el caso de que el tema oscuro
+// no esté puesto en el `body`.
+.dark-premium .main-header.main-header--over-media,
+.main-header.main-header--over-media {
+  // Sigue siendo `sticky` (lo hereda de .main-header). Aquí solo se le quita el
+  // fondo: si se pasara a `absolute` dejaría de acompañar al lector al bajar,
+  // que es justo lo que hace bien Louis Vuitton.
+  background: transparent;
+  box-shadow: none;
+
+  // La franja oscura que protege al contenido. `pointer-events: none` para que
+  // no se coma los clics de lo que hay debajo.
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0.55) 0%,
+      rgba(0, 0, 0, 0.28) 55%,
+      rgba(0, 0, 0, 0) 100%
+    );
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+
+  // Al acercar el cursor, fondo sólido. Contraste total justo cuando hace falta.
+  &:hover,
+  &:focus-within {
+    background: rgba(0, 0, 0, 0.92);
+
+    &::before {
+      opacity: 0;
+    }
+  }
+}
+
+// La altura del encabezado vive en `:root`, no dentro de `.main-header`.
+//
+// Una propiedad declarada en `.main-header` solo la ven sus descendientes, y
+// quien necesita este número es el héroe, que es su hermano. En `:root` la ve
+// todo el documento y el margen negativo de abajo nunca se desincroniza.
+:root {
+  --header-height: 56px;
+}
+
+@media (min-width: 768px) {
+  :root { --header-height: 64px; }
+}
+
+@media (min-width: 992px) {
+  :root { --header-height: 72px; }
+}
+
+// El héroe sube por debajo del encabezado en vez de empezar después de él.
+//
+// El encabezado es `sticky`, así que ocupa su sitio en el flujo y empujaría el
+// video hacia abajo dejando una banda vacía arriba. Este margen lo sube
+// exactamente su altura, y el video queda detrás de los iconos.
+.home-hero-video {
+  position: relative;
+  z-index: 1;
+  margin-top: calc(-1 * var(--header-height));
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// EL ESTADO SÓLIDO — lo que pasa al bajar
+// ═══════════════════════════════════════════════════════════════════
+//
+// NEGRO, no blanco. Y la razón importa más que el color.
+//
+// Louis Vuitton pone la barra blanca al bajar, y funciona **porque su página
+// es blanca**: la barra se funde con el documento. Copiar ese blanco aquí,
+// sobre una página negra, produce lo contrario de lo que se buscaba — una
+// franja clara flotando sobre contenido oscuro, que se lee como un elemento
+// ajeno pegado encima.
+//
+// Lo que se copia de LV no es el color: es que la barra DEJE DE FLOTAR y pase
+// a ser parte de la página. En una página negra eso se consigue con negro.
+// Corregido el 2026-08-31 por Eduardo, y tiene razón.
+//
+// Encadenado de dos clases, 0,3,0, por el mismo motivo que la regla
+// transparente: hay que ganarle a `.dark-premium .main-header`, que vale 0,2,0
+// y vive en un archivo que se importa DESPUÉS.
+.dark-premium .main-header.main-header--solid,
+.main-header.main-header--solid {
+  background: #0a0a0a;
+  // La línea de abajo es lo único que separa la barra del contenido. Sin ella,
+  // sobre una sección igual de negra, no se sabe dónde termina.
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.08), 0 8px 24px rgba(0, 0, 0, 0.55);
+  transition: background 0.32s ease, box-shadow 0.32s ease;
+
+  // Sin velo: el degradado existía para proteger el texto sobre el video.
+  // Sobre negro sólido no hay nada de lo que protegerlo, y dejaría una banda
+  // más clara en el borde de arriba.
+  &::before {
+    content: none;
+  }
+
+  // El texto y los iconos NO cambian: ya eran blancos y el fondo sigue siendo
+  // oscuro. Ese es el otro ahorro de quedarse en negro — no hace falta
+  // invertir el logo ni recolorear media fila.
+}
+
+// Cuando alguien pide menos movimiento, el color CAMBIA IGUAL —lo contrario
+// sería un encabezado ilegible—; lo que se quita es la transición.
+@media (prefers-reduced-motion: reduce) {
+  .main-header.main-header--solid {
+    transition: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  // Mismo encadenado de dos clases que la regla principal. Al subir aquella a
+  // 0,3,0 el 2026-08-28, esta se quedaba en 0,1,0 y perdía contra la
+  // transición que pretendía anular. Seguía funcionando solo porque más abajo
+  // hay un `* { transition-duration: 0.01ms !important }`, y apoyarse en un
+  // catch-all para que una regla explícita haga su trabajo es dejarla podrida.
+  .main-header.main-header--over-media,
+  .main-header.main-header--over-media::before {
+    transition: none;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// Las tres zonas — móvil primero
+// ═══════════════════════════════════════════════════════════════════
+
+// La altura la manda `--header-height` y nada más. Sin esto, otra regla imponía
+// `min-height: 84px` y el encabezado medía 88 con su relleno, mientras el héroe
+// subía solo 72: quedaba una banda vacía de 16px encima del video.
+.main-header .main-header__nav-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: var(--header-height);
+  height: var(--header-height);
+  padding-top: 0;
+  padding-bottom: 0;
+  flex-wrap: nowrap; // nunca se parte en dos filas
+}
+
+.header-zone {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-width: 0; // permite que el contenido se encoja en vez de desbordar
+}
+
+// Los dos costados reparten el sobrante en partes iguales.
+//
+// Con `flex: 0 0 auto` cada lado medía lo que pesaba su contenido —317 contra
+// 155— y el centro quedaba corrido 73px a la derecha. Un logo "centrado" que
+// se mueve cada vez que cambia un icono no está centrado: está donde cayó.
+// Repartiendo el sobrante por igual, el centro de la zona central coincide con
+// el centro de la ventana pase lo que pase a los lados.
+.header-zone--left,
+.header-zone--right {
+  flex: 1 1 0;
+}
+
+.header-zone--right {
+  justify-content: flex-end;
+}
+
+.header-zone--center {
+  // `flex: 0 0 auto` obligaba a la zona a ocupar el ancho natural del logo y
+  // empujaba a los lados hasta romperlos. Con `1 1 auto` cede cuando no cabe,
+  // que es lo que tiene que pasar en un teléfono.
+  flex: 0 1 auto;
+  min-width: 0;
+  justify-content: center;
+  overflow: hidden;
+
+  // AIRE A LOS COSTADOS.
+  //
+  // El logo es una placa rectangular con borde, y pegada a la lupa por un lado
+  // y al carrito por el otro se lee como un elemento más de la fila en vez de
+  // como la marca. El relleno lateral lo separa de los dos vecinos y es lo que
+  // lo hace verse centrado y no encajado.
+  padding-inline: 0.75rem;
+
+  @media (min-width: 768px) {
+    padding-inline: 1.5rem;
+  }
+
+  @media (min-width: 992px) {
+    padding-inline: 2.5rem;
+  }
+
+  // Bootstrap le pone `margin-right: 1rem` a `.navbar-brand`. Como
+  // `justify-content: center` centra la caja CON su margen, el logo visible
+  // quedaba 8px corrido a la izquierda —la mitad de esos 16px— y se notaba.
+  // Medido el 2026-08-31: centro del logo 632, centro del encabezado 640.
+  //
+  // `margin-inline` en vez de las dos propiedades sueltas: si mañana alguien
+  // añade `margin-left` en otra hoja, esto lo cubre igual.
+  .navbar-brand {
+    margin-inline: 0;
+    // El enlace es la caja que se centra. Sin esto, hereda el `display: block`
+    // de Bootstrap y su ancho no se ajusta a la imagen.
+    display: flex;
+    align-items: center;
+  }
+}
+
+// EL LOGO EN TELÉFONO.
+//
+// La placa mide 1254x363 px — una proporción de 3.45:1, muy alargada. A 34px de
+// alto ocupa 117px de ancho, y con `max-width: 220px` heredado llegaba a
+// invadir la zona derecha: en 375px el logo se montaba encima del carrito.
+//
+// El tope de ancho es lo que manda aquí, no el alto: en una fila estrecha lo
+// que se agota es el ancho.
+.main-header__logo {
+  height: 30px;
+  max-width: 118px;
+  object-fit: contain;
+  display: block;
+
+  @media (min-width: 400px) {
+    height: 34px;
+    max-width: 136px;
+  }
+
+  @media (min-width: 768px) {
+    height: 40px;
+    max-width: 180px;
+  }
+
+  @media (min-width: 992px) {
+    height: 46px;
+    max-width: 220px;
+  }
+}
+
+// ── Buscador ──
+// En móvil solo la lupa. La etiqueta aparece cuando hay sitio para ella.
+.header-search__label {
+  display: none;
+}
+
+// ── Clima: icono y grados, nada más ──
+// EL CLIMA NO CABE EN UN TELÉFONO, Y ALGO TENÍA QUE SALIR.
+//
+// Medido a 375px el 2026-08-31: la zona derecha necesita 137px para carrito +
+// cuenta + clima, y el reparto en tres zonas le daba 107. El contenido se
+// desbordaba HACIA LA IZQUIERDA y se montaba sobre el logo — la placa acababa
+// en 236 y el carrito empezaba en 226. Diez píxeles de solapamiento.
+//
+// De los tres, el clima es el único que no es navegación: el carrito y la
+// cuenta llevan a algún sitio, la temperatura es un dato agradable. Quitando
+// sus 53px la zona derecha baja a ~80 y todo entra con holgura.
+//
+// Reaparece en 576px, donde sí hay sitio. No se borra de la página: se
+// esconde donde estorba.
+.main-header__weather {
+  // OCULTO EN TELÉFONO. Medido a 375px el 2026-08-31: la zona derecha necesita
+  // 137px para carrito + cuenta + clima y el reparto en tres zonas le daba 107.
+  // Su contenido se desbordaba HACIA LA IZQUIERDA y se montaba sobre el logo:
+  // la placa terminaba en 236 y el carrito empezaba en 226.
+  //
+  // De los tres, el clima es el único que no lleva a ningún sitio. Se esconde
+  // donde estorba y vuelve en 576px, donde sí hay hueco.
+  display: none;
+  align-items: center;
+
+  @media (min-width: 576px) {
+    display: flex;
+  }
+
+  gap: 0.25rem;
+  color: var(--carni-text, #fff);
+  font-size: 0.85rem;
+  white-space: nowrap;
+
+  .weather-icon {
+    color: #ff9800;
+    font-size: 1rem;
+    line-height: 1;
+  }
+
+  .weather-temp {
+    font-weight: 600;
+  }
+}
+
+// ── A partir de tableta ──
+@media (min-width: 768px) {
+  // La altura ya la lleva `--header-height` desde `:root`. Repetirla aquí sería
+  // dos fuentes para el mismo número, y la segunda siempre se olvida.
+  .main-header .main-header__nav-container {
+    gap: 0.75rem;
+  }
+
+  .header-zone {
+    gap: 0.5rem;
+  }
+
+  .main-header__logo {
+    height: 42px;
+  }
+
+  .main-header__weather {
+    font-size: 0.95rem;
+
+    .weather-icon {
+      font-size: 1.1rem;
+    }
+  }
+}
+
+// ── A partir de escritorio: aparece la etiqueta del buscador ──
+@media (min-width: 992px) {
+  .header-search__label {
+    display: inline;
+  }
+
+  .main-header__logo {
+    height: 48px;
+  }
+}
+
+// `.scrolled-dark` y `.scrolled-light` borradas el 2026-08-31.
+//
+// Eran estado muerto: la versión vieja de `header-scroll.js` solo llegaba a
+// poner `scrolled-dark`, y `scrolled-light` no la activaba NADIE. Treinta
+// líneas de CSS con `!important` incluido esperando una clase que no llegaba.
+//
+// El estado sólido ahora es `.main-header--solid`, más arriba en este archivo,
+// y lo pone `header-scroll.js`, que es su único dueño.
 
 @media (prefers-reduced-motion: reduce) {
   .main-header {
@@ -82,8 +446,17 @@
 // ICONOS REDONDOS Y PEQUEÑOS (Mejora Global)
 // ========================================
 .header-icon-btn {
-  width: 40px;
-  height: 40px;
+  // Móvil primero. 36px es el piso: por debajo el dedo empieza a fallar el
+  // objetivo, y a 375px con carrito + cuenta + clima no cabe nada más grande.
+  // Antes esto vivía en un `@media (max-width: 576px)` encogiendo desde 40.
+  width: 36px;
+  height: 36px;
+  flex: 0 0 auto;
+
+  @media (min-width: 576px) {
+    width: 40px;
+    height: 40px;
+  }
   display: flex;
   align-items: center;
   justify-content: center;
@@ -95,8 +468,12 @@
   cursor: pointer;
   
   i {
-    font-size: 1.2rem; // Más pequeño que fs-4
+    font-size: 1.05rem;
     transition: transform 0.3s ease;
+
+    @media (min-width: 576px) {
+      font-size: 1.2rem;
+    }
   }
   
   &:hover {
@@ -111,14 +488,6 @@
     transform: scale(1.05);
   }
   
-  @media (max-width: 576px) {
-    width: 36px;
-    height: 36px;
-    
-    i {
-      font-size: 1.1rem;
-    }
-  }
 }
 
 // Variante redonda con borde circular
@@ -171,7 +540,8 @@ main {
   padding-top: 0; 
 }
 
-.main-header { --header-height: 72px; }
+// Segunda copia de `--header-height: 72px` en `.main-header`, borrada el
+// 2026-08-28 por el mismo motivo que la de arriba. Estaba declarada dos veces.
 
 /* separate carousel visually from header */
 .carousel-area { margin-top: 0; }
@@ -409,12 +779,38 @@ main {
   display: flex;
   align-items: center;
   gap: 0.6rem;
-  flex: 1 1 auto;
+  // NO SE ESTIRA. Antes era `flex: 1 1 auto` con `max-width: 520px` y se comía
+  // todo el lado izquierdo.
+  //
+  // El efecto medido a 1024 el 2026-08-31: el logo quedaba a 0px del centro
+  // —geométrica y verticalmente exacto— pero con 64px de aire a su izquierda y
+  // 248px a su derecha. El ojo no centra respecto al viewport, centra respecto
+  // al VACÍO: con esa diferencia el logo se lee corrido aunque no lo esté. Por
+  // eso Eduardo lo veía chueco y la medición decía 0.
+  //
+  // De paso se acerca a la referencia: en Louis Vuitton "Menú" y "Buscar" son
+  // dos enlaces compactos, no una barra estirada.
+  flex: 0 1 auto;
   min-width: 0;
-  max-width: 520px;
-  min-height: 44px; // pointer target floor
-  margin: 0 0.75rem;
-  padding: 0.55rem 1.1rem;
+  // Los topes salen de igualar los huecos a cada lado del logo, medidos en el
+  // navegador. Con 260px, a 1024 quedaban 98px de aire a la izquierda y 248 a
+  // la derecha: 150 de diferencia, y ahí es donde se ve corrido.
+  max-width: 190px;
+
+  @media (min-width: 1200px) {
+    max-width: 230px;
+  }
+  min-height: 40px; // piso de area tactil
+  // Sin margen lateral en teléfono: cada píxel de esos 0.75rem por lado salía
+  // del hueco que necesitan el logo y los iconos.
+  margin: 0;
+  padding: 0.45rem 0.7rem;
+
+  @media (min-width: 768px) {
+    min-height: 44px;
+    margin: 0 0.75rem;
+    padding: 0.55rem 1.1rem;
+  }
   background: rgba($carni-white, 0.06);
   border: 1px solid rgba($carni-beige, 0.18);
   border-radius: 999px;
@@ -531,7 +927,8 @@ main {
 
   max-width: 1360px;
   margin: 0 auto;
-  min-height: 84px;
+  // `min-height: 84px` borrado el 2026-08-28. La altura la manda
+  // `--header-height` y NADA MAS (ver la regla de las tres zonas, arriba).
   padding-left: clamp(1rem, 2vw, 2rem) !important;
   padding-right: clamp(1rem, 2vw, 2rem) !important;
 }
@@ -633,17 +1030,19 @@ main {
   display: none !important;
 }
 
-.main-header.scrolled {
-
-  transform: translateY(-100%);
-  opacity: 0;
-  pointer-events: none;
-}
+// `.main-header.scrolled { transform: translateY(-100%) }` borrada el
+// 2026-08-31. Sacaba el encabezado de la pantalla al bajar y lo devolvía al
+// subir. Era la causa real de "el header no se mantiene": sí estaba pegado con
+// `position: sticky`, pero un `translateY(-100%)` lo empujaba fuera igual.
+//
+// La referencia es Louis Vuitton, donde la barra no se va nunca. Quien la
+// ponía era `js/modules/ui/header.js`, que ya no lo hace.
 
 @media (max-width: 767.98px) {
   .main-header__nav-container {
 
-    min-height: 72px;
+    // `min-height: 72px` borrado el 2026-08-28: forzaba 72 cuando
+    // `--header-height` decia 56, y dejaba 16px de banda vacia sobre el video.
     gap: 0.75rem;
   }
   .main-header__logo {
@@ -660,7 +1059,9 @@ main {
 @media (max-width: 991.98px) {
   .main-header__nav-container {
 
-    min-height: 76px;
+    // `min-height: 76px` borrado el 2026-08-28, mismo motivo que el de 72px.
+    // Tres reglas `max-width` peleando por un numero que ya tiene una variable
+    // es como se pierde una tarde. Una sola fuente: `--header-height`.
     padding-left: 1rem !important;
     padding-right: 1rem !important;
   }

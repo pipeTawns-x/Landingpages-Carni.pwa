@@ -129,7 +129,7 @@ Los links de referencia que pasaste caen en tres grupos, y cada uno se trata dis
 | `browser-harness` | control de navegador vía CDP |
 | `playwright-cli` | automatización y capturas |
 
-Marcadas **UNKNOWN — verify** en `docs/tooling/triage.md`: Apify y ScrapeGraphAI. Nota de seguridad que sigue vigente: la llave `apify_api_jkZn...` está filtrada y **no debe usarse**; hay que rotarla antes de conectar nada.
+Marcadas sin conectar en `docs/tooling/triage.md`: Apify y ScrapeGraphAI. Las llaves de Apify que se filtraron fueron rotadas el 2026-08-25 y están muertas; ya no bloquean nada. La regla que sigue vigente es que ninguna llave se escriba en el repo: al conectar, la aporta el dueño por variable de entorno.
 
 ---
 
@@ -137,4 +137,4 @@ Marcadas **UNKNOWN — verify** en `docs/tooling/triage.md`: Apify y ScrapeGraph
 
 - El `SKILL.md` de `abogado-del-diablo` sigue sin leerse desde Cowork (fuera de las carpetas conectadas). Si su contrato pide otro formato de entrada, ese archivo manda sobre estos prompts.
 - No probé `markitdown` contra ninguna URL.
-- No confirmé si la llave de Apify ya se rotó.
+- ~~No confirmé si la llave de Apify ya se rotó.~~ Confirmado: rotadas el 2026-08-25.
