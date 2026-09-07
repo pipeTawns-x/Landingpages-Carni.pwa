@@ -6,7 +6,7 @@ Los blueprints guardan **decisiones** (por qué se hizo algo). Este archivo guar
 
 Estados: `abierto` · `en curso` · `congelado`
 
-Última revisión: 2026-09-02 (segunda pasada)
+Última revisión: 2026-09-07 (verificación de la Práctica 4 y merge de `main`)
 
 > **Aviso de techo.** El archivo queda en 21 pendientes abiertos (contados, no estimados). La regla del proyecto sigue en pie: pasar de ~20 no es un problema del archivo, es señal de que se acumulan decisiones sin tomar.
 
@@ -196,7 +196,27 @@ El proyecto de Supabase no tiene copias de seguridad, ni automáticas ni manuale
 
 `getProducts()` hace `select('*, categories(...)')`: stock, precios internos y metadatos viajan al navegador anónimo porque RLS filtra filas, no columnas. La Lupa (Práctica 4) ya usa un `select` restringido — pero el catálogo y los dashboards siguen pasando por `getProducts`.
 
+**Confirmado en vivo el 2026-09-07** desde `index.html`, leyendo la URL de la petición real:
+`.../rest/v1/products?select=*%2Ccategories(name%2Cslug)&is_active=eq.true&offset=0&limit=100&stock=gt.0&order=name.asc`.
+Devuelve 200 y trae las doce columnas de la tabla, incluidas `stock` y `metadata`.
+
 **Arreglo:** vista pública o función `SECURITY DEFINER` con columnas mínimas, y migrar lectores a ella.
+
+### P-38 · El sitio `carni-pwa` de Netlify no tiene las variables de Supabase
+**Estado:** abierto · **Evidencia:** consola de `https://deploy-preview-9--carni-pwa.netlify.app/products.html`, 2026-09-07
+
+Hay dos sitios de Netlify conectados al mismo repo. `carniwebpwa` es el bueno: sirve el catálogo con sus 53 tarjetas y la consola limpia. `carni-pwa` **no tiene definidas `VITE_SUPABASE_URL` ni `VITE_SUPABASE_ANON_KEY`**, así que el bundle lanza al importar —«Supabase configuration missing»— y la capa React entera muere: ni catálogo, ni lupa, ni carrito. Cero recursos fallidos, un solo error en consola.
+
+Importa porque **es uno de los dos previews que aparecen en cada PR**. Quien abra el equivocado va a ver la entrega rota sin que la entrega tenga nada roto.
+
+**Arreglo:** es de Eduardo — o se le ponen las variables en el panel de Netlify, o se desconecta del repo. Relacionado con **P-34** (decidir los tres sitios de Netlify).
+
+### P-37 · Migrar de styled-components a Tailwind v4
+**Estado:** abierto · **Bloqueado por:** el merge deliberado del PR #9 a `main`
+
+styled-components está en modo mantenimiento desde el 17/03/2025: no encaja con React Server Components e inyecta el CSS en tiempo de ejecución. La Práctica 4 se entrega con él a propósito, porque es lo que pide el enunciado y la biblioteca está congelada, no rota.
+
+**Arreglo:** el porqué, la comparación y el plan componente por componente están en `docs/MIGRACION_TAILWIND.md`. No se empieza antes del merge.
 
 ---
 
@@ -418,6 +438,14 @@ TANDA 5   P-15, P-16              animación scroll, escalas de 10 tonos
 
 `P-11`, `P-12`, `P-13` se resuelven de paso cuando se toque cada archivo. No merecen tanda propia.
 `P-24` se resuelve en cuanto haya sesión de GGA viva.
+
+**Cerrados el 2026-09-07 (verificación de la Práctica 4):**
+
+- **La búsqueda en vivo de la Lupa nunca funcionó.** `RESULT_SELECT` pedía `is_promoted` y `badge`, que no son columnas de `products`: PostgREST devolvía 400 en cada búsqueda y el suelo de seed lo disfrazaba de lista correcta con precios inventados. Arreglado en `a339ea67`, verificado con HTTP 200 en local y en el preview del PR.
+- **El cajón del pedido no sobrevivía al cambio de página.** El estado abierto vivía dentro de `products.tsx`, así que solo el catálogo lo conocía. Subido a `usePedido` en `328cff9c`; verificado landing → catálogo → acceso con el panel abierto en las tres.
+- **El cajón quedaba tapado por el encabezado en el teléfono.** Contexto de apilamiento de un ancestro con `z-index: 20`. Resuelto con `createPortal` a `body` en `d8f32256`.
+- **La lupa no avisaba de que la lista de abajo cambia sola.** `aria-describedby` + `role="status"` en `9c399dfd`.
+- **PR #9 en conflicto.** `main` había ganado 52 commits en paralelo y ambas ramas escribieron su propia `Lupa.tsx`. Resuelto en el merge `47c20140` conservando las dos capas. El PR quedó `MERGEABLE`.
 
 **Cerrados el 2026-08-25:**
 
