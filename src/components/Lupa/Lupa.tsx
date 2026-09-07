@@ -22,9 +22,18 @@ export interface LupaProps {
  * 1.5s, cae al seed — el mismo suelo duro que usa fetchProducts().
  */
 
-/** Columnas mínimas para un resultado: nada de stock ni metadata interna. */
+/**
+ * Columnas mínimas para un resultado: nada de stock ni metadata interna.
+ *
+ * TODAS TIENEN QUE EXISTIR EN LA TABLA. `is_promoted` y `badge` estuvieron aquí
+ * y no son columnas de `products`: son campos opcionales del tipo `Product`
+ * (src/types/database.ts) que solo el seed rellena. PostgREST respondía 400
+ * —«column products.is_promoted does not exist»— a CADA búsqueda, y como el
+ * fallo caía en el suelo de seed, la lista se veía correcta y la búsqueda en
+ * vivo no funcionó nunca. TypeScript no lo puede ver: esto es un string.
+ */
 const RESULT_SELECT =
-  'id, name, description, price_per_kg, price_per_lb, image_url, is_promoted, badge, categories(id, name, slug)';
+  'id, name, description, price_per_kg, price_per_lb, image_url, categories(id, name, slug)';
 
 const TENDENCIAS = ['arrachera', 'rib eye', 'pollo', 'promos'] as const;
 
@@ -139,8 +148,19 @@ async function searchProducts(term: string): Promise<Product[]> {
     const settled = await Promise.race([request, timeout]);
 
     if (settled !== null && typeof settled === 'object') {
-      const { data } = settled as { data: Product[] | null };
-      if (Array.isArray(data) && data.length > 0) {
+      // Supabase NO lanza: devuelve `{ data, error }`. Leer solo `data` deja
+      // pasar un 400 como si fuera «sin resultados», y el seed lo disfraza de
+      // búsqueda que funciona. El error se mira antes que los datos.
+      const { data, error } = settled as {
+        data: Product[] | null;
+        error: { message: string; code?: string } | null;
+      };
+
+      if (error) {
+        console.error(
+          `[carni] La búsqueda de «${term}» falló en Supabase (${error.code ?? 's/n'}): ${error.message}. Se usó el seed.`
+        );
+      } else if (Array.isArray(data) && data.length > 0) {
         return data;
       }
     }
