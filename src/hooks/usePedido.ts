@@ -1,6 +1,26 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { OrderLine } from '@src/types/database';
 
+/**
+ * Whether the drawer is open, persisted like the order itself.
+ *
+ * The three pages are three separate documents: the panel used to reopen closed
+ * on every jump, so a customer who opened the ticket on the landing and walked
+ * to the catalogue found it shut again. The key holds the last deliberate
+ * choice — it is written when the customer opens it and removed when they close
+ * it, never on its own.
+ */
+const CLAVE_ABIERTO = 'carni_cart_abierto_v1';
+
+function leerAbierto(): boolean {
+  try {
+    return window.localStorage.getItem(CLAVE_ABIERTO) === '1';
+  } catch {
+    /* Private browsing refuses to read: the drawer simply starts closed. */
+    return false;
+  }
+}
+
 export interface Pedido {
   lineas: OrderLine[];
   total: number;
@@ -32,7 +52,7 @@ export interface OpcionesPedido {
  */
 export function usePedido({ leer, estaSincronizando }: OpcionesPedido): Pedido {
   const [lineas, setLineas] = useState<OrderLine[]>(() => leer());
-  const [abierto, setAbierto] = useState<boolean>(false);
+  const [abierto, setAbierto] = useState<boolean>(leerAbierto);
 
   const abrir = useCallback(() => setAbierto(true), []);
   const cerrar = useCallback(() => setAbierto(false), []);
@@ -45,6 +65,31 @@ export function usePedido({ leer, estaSincronizando }: OpcionesPedido): Pedido {
     () => lineas.reduce((suma, l) => suma + l.pricePerKg * l.quantity, 0),
     [lineas]
   );
+
+  // El cajón queda donde el cliente lo dejó, también al cambiar de página.
+  useEffect(() => {
+    try {
+      if (abierto) {
+        window.localStorage.setItem(CLAVE_ABIERTO, '1');
+      } else {
+        window.localStorage.removeItem(CLAVE_ABIERTO);
+      }
+    } catch {
+      /* Sin almacenamiento el panel funciona igual, solo no se recuerda. */
+    }
+  }, [abierto]);
+
+  // Otra pestaña abrió o cerró el pedido: este panel la sigue.
+  useEffect(() => {
+    const seguir = (evento: StorageEvent): void => {
+      if (evento.key === CLAVE_ABIERTO) {
+        setAbierto(evento.newValue === '1');
+      }
+    };
+
+    window.addEventListener('storage', seguir);
+    return () => window.removeEventListener('storage', seguir);
+  }, []);
 
   // Someone else wrote the key: another tab, the vanilla cart, or the
   // configuration page adding a line.
