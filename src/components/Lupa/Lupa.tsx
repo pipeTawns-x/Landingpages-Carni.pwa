@@ -213,6 +213,25 @@ const Inner = styled.div`
   padding: 1.25rem 1.5rem 1.5rem;
 `;
 
+/**
+ * Texto que solo existe para un lector de pantalla.
+ *
+ * No se usa `display: none` ni `visibility: hidden`: eso lo esconde también del
+ * lector, que es justo lo contrario de lo que se busca. El recorte de 1px es el
+ * patrón estándar para dejarlo audible e invisible.
+ */
+const SoloLectores = styled.span`
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+`;
+
 const SearchForm = styled.form`
   display: flex;
   align-items: center;
@@ -591,6 +610,9 @@ export function Lupa({ onPickProduct }: LupaProps): JSX.Element {
               <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z" />
             </SearchIcon>
             <SearchInput
+              aria-autocomplete="list"
+              aria-controls="lupa-resultados"
+              aria-describedby="lupa-ayuda"
               aria-label="Buscar un corte o una promoción"
               autoComplete="off"
               onChange={(event) => setTerm(event.target.value)}
@@ -609,6 +631,26 @@ export function Lupa({ onPickProduct }: LupaProps): JSX.Element {
               ✕
             </GhostButton>
           </SearchForm>
+
+          {/*
+            Quien no ve la pantalla no se entera de que debajo hay una lista que
+            cambia sola mientras teclea. La descripción se lee una vez, al
+            enfocar el campo; el `status` avisa del recuento cada vez que la
+            lista cambia, sin robar el foco. Es lo que hace la lupa de Louis
+            Vuitton con su label larga, dicho con las dos piezas que hoy
+            corresponden.
+          */}
+          <SoloLectores id="lupa-ayuda">
+            Escribe al menos {MIN_TERM_LENGTH} letras. Las sugerencias aparecen debajo y se
+            actualizan mientras escribes.
+          </SoloLectores>
+          <SoloLectores aria-live="polite" role="status">
+            {query.length >= MIN_TERM_LENGTH
+              ? searching
+                ? `Buscando ${query}`
+                : `${fresh.length + featured.length} resultados para ${query}`
+              : ''}
+          </SoloLectores>
 
           <ChipRow aria-label="Búsquedas de tendencia">
             <RowLabel>Tendencias</RowLabel>
@@ -651,6 +693,7 @@ export function Lupa({ onPickProduct }: LupaProps): JSX.Element {
             <EmptyState>Buscando «{query}»…</EmptyState>
           ) : null}
 
+          <div id="lupa-resultados">
           {fresh.length > 0 ? (
             <section>
               <SectionHeader>Lo nuevo</SectionHeader>
@@ -702,6 +745,7 @@ export function Lupa({ onPickProduct }: LupaProps): JSX.Element {
           {query.length >= MIN_TERM_LENGTH && !searching && fresh.length === 0 && featured.length === 0 ? (
             <EmptyState>Sin resultados para «{query}». Prueba con otro corte.</EmptyState>
           ) : null}
+          </div>
         </Inner>
       </Popin>
     </>
