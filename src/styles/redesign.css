@@ -1169,14 +1169,22 @@
      medir el alto entero del contenedor y la pila se desbordaria sobre lo que
      viene debajo. El `aspect-ratio` de la regla base ya le da su forma. */
   .ficha__lienzo .ficha__foto { border-radius: 14px; }
-  .ficha__cuerpo {
+  /* La columna ocupa el area y SE ESTIRA a la fila. Es el freno del pegajoso:
+     un elemento sticky se detiene en el borde de su bloque contenedor, y el
+     panel suelto en la rejilla no tenia ninguno que lo parara donde hacia
+     falta — seguia bajando hasta dibujarse sobre los sugeridos. */
+  .ficha__columna {
     grid-area: cuerpo;
+    align-self: stretch;
+    height: 100%;
+  }
+
+  .ficha__cuerpo {
     padding-top: 0.5rem;
     position: sticky;
     /* El encabezado del sitio es pegajoso y ocupa su sitio: sin este desfase el
        titulo del panel quedaria debajo de la barra al pegarse. */
     top: calc(var(--header-height, 72px) + 1rem);
-    align-self: start;
     /* RED DE SEGURIDAD, y hace falta.
        Un elemento pegajoso MAS ALTO que la ventana se pega arriba y deja su
        propio pie fuera de pantalla para siempre: el boton de agregar quedaria
