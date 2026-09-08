@@ -899,11 +899,14 @@
 }
 .ficha__volver:hover { color: var(--tinta); }
 
+/* La columna de fotos es una pila, no una foto.
+   El `gap` es lo unico que las separa: cada toma ocupa el ancho entero de la
+   columna, como en la referencia. En movil se ven una tras otra al bajar; en
+   escritorio son la altura contra la que se pega el panel de la derecha. */
 .ficha__lienzo {
   margin: 0.5rem 0 1.75rem;
-  background: #131313;
-  border-radius: 2px;
-  overflow: hidden;
+  display: grid;
+  gap: 0.75rem;
 }
 
 .ficha__foto {
@@ -912,6 +915,8 @@
   height: auto;
   aspect-ratio: 1 / 1;
   object-fit: cover;
+  background: #131313;
+  border-radius: 2px;
 }
 
 .ficha__marca {
@@ -1019,6 +1024,56 @@
 .ficha__resumen-linea strong { font-size: 1.9rem; font-weight: 600; color: var(--crema); }
 .ficha__resumen-detalle { margin: 0.5rem 0 0; font-size: 0.85rem; color: var(--tenue); }
 
+/* Fila-acordeon del panel.
+   Un solo bloque de estilos sirve a las observaciones plegadas y a las filas de
+   informacion del pie: son la misma fila con filete, chevron y contenido
+   opcional. Escribirlo dos veces seria duplicarlo. */
+.ficha__acordeon {
+  border-top: 1px solid var(--linea);
+  border-bottom: 1px solid var(--linea);
+}
+.ficha__acordeon + .ficha__acordeon { border-top: 0; }
+
+.ficha__acordeon-fila {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.9rem 0;
+  cursor: pointer;
+  list-style: none;
+}
+/* Safari dibuja su propio triangulo y queda al lado del chevron: dos flechas
+   para una misma fila. Se quita el suyo y se deja el nuestro. */
+.ficha__acordeon-fila::-webkit-details-marker { display: none; }
+
+.ficha__acordeon-fila::after {
+  content: '';
+  margin-left: auto;
+  width: 8px;
+  height: 8px;
+  border-right: 1px solid currentColor;
+  border-bottom: 1px solid currentColor;
+  transform: rotate(45deg) translate(-2px, -2px);
+  transition: transform 0.18s ease;
+}
+.ficha__acordeon[open] > .ficha__acordeon-fila::after {
+  transform: rotate(-135deg) translate(-2px, -2px);
+}
+
+/* Avisa de que adentro hay algo escrito, para que cerrarlo no lo esconda sin
+   dejar rastro. */
+.ficha__acordeon-marca {
+  margin-left: auto;
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--acento);
+}
+.ficha__acordeon-marca + :is(span, div) { margin-left: 0; }
+.ficha__acordeon-fila:has(.ficha__acordeon-marca)::after { margin-left: 0.75rem; }
+
+.ficha__campo--plegado { padding-bottom: 1rem; }
+
 .ficha__boton {
   width: 100%;
   min-height: 52px;
@@ -1086,27 +1141,58 @@
     padding-inline: 2rem;
   }
   .ficha__migas { grid-area: volver; }
-  /* `align-self: start` es lo que lo mantiene en su fila.
-     Un elemento pegajoso se estira a la altura de su area de rejilla, y como la
-     fila crece con la columna de decision, la foto seguia bajando y acababa
-     encima de las sugerencias. Con `start` ocupa solo su alto y se pega dentro
-     de esa fila, sin invadir lo de abajo. */
-  /* La foto se queda QUIETA.
-     Estuvo `position: sticky` y no funciono: seguia a la columna de decision
-     hacia abajo y acababa invadiendo el banner y las sugerencias. Eduardo lo
-     reporto tres veces —"se sobrepone", "se ve mal", "sigues dejando suelta la
-     img"—. Una foto que persigue al lector no ayuda a decidir: se queda donde
-     esta y se acabo. */
+  /* EL PEGAJOSO VA EN EL PANEL, NO EN LA FOTO.
+     -------------------------------------------
+     Estuvo `position: sticky` en `.ficha__lienzo` y Eduardo lo rechazo tres
+     veces —"se sobrepone", "se ve mal", "sigues dejando suelta la img"—. Tenia
+     razon, y el diagnostico de entonces se quedo a medias: el problema no era
+     el pegajoso, era el elemento. Una foto que persigue al lector no le ayuda a
+     decidir; el panel donde elige el corte, si.
+
+     Invertido queda como la referencia: la columna de fotos corre, el panel se
+     queda arriba, y al terminar la tercera foto siguen el banner y los
+     sugeridos SIN QUE NADA LOS TAPE.
+
+     `align-self: start` es lo que impide que los invada. Un elemento pegajoso
+     se estira a la altura de su area de rejilla; sin `start`, el panel ocuparia
+     toda la fila y se montaria sobre lo de abajo, que es exactamente el defecto
+     que se vio en el video. Con `start` ocupa solo su alto y se pega dentro de
+     su fila. */
   .ficha__lienzo {
     grid-area: foto;
     margin-top: 0;
     position: static;
     align-self: start;
-    border-radius: 14px;
-    overflow: hidden;
   }
-  .ficha__lienzo .ficha__foto { height: 100%; object-fit: cover; }
-  .ficha__cuerpo { grid-area: cuerpo; padding-top: 0.5rem; }
+  /* La foto NO lleva `height: 100%` aqui.
+     Con una sola foto era inofensivo. Con tres apiladas, cada una intentaria
+     medir el alto entero del contenedor y la pila se desbordaria sobre lo que
+     viene debajo. El `aspect-ratio` de la regla base ya le da su forma. */
+  .ficha__lienzo .ficha__foto { border-radius: 14px; }
+  .ficha__cuerpo {
+    grid-area: cuerpo;
+    padding-top: 0.5rem;
+    position: sticky;
+    /* El encabezado del sitio es pegajoso y ocupa su sitio: sin este desfase el
+       titulo del panel quedaria debajo de la barra al pegarse. */
+    top: calc(var(--header-height, 72px) + 1rem);
+    align-self: start;
+    /* RED DE SEGURIDAD, y hace falta.
+       Un elemento pegajoso MAS ALTO que la ventana se pega arriba y deja su
+       propio pie fuera de pantalla para siempre: el boton de agregar quedaria
+       inalcanzable mientras dura el pegado. Medido: el panel daba 910px contra
+       900 de ventana.
+
+       Plegar las observaciones y bajar la descripcion lo dejan holgado hoy,
+       pero eso es un margen que el proximo control se come. El tope lo vuelve
+       imposible: si algun dia no entra, el panel hace scroll adentro y el boton
+       sigue estando. Cuando entra —que es el caso normal— esto no se ve. */
+    max-height: calc(100vh - var(--header-height, 72px) - 2rem);
+    overflow-y: auto;
+    /* Sin esto el foco del teclado dentro de un contenedor con scroll salta con
+       un tiron en cada tabulacion. */
+    scroll-behavior: smooth;
+  }
   .ficha .banner { grid-area: banner; }
   .ficha .sugeridos { grid-area: mas; }
   .ficha__titulo { font-size: 2.6rem; }
