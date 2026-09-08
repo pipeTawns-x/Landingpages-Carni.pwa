@@ -48,11 +48,21 @@ const MIN_TERM_LENGTH = 2;
 
 /* ------------------------------------------------------------------ helpers */
 
+/**
+ * Precio como en la referencia: "MXN 1,234.00".
+ *
+ * `currencyDisplay: 'code'` pone el codigo delante en vez del simbolo, y los
+ * dos decimales fijos evitan que "$85" y "$120.50" se alineen distinto en la
+ * misma fila de la rejilla. Es local a este archivo: no se filtra al carrito ni
+ * a las tarjetas del catalogo, que tienen su propio formato.
+ */
 function formatPrice(price: number): string {
   return new Intl.NumberFormat('es-MX', {
     style: 'currency',
     currency: 'MXN',
-    maximumFractionDigits: 0
+    currencyDisplay: 'code',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
   }).format(price);
 }
 
@@ -190,15 +200,30 @@ const Backdrop = styled.div<{ $open: boolean }>`
   pointer-events: ${({ $open }) => ($open ? 'auto' : 'none')};
 `;
 
+/**
+ * El popin TAPA EL ENCABEZADO, y esa es la pieza que faltaba.
+ *
+ * Colgaba del header (`top: var(--carni-header-h)`), asi que la pildora de
+ * busqueda de la barra seguia a la vista con su propia lupa mientras el campo
+ * del popin mostraba otra. Eduardo lo vio y lo dijo con todas las letras: "se
+ * ven 2 lupas y eso no esta bien, hay que hacerlo igual que la LV, que solo es
+ * una lupa".
+ *
+ * En la referencia no hay ningun truco para esconder la del header: el panel
+ * arranca en `top: 0` y la tapa. El wordmark de adentro pasa a ser el unico
+ * ancla de marca mientras dura la busqueda. Una sola lupa porque solo hay una
+ * barra visible, no porque se este ocultando nada.
+ */
 const Popin = styled.div<{ $open: boolean }>`
   position: fixed;
-  top: var(--carni-header-h, 84px);
+  top: 0;
   left: 0;
   right: 0;
-  z-index: 1030;
+  bottom: 0;
+  z-index: 1040;
+  display: flex;
+  flex-direction: column;
   background: ${({ theme }) => theme.colors.surface};
-  border-top: 3px solid ${({ theme }) => theme.colors.carniRed};
-  border-radius: 0 0 ${({ theme }) => theme.radii.lg} ${({ theme }) => theme.radii.lg};
   box-shadow: ${({ theme }) => theme.shadowXl};
   opacity: ${({ $open }) => ($open ? 1 : 0)};
   visibility: ${({ $open }) => ($open ? 'visible' : 'hidden')};
@@ -207,10 +232,51 @@ const Popin = styled.div<{ $open: boolean }>`
   pointer-events: ${({ $open }) => ($open ? 'auto' : 'none')};
 `;
 
+/* El contenido hace scroll ADENTRO del popin: el panel ocupa la ventana entera,
+   asi que sin esto una busqueda con muchos resultados se desbordaria por abajo
+   sin forma de alcanzarla. */
 const Inner = styled.div`
-  max-width: 1120px;
-  margin: 0 auto;
-  padding: 1.25rem 1.5rem 1.5rem;
+  position: relative;
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 1.75rem 0 2rem;
+`;
+
+/* La franja de arriba: wordmark centrado y la x en su esquina. En la referencia
+   la x vive aqui, lejos del campo — no pegada al boton de limpiar, donde se
+   confunden dos circulos identicos. */
+const Encabezado = styled.div`
+  position: relative;
+  padding: 0 1.5rem 1.25rem;
+  text-align: center;
+`;
+
+const Wordmark = styled.h2`
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: ${({ theme }) => theme.colors.carniBrown};
+`;
+
+const CerrarEsquina = styled.button`
+  position: absolute;
+  top: -0.35rem;
+  right: 1.5rem;
+  border: 0;
+  background: none;
+  font-size: 1.35rem;
+  line-height: 1;
+  cursor: pointer;
+  color: ${({ theme }) => theme.colors.carniBrown};
+  opacity: 0.7;
+
+  &:hover { opacity: 1; }
+  &:focus-visible {
+    outline: 2px solid ${({ theme }) => theme.colors.carniRed};
+    outline-offset: 3px;
+  }
 `;
 
 /**
@@ -232,18 +298,23 @@ const SoloLectores = styled.span`
   border: 0;
 `;
 
+/* Pildora centrada, como la referencia. Antes era una linea inferior de ancho
+   completo y llevaba un icono de lupa adentro; ese icono era la SEGUNDA lupa
+   que se veia en pantalla. Fuera. */
 const SearchForm = styled.form`
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid rgba(54, 52, 50, 0.12);
-`;
+  gap: 0.5rem;
+  width: min(605px, calc(100% - 3rem));
+  margin: 0 auto;
+  padding: 0.7rem 1.2rem;
+  border: 1px solid rgba(54, 52, 50, 0.22);
+  border-radius: 999px;
+  background: ${({ theme }) => theme.colors.surface};
 
-const SearchIcon = styled.svg`
-  flex: 0 0 auto;
-  color: ${({ theme }) => theme.colors.carniBrown};
-  opacity: 0.65;
+  &:focus-within {
+    border-color: rgba(54, 52, 50, 0.5);
+  }
 `;
 
 const SearchInput = styled.input`
@@ -285,12 +356,20 @@ const GhostButton = styled.button`
   }
 `;
 
+/* Etiqueta arriba y terminos debajo, centrados los dos. */
 const ChipRow = styled.div`
   display: flex;
+  flex-direction: column;
   align-items: center;
+  gap: 0.55rem;
+  padding: 1.1rem 1.5rem 0.2rem;
+`;
+
+const ChipLinea = styled.div`
+  display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
-  padding: 0.9rem 0 0.1rem;
+  justify-content: center;
+  gap: 1.1rem;
 `;
 
 const RowLabel = styled.span`
@@ -298,39 +377,49 @@ const RowLabel = styled.span`
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+  /* El dorado se queda: carniTheme lo documenta como el token de kickers, y una
+     etiqueta en versalitas ES un kicker. Se adapta el patron, no la paleta. */
   color: ${({ theme }) => theme.colors.carniGold};
-  margin-right: 0.25rem;
 `;
 
+/* Texto plano, no pildora. En la referencia las tendencias son enlaces y el
+   hover las subraya — se comprobo en el video, con el cursor sobre "bolsas". */
 const Chip = styled.button`
-  border: 1px solid rgba(54, 52, 50, 0.18);
-  border-radius: 999px;
-  background: ${({ theme }) => theme.colors.surface};
+  border: 0;
+  border-radius: 0;
+  background: none;
+  padding: 0;
   color: ${({ theme }) => theme.colors.carniBrown};
-  font-size: 0.8rem;
-  font-weight: 600;
-  padding: 0.3rem 0.8rem;
+  font-size: 0.9rem;
+  font-weight: 400;
   cursor: pointer;
-  transition: background ${({ theme }) => theme.transitionFast}, color ${({ theme }) => theme.transitionFast},
-    border-color ${({ theme }) => theme.transitionFast};
+  transition: color ${({ theme }) => theme.transitionFast};
 
   &:hover {
-    background: ${({ theme }) => theme.colors.carniRed};
-    border-color: ${({ theme }) => theme.colors.carniRed};
-    color: #ffffff;
+    text-decoration: underline;
+    text-underline-offset: 3px;
   }
 
   &:focus-visible {
     outline: 2px solid ${({ theme }) => theme.colors.carniRed};
-    outline-offset: 2px;
+    outline-offset: 3px;
   }
 `;
 
+/* Las recientes SI son pildoras: llevan su propia x para borrarse, y sin
+   carcasa esa x quedaria flotando junto al texto sin decir a quien pertenece.
+   Como extiende Chip, hay que devolverle lo que Chip acaba de perder. */
 const RecentChip = styled(Chip)`
+  border: 1px solid rgba(54, 52, 50, 0.18);
+  border-radius: 999px;
+  padding: 0.3rem 0.8rem;
+  font-size: 0.8rem;
   font-weight: 500;
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
+
+  &:hover { text-decoration: none; background: rgba(54, 52, 50, 0.05); }
 
   i {
     font-style: normal;
@@ -339,81 +428,86 @@ const RecentChip = styled(Chip)`
   }
 `;
 
+/* Etiqueta pequena a la izquierda, sin filete. En la referencia el gris es de
+   la BANDA de la rejilla, no de la etiqueta, y sangra de borde a borde. */
 const SectionHeader = styled.h3`
-  margin: 1.25rem 0 0.75rem;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
+  margin: 1.5rem 0 0.5rem;
+  padding: 0 1.5rem;
   font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: ${({ theme }) => theme.colors.carniBrown};
-
-  &::after {
-    content: '';
-    flex: 1 1 auto;
-    height: 1px;
-    background: rgba(54, 52, 50, 0.12);
-  }
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  color: ${({ theme }) => theme.colors.textMuted};
 `;
 
+/* SEIS columnas, y bajando por escalones.
+   `minmax(0, 1fr)` no es opcional: con `auto`, un nombre largo ensancha su
+   pista y desarma la rejilla entera. */
 const ResultsGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 0.75rem;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 0;
+
+  @media (max-width: 1200px) { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  @media (max-width: 900px)  { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  @media (max-width: 600px)  { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 `;
 
+/* Vertical: foto arriba, texto debajo. Era horizontal con una miniatura de
+   56px, que es una lista de resultados, no una vitrina. */
 const ResultCard = styled.button`
   display: flex;
-  align-items: center;
-  gap: 0.75rem;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
   text-align: left;
-  padding: 0.6rem;
-  border: 1px solid transparent;
-  border-radius: ${({ theme }) => theme.radii.md};
-  background: ${({ theme }) => theme.colors.surface};
+  padding: 0;
+  border: 0;
+  background: none;
   cursor: pointer;
-  transition: background ${({ theme }) => theme.transitionFast}, border-color ${({ theme }) => theme.transitionFast};
 
-  &:hover {
-    background: rgba(54, 52, 50, 0.04);
-    border-color: rgba(54, 52, 50, 0.12);
-  }
+  &:hover img { opacity: 0.88; }
 
   &:focus-visible {
     outline: 2px solid ${({ theme }) => theme.colors.carniRed};
-    outline-offset: 2px;
+    outline-offset: -2px;
   }
 `;
 
+/* `contain`, no `cover`: la foto se ve entera sobre su fondo, sin recortarle el
+   corte al cliente. El gris con aire es lo que le da la vitrina. */
 const ResultThumb = styled.img`
-  flex: 0 0 auto;
-  width: 56px;
-  height: 56px;
-  border-radius: 8px;
-  object-fit: cover;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 3 / 4;
+  object-fit: contain;
+  background: ${({ theme }) => theme.colors.surfaceMuted};
+  padding: 0.9rem;
+  transition: opacity ${({ theme }) => theme.transitionFast};
 `;
 
+/* El texto vive FUERA de la banda gris, sobre blanco. */
 const ResultInfo = styled.span`
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.15rem;
+  gap: 0.2rem;
+  padding: 0.6rem 0.75rem 1.1rem;
 `;
 
+/* Dos lineas, no una. "Filete de Pollo Empanizado" cortado en la primera es
+   media palabra; el `min-height` mantiene los precios alineados en la fila
+   aunque un nombre ocupe una linea y su vecino dos. */
 const ResultName = styled.strong`
-  font-size: 0.88rem;
-  font-weight: 600;
+  font-size: 0.82rem;
+  font-weight: 400;
   color: ${({ theme }) => theme.colors.carniBrown};
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-`;
-
-const ResultMeta = styled.span`
-  font-size: 0.72rem;
-  color: ${({ theme }) => theme.colors.textMuted};
+  white-space: normal;
+  line-height: 1.3;
+  min-height: 2.6em;
 `;
 
 const ResultPrice = styled.span`
@@ -515,22 +609,71 @@ export function Lupa({ onPickProduct }: LupaProps): JSX.Element {
     return () => window.clearTimeout(timer);
   }, [term]);
 
-  /* Cerrar con Escape y devolver el foco al disparador. */
+  const popinRef = useRef<HTMLDivElement>(null);
+
+  /**
+   * El foco pertenece al dialogo mientras esta abierto, y VUELVE al cerrarse.
+   *
+   * El comentario que habia aqui prometia exactamente esto y el codigo no lo
+   * hacia: `triggerRef` se guardaba al abrir y no se leia en ningun sitio del
+   * archivo. Quien navega con teclado abria la busqueda, la cerraba con Escape
+   * y aparecia al principio de la pagina, sin ninguna relacion con el boton que
+   * habia pulsado.
+   *
+   * El ciclado de Tab es la otra mitad. Sin el, `aria-modal="true"` seria una
+   * etiqueta falsa: el atributo promete que no hay nada mas que alcanzar, y con
+   * dos tabulaciones se salia al encabezado de la pagina que hay detras.
+   */
   useEffect(() => {
     if (!open) {
       return;
     }
 
+    const focusables = (): HTMLElement[] =>
+      Array.from(
+        popinRef.current?.querySelectorAll<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        ) ?? []
+      ).filter((el) => !el.hasAttribute('disabled') && el.offsetParent !== null);
+
     const onKeyDown = (event: KeyboardEvent): void => {
       if (event.key === 'Escape') {
         setOpen(false);
+        return;
+      }
+
+      if (event.key !== 'Tab') {
+        return;
+      }
+
+      const lista = focusables();
+      if (lista.length === 0) {
+        return;
+      }
+
+      const primero = lista[0];
+      const ultimo = lista[lista.length - 1];
+      const actual = document.activeElement;
+
+      if (event.shiftKey && actual === primero) {
+        event.preventDefault();
+        ultimo.focus();
+      } else if (!event.shiftKey && actual === ultimo) {
+        event.preventDefault();
+        primero.focus();
       }
     };
 
     document.addEventListener('keydown', onKeyDown);
     inputRef.current?.focus();
 
-    return () => document.removeEventListener('keydown', onKeyDown);
+    return () => {
+      document.removeEventListener('keydown', onKeyDown);
+      /* Al cerrar, el foco vuelve de donde vino. Si el popin se abrio por
+         deep-link (?search) no hubo disparador y no hay a donde volver: se deja
+         en paz en vez de mandarlo a un sitio arbitrario. */
+      triggerRef.current?.focus();
+    };
   }, [open]);
 
   /* Un solo binding por montaje: los triggers estáticos viven en el HTML. */
@@ -597,18 +740,35 @@ export function Lupa({ onPickProduct }: LupaProps): JSX.Element {
   return (
     <>
       <Backdrop $open={open} aria-hidden="true" onClick={() => setOpen(false)} />
-      <Popin $open={open} id="lupa-popin" role="search" aria-label="Búsqueda de productos">
+      {/*
+        Dialogo, no landmark de busqueda.
+        --------------------------------
+        El fondo oscuro cubre la ventana entera y atrapa el puntero, asi que
+        para quien ve la pantalla esto YA se comportaba como un modal. Lo que
+        faltaba era decirlo: con `role="search"` un lector de pantalla lo
+        anunciaba como una region mas de la pagina y nadie avisaba de que el
+        resto habia quedado detras de un telon. Era modal para el raton y no
+        modal para el teclado — la peor de las dos combinaciones.
+
+        El `role="search"` no se pierde: baja al formulario, que es su sitio.
+      */}
+      <Popin
+        $open={open}
+        id="lupa-popin"
+        ref={popinRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="lupa-titulo"
+      >
         <Inner>
-          <SearchForm onSubmit={handleSubmit}>
-            <SearchIcon
-              aria-hidden="true"
-              width="20"
-              height="20"
-              viewBox="0 0 16 16"
-              fill="currentColor"
-            >
-              <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z" />
-            </SearchIcon>
+          <Encabezado>
+            <Wordmark id="lupa-titulo">Carnicería</Wordmark>
+            <CerrarEsquina aria-label="Cerrar la búsqueda" onClick={() => setOpen(false)} type="button">
+              ✕
+            </CerrarEsquina>
+          </Encabezado>
+
+          <SearchForm onSubmit={handleSubmit} role="search">
             <SearchInput
               aria-autocomplete="list"
               aria-controls="lupa-resultados"
@@ -622,14 +782,14 @@ export function Lupa({ onPickProduct }: LupaProps): JSX.Element {
               type="search"
               value={term}
             />
+            {/* Solo LIMPIAR vive dentro del campo. La de cerrar se fue a la
+                esquina: juntas eran dos circulos identicos y, justo cuando el
+                cliente ya habia escrito, no se sabia cual vaciaba y cual salia. */}
             {term ? (
               <GhostButton aria-label="Limpiar la búsqueda" onClick={() => setTerm('')} type="button">
                 ×
               </GhostButton>
             ) : null}
-            <GhostButton aria-label="Cerrar la búsqueda" onClick={() => setOpen(false)} type="button">
-              ✕
-            </GhostButton>
           </SearchForm>
 
           {/*
@@ -653,17 +813,20 @@ export function Lupa({ onPickProduct }: LupaProps): JSX.Element {
           </SoloLectores>
 
           <ChipRow aria-label="Búsquedas de tendencia">
-            <RowLabel>Tendencias</RowLabel>
-            {TENDENCIAS.map((tendencia) => (
-              <Chip key={tendencia} onClick={() => runTerm(tendencia)} type="button">
-                {tendencia}
-              </Chip>
-            ))}
+            <RowLabel>Búsquedas de tendencias</RowLabel>
+            <ChipLinea>
+              {TENDENCIAS.map((tendencia) => (
+                <Chip key={tendencia} onClick={() => runTerm(tendencia)} type="button">
+                  {tendencia}
+                </Chip>
+              ))}
+            </ChipLinea>
           </ChipRow>
 
           {recientes.length > 0 ? (
             <ChipRow aria-label="Búsquedas recientes">
               <RowLabel>Recientes</RowLabel>
+              <ChipLinea>
               {recientes.map((reciente) => (
                 <RecentChip key={reciente} onClick={() => runTerm(reciente)} type="button">
                   {reciente}
@@ -686,6 +849,7 @@ export function Lupa({ onPickProduct }: LupaProps): JSX.Element {
                   </i>
                 </RecentChip>
               ))}
+              </ChipLinea>
             </ChipRow>
           ) : null}
 
@@ -707,7 +871,6 @@ export function Lupa({ onPickProduct }: LupaProps): JSX.Element {
                     />
                     <ResultInfo>
                       <ResultName>{product.name}</ResultName>
-                      <ResultMeta>{categoryName(product)}</ResultMeta>
                       <ResultPrice>
                         {formatPrice(product.price_per_kg)} <small>{priceUnit(product)}</small>
                       </ResultPrice>
@@ -731,7 +894,6 @@ export function Lupa({ onPickProduct }: LupaProps): JSX.Element {
                     />
                     <ResultInfo>
                       <ResultName>{product.name}</ResultName>
-                      <ResultMeta>{categoryName(product)}</ResultMeta>
                       <ResultPrice>
                         {formatPrice(product.price_per_kg)} <small>{priceUnit(product)}</small>
                       </ResultPrice>
