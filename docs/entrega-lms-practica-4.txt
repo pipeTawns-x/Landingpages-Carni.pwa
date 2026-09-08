@@ -1,0 +1,96 @@
+¡Hola profe Sergio! ¿Cómo va todo?
+
+Le mando la práctica del módulo de estilos. Otra vez seguí con el mismo
+proyecto en vez de armar un ejercicio aparte: es la tienda de la Carnicería El
+Señor de La Misericordia, el negocio de mi hermana aquí en San Luis Potosí.
+
+
+PARA CORRERLO
+
+  git clone -b practicas-ebac https://github.com/pipeTawns-x/Landingpages-Carni.pwa.git
+  cd Landingpages-Carni.pwa
+  npm install
+  npm run dev
+
+Abre en http://localhost:3002 (el puerto está fijo en vite.config.js).
+Commit: f8bb65f1
+PR: https://github.com/pipeTawns-x/Landingpages-Carni.pwa/pull/9
+
+
+DÓNDE ESTÁ CADA COSA
+
+  styled-components 6.5.3   package.json:35
+  Tema                      src/theme/carniTheme.ts:9
+  ThemeProvider             src/entry/products.tsx:458
+  Tipos del tema            src/theme/styled.d.ts:12
+  createGlobalStyle         src/styles/globalStyles.ts:18
+  Estilos según props       src/components/CartPanel/CartPanel.tsx:24    ($isOpen)
+                            src/components/ProductCard/ProductCard.tsx:20 ($size)
+                            src/components/Lupa/Lupa.tsx:217              ($open)
+  Herencia                  src/components/Lupa/Lupa.tsx:412             (styled(Chip))
+
+Ninguno es de adorno: $isOpen abre y cierra el cajón del pedido, $open levanta
+el buscador, $size decide el tamaño de cada tarjeta, y styled(Chip) son las
+búsquedas recientes de verdad, guardadas y borrables una por una.
+
+El tema tampoco me lo inventé: carniTheme.ts copia los valores de
+css/abstracts/_variables.scss, que es de donde ya vivían los 45 archivos SCSS
+del proyecto. Un solo lugar donde cambiar un color. Y el prefijo $ de las props
+no es capricho: sin él, styled-components le pasa la prop al DOM y el navegador
+se queja por cada isOpen que no es un atributo HTML de verdad.
+
+
+LO QUE ME SALIÓ MAL
+
+El buscador nunca funcionó, y se veía perfecto. Le pedía a la base dos columnas
+que no existen, así que el servidor respondía 400 en cada búsqueda desde el
+primer día. No se notaba porque el error caía en unos datos de respaldo del
+código y la lista salía creíble: "Pollo Entero, $85 el kilo" cuando en la base
+vale $119. Lo tapaba una línea: yo leía solo los datos y no el error. Supabase
+no lanza excepciones, devuelve las dos cosas, así que un 400 entraba como si
+fuera "no hay resultados".
+
+Y un lío de scroll que me costó tres intentos. Quería que el panel de
+configuración se quedara fijo mientras corren las fotos del producto. Primero
+puse el sticky en la foto y se montaba encima de los sugeridos. Lo quité. Luego
+lo puse en el panel y pasó lo mismo al revés. El detalle es que un elemento
+pegajoso se frena en el borde de su contenedor, y el mío era hijo directo de la
+rejilla, así que no tenía dónde pararse. Metiéndolo en una columna que sí se
+estira, se detiene justo donde terminan las fotos.
+
+
+SOBRE LA HERRAMIENTA, Y HACIA DÓNDE VA EL PROYECTO
+
+Me puse a investigar y vi tres videos que juntos cuentan la historia.
+
+midudev, sobre el modo mantenimiento: https://youtu.be/9GiosVIaDSY
+Su propio mantenedor lo anunció en marzo de 2025: para proyectos nuevos no lo
+recomendaría.
+
+Gentleman Programming, curso de Next.js: https://youtu.be/ndWmjeoRHR4
+Es de 2023, dos años antes del anuncio, y ya decía: "a mí me encanta
+styled-components, me apasiona, en el trabajo lo usamos y es mágico, pero en
+server rendering es un dolor más que otra cosa". El problema se veía venir.
+
+Jesús Elías: https://youtu.be/3jwGbwSr4WE
+Se llama "Integrando Styled Components y NativeWind" y pensé que era de usar
+los dos a la vez. No lo es: arranca diciendo que el objetivo es migrar. Lo que
+se ve conviviendo es la mudanza a medias, no el destino.
+
+¿Está muerto styled-components? Congelado, más bien: recibe parches de
+seguridad pero no funciones nuevas. Frente a Tailwind sí se queda atrás, y por
+razones que se notan en el navegador: mete el CSS mientras la página se dibuja,
+así que pesa en tiempo de ejecución y en cada isla de React. Tailwind saca el
+CSS desde el build, no arrastra librería al navegador y sigue viva, ya en v4.
+Menos peso, página menos lenta y herramienta actualizada son tres cosas que a
+una tienda que vende sí le importan.
+
+Aun así la entrega va con styled-components a propósito: es lo que pide la
+práctica, y estar congelado no es estar roto.
+
+Lo que sí dejé planeado es migrar a Tailwind en la rama main, que es la que va a
+producción. Componente por componente, empezando por los más aislados y dejando
+el buscador para el final, con captura antes y después en cada paso. Si algo se
+rompe, se rompe un componente y no la web entera.
+
+Gracias por la revisión, profe. Un salUdos.
