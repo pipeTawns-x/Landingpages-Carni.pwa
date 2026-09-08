@@ -328,6 +328,24 @@ export function ProductoDetalle(): JSX.Element {
         ))}
       </div>
 
+      {/*
+        La columna existe SOLO para acotar el pegajoso.
+        -----------------------------------------------
+        El panel era hijo directo de la rejilla y se pegaba, pero seguia bajando
+        mas alla de su fila: con los sugeridos a la vista, los controles del
+        pedido quedaban dibujados ENCIMA de las tarjetas. Eduardo lo vio y lo
+        dijo exacto: "las fotos ya no tapan, pero ahora lo que tapa son las
+        configuraciones del pedido; estas solo deben bajar hasta antes de la
+        img".
+
+        Un elemento pegajoso se detiene en el borde de su BLOQUE CONTENEDOR.
+        Como hijo directo de la rejilla ese bloque no lo frenaba donde hacia
+        falta. Esta columna si se estira al alto de la fila —la de las fotos— y
+        el panel se pega adentro: baja mientras corren las tres fotos y se
+        planta cuando se acaban. Despues empiezan el banner y los sugeridos, que
+        son otras filas y ya no comparten espacio con nadie.
+      */}
+      <div className="ficha__columna">
       <div className="ficha__cuerpo">
         <p className="ficha__marca">Carnicería El Señor de La Misericordia</p>
         <h1 className="ficha__titulo">{producto.name}</h1>
@@ -523,6 +541,8 @@ export function ProductoDetalle(): JSX.Element {
           primero se decide el pedido, luego respira una imagen a todo lo ancho, y
           al final las cuatro sugerencias. Al reves, las tarjetas competian con la
           decision que el cliente vino a tomar. */}
+      </div>
+
       <BannerEditorial />
       <Relacionados producto={producto} />
     </section>
