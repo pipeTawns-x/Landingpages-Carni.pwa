@@ -18,6 +18,10 @@ export const carniTheme = {
     carniBrown: '#363432',
     /* $carni-white — superficies claras (popin de la Lupa) */
     surface: '#FFFFFF',
+    /* Fondo de la vitrina: la banda gris muy clara detras de cada foto de
+       resultado. Vive aqui y no clavado en el componente porque la misma banda
+       se reusa en mas de un sitio. */
+    surfaceMuted: '#F8F8F8',
     /* --carni-charcoal — superficies oscuras (cart panel) */
     charcoal: '#111111',
     /* --carni-text */
