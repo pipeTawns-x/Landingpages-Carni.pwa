@@ -30,6 +30,8 @@ Abre en `http://localhost:3002` (el puerto está fijo en `vite.config.js`).
 | | `src/components/Lupa/Lupa.tsx:217` (`$open`) |
 | Herencia entre componentes | `src/components/Lupa/Lupa.tsx:412` (`styled(Chip)`) |
 
+Los seis requisitos están, pero ninguno es de adorno: cada uno hace un trabajo real en una tienda que vende. `$isOpen` es lo que abre y cierra el cajón del pedido. `$open` levanta el buscador. `$size` decide el tamaño de cada tarjeta del catálogo. Y la herencia es `RecentChip = styled(Chip)`, que son las búsquedas recientes de verdad, guardadas y que se pueden borrar una por una.
+
 Dos cosas que me parecieron lo más útil del módulo:
 
 El tema no me lo inventé. `carniTheme.ts` copia los valores de `css/abstracts/_variables.scss`, que es de donde ya vivían los 45 archivos SCSS del proyecto. Así la parte de React y el CSS de siempre hablan el mismo idioma, y si mañana cambia un color hay un solo lugar donde tocarlo.
@@ -44,12 +46,20 @@ Aquí aprendí más que escribiendo lo nuevo.
 
 **Y un lío de scroll que me costó tres intentos.** En la ficha del producto quería que el panel de configuración se quedara fijo mientras corren las fotos. Primero puse el sticky en la foto y se montaba encima de los productos sugeridos. Lo quité. Luego lo puse en el panel y pasó lo mismo al revés: ahora era el panel el que tapaba las tarjetas. El detalle es que un elemento pegajoso se frena en el borde de su contenedor, y el mío era hijo directo de la rejilla, así que no tenía dónde pararse. Metiéndolo en una columna que sí se estira, se detiene justo donde terminan las fotos.
 
-## Sobre la herramienta
+## Sobre la herramienta, y hacia dónde va el proyecto
 
-Mientras hacía esto me enteré por un video de midudev de que styled-components está en modo mantenimiento desde marzo de 2025. Su propio mantenedor lo dijo así: para proyectos nuevos no lo recomendaría. Las razones son de fondo: no encaja bien con React Server Components y mete el CSS mientras la página se dibuja, en vez de dejarlo listo desde el build.
+Mientras hacía la práctica me puse a investigar y vi tres videos que juntos cuentan la historia completa.
 
-Aun así la entrega va con styled-components a propósito, porque es lo que pide la práctica y porque la librería está congelada, no rota. Para lo que hace el proyecto funciona perfecto.
+El primero es de **midudev**, sobre styled-components en modo mantenimiento: https://youtu.be/9GiosVIaDSY — Su propio mantenedor lo anunció en marzo de 2025 y lo dijo así: para proyectos nuevos no lo recomendaría.
 
-Lo que sí dejé planeado es la migración a Tailwind para la versión de producción, en la rama `main`. Tailwind no tiene coste en tiempo de ejecución, el CSS sale del build, y sigue vivo. La idea es hacerlo de a un componente por vez y en este orden: primero la lista del pedido, que está aislada; luego la tarjeta de producto, que se repite 53 veces y es donde más se nota; después el panel del carrito, que tiene props dinámicas y hay que traducirlas a clases; y de último el buscador, que es el más grande. Con captura antes y después en cada paso, a 390 y a 1440. Si algo se rompe, se rompe un componente y no la web entera.
+El segundo es de **Gentleman Programming**, del curso de Next.js: https://youtu.be/ndWmjeoRHR4 — Y me llamó la atención la fecha, porque es de 2023, dos años antes del anuncio. Ahí ya dice: *"a mí me encanta styled-components, me apasiona, en el trabajo lo usamos y es mágico, pero en server rendering es un dolor más que otra cosa"*. O sea que el problema no apareció de golpe: se veía venir.
+
+El tercero es de **Jesús Elías**: https://youtu.be/3jwGbwSr4WE — Se llama "Integrando Styled Components y NativeWind", y al principio pensé que era un video de usar los dos a la vez. No lo es: arranca diciendo que el objetivo es *migrar* de uno al otro. Lo que se ve conviviendo es la mudanza a medias, no el destino.
+
+Entonces, ¿styled-components está muerto? Congelado, más bien: recibe parches de seguridad pero no funciones nuevas. Pero comparado con Tailwind sí se queda atrás, y por razones que se notan en el navegador. styled-components mete el CSS mientras la página se dibuja, así que el estilo pesa en tiempo de ejecución y en cada isla de React que tengo. Tailwind no: el CSS sale del build ya listo, no arrastra librería al navegador, y sigue actualizándose — ya va por la v4. Menos peso, página menos lenta y una herramienta viva son tres cosas que a una tienda que vende sí le importan.
+
+Aun así la entrega va con styled-components a propósito, porque es lo que pide la práctica y porque estar congelado no es estar roto: para lo que hace hoy el proyecto, funciona perfecto.
+
+Lo que sí dejé planeado es migrar a Tailwind en la rama `main`, que es la que va a producción. Y no de un tirón: componente por componente, empezando por los más aislados y dejando el buscador para el final, con captura antes y después en cada paso. Si algo se rompe, se rompe un componente y no la web entera.
 
 Gracias por la revisión, profe. Un salUdos.
