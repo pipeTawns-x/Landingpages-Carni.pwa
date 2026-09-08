@@ -52,6 +52,37 @@ const PESO_POR_PIEZA_SUGERIDO: Record<string, number> = {
   arrachera: 0.35
 };
 
+/** Cómo se nombra cada vista en el `alt`. Tres fotos con el mismo alt no son
+ *  tres fotos para quien no ve la pantalla: son la misma repetida tres veces. */
+const VISTAS = ['toma completa', 'detalle del marmoleo', 'otra vista'] as const;
+
+/**
+ * Las fotos de la ficha.
+ *
+ * `metadata.galeria` manda si existe — mismo patrón de override que
+ * `pesoPorPieza()`. Si no, se derivan del propio `image_url` con los sufijos
+ * que ffmpeg generó en `public/img/products/`. La derivación es por nombre y no
+ * pregunta nada a la base.
+ *
+ * Si el archivo no termina en `.webp` (una URL remota, un png suelto), se
+ * devuelve la única foto y no se inventan hermanas que darían 404.
+ */
+function fotosDe(p: Product): string[] {
+  const meta = (p as unknown as { metadata?: Record<string, unknown> }).metadata;
+  const galeria = meta?.galeria;
+  if (Array.isArray(galeria) && galeria.length > 0) {
+    return galeria.filter((f): f is string => typeof f === 'string');
+  }
+
+  const base = p.image_url ?? '/img/products/res.webp';
+  if (!base.endsWith('.webp')) {
+    return [base];
+  }
+
+  const raiz = base.slice(0, -'.webp'.length);
+  return [base, `${raiz}-detalle.webp`, `${raiz}-alto.webp`];
+}
+
 function pesoPorPieza(p: Product): number | null {
   const meta = (p as unknown as { metadata?: Record<string, unknown> }).metadata;
   const v = meta?.peso_por_pieza_kg;
@@ -127,6 +158,7 @@ export function ProductoDetalle(): JSX.Element {
 
   const esPremium = producto ? esCortePremium(producto) : false;
   const pesoPieza = producto ? pesoPorPieza(producto) : null;
+  const fotos = producto ? fotosDe(producto) : [];
 
   const cotizacion = useMemo(() => {
     if (!producto) return null;
@@ -262,14 +294,38 @@ export function ProductoDetalle(): JSX.Element {
         ) : null}
       </nav>
 
+      {/*
+        La columna de fotos, y por qué son tres.
+        ----------------------------------------
+        El panel de la derecha se queda pegado mientras esta columna corre; sin
+        altura de la que agarrarse, no hay nada contra qué pegarse y el efecto
+        no existe. Una sola foto deja el panel flotando y el hueco negro debajo
+        —que es como se veía— es la mitad del problema que Eduardo reportó.
+
+        Las tres salen del mismo archivo: la toma completa, el detalle del
+        marmoleo y un encuadre alto, derivados con ffmpeg desde las fuentes del
+        repo. No son fotografías nuevas y no se pretende que lo sean; en una
+        carnicería el marmoleo es información de compra de verdad, así que la
+        segunda vista se gana su lugar.
+
+        `metadata.galeria` gana si existe: el día que la carnicería suba tomas
+        reales, esto se apaga solo sin tocar una línea.
+      */}
       <div className="ficha__lienzo">
-        <img
-          className="ficha__foto"
-          src={assetUrl(producto.image_url ?? '/img/products/res.webp')}
-          alt={producto.name}
-          width={1000}
-          height={1000}
-        />
+        {fotos.map((foto, i) => (
+          <img
+            className="ficha__foto"
+            key={foto}
+            src={assetUrl(foto)}
+            alt={VISTAS[i] ? `${producto.name} — ${VISTAS[i]}` : producto.name}
+            width={1000}
+            height={1000}
+            /* La primera entra en la primera pantalla; las otras dos solo si el
+               cliente baja. Sin esto la ficha pediría tres imágenes de golpe. */
+            loading={i === 0 ? 'eager' : 'lazy'}
+            decoding={i === 0 ? 'sync' : 'async'}
+          />
+        ))}
       </div>
 
       <div className="ficha__cuerpo">
@@ -283,8 +339,6 @@ export function ProductoDetalle(): JSX.Element {
             <span className="ficha__libra">${producto.price_per_lb} / lb</span>
           ) : null}
         </p>
-
-        {producto.description ? <p className="ficha__nota">{producto.description}</p> : null}
 
         <h2 className="ficha__pregunta">¿Cómo lo quieres?</h2>
 
@@ -380,18 +434,39 @@ export function ProductoDetalle(): JSX.Element {
 
           {/* Free text from the customer. It travels with the line, reaches the
               admin panel and gets printed on the order — without it the counter
-              does not know what to cut. */}
-          <label className="ficha__campo">
-            <span className="ficha__etiqueta">Observaciones para el carnicero</span>
-            <textarea
-              rows={2}
-              maxLength={240}
-              placeholder="Sin tanta grasa, en bisteces delgados, para asar…"
-              value={observaciones}
-              onChange={(e) => setObservaciones(e.target.value)}
-              aria-label="Observaciones"
-            />
-          </label>
+              does not know what to cut.
+
+              PLEGADO, Y NO POR ESTÉTICA. El panel es pegajoso en escritorio, y
+              un pegajoso más alto que la ventana deja su propio botón fuera de
+              alcance: medido, el panel daba 910px contra 900 de ventana, y este
+              campo era el que sobraba. Cerrado entra.
+
+              Se pliega ÉSTE y no la cantidad ni el grosor: aquéllos son la
+              decisión de compra y esconderlos la empeora. Éste lo usa quien
+              tiene algo que pedir, y ese lo abre.
+
+              `<details>` da el acordeón sin estado nuevo en React. El texto
+              escrito sigue vivo aunque se cierre: el valor vive en `observaciones`,
+              no en el DOM. */}
+          <details className="ficha__acordeon">
+            <summary className="ficha__acordeon-fila">
+              <span className="ficha__etiqueta">Observaciones para el carnicero</span>
+              {observaciones.trim() ? (
+                <span className="ficha__acordeon-marca">Escrita</span>
+              ) : null}
+            </summary>
+            <label className="ficha__campo ficha__campo--plegado">
+              <span className="visually-hidden">Observaciones para el carnicero</span>
+              <textarea
+                rows={2}
+                maxLength={240}
+                placeholder="Sin tanta grasa, en bisteces delgados, para asar…"
+                value={observaciones}
+                onChange={(e) => setObservaciones(e.target.value)}
+                aria-label="Observaciones"
+              />
+            </label>
+          </details>
         </div>
 
         {pesoPieza === null ? (
@@ -428,6 +503,20 @@ export function ProductoDetalle(): JSX.Element {
         <p className="ficha__nota ficha__nota--tenue">
           El total definitivo lo calcula el servidor con el precio del día.
         </p>
+
+        {/* La descripción baja aquí, y recortada.
+            Arriba empujaba la decisión de compra fuera de la primera pantalla y
+            estiraba el panel por encima del alto de la ventana, que es lo que
+            dejaba el botón fuera de alcance al pegarse. Quien quiere leerla la
+            abre; quien viene a comprar no la tiene que saltar. */}
+        {producto.description ? (
+          <details className="ficha__acordeon">
+            <summary className="ficha__acordeon-fila">
+              <span className="ficha__etiqueta">Sobre este corte</span>
+            </summary>
+            <p className="ficha__nota ficha__campo--plegado">{producto.description}</p>
+          </details>
+        ) : null}
       </div>
 
       {/* El orden lo fijo Eduardo mirando como cierran Louis Vuitton y carnivoros:
