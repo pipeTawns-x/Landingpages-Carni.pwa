@@ -1,6 +1,6 @@
 import { assetUrl } from '@src/entry/shared';
 import type { Category } from '@src/entry/shared';
-import './styles.css';
+import { Tarjeta } from './styles';
 
 export interface CategoryCardProps {
   category: Category;
@@ -67,7 +67,7 @@ export function CategoryCard({
     // article itself slid it out from under the cursor, which dropped the
     // hover, which put it back, which caught the cursor again — the flicker
     // recorded as P-09. The pointer area has to stay still.
-    <article
+    <Tarjeta
       className={`category-card category-card-${position}`}
       style={{ '--reveal-delay': `${revealIndex * 70}ms` } as React.CSSProperties}
     >
@@ -101,6 +101,6 @@ export function CategoryCard({
           </div>
         </div>
       </div>
-    </article>
+    </Tarjeta>
   );
 }
