@@ -7,7 +7,7 @@ import { cotizar } from '../../js/modules/core/quote.js';
 import { useSupabaseQuery } from '@src/hooks/useSupabaseQuery';
 import { useUnidadInteligente } from '@src/hooks/useUnidadInteligente';
 import { claveDeVariante } from '@src/lib/lineaPedido';
-import { agregarProducto } from '@src/redux/carritoActions';
+import { agregarProducto } from '@src/redux/slices/carritoSlice';
 import type { Despacho } from '@src/redux/store';
 import { Relacionados } from '@src/components/Relacionados/Relacionados';
 import { BannerEditorial } from '@src/components/BannerEditorial/BannerEditorial';

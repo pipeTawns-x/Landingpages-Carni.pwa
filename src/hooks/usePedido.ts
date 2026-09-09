@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import type { OrderLine } from '@src/types/database';
-import { hidratarCarrito, quitarProducto } from '@src/redux/carritoActions';
+import { hidratarCarrito, quitarProducto } from '@src/redux/slices/carritoSlice';
 import type { Despacho, EstadoRaiz } from '@src/redux/store';
 
 /**
@@ -65,7 +65,7 @@ export function usePedido({ leer, estaSincronizando }: OpcionesPedido): Pedido {
    * cajon, no del dominio. Meterlo al store global seria confundir "que hay en
    * el pedido" con "el panel esta desplegado".
    */
-  const lineas = useSelector((estado: EstadoRaiz) => estado);
+  const lineas = useSelector((estado: EstadoRaiz) => estado.carrito);
   const despachar = useDispatch<Despacho>();
   const [abierto, setAbierto] = useState<boolean>(leerAbierto);
 

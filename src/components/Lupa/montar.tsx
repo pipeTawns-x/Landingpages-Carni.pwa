@@ -1,7 +1,9 @@
 import { createRoot } from 'react-dom/client';
+import { Provider } from 'react-redux';
 import { ThemeProvider } from 'styled-components';
 import { Lupa } from './Lupa';
 import { carniTheme } from '@src/theme/carniTheme';
+import { store } from '@src/redux/store';
 
 /**
  * Mounts the search popin on the pages that are not the catalogue.
@@ -30,12 +32,16 @@ export function montarLupa(): void {
   document.body.appendChild(host);
 
   createRoot(host).render(
-    <ThemeProvider theme={carniTheme}>
+    /* La Lupa lee sus resultados del store, y esta raiz se crea fuera del
+       arbol de la pagina: sin Provider, useSelector lanza y el popin no monta. */
+    <Provider store={store}>
+      <ThemeProvider theme={carniTheme}>
       <Lupa
         onPickProduct={(producto) => {
           window.location.href = `products.html#/producto/${producto.id}`;
         }}
       />
-    </ThemeProvider>
+      </ThemeProvider>
+    </Provider>
   );
 }

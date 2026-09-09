@@ -1,6 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { supabase } from '../../../js/modules/supabase.js';
 import { SEED_PRODUCTS } from '@src/data/seedProducts';
+import {
+  buscarProductos,
+  reiniciarResultados
+} from '@src/redux/slices/busquedaSlice';
+import type { Despacho, EstadoRaiz } from '@src/redux/store';
 import type { Product } from '@src/types/database';
 import { Backdrop, Popin, Inner, Encabezado, Wordmark, CerrarEsquina, SoloLectores, SearchForm, SearchInput, GhostButton, ChipRow, ChipLinea, RowLabel, Chip, RecentChip, SectionHeader, ResultsGrid, ResultCard, ResultThumb, ResultInfo, ResultName, ResultPrice, EmptyState } from './styles';
 
@@ -258,8 +264,18 @@ function splitResults(term: string, live: Product[]): { fresh: Product[]; featur
 export function Lupa({ onPickProduct }: LupaProps): JSX.Element {
   const [open, setOpen] = useState<boolean>(() => new URLSearchParams(window.location.search).has('search'));
   const [term, setTerm] = useState<string>('');
-  const [results, setResults] = useState<Product[]>([]);
-  const [searching, setSearching] = useState<boolean>(false);
+  /*
+    Los resultados ya no son estado local: viven en el slice de busqueda.
+
+    Antes esta pantalla tenia su propio `results` y su propio `searching`, y
+    ningun campo para el error — por eso un 400 de Supabase entraba como "no
+    hay resultados" y un respaldo local lo tapaba con precios inventados.
+    Ahora los tres estados son del slice y el error tiene su propio lugar.
+  */
+  const { resultados: results, cargando: searching, error: errorBusqueda } = useSelector(
+    (estado: EstadoRaiz) => estado.busqueda
+  );
+  const despachar = useDispatch<Despacho>();
   const [recientes, setRecientes] = useState<string[]>(() => readRecientes());
   const [palabraIndex, setPalabraIndex] = useState<number>(0);
 
@@ -278,21 +294,18 @@ export function Lupa({ onPickProduct }: LupaProps): JSX.Element {
   useEffect(() => {
     const query = term.trim();
     if (query.length < MIN_TERM_LENGTH) {
-      setResults([]);
-      setSearching(false);
+      despachar(reiniciarResultados());
       return;
     }
 
-    setSearching(true);
+    /* El debounce se queda: el thunk maneja los estados, no el ritmo. Sin esto
+       cada tecla seria una consulta a la base. */
     const timer = window.setTimeout(() => {
-      void searchProducts(query).then((found) => {
-        setResults(found);
-        setSearching(false);
-      });
+      void despachar(buscarProductos(query));
     }, DEBOUNCE_MS);
 
     return () => window.clearTimeout(timer);
-  }, [term]);
+  }, [term, despachar]);
 
   const popinRef = useRef<HTMLDivElement>(null);
 
@@ -540,6 +553,27 @@ export function Lupa({ onPickProduct }: LupaProps): JSX.Element {
 
           {query.length >= MIN_TERM_LENGTH && searching && fresh.length === 0 && featured.length === 0 ? (
             <EmptyState>Buscando «{query}»…</EmptyState>
+          ) : null}
+
+          {/*
+            El error, VISIBLE y con salida.
+
+            Este bloque es la razon de ser de la practica. Antes un fallo del
+            servidor no llegaba nunca a la pantalla: se leia `data`, se ignoraba
+            `error`, y un respaldo local rellenaba la lista con precios que no
+            eran los de la base. El cliente veia una busqueda que funcionaba.
+
+            Ahora `rejected` tiene su propia rama en el slice, su propio campo
+            en el estado, y aqui su propio lugar en la pantalla — con un boton
+            para reintentar, que es lo que el enunciado pide.
+          */}
+          {errorBusqueda ? (
+            <EmptyState role="alert">
+              No pudimos buscar «{query}». {errorBusqueda}{' '}
+              <button type="button" onClick={() => void despachar(buscarProductos(query))}>
+                Reintentar
+              </button>
+            </EmptyState>
           ) : null}
 
           <div id="lupa-resultados">
