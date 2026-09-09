@@ -1,40 +1,13 @@
-import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 import { assetUrl } from '@src/entry/shared';
 import type { Product } from '@src/types/database';
+import { Shell, type TamanoTarjeta } from './styles';
 
 export interface ProductCardProps {
   product: Product;
-  size: 'small' | 'medium' | 'large';
+  size: TamanoTarjeta;
   isIAContent?: boolean;
 }
-
-/**
- * Reglas propias vendrían de ProductCard/styles.css (9 líneas) y ahora viven
- * aquí. El look real de la tarjeta lo sigue dando la capa global `tw-*`
- * (redesign.css + _productos.scss): este styled-component solo cubre lo que el
- * componente considera suyo, y las variantes de tamaño/IA se pasan como props
- * transitorias ($size, $isIAContent) que alimentan las clases globales sin
- * filtrarse al DOM.
- */
-const Shell = styled.article<{ $size: ProductCardProps['size']; $isIAContent: boolean }>`
-  /* 'tw-card-shell--' + $size y 'tw-card-shell--ia' se resuelven abajo en el
-     className: los estilos de esas variantes son de la capa global. Las props
-     transitorias existen para que el estilo propio y el global lean la misma
-     fuente de verdad. */
-  &[hidden] {
-    display: none;
-  }
-
-  .producto-card__title {
-    color: ${({ theme }) => theme.colors.text};
-  }
-
-  .producto-card__description {
-    color: #b8b8b8;
-  }
-`;
-
 function formatPrice(price: number): string {
   return new Intl.NumberFormat('es-MX', {
     style: 'currency',
