@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { Link, useParams } from 'react-router-dom';
 import { getProductById } from '../../js/modules/supabase.js';
 import { esCortePremium } from '../../js/modules/core/premium-cuts.js';
@@ -6,6 +7,8 @@ import { cotizar } from '../../js/modules/core/quote.js';
 import { useSupabaseQuery } from '@src/hooks/useSupabaseQuery';
 import { useUnidadInteligente } from '@src/hooks/useUnidadInteligente';
 import { claveDeVariante } from '@src/lib/lineaPedido';
+import { agregarProducto } from '@src/redux/carritoActions';
+import type { Despacho } from '@src/redux/store';
 import { Relacionados } from '@src/components/Relacionados/Relacionados';
 import { BannerEditorial } from '@src/components/BannerEditorial/BannerEditorial';
 import { assetUrl } from '@src/entry/shared';
@@ -154,6 +157,7 @@ export function ProductoDetalle(): JSX.Element {
   const [presupuesto, setPresupuesto] = useState<string>('200');
   const [grosor, setGrosor] = useState<number>(1.25);
   const [observaciones, setObservaciones] = useState<string>('');
+  const despachar = useDispatch<Despacho>();
   const [agregado, setAgregado] = useState<boolean>(false);
 
   const esPremium = producto ? esCortePremium(producto) : false;
@@ -227,6 +231,31 @@ export function ProductoDetalle(): JSX.Element {
     }
 
     window.localStorage.setItem(LLAVE_PEDIDO, JSON.stringify(actual));
+    /*
+      Dos escrituras, y las dos hacen falta.
+
+      El objeto legacy que acaba de guardarse es el que lee `cart.js`, que es
+      JavaScript plano y no puede usar hooks. El despacho es el que actualiza el
+      store, que es de donde leen las islas de React.
+
+      Redux es la fuente de verdad para React; `localStorage` sigue siendo el
+      puente hacia lo que no es React. El evento deja de ser el mecanismo de
+      sincronizacion y pasa a ser solo un aviso.
+    */
+    despachar(
+      agregarProducto({
+        lineId: `${producto.id}-${Date.now()}`,
+        productId: producto.id,
+        name: producto.name,
+        pricePerKg: producto.price_per_kg,
+        quantity: cotizacion.pesoTotalKg,
+        image: producto.image_url ?? '/img/products/res.webp',
+        categorySlug:
+          (producto as unknown as { categories?: { slug?: string } }).categories?.slug ?? '',
+        unit: 'kg'
+      })
+    );
+
     window.dispatchEvent(new CustomEvent('cart:updated', { detail: { count: actual.length } }));
     setAgregado(true);
     window.setTimeout(() => setAgregado(false), 4000);

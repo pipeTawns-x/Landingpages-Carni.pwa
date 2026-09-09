@@ -1,7 +1,9 @@
 import { createRoot } from 'react-dom/client';
+import { Provider } from 'react-redux';
 import { ThemeProvider } from 'styled-components';
 import { CartPanel } from './CartPanel';
 import { carniTheme } from '@src/theme/carniTheme';
+import { store } from '@src/redux/store';
 import GlobalStyles from '@src/styles/globalStyles';
 import { usePedido } from '@src/hooks/usePedido';
 import { leerPedidoGuardado } from '@src/lib/pedidoStorage';
@@ -51,9 +53,13 @@ export function montarCarrito(): void {
   // El tema y las reglas globales viajan con el cajón: en la landing y en el
   // acceso esta es la única raíz de styled-components de la página.
   createRoot(host).render(
-    <ThemeProvider theme={carniTheme}>
-      <GlobalStyles />
-      <CarritoGlobal />
-    </ThemeProvider>
+    /* El Provider va FUERA del tema: el estado del pedido no depende de como
+       se ve, y esta raiz se crea aparte del arbol de la pagina. */
+    <Provider store={store}>
+      <ThemeProvider theme={carniTheme}>
+        <GlobalStyles />
+        <CarritoGlobal />
+      </ThemeProvider>
+    </Provider>
   );
 }

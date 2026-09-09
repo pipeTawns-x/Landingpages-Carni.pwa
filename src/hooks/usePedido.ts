@@ -1,5 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import type { OrderLine } from '@src/types/database';
+import { hidratarCarrito, quitarProducto } from '@src/redux/carritoActions';
+import type { Despacho, EstadoRaiz } from '@src/redux/store';
 
 /**
  * Whether the drawer is open, persisted like the order itself.
@@ -51,14 +54,37 @@ export interface OpcionesPedido {
  * same key. Events are the only channel all three share.
  */
 export function usePedido({ leer, estaSincronizando }: OpcionesPedido): Pedido {
-  const [lineas, setLineas] = useState<OrderLine[]>(() => leer());
+  /**
+   * Las lineas ya NO viven en este hook: viven en el store.
+   *
+   * Antes eran un `useState` por isla, y como las islas no comparten arbol,
+   * cada una tenia su propia copia. Se sincronizaban por `localStorage` y un
+   * evento a mano. Ahora hay UNA sola lista y todas la leen del mismo sitio.
+   *
+   * `abierto` se queda en `useState` a proposito: es estado de interfaz de ESTE
+   * cajon, no del dominio. Meterlo al store global seria confundir "que hay en
+   * el pedido" con "el panel esta desplegado".
+   */
+  const lineas = useSelector((estado: EstadoRaiz) => estado);
+  const despachar = useDispatch<Despacho>();
   const [abierto, setAbierto] = useState<boolean>(leerAbierto);
 
   const abrir = useCallback(() => setAbierto(true), []);
   const cerrar = useCallback(() => setAbierto(false), []);
 
-  const quitar = useCallback((lineId: string) => {
-    setLineas((actuales) => actuales.filter((l) => l.lineId !== lineId));
+  const quitar = useCallback(
+    (lineId: string) => {
+      despachar(quitarProducto(lineId));
+    },
+    [despachar]
+  );
+
+  /* El store arranca vacio; el pedido de verdad ya esta en `localStorage`,
+     escrito por esta pestaña, por otra o por el `cart.js` plano. Esta es la
+     puerta por la que ese estado entra una sola vez al montar. */
+  useEffect(() => {
+    despachar(hidratarCarrito(leer()));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const total = useMemo(
@@ -98,7 +124,7 @@ export function usePedido({ leer, estaSincronizando }: OpcionesPedido): Pedido {
       if (estaSincronizando?.()) {
         return;
       }
-      setLineas(leer());
+      despachar(hidratarCarrito(leer()));
     };
 
     window.addEventListener('storage', rehidratar);

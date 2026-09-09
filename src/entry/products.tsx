@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Provider } from 'react-redux';
 import { ThemeProvider } from 'styled-components';
 import { Lupa } from '@src/components/Lupa/Lupa';
 import { usePedido } from '@src/hooks/usePedido';
@@ -11,6 +12,7 @@ import { HashRouter, Route, Routes, useNavigate, useSearchParams } from 'react-r
 import { ProductoDetalle } from '@src/pages/ProductoDetalle';
 import { fetchProducts, mountReactNode, categoryLabel, categorySlugOf, assetUrl } from './shared';
 import { carniTheme } from '@src/theme/carniTheme';
+import { store } from '@src/redux/store';
 import GlobalStyles from '@src/styles/globalStyles';
 import '@src/styles/redesign.css';
 
@@ -455,8 +457,10 @@ function CatalogoConRutas(): JSX.Element {
 
 mountReactNode(
   '#productsReactRoot',
-  <ThemeProvider theme={carniTheme}>
-    <GlobalStyles />
-    <CatalogoConRutas />
-  </ThemeProvider>
+  <Provider store={store}>
+    <ThemeProvider theme={carniTheme}>
+      <GlobalStyles />
+      <CatalogoConRutas />
+    </ThemeProvider>
+  </Provider>
 );
