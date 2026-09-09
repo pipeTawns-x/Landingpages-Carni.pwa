@@ -183,21 +183,35 @@ respuesta de Eduardo.
 
 ## LA MIGRACIÓN A TAILWIND — cuándo, y por qué ahí
 
-**Recomendación: después de Redux 2, antes del bloque de accesibilidad.**
+**Recomendación: después de ENTREGAR testing, antes del bloque de accesibilidad.**
 
-Por qué NO antes:
+El orden completo del temario que queda:
+
+    Redux 1 → Redux 2 → Testing → [MIGRACIÓN] → Accesibilidad → Integración
+    → Habilidades y entrevistas → Proyecto final
+
+Por qué NO antes de Redux:
 - Redux 1 y 2 refactorizan los componentes de la práctica de estilos. Si esos
   componentes dejan de ser styled-components ahora, la cadena de prácticas se
   rompe y el maestro no puede seguir el hilo.
 
+Por qué DESPUÉS de entregar testing, y no antes:
+- Testing es una práctica evaluada. No se cambia la capa de estilos de todo el
+  proyecto justo antes de una entrega que van a calificar.
+- Y al revés funciona a favor: los tests quedan escritos y aprobados sobre
+  código estable, y después son la red de la migración.
+
+Por qué los tests NO se rompen por migrar (y qué sí detectan):
+- React Testing Library consulta por **rol y texto accesible**, no por clases.
+  Un test bien escrito no se entera de que cambió el CSS. Si se rompe por eso,
+  el test estaba mal escrito y conviene saberlo.
+- Pero si la migración borra un `aria-label`, cambia un rol o rompe un texto
+  accesible, ahí **sí** fallan. Eso no es CSS, y es exactamente lo que se quiere
+  que salte.
+
 Por qué NO después de accesibilidad:
 - Accesibilidad audita contraste, foco visible y estados. Todo eso es CSS. Si se
   audita antes de migrar, se audita dos veces.
-
-Por qué testing no es un obstáculo:
-- React Testing Library consulta por **rol y texto**, no por clases. Un test bien
-  escrito no se entera de que cambió el CSS. Si un test se rompe por migrar
-  estilos, el test estaba mal escrito y eso también conviene saberlo.
 
 Y el proyecto final es un portafolio: llega con la migración hecha y con la
 historia completa que contar — por qué se entregó con styled-components, por qué
