@@ -1,32 +1,28 @@
 /**
- * El store: un solo contenedor para el estado del carrito.
+ * El store, ahora con Redux Toolkit.
  *
- * POR QUE ESTE PROYECTO LO NECESITA DE VERDAD
- * -------------------------------------------
- * Carni-mvp no es una SPA. Es un conjunto de paginas HTML con islas de React
- * montadas encima, y esas islas NO COMPARTEN ARBOL: el cajon del pedido, la
- * ficha del producto y el catalogo se montan por separado. Un `useState` en una
- * no existe para las otras.
+ * Compara con lo que habia en el modulo anterior: `createStore`, un enhancer
+ * escrito a mano para las devtools y un cast para tiparlo. `configureStore`
+ * trae las devtools ya conectadas y el middleware de thunk incluido, que es lo
+ * que permite despachar `buscarProductos` — una funcion asincrona — como si
+ * fuera una accion cualquiera.
  *
- * Hasta ahora eso se resolvia con `localStorage` mas un `CustomEvent`
- * ('cart:updated'), y CINCO archivos escribian la misma llave. Eso es un bus de
- * eventos casero. Redux es el bus de verdad, y encima con historial.
- *
- * Se usa `createStore` y no `configureStore` a proposito: este modulo enseña
- * Redux clasico. La migracion a Redux Toolkit es el modulo siguiente, y ahi
- * este archivo se reduce a tres lineas.
+ * POR QUE ESTE PROYECTO LO NECESITA
+ * ---------------------------------
+ * Carni-mvp no es una SPA: son islas de React sobre paginas HTML que NO
+ * comparten arbol. El cajon del pedido, la ficha y el catalogo se montan por
+ * separado, asi que un `useState` en una no existe para las otras.
  */
-import { createStore, type StoreEnhancer } from 'redux';
-import { carritoReducer } from './carritoReducer';
+import { configureStore } from '@reduxjs/toolkit';
+import carritoReducer from './slices/carritoSlice';
+import busquedaReducer from './slices/busquedaSlice';
 
-export const store = createStore(
-  carritoReducer,
-  /* Las devtools de Redux, solo si la extension esta instalada. Sirven para ver
-     la lista de acciones despachadas: es el argumento mas visible de por que
-     una accion es un objeto y no una llamada a funcion. */
-  (window as unknown as { __REDUX_DEVTOOLS_EXTENSION__?: () => StoreEnhancer })
-    .__REDUX_DEVTOOLS_EXTENSION__?.()
-);
+export const store = configureStore({
+  reducer: {
+    carrito: carritoReducer,
+    busqueda: busquedaReducer
+  }
+});
 
 export type EstadoRaiz = ReturnType<typeof store.getState>;
 export type Despacho = typeof store.dispatch;
