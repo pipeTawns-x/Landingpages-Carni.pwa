@@ -29,10 +29,23 @@ lista de todo lo que entregamos.
 **Esto vale la mayor parte de los 25 puntos y es culpa de la entrega, no del
 revisor.**
 
-Arreglo: mergear el PR #9 a `main`. Es la opción honesta — la práctica pasa a
-ser lo que cualquiera ve al abrir el repo. Alternativa si no se quiere mergear
-todavía: cambiar la rama por defecto del repo a `practicas-ebac` mientras dura
-la evaluación.
+**Arreglo, decidido por Eduardo el 2026-09-09: NO se mergea a `main`.**
+
+`main` recibe la versión completa —Redux 1, Redux 2, styled-components, React
+1/2/3 y testing— o no recibe nada. No se le hace un goteo de prácticas a la
+rama de producción, y el repo se queda atrasado a la vista mientras tanto. Es
+una decisión de producto, no una omisión.
+
+Lo que SÍ se hace, y resuelve la causa sin tocar `main`: **cambiar la rama por
+defecto del repositorio a `practicas-ebac`** mientras dura la evaluación.
+
+    gh repo edit pipeTawns-x/Landingpages-Carni.pwa --default-branch practicas-ebac
+
+Un revisor que abre el repo en el navegador cae en la rama que tiene la
+práctica. No mueve una línea de código, no mergea nada, y se revierte en un
+comando el día que `main` reciba la versión completa.
+
+Es de Eduardo ejecutarlo: toca la configuración del repositorio.
 
 ### Causa 2 — quedan archivos CSS que el paso 1 mandaba borrar
 
