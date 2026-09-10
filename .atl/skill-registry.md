@@ -7,6 +7,7 @@ Last updated: 2026-09-07
 ## Sources scanned
 
 - .claude/skills
+- .agents/skills
 - /Users/felipeeduardotorresaguilar/.config/opencode/skills
 - /Users/felipeeduardotorresaguilar/.claude/skills
 - /Users/felipeeduardotorresaguilar/.gemini/skills
