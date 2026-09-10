@@ -17,7 +17,8 @@
     "ebac:check": "npm run ebac && npm run build",
     "serve:static": "serve . -l 3000",
     "start": "npm run serve:static",
-    "test": "NODE_OPTIONS=--experimental-vm-modules jest"
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest",
+    "test:coverage": "npm test -- --coverage"
   },
   "engines": {
     "node": ">=20.0.0"
@@ -39,12 +40,20 @@
     "styled-components": "^6.5.3"
   },
   "devDependencies": {
+    "@babel/core": "^8.0.1",
+    "@babel/preset-env": "^8.0.2",
+    "@babel/preset-react": "^8.0.1",
+    "@babel/preset-typescript": "^8.0.1",
+    "@testing-library/jest-dom": "^7.0.1",
+    "@testing-library/react": "^16.3.3",
+    "@testing-library/user-event": "^14.6.7",
     "@types/express": "^5.0.3",
     "@types/node": "^25.6.0",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
     "@vitejs/plugin-react": "^4.7.0",
     "jest": "^30.5.1",
+    "jest-environment-jsdom": "^30.5.1",
     "sass": "^1.93.3",
     "serve": "^14.2.4",
     "tsx": "^4.21.0",
