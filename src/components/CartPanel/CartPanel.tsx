@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { OrderList } from '@src/components/OrderList/OrderList';
+import { formatearPrecio } from '@src/lib/formatearPrecio';
 import type { OrderLine } from '@src/types/database';
 import { Panel } from './styles';
 
@@ -11,12 +12,36 @@ export interface CartPanelProps {
   onClose: () => void;
   onRemove: (lineId: string) => void;
 }
-function formatPrice(price: number): string {
-  return new Intl.NumberFormat('es-MX', {
-    style: 'currency',
-    currency: 'MXN',
-    maximumFractionDigits: 2
-  }).format(price);
+
+/**
+ * La direccion del pedido, servible CON router y SIN el.
+ *
+ * Este panel se monta en dos sitios muy distintos. En `products.tsx` cuelga de
+ * un `HashRouter` y podria usar `<Link>`. Pero `montarCarrito()` lo monta
+ * tambien en `index.html` y en `accessweb.html`, donde NO HAY ROUTER: alli un
+ * `<Link>` o un `useNavigate` lanzan «useHref() may be used only in the context
+ * of a <Router>» y se llevan por delante el componente entero — el cliente se
+ * queda sin cajon, no sin enlace. Ya paso lo mismo con la Lupa y su Provider.
+ *
+ * Un `<a>` normal no tiene ese problema porque no sabe nada de React Router, y
+ * un fragmento nunca llega al servidor: `products.html#/carrito` es una peticion
+ * de `products.html` en Netlify (raiz) y en GitHub Pages (`/Landingpages-
+ * Carni.pwa/`) por igual. Por eso la ruta va RELATIVA y sin pasar por
+ * `assetUrl()`: el navegador la resuelve contra el documento actual y sale el
+ * prefijo correcto solo. Importar `assetUrl` aqui, ademas, arrastraria
+ * `import.meta.env` a un archivo que Jest compila a CommonJS y ni siquiera
+ * llegaria a ejecutarse.
+ *
+ * Y estando YA en el catalogo se devuelve solo el fragmento. Cambiar unicamente
+ * el `#` es navegacion DENTRO del mismo documento: no recarga y el `HashRouter`
+ * la recoge como cualquier otra ruta. Repetir `products.html` en ese caso
+ * cambiaria tambien la cadena de consulta, y eso SI es una recarga que ademas
+ * tira el `?categoria=` o el `?q=` con el que el cliente venia filtrando.
+ */
+function hrefDelPedido(): string {
+  return window.location.pathname.endsWith('/products.html')
+    ? '#/carrito'
+    : 'products.html#/carrito';
 }
 
 /**
@@ -102,11 +127,66 @@ export function CartPanel({ isOpen, order, total, onClose, onRemove }: CartPanel
       <footer className="cart-panel__footer">
         <div className="cart-panel__total-row">
           <span>Total</span>
-          <strong className="cart-panel__total">{formatPrice(total)}</strong>
+          <strong className="cart-panel__total">{formatearPrecio(total, 'ticket')}</strong>
         </div>
-        <button className="cart-panel__checkout" disabled={itemCount === 0} type="button">
-          Continuar con el pedido
-        </button>
+        {/*
+          La puerta al pedido, y por que no se agrega un boton nuevo al lado.
+
+          La ruta `#/carrito` existia y no habia UN SOLO enlace que llevara a
+          ella: se llegaba escribiendo la URL. La puerta ya estaba aqui, sin
+          hacer nada — «Continuar con el pedido» ya dice lo que toca hacer:
+          salir del vistazo rapido y entrar a la revision. Poner otro control
+          junto al icono del encabezado serian dos mandos para el mismo recado.
+
+          POR QUE CAMBIA DE ELEMENTO SEGUN EL ESTADO
+          ------------------------------------------
+          Con el pedido vacio no hay nada que continuar, y en HTML un enlace no
+          se puede deshabilitar: `<a>` no admite `disabled` y `aria-disabled`
+          avisa al lector de pantalla pero no impide el clic. Un boton apagado
+          si es exactamente eso — un mando presente que no se puede accionar—,
+          asi que el estado vacio se queda como estaba. Con lineas dentro es una
+          NAVEGACION de verdad, y eso es un enlace: se abre en pestaña nueva, se
+          copia, se previsualiza en la barra de estado y se anuncia como enlace.
+          No son dos controles: es el mismo, dicho con el elemento que
+          corresponde a cada estado.
+        */}
+        {itemCount === 0 ? (
+          <button className="cart-panel__checkout" disabled type="button">
+            Continuar con el pedido
+          </button>
+        ) : (
+          <a
+            className="cart-panel__checkout"
+            href={hrefDelPedido()}
+            /*
+              Cerrar al salir. Sin esto el cajon queda abierto ENCIMA de la
+              pagina del pedido, que es la misma lista dos veces.
+              `usePedido` recuerda el estado abierto en `localStorage`, asi que
+              el cajon reaparecia incluso despues de cambiar de documento.
+
+              TRAMPA: `onClose` provoca un `setState`, y quien borra la llave es
+              un `useEffect` de `usePedido`. React ejecuta los efectos pasivos
+              en una tarea posterior al clic, mientras el navegador ya empezo a
+              pedir `products.html`. En la practica el borrado gana —
+              `localStorage` es sincrono y una navegacion tarda mas— pero si
+              alguna vez se ve el cajon abierto sobre `#/carrito`, es aqui donde
+              hay que mirar, no en el CSS.
+            */
+            onClick={onClose}
+            /*
+              Estas tres declaraciones estan en linea porque
+              `CartPanel/styles.ts` queda fuera del alcance de este cambio, y
+              son justo las que le faltan a un `<a>` para ocupar la caja que
+              `.cart-panel__checkout` dibujo para un `<button>`: un enlace es
+              `inline`, asi que ignoraria el `width: 100%`, se le saldria el
+              relleno vertical por encima de la fila del total, y el navegador
+              lo subrayaria. Su sitio natural es la regla de `styles.ts`.
+            */
+            style={{ display: 'block', textAlign: 'center', textDecoration: 'none' }}
+          >
+            Continuar con el pedido
+          </a>
+        )}
       </footer>
     </Panel>,
     document.body
