@@ -6,6 +6,7 @@ import {
   buscarProductos,
   reiniciarResultados
 } from '@src/redux/slices/busquedaSlice';
+import { formatearPrecio } from '@src/lib/formatearPrecio';
 import type { Despacho, EstadoRaiz } from '@src/redux/store';
 import type { Product } from '@src/types/database';
 import { Backdrop, Popin, Inner, Encabezado, Wordmark, CerrarEsquina, SoloLectores, SearchForm, SearchInput, GhostButton, ChipRow, ChipLinea, RowLabel, Chip, RecentChip, SectionHeader, ResultsGrid, ResultCard, ResultThumb, ResultInfo, ResultName, ResultPrice, EmptyState } from './styles';
@@ -54,23 +55,17 @@ const MIN_TERM_LENGTH = 2;
 
 /* ------------------------------------------------------------------ helpers */
 
-/**
- * Precio como en la referencia: "MXN 1,234.00".
+/*
+ * El precio de esta rejilla usa la variante `vitrina`: codigo de moneda delante
+ * en vez de simbolo, y dos decimales fijos para que "MXN 85.00" y "MXN 120.50"
+ * no se alineen distinto en la misma fila. Es la lectura de la referencia y se
+ * mantiene tal cual.
  *
- * `currencyDisplay: 'code'` pone el codigo delante en vez del simbolo, y los
- * dos decimales fijos evitan que "$85" y "$120.50" se alineen distinto en la
- * misma fila de la rejilla. Es local a este archivo: no se filtra al carrito ni
- * a las tarjetas del catalogo, que tienen su propio formato.
+ * Lo que cambia es de donde sale: el bloque de `Intl` que vivia aqui era una de
+ * SEIS copias, y la que mas se habia alejado de las demas. Ahora la diferencia
+ * es un argumento con nombre —no un `Intl.NumberFormat` distinto en cada
+ * archivo—, asi que se ve que es una decision y no una divergencia.
  */
-function formatPrice(price: number): string {
-  return new Intl.NumberFormat('es-MX', {
-    style: 'currency',
-    currency: 'MXN',
-    currencyDisplay: 'code',
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  }).format(price);
-}
 
 function categorySlug(product: Product): string {
   if (Array.isArray(product.categories)) {
@@ -591,7 +586,7 @@ export function Lupa({ onPickProduct }: LupaProps): JSX.Element {
                     <ResultInfo>
                       <ResultName>{product.name}</ResultName>
                       <ResultPrice>
-                        {formatPrice(product.price_per_kg)} <small>{priceUnit(product)}</small>
+                        {formatearPrecio(product.price_per_kg, 'vitrina')} <small>{priceUnit(product)}</small>
                       </ResultPrice>
                     </ResultInfo>
                   </ResultCard>
@@ -614,7 +609,7 @@ export function Lupa({ onPickProduct }: LupaProps): JSX.Element {
                     <ResultInfo>
                       <ResultName>{product.name}</ResultName>
                       <ResultPrice>
-                        {formatPrice(product.price_per_kg)} <small>{priceUnit(product)}</small>
+                        {formatearPrecio(product.price_per_kg, 'vitrina')} <small>{priceUnit(product)}</small>
                       </ResultPrice>
                     </ResultInfo>
                   </ResultCard>

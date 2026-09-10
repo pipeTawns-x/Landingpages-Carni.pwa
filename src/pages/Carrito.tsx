@@ -18,24 +18,17 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { OrderList } from '@src/components/OrderList/OrderList';
+import { formatearPrecio } from '@src/lib/formatearPrecio';
 import { quitarProducto } from '@src/redux/slices/carritoSlice';
 import type { Despacho, EstadoRaiz } from '@src/redux/store';
 
-/**
- * El formateador es local, y es la sexta copia de este mismo bloque en el repo
- * (Lupa, ProductCard, Showcase, OrderList, CartPanel y esta pagina).
- *
- * No se extrae a `src/lib` en esta entrega porque el cambio esta acotado a tres
- * archivos y mover el formateador tocaria cinco componentes mas. Queda dicho
- * para que se vea como lo que es —deuda— y no como un descuido.
+/*
+ * La deuda que este archivo declaraba —«el formateador es local, y es la sexta
+ * copia de este mismo bloque en el repo»— esta pagada: las seis copias viven
+ * ahora en `src/lib/formatearPrecio.ts`. Aqui se pide la variante `ticket`, con
+ * centavos, porque el total de una hoja de pedido tiene que cuadrar al centavo
+ * con lo que suman sus lineas.
  */
-function formatearPrecio(precio: number): string {
-  return new Intl.NumberFormat('es-MX', {
-    style: 'currency',
-    currency: 'MXN',
-    maximumFractionDigits: 2
-  }).format(precio);
-}
 
 /**
  * La hoja del ticket.
@@ -199,7 +192,7 @@ export function Carrito(): JSX.Element {
       ) : (
         <div className="carrito__resumen">
           <span>Total</span>
-          <strong>{formatearPrecio(total)}</strong>
+          <strong>{formatearPrecio(total, 'ticket')}</strong>
         </div>
       )}
 

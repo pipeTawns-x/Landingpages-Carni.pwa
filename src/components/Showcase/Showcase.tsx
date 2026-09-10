@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { fetchProducts, categorySlugOf, assetUrl } from '@src/entry/shared';
+import { formatearPrecio } from '@src/lib/formatearPrecio';
 import type { Product } from '@src/types/database';
 
 /**
@@ -76,14 +77,6 @@ function showcaseCandidates(products: Product[]): Product[] {
  */
 function pngFallback(path: string): string {
   return path.replace(/\.webp$/i, '.png');
-}
-
-function formatPrice(value: number | string): string {
-  return new Intl.NumberFormat('es-MX', {
-    style: 'currency',
-    currency: 'MXN',
-    maximumFractionDigits: 0
-  }).format(Number(value));
 }
 
 export function Showcase(): JSX.Element | null {
@@ -297,8 +290,13 @@ export function Showcase(): JSX.Element | null {
               </div>
               <div className="showcase-card__body">
                 <h3 className="showcase-card__name">{product.name}</h3>
+                {/* Misma variante que la tarjeta del catalogo: esta fila es una
+                    vitrina para comparar, no un ticket. La copia local que habia
+                    aqui aceptaba `number | string` porque PostgREST devuelve las
+                    columnas `numeric` como cadena segun la consulta; esa defensa
+                    se conservo dentro de `formatearPrecio`. */}
                 <p className="showcase-card__price">
-                  {formatPrice(product.price_per_kg)}
+                  {formatearPrecio(product.price_per_kg)}
                   <span className="showcase-card__unit"> / kg</span>
                 </p>
               </div>
