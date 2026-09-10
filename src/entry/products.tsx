@@ -301,9 +301,16 @@ function CatalogExperience(): JSX.Element {
     console.log('Pedido actualizado:', order);
   }, [order]);
 
-  useEffect(() => {
-    syncLegacyCart(order);
-  }, [order]);
+  /*
+    Aqui habia un segundo escritor sobre `carni_cart_v1`.
+
+    Escribia desde el `useState` local `order`, que no se entera de las bajas
+    del store: quitar una linea no cambiaba `order`, asi que este efecto no
+    corria y el disco se quedaba con la linea. Ahora el disco es un efecto de
+    la suscripcion del store (src/redux/store.ts), que cubre TODAS las
+    acciones. Dos escritores sobre la misma llave son la receta para que un
+    dia se pisen.
+  */
 
   // Rehydrates the order when another writer touches the shared key: the
   // premium modal on products.html persists through cart.js, which fires
