@@ -10,6 +10,7 @@ import { SEED_PRODUCTS } from '@src/data/seedProducts';
 import type { CartLegacyItem, OrderLine, Product } from '@src/types/database';
 import { HashRouter, Route, Routes, useNavigate, useSearchParams } from 'react-router-dom';
 import { ProductoDetalle } from '@src/pages/ProductoDetalle';
+import { Carrito } from '@src/pages/Carrito';
 import { fetchProducts, mountReactNode, categoryLabel, categorySlugOf, assetUrl } from './shared';
 import { carniTheme } from '@src/theme/carniTheme';
 import { store } from '@src/redux/store';
@@ -448,6 +449,12 @@ function CatalogoConRutas(): JSX.Element {
       <Routes>
         <Route path="/" element={<CatalogExperience />} />
         <Route path="/producto/:id" element={<ProductoDetalle />} />
+        {/* El pedido tiene direccion propia, ademas del cajon.
+            El cajon vive fuera de `<Routes>` justamente para sobrevivir a los
+            cambios de ruta; esta pagina es lo contrario: la misma lista, pero
+            con URL, para poder recargarla, compartirla o volver a ella. Las dos
+            leen del mismo store, asi que no hay dos pedidos, hay dos vistas. */}
+        <Route path="/carrito" element={<Carrito />} />
       </Routes>
       <CarritoGlobal />
       <LupaConRuta />
