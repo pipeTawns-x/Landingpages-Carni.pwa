@@ -44,22 +44,49 @@ const SUPABASE_URL = entorno.VITE_SUPABASE_URL;
 const ANON_KEY = entorno.VITE_SUPABASE_ANON_KEY || entorno.VITE_SUPABASE_KEY;
 
 /**
- * Escapa los comodines de LIKE y los separadores de `.or()` de PostgREST.
+ * Prepara el termino para que viaje entero dentro del filtro `or=`.
  *
- * `%` y `_` son comodines del patron, y `.or()` separa condiciones con comas y
- * las agrupa con parentesis: un termino que traiga cualquiera de esos rompe el
- * filtro y devuelve 400.
+ * POR QUE LA COMA NO SE PODIA ESCAPAR
+ * -----------------------------------
+ * Antes esta funcion ponia una barra invertida delante de `,` `(` `)` `%` `_`.
+ * Con `%` y `_` funcionaba; con la coma NO, y buscar "a,b" devolvia 400
+ * (PGRST100, "failed to parse logic tree"). La razon es que la coma la lee
+ * PostgREST al partir el arbol logico de la URL, y ahi una barra invertida no
+ * significa nada: es un caracter mas del texto. Lo que PostgREST si respeta al
+ * parsear son las COMILLAS DOBLES —igual que un CSV—, asi que el valor viaja
+ * entrecomillado y la coma deja de partir nada.
  *
- * MEDIDO CONTRA EL SERVIDOR, NO SUPUESTO: `\%`, `\_`, `\(` y `\)` si funcionan,
- * pero `\,` NO. Buscar "a,b" sigue devolviendo 400 (PGRST100, "failed to parse
- * logic tree"), porque la coma separa las condiciones del arbol logico y ahi la
- * barra invertida no la desarma. Lo que si funciona es entrecomillar el valor
- * —`name.ilike."%a,b%"`—, verificado tambien contra el servidor. No se cambia
- * en esta entrega para no mover el escape junto con el cambio de cliente: el
- * fallo es anterior a axios y se comporta igual con los dos. Queda anotado.
+ * LOS DOS INTERPRETES, Y POR QUE HAY DOS NIVELES DE BARRAS
+ * -------------------------------------------------------
+ * La misma cadena la leen dos programas distintos en dos momentos distintos:
+ *
+ *   1. PostgREST, al parsear la URL. Dentro de comillas se come UNA barra de
+ *      cada pareja: recibe `\X` y entrega `X`, sea cual sea la X.
+ *   2. PostgreSQL, al ejecutar el `ilike` ya dentro de la base. Ahi `\%` y `\_`
+ *      son "porcentaje literal" y "guion bajo literal" en vez de comodines.
+ *
+ * Por eso se escapa DE ADENTRO HACIA AFUERA, en dos pasadas y en este orden:
+ * primero lo que tiene que ver PostgreSQL, despues se protege ese resultado
+ * para que PostgREST no se lo coma al desenvolverlo. Un `%` del cliente sale al
+ * cable como `\\%`: PostgREST lo convierte en `\%` y PostgreSQL lo entiende
+ * como literal. Con UNA sola barra —lo que parecia obvio— PostgREST se la come
+ * entera y el `%` vuelve a ser comodin: buscar "50%" devolvia el catalogo
+ * completo, 53 productos, sin error visible. MEDIDO CONTRA EL SERVIDOR.
+ *
+ * OJO CON LO QUE ESTA FUNCION NO ARREGLA: en `ilike`, PostgREST trata al
+ * ASTERISCO como sinonimo de `%`, asi que un `*` en el termino sigue actuando
+ * de comodin. No se toca aqui porque protegerlo lo convertiria en una busqueda
+ * de `%` literal —otra respuesta equivocada, no la correcta—. Queda anotado.
  */
 function escapar(termino: string): string {
-  return termino.replace(/[\\%_,()]/g, (c) => `\\${c}`);
+  // Pasada 1, para el interprete de mas adentro (PostgreSQL): comodines de LIKE.
+  const paraLike = termino.replace(/[\\%_]/g, (c) => `\\${c}`);
+
+  // Pasada 2, para el de mas afuera (PostgREST): dentro de comillas hay que
+  // doblar toda barra —incluidas las que acaba de poner la pasada 1— y escapar
+  // la comilla doble, o un termino con comillas cierra el valor antes de tiempo
+  // y rompe el filtro.
+  return paraLike.replace(/[\\"]/g, (c) => `\\${c}`);
 }
 
 export interface EstadoBusqueda {
@@ -144,7 +171,11 @@ export const buscarProductos = createAsyncThunk<
       params: {
         select: COLUMNAS,
         is_active: 'eq.true',
-        or: `(name.ilike.${patron},description.ilike.${patron})`,
+        /* El patron va ENTRECOMILLADO: es lo unico que hace que una coma dentro
+           del termino no parta el arbol logico. Los parentesis de afuera siguen
+           siendo los del `or` —eso lo exige PostgREST— y las comillas de adentro
+           delimitan el valor, como en un CSV. */
+        or: `(name.ilike."${patron}",description.ilike."${patron}")`,
         limit: LIMITE
       },
       /* Las dos cabeceras hacen falta y no son la misma: `apikey` identifica al
