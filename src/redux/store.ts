@@ -19,6 +19,9 @@ import busquedaReducer from './slices/busquedaSlice';
 import { LLAVE_PEDIDO } from '@src/lib/pedidoStorage';
 import type { CartLegacyItem, OrderLine } from '@src/types/database';
 
+/** Arriba solo mientras esta suscripcion emite su propio aviso. */
+let avisando = false;
+
 export const store = configureStore({
   reducer: {
     carrito: carritoReducer,
@@ -111,6 +114,10 @@ if (typeof window !== 'undefined') {
   let carritoAnterior: OrderLine[] = store.getState().carrito;
 
   store.subscribe(() => {
+    if (avisando) {
+      return;
+    }
+
     const carritoActual = store.getState().carrito;
     if (carritoActual === carritoAnterior) {
       return;
@@ -119,6 +126,24 @@ if (typeof window !== 'undefined') {
 
     try {
       window.localStorage.setItem(LLAVE_PEDIDO, JSON.stringify(carritoActual.map(aItemLegacy)));
+
+      /*
+        Avisar al contador del encabezado, que lo pinta `cart.js` — JavaScript
+        plano que no sabe que Redux existe y que lee del disco.
+
+        La bandera es lo que impide el lazo: `usePedido` tambien escucha este
+        evento y rehidrata, y rehidratar cambia el store, que dispara esta
+        suscripcion otra vez. `dispatchEvent` es sincrono, asi que el listener
+        corre con la bandera arriba y se salta la vuelta.
+      */
+      avisando = true;
+      try {
+        window.dispatchEvent(
+          new CustomEvent('cart:updated', { detail: { count: carritoActual.length } })
+        );
+      } finally {
+        avisando = false;
+      }
     } catch {
       /* En navegacion privada `localStorage` lanza al escribir. El pedido sigue
          funcionando en memoria durante la visita; lo unico que se pierde es que
