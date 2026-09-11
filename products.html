@@ -267,6 +267,42 @@
        the prev/next arrows of #productsCategorySlider, which no longer exists.
        The React chips wrap instead of scrolling, so there is nothing to drive. -->
   <script type="module" src="/src/entry/products.tsx"></script>
+
+  <!-- Asistente virtual (chatbot flotante, práctica M44) -->
+  <div class="chat-widget" data-carni-chat>
+    <button class="chat-floating-btn" id="chatToggle" type="button"
+      aria-label="Abrir asistente virtual" aria-expanded="false" aria-controls="chatPanel">
+      <i class="bi bi-chat-dots-fill chat-floating-btn__icon" aria-hidden="true"></i>
+      <i class="bi bi-x-lg chat-floating-btn__close" aria-hidden="true"></i>
+    </button>
+
+    <section class="chat-drawer" id="chatPanel" aria-hidden="true" aria-label="Ventana del asistente virtual">
+      <header class="chat-header">
+        <div class="chat-header__info">
+          <img class="chat-header__avatar" src="img/recursos_web/logo-user.png" alt="" aria-hidden="true">
+          <div class="chat-header__text">
+            <p class="chat-header__title">Asistente virtual</p>
+            <p class="chat-header__status"><span class="chat-header__dot" aria-hidden="true"></span> En línea</p>
+          </div>
+        </div>
+        <button class="chat-header__close" id="chatClose" type="button" aria-label="Cerrar asistente virtual">
+          <i class="bi bi-x-lg" aria-hidden="true"></i>
+        </button>
+      </header>
+
+      <div class="chat-messages" id="chatMessages" role="log" aria-live="polite" aria-label="Mensajes del chat"></div>
+
+      <form class="chat-input" id="chatForm" novalidate>
+        <label class="visually-hidden" for="chatInput">Escribe tu mensaje</label>
+        <input class="chat-input__field" id="chatInput" type="text" placeholder="Escribe tu mensaje..."
+          autocomplete="off" maxlength="500" required>
+        <button class="chat-input__send" id="chatSend" type="submit" aria-label="Enviar mensaje">
+          <i class="bi bi-send-fill" aria-hidden="true"></i>
+        </button>
+      </form>
+    </section>
+  </div>
+  <script type="module" src="js/modules/chatbot.js"></script>
 </body>
 
 </html>
