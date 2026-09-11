@@ -49,7 +49,13 @@ module.exports = {
       // La practica m33 tal cual estaba: nada que probar aqui.
       displayName: 'node',
       testEnvironment: 'node',
-      testMatch: ['<rootDir>/tests/**/*.test.js', '<rootDir>/js/**/*.test.js']
+      testMatch: ['<rootDir>/tests/**/*.test.js', '<rootDir>/js/**/*.test.js'],
+      // Con Jest 30 el runtime dejó de compilar `import` en .js de paquete
+      // CommonJS (CjsParseError). El mismo transform Babel que ya usa el
+      // proyecto react lo resuelve: preset-env baja el ESM a require.
+      transform: {
+        '^.+\\.[jt]sx?$': transformarTsx
+      }
     },
     {
       displayName: 'react',

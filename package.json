@@ -51,6 +51,7 @@
     "@types/node": "^25.6.0",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
+    "@unrs/resolver-binding-linux-arm64-gnu": "^1.12.2",
     "@vitejs/plugin-react": "^4.7.0",
     "jest": "^30.5.1",
     "jest-environment-jsdom": "^30.5.1",
