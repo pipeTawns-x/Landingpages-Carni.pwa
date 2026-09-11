@@ -47,6 +47,7 @@
 </head>
 
 <body class="dark-premium">
+  <h1 class="visually-hidden">Cortes Premium a Tu Puerta - Carnicería El Señor de La Misericordia</h1>
   <!-- Alerta Offline -->
   <div class="offline-alert alert alert-warning d-none" role="alert">
     <i class="bi bi-wifi-off me-2"></i> Estás en modo offline. Algunas funciones pueden estar limitadas.
@@ -56,7 +57,7 @@
   <!-- `--over-media` solo en la landing: es la única página con video detrás.
        En products.html y accessweb.html el encabezado conserva su fondo sólido,
        porque ahí no hay nada que dejar ver. -->
-  <header class="main-header main-header--over-media" id="mainHeader" role="banner">
+  <header class="main-header main-header--over-media" id="mainHeader">
     <!-- Tres zonas, no cuatro elementos sueltos. Izquierda y derecha ocupan lo
          que necesitan; el centro se lleva el resto y ahí el logo queda centrado
          de verdad, sin cuentas ni posiciones absolutas. -->
@@ -159,7 +160,7 @@
     <!-- SECCIÓN 1: HERO — video de fondo + logo. Sin título textual (el logo ya
          lo dice) y sin botones: Ver Productos y Fidelidad ya viven en el header
          y en las categorías. -->
-    <section class="hero-section home-hero-section home-hero-video dark-premium" aria-label="Presentación">
+    <section class="hero-section home-hero-section home-hero-video dark-premium">
       <!-- El video pesaba 13.4 MB a 7.5 Mbps: un bitrate de master para un fondo
            mudo de 15 segundos en bucle. Recomprimido el 2026-08-31 sin pista de
            audio —el elemento va `muted`— queda en 2.0 MB el MP4 y 1.2 MB el
@@ -215,10 +216,10 @@
             <div class="card border-0 rounded-3 h-100" style="background: var(--carni-charcoal); box-shadow: 0 4px 16px rgba(0,0,0,0.3); padding: 2rem;">
               <h3 class="fw-bold mb-3" style="color: var(--carni-gold);"><i class="bi bi-info-circle me-2"
                   style="color: var(--carni-red);"></i>Quiénes Somos</h3>
-              <p style="color: #666; line-height: 1.7;">Carnicería El Señor de La Misericordia es una carnicería premium
+              <p style="color: var(--carni-text-muted); line-height: 1.7;">Carnicería El Señor de La Misericordia es una carnicería premium
                 que ofrece los mejores cortes y productos cárnicos frescos. Nos destacamos por nuestro compromiso con la
                 excelencia y la satisfacción del cliente.</p>
-              <p style="color: #666; line-height: 1.7;">Los clientes valoran nuestra atención personalizada, la
+              <p style="color: var(--carni-text-muted); line-height: 1.7;">Los clientes valoran nuestra atención personalizada, la
                 confianza en la procedencia de nuestros productos y los precios justos. Somos parte de la comunidad
                 local.</p>
             </div>
@@ -289,7 +290,7 @@
               <i class="bi bi-whatsapp" style="font-size: 2.5rem; color: #25d366; margin-bottom: 1rem;"></i>
               <h3 class="fw-bold mb-3" style="color: var(--carni-gold);">WhatsApp</h3>
               <p class="mb-3" style="color: var(--carni-text-muted);">Mensajes directos</p>
-              <a href="https://wa.me/524442715470" target="_blank" class="btn fw-bold contact-direct-card__button contact-direct-card__button--whatsapp" style="background: #25d366; color: white;">
+              <a href="https://wa.me/524442715470" target="_blank" class="btn fw-bold contact-direct-card__button contact-direct-card__button--whatsapp" style="background: #25d366; color: #0B3D2E;">
                 Chatear
               </a>
             </div>
@@ -322,16 +323,18 @@
           <h5 class="fw-bold mb-3" style="color: #e4d1b0;">Carnicería El Señor de La Misericordia</h5>
           <p style="font-size: 0.9rem; color: #ccc; line-height: 1.6;">Productos cárnicos frescos de la más alta
             calidad. Compromiso con la excelencia.</p>
+          <p lang="en" style="font-size: 0.9rem; color: #ccc; line-height: 1.6;">Premium cuts, delivered to your door —
+            San Luis Potosí, México.</p>
           <div class="mt-3 d-flex gap-2">
-            <a href="#" class="btn btn-sm btn-outline-light rounded-circle"
+            <a href="#" class="btn btn-sm btn-outline-light rounded-circle" aria-label="Facebook"
               style="width: 40px; height: 40px; padding: 0; display: flex; align-items: center; justify-content: center;"><i
-                class="bi bi-facebook"></i></a>
-            <a href="#" class="btn btn-sm btn-outline-light rounded-circle"
+                class="bi bi-facebook" aria-hidden="true"></i></a>
+            <a href="#" class="btn btn-sm btn-outline-light rounded-circle" aria-label="Instagram"
               style="width: 40px; height: 40px; padding: 0; display: flex; align-items: center; justify-content: center;"><i
-                class="bi bi-instagram"></i></a>
-            <a href="#" class="btn btn-sm btn-outline-light rounded-circle"
+                class="bi bi-instagram" aria-hidden="true"></i></a>
+            <a href="#" class="btn btn-sm btn-outline-light rounded-circle" aria-label="WhatsApp"
               style="width: 40px; height: 40px; padding: 0; display: flex; align-items: center; justify-content: center;"><i
-                class="bi bi-whatsapp"></i></a>
+                class="bi bi-whatsapp" aria-hidden="true"></i></a>
           </div>
         </div>
 
@@ -374,7 +377,7 @@
       <div class="modal-content">
         <div class="modal-header bg-danger text-white">
           <h5 class="modal-title" id="cartModalLabel">🛒 Tu Carrito de Compras</h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
         <div class="modal-body">
           <div id="cartItems" style="max-height: 500px; overflow-y: auto;"></div>
@@ -392,7 +395,7 @@
       <div class="modal-content">
         <div class="modal-header bg-danger text-white">
           <h5 class="modal-title" id="loyaltyModalLabel">Club Misericordia</h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
         <div class="modal-body" id="loyaltyContent"></div>
       </div>

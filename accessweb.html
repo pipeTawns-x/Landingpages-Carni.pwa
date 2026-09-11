@@ -28,13 +28,14 @@
 </head>
 
 <body class="auth-page dark-premium">
+  <h1 class="visually-hidden">Acceso Web - Carnicería El Señor de La Misericordia</h1>
   <div class="offline-alert alert alert-warning d-none" role="alert">
     <i class="bi bi-wifi-off me-2"></i> Estás en modo offline. Algunas funciones pueden estar limitadas.
   </div>
 
 
   <!-- Header Maximalista Unificado -->
-  <header class="main-header" id="mainHeader" role="banner">
+  <header class="main-header" id="mainHeader">
     <nav class="navbar navbar-expand-lg main-header__nav-container container-fluid px-3 px-lg-5">
       <button class="hamburger-btn" type="button" id="menuToggle" aria-label="Abrir menú de navegación">
         <span></span>
@@ -114,11 +115,13 @@
           <form id="loginForm" class="sign-in-form">
             <h2 class="title">Bienvenido de vuelta a tu carniceria</h2>
 
+            <label class="auth-field-label" for="loginEmail">Correo electrónico</label>
             <div class="input-field">
               <i class="fas fa-envelope"></i>
               <input type="email" id="loginEmail" name="email" placeholder="Correo electronico" autocomplete="email"
                 required>
             </div>
+            <label class="auth-field-label" for="loginPassword">Contraseña</label>
             <div class="input-field">
               <i class="fas fa-lock"></i>
               <input type="password" id="loginPassword" name="password" placeholder="Contrasena"
@@ -161,11 +164,13 @@
             <p class="form-subtitle">Empieza con lo esencial y agrega datos de entrega solo si los necesitas</p>
 
             <!-- Datos personales -->
+            <label class="auth-field-label" for="registerName">Nombre completo</label>
             <div class="input-field">
               <i class="fas fa-user"></i>
               <input type="text" id="registerName" name="full_name" placeholder="Nombre completo" autocomplete="name"
                 required>
             </div>
+            <label class="auth-field-label" for="registerEmail">Correo electrónico</label>
             <div class="input-field">
               <i class="fas fa-envelope"></i>
               <input type="email" id="registerEmail" name="email" placeholder="Correo electronico" autocomplete="email" required>
@@ -174,6 +179,7 @@
               <span class="field-hint">Al finalizar enviaremos confirmacion por correo.</span>
               <button type="button" class="verify-chip" id="verifyEmailBtn">Validar correo</button>
             </div>
+            <label class="auth-field-label" for="registerPhone">Teléfono</label>
             <div class="input-field">
               <i class="fas fa-phone"></i>
               <input type="tel" id="registerPhone" name="phone" placeholder="Teléfono (10 dígitos)" inputmode="tel"
@@ -185,11 +191,13 @@
             </div>
 
             <!-- Contraseña -->
+            <label class="auth-field-label" for="registerPassword">Contraseña segura</label>
             <div class="input-field">
               <i class="fas fa-lock"></i>
               <input type="password" id="registerPassword" name="password" placeholder="Contrasena segura"
                 autocomplete="new-password" required minlength="8">
             </div>
+            <label class="auth-field-label" for="registerConfirmPassword">Confirmar contraseña</label>
             <div class="input-field">
               <i class="fas fa-shield-alt"></i>
               <input type="password" id="registerConfirmPassword" name="password_confirm"
@@ -277,9 +285,9 @@
           <p class="auth-footer__text mb-3">Productos cárnicos frescos de la más alta calidad. Compromiso con la
             excelencia.</p>
           <div class="d-flex gap-3 auth-footer__social">
-            <a href="#"><i class="bi bi-facebook"></i></a>
-            <a href="#"><i class="bi bi-instagram"></i></a>
-            <a href="#"><i class="bi bi-whatsapp"></i></a>
+            <a href="#" aria-label="Facebook"><i class="bi bi-facebook" aria-hidden="true"></i></a>
+            <a href="#" aria-label="Instagram"><i class="bi bi-instagram" aria-hidden="true"></i></a>
+            <a href="#" aria-label="WhatsApp"><i class="bi bi-whatsapp" aria-hidden="true"></i></a>
           </div>
         </div>
         <div class="col-12 col-md-6 col-lg-4">

@@ -4714,6 +4714,18 @@ body.header-collapsed .categorias-menu {
   }
 }
 
+.auth-field-label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--carni-text);
+  margin: 0.75rem 0 0.1rem 0.5rem;
+  cursor: pointer;
+}
+.auth-field-label + .input-field {
+  margin-top: 0.15rem;
+}
+
 .input-field {
   width: 100%;
   max-width: 100%;
@@ -4754,7 +4766,7 @@ body.header-collapsed .categorias-menu {
   padding-right: 0.5rem;
 }
 .input-field input::placeholder {
-  color: #999;
+  color: #595959;
   font-weight: 400;
 }
 @media (min-width: 570px) {
