@@ -1,6 +1,6 @@
 # Carni-mvp — MVP Frontend + Arquitectura Objetivo
 
-![Banner Carni-mvp](img/recursos_web/banercarnimvp.png)
+![Banner Carni-mvp](public/img/recursos_web/banercarnimvp.png)
 
 > Primera versión navegable de la tienda de Carnicería El Señor de La Misericordia, con backend real y frontend moderno. Landing rediseñada, catálogo, autenticación, carrito con persistencia, dashboard de administración y PWA, todo contra una base Supabase con RLS, triggers y funciones transaccionales. Este README documenta también la arquitectura objetivo, **sin vender como implementado lo que todavía es hoja de ruta** — cada tabla distingue lo que existe de lo que falta.
 
@@ -9,6 +9,8 @@
 [![PWA](https://img.shields.io/badge/PWA-Ready-green)](manifest.json)
 [![Responsive](https://img.shields.io/badge/Responsive-375%E2%86%92768%E2%86%921440-brightgreen)](https://github.com/pipeTawns-x/Landingpages-Carni.pwa)
 [![Branch](https://img.shields.io/badge/Branch-main-purple)](https://github.com/pipeTawns-x/Landingpages-Carni.pwa/tree/main)
+
+**[Demo en vivo — GitHub Pages](https://pipetawns-x.github.io/Landingpages-Carni.pwa/)**
 
 
 ## Práctica m29 · React III — dónde se cumple cada requisito
@@ -43,9 +45,9 @@ una de las dos razones que da la clase — reutilización o complejidad:
 
 ### Sobre `HashRouter` y no `BrowserRouter`
 
-El sitio se publica en dos destinos que sirven desde raíces distintas: Netlify
-desde `/` y GitHub Pages desde `/Landingpages-Carni.pwa/`. Un router de ruta
-necesitaría un `basename` por destino **más una regla de reescritura en el
+El sitio se publica en GitHub Pages bajo la subruta `/Landingpages-Carni.pwa/`
+([demo en vivo](https://pipetawns-x.github.io/Landingpages-Carni.pwa/)). Un
+router de ruta necesitaría un `basename` **más una regla de reescritura en el
 servidor**, para que `/producto/12` —una URL sin archivo detrás— no diera 404.
 Un hash nunca llega al servidor. La ruta, `useParams` y `<Link>` funcionan igual.
 
@@ -191,8 +193,7 @@ npm run dev             # Vite dev server
 - **Las fotos del catálogo son miniaturas.** `filet_mignon.webp` mide 248×193 px. Por eso la diapositiva se parte en dos columnas desde 1024 en vez de ir a sangre completa: a todo el ancho se vería como una mancha. Se arregla con fotografía real, no con CSS.
 - **Pagos**: sin pasarela integrada. Los pedidos se crean con status `pending`.
 - **n8n/Automatización**: sin workflows en producción.
-- **El sitio publicado vive en Netlify**, no en GitHub Pages. Pages sigue publicando la rama `practicas-ebac` por su cuenta y sirve la raíz sin construir, así que ahí React no se ejecuta. Queda decidir qué se hace con esa publicación: **P-04**.
-- **Hay tres sitios de Netlify** colgando de este mismo repositorio. Los tres construyen en cada push.
+- **El sitio publicado vive en GitHub Pages**: <https://pipetawns-x.github.io/Landingpages-Carni.pwa/>. Despliegue activo y verificado desde la rama `main`.
 - **BuildAds y ProductAds están congelados** por `docs/DECISION_ALCANCE_2026-08-13.md` hasta que el dueño entregue márgenes reales. Hay un blueprint con las decisiones abiertas, sin una línea de implementación.
 
 ---
