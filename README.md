@@ -12,6 +12,13 @@
 
 **[Demo en vivo — GitHub Pages](https://pipetawns-x.github.io/Landingpages-Carni.pwa/)**
 
+## 📸 Capturas de pantalla
+
+| Vista | Descripción |
+|---|---|
+| ![Home](docs/screenshots/home.jpg) | Landing con categorías y asistente virtual |
+| ![Catálogo](docs/screenshots/products.jpg) | Catálogo de productos |
+| ![Acceso](docs/screenshots/access.jpg) | Acceso de clientes |
 
 ## Práctica m29 · React III — dónde se cumple cada requisito
 
