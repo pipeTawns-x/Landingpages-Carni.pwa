@@ -136,7 +136,7 @@ El modo **por peso** funciona: `price_per_kg` existe. Los otros dos no tienen de
 - **por precio** ("dame $150 de arrachera") — se puede derivar del precio por kilo, pero nadie decidió cómo se redondea al pesar
 - **por pieza** — necesita peso promedio por pieza, y esa columna no existe en ninguna migración
 
-Es el diferenciador del proyecto según `docs/INVESTIGACION_Y_PROMPTS.md:87`, y lleva desde el 12 de agosto bloqueado por la misma columna faltante.
+Es el diferenciador del proyecto según la investigación de agosto (documento de referencia conservado en la rama `practicas-ebac`: `docs/INVESTIGACION_Y_PROMPTS.md`), y lleva desde el 12 de agosto bloqueado por la misma columna faltante.
 
 **Depende de P-19:** la unidad de venta y la pieza son el mismo modelo de datos. Resolverlos por separado es hacerlo dos veces.
 

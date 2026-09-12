@@ -16,7 +16,6 @@ This is the map of all project documentation. Start here before searching the re
 |------|----------|-----------------|
 | Agent entry point | `/AGENTS.md` (root) | Canonical local agent rules, roles, skills, human-in-the-loop guardrails |
 | Project overview | `/README.md` (root) | Full project README |
-| Copilot/AI master prompt | `/PROMPT_COPILOT_MAESTRO.md` (root) | Long-form prompt reference for AI-assisted work |
 | Implementation plan | `docs/IMPLEMENTATION_PLAN.md` | Active technical base, agentic layer, CI rules, asset structure |
 | Task plan | `docs/TASK_PLAN.md` | Current objective, in-progress items, completed items, next cut |
 | Supabase schema reference | `docs/SUPABASE_SCHEMA_README.md` + `docs/supabase-schema.sql` | Database schema documentation and raw SQL |
