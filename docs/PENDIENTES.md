@@ -136,7 +136,7 @@ El modo **por peso** funciona: `price_per_kg` existe. Los otros dos no tienen de
 - **por precio** ("dame $150 de arrachera") — se puede derivar del precio por kilo, pero nadie decidió cómo se redondea al pesar
 - **por pieza** — necesita peso promedio por pieza, y esa columna no existe en ninguna migración
 
-Es el diferenciador del proyecto según `docs/INVESTIGACION_Y_PROMPTS.md:87`, y lleva desde el 12 de agosto bloqueado por la misma columna faltante.
+Es el diferenciador del proyecto según la investigación de agosto (documento de referencia conservado en la rama `practicas-ebac`: `docs/INVESTIGACION_Y_PROMPTS.md`), y lleva desde el 12 de agosto bloqueado por la misma columna faltante.
 
 **Depende de P-19:** la unidad de venta y la pieza son el mismo modelo de datos. Resolverlos por separado es hacerlo dos veces.
 
@@ -217,6 +217,35 @@ Importa porque **es uno de los dos previews que aparecen en cada PR**. Quien abr
 styled-components está en modo mantenimiento desde el 17/03/2025: no encaja con React Server Components e inyecta el CSS en tiempo de ejecución. La Práctica 4 se entrega con él a propósito, porque es lo que pide el enunciado y la biblioteca está congelada, no rota.
 
 **Arreglo:** el porqué, la comparación y el plan componente por componente están en `docs/MIGRACION_TAILWIND.md`. No se empieza antes del merge.
+
+### P-39 · El grosor no se puede omitir, y hay clientes que no lo quieren elegir
+**Estado:** abierto · **Origen:** Eduardo, 2026-09-09
+
+Hoy la ficha obliga a elegir grosor para cotizar por pieza. Pero hay dos
+clientes distintos: el que sabe lo que quiere ("tres rib eye de pulgada y
+media") y el que no ("dame tres rib eye y ya").
+
+Al segundo el selector de grosor le estorba, y ponerlo en 0 no es opcion: una
+pieza de cero pulgadas no existe, y el motor de cotizacion tiene un suelo justo
+para que el corte no salga gratis (ver el test de `pesoUnitario` con grosor 0 en
+`js/modules/core/__tests__/quote.test.js`).
+
+**Arreglo propuesto:** un boton de "no me importa el grosor" que use el grosor
+de referencia (1.25") sin pedirselo al cliente. El precio sigue saliendo del
+peso, que es lo unico que importa; lo que se omite es la DECISION, no el dato.
+
+### P-40 · Contador en vivo de piezas al pedir por kilos
+**Estado:** abierto · **Origen:** Eduardo, 2026-09-09
+
+Quien pide por kilos no sabe cuantas piezas le van a salir. "Necesito como tres
+bisteces, ¿como cuanto sera?" es una pregunta real de mostrador.
+
+**Arreglo propuesto:** al elegir peso y grosor, mostrar en vivo "≈ 3 piezas".
+El calculo YA existe y esta probado: `cotizar()` en modo `weight` devuelve
+`piezas` como `Math.ceil(pesoTotalKg / pesoUnitario)`. Solo falta mostrarlo.
+
+Es el puente entre los dos modos de compra: el cliente piensa en piezas y la
+carniceria cobra por kilo.
 
 ---
 

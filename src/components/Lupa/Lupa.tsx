@@ -6,6 +6,7 @@ import {
   buscarProductos,
   reiniciarResultados
 } from '@src/redux/slices/busquedaSlice';
+import { formatearPrecio } from '@src/lib/formatearPrecio';
 import type { Despacho, EstadoRaiz } from '@src/redux/store';
 import type { Product } from '@src/types/database';
 import { Backdrop, Popin, Inner, Encabezado, Wordmark, CerrarEsquina, SoloLectores, SearchForm, SearchInput, GhostButton, ChipRow, ChipLinea, RowLabel, Chip, RecentChip, SectionHeader, ResultsGrid, ResultCard, ResultThumb, ResultInfo, ResultName, ResultPrice, EmptyState } from './styles';
@@ -54,23 +55,17 @@ const MIN_TERM_LENGTH = 2;
 
 /* ------------------------------------------------------------------ helpers */
 
-/**
- * Precio como en la referencia: "MXN 1,234.00".
+/*
+ * El precio de esta rejilla usa la variante `vitrina`: codigo de moneda delante
+ * en vez de simbolo, y dos decimales fijos para que "MXN 85.00" y "MXN 120.50"
+ * no se alineen distinto en la misma fila. Es la lectura de la referencia y se
+ * mantiene tal cual.
  *
- * `currencyDisplay: 'code'` pone el codigo delante en vez del simbolo, y los
- * dos decimales fijos evitan que "$85" y "$120.50" se alineen distinto en la
- * misma fila de la rejilla. Es local a este archivo: no se filtra al carrito ni
- * a las tarjetas del catalogo, que tienen su propio formato.
+ * Lo que cambia es de donde sale: el bloque de `Intl` que vivia aqui era una de
+ * SEIS copias, y la que mas se habia alejado de las demas. Ahora la diferencia
+ * es un argumento con nombre —no un `Intl.NumberFormat` distinto en cada
+ * archivo—, asi que se ve que es una decision y no una divergencia.
  */
-function formatPrice(price: number): string {
-  return new Intl.NumberFormat('es-MX', {
-    style: 'currency',
-    currency: 'MXN',
-    currencyDisplay: 'code',
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  }).format(price);
-}
 
 function categorySlug(product: Product): string {
   if (Array.isArray(product.categories)) {
@@ -118,79 +113,6 @@ function rememberTerm(term: string): string[] {
     /* almacenamiento no disponible: los recientes no son críticos */
   }
   return next;
-}
-
-/**
- * Escapa los comodines de LIKE y los separadores del `.or()` de PostgREST.
- * PostgREST envía la búsqueda parametrizada a PostgreSQL, pero `%` y `_` son
- * comodines del patrón: un término que los contenga ampliaría la búsqueda en
- * vez de buscarlos al pie de la letra. Además, `.or()` usa comas para separar
- * condiciones y paréntesis para agruparlas: un término con `,` o `()` rompería
- * la sintaxis del filtro (400 silencioso que degrada al seed).
- */
-function escapeIlkce(term: string): string {
-  return term.replace(/[\\%_,()]/g, (char) => `\\${char}`);
-}
-
-function searchSeed(term: string): Product[] {
-  const needle = term.toLowerCase();
-  return SEED_PRODUCTS.filter((product) => {
-    const haystack = `${product.name} ${product.description} ${categoryName(product)}`.toLowerCase();
-    return haystack.includes(needle);
-  }).slice(0, 12);
-}
-
-/**
- * Búsqueda en vivo con suelo duro de seed. Devuelve siempre una lista en el
- * plazo de TIMEOUT_MS: si Supabase no responde, el seed filtra localmente.
- */
-async function searchProducts(term: string): Promise<Product[]> {
-  const escaped = escapeIlkce(term);
-  const pattern = `%${escaped}%`;
-
-  let timeoutId = 0;
-  const timeout = new Promise<null>((resolve) => {
-    timeoutId = window.setTimeout(() => resolve(null), TIMEOUT_MS);
-  });
-
-  try {
-    const request = supabase
-      .from('products')
-      .select(RESULT_SELECT)
-      .eq('is_active', true)
-      .or(`name.ilike.${pattern},description.ilike.${pattern}`)
-      .limit(12) as Promise<unknown>;
-
-    const settled = await Promise.race([request, timeout]);
-
-    if (settled !== null && typeof settled === 'object') {
-      // Supabase NO lanza: devuelve `{ data, error }`. Leer solo `data` deja
-      // pasar un 400 como si fuera «sin resultados», y el seed lo disfraza de
-      // búsqueda que funciona. El error se mira antes que los datos.
-      const { data, error } = settled as {
-        data: Product[] | null;
-        error: { message: string; code?: string } | null;
-      };
-
-      if (error) {
-        console.error(
-          `[carni] La búsqueda de «${term}» falló en Supabase (${error.code ?? 's/n'}): ${error.message}. Se usó el seed.`
-        );
-      } else if (Array.isArray(data) && data.length > 0) {
-        return data;
-      }
-    }
-
-    if (settled === null) {
-      console.warn(`[carni] Supabase no respondió en ${TIMEOUT_MS}ms; la Lupa usó el seed para «${term}».`);
-    }
-  } catch (error) {
-    console.warn('[carni] Supabase inalcanzable; la Lupa usó el seed.', error);
-  } finally {
-    window.clearTimeout(timeoutId);
-  }
-
-  return searchSeed(term);
 }
 
 /* ---------------------------------------------------------------- estilos */
@@ -245,8 +167,27 @@ function bindTriggers(open: () => void): () => void {
 }
 
 /**
- * Resultado "Lo nuevo": recientes del seed (id desc), o primera mitad de una
- * búsqueda en vivo. "Cortes destacados": promocionados, o segunda mitad.
+ * Qué se ve en las dos secciones del popin.
+ *
+ * AQUI VIVIA LA ULTIMA GUARIDA DEL FALLO MUDO, y era la peor porque parecia
+ * inofensiva. Esta funcion recibia `term` y NO LO USABA: con la lista viva
+ * vacia mostraba el seed SIEMPRE, sin preguntarse por qué estaba vacía.
+ *
+ * Y hay dos motivos muy distintos para que esté vacía:
+ *
+ *   1. El cliente todavía no buscó nada. El popin recién abrió y hay que
+ *      llenarlo con algo — eso es un ESCAPARATE, y es legítimo. La referencia
+ *      hace lo mismo: al abrir muestra "Lo nuevo" sin que nadie haya tecleado.
+ *
+ *   2. El cliente buscó y no hubo coincidencias. Eso es un RESULTADO, y el
+ *      resultado es CERO. Rellenarlo con seis cortes del seed —con precios que
+ *      no son los de la base— es contestarle otra cosa a la pregunta que hizo.
+ *
+ * Se arreglo el 400 en el slice y el error quedó visible, pero el camino del
+ * VACIO seguía mintiendo un archivo más abajo: buscar «a,b» ahora devuelve 200
+ * con cuerpo vacío y la pantalla igual pintaba seis cortes inventados.
+ *
+ * El parámetro que hacía falta ya estaba en la firma. Solo había que leerlo.
  */
 function splitResults(term: string, live: Product[]): { fresh: Product[]; featured: Product[] } {
   if (live.length > 0) {
@@ -254,6 +195,13 @@ function splitResults(term: string, live: Product[]): { fresh: Product[]; featur
     return { fresh: live.slice(0, middle), featured: live.slice(middle) };
   }
 
+  /* Buscó de verdad y no hubo nada: cero es cero. El estado vacío de más abajo
+     se encarga de decírselo con sus palabras. */
+  if (term.length >= MIN_TERM_LENGTH) {
+    return { fresh: [], featured: [] };
+  }
+
+  /* Todavía no buscó: el seed entra como escaparate, no como respuesta. */
   const byIdDesc = [...SEED_PRODUCTS].sort((a, b) => Number(b.id) - Number(a.id));
   return {
     fresh: byIdDesc.slice(0, 6),
@@ -591,7 +539,7 @@ export function Lupa({ onPickProduct }: LupaProps): JSX.Element {
                     <ResultInfo>
                       <ResultName>{product.name}</ResultName>
                       <ResultPrice>
-                        {formatPrice(product.price_per_kg)} <small>{priceUnit(product)}</small>
+                        {formatearPrecio(product.price_per_kg, 'vitrina')} <small>{priceUnit(product)}</small>
                       </ResultPrice>
                     </ResultInfo>
                   </ResultCard>
@@ -614,7 +562,7 @@ export function Lupa({ onPickProduct }: LupaProps): JSX.Element {
                     <ResultInfo>
                       <ResultName>{product.name}</ResultName>
                       <ResultPrice>
-                        {formatPrice(product.price_per_kg)} <small>{priceUnit(product)}</small>
+                        {formatearPrecio(product.price_per_kg, 'vitrina')} <small>{priceUnit(product)}</small>
                       </ResultPrice>
                     </ResultInfo>
                   </ResultCard>

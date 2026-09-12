@@ -10,6 +10,7 @@ import { SEED_PRODUCTS } from '@src/data/seedProducts';
 import type { CartLegacyItem, OrderLine, Product } from '@src/types/database';
 import { HashRouter, Route, Routes, useNavigate, useSearchParams } from 'react-router-dom';
 import { ProductoDetalle } from '@src/pages/ProductoDetalle';
+import { Carrito } from '@src/pages/Carrito';
 import { fetchProducts, mountReactNode, categoryLabel, categorySlugOf, assetUrl } from './shared';
 import { carniTheme } from '@src/theme/carniTheme';
 import { store } from '@src/redux/store';
@@ -300,9 +301,16 @@ function CatalogExperience(): JSX.Element {
     console.log('Pedido actualizado:', order);
   }, [order]);
 
-  useEffect(() => {
-    syncLegacyCart(order);
-  }, [order]);
+  /*
+    Aqui habia un segundo escritor sobre `carni_cart_v1`.
+
+    Escribia desde el `useState` local `order`, que no se entera de las bajas
+    del store: quitar una linea no cambiaba `order`, asi que este efecto no
+    corria y el disco se quedaba con la linea. Ahora el disco es un efecto de
+    la suscripcion del store (src/redux/store.ts), que cubre TODAS las
+    acciones. Dos escritores sobre la misma llave son la receta para que un
+    dia se pisen.
+  */
 
   // Rehydrates the order when another writer touches the shared key: the
   // premium modal on products.html persists through cart.js, which fires
@@ -448,6 +456,12 @@ function CatalogoConRutas(): JSX.Element {
       <Routes>
         <Route path="/" element={<CatalogExperience />} />
         <Route path="/producto/:id" element={<ProductoDetalle />} />
+        {/* El pedido tiene direccion propia, ademas del cajon.
+            El cajon vive fuera de `<Routes>` justamente para sobrevivir a los
+            cambios de ruta; esta pagina es lo contrario: la misma lista, pero
+            con URL, para poder recargarla, compartirla o volver a ella. Las dos
+            leen del mismo store, asi que no hay dos pedidos, hay dos vistas. */}
+        <Route path="/carrito" element={<Carrito />} />
       </Routes>
       <CarritoGlobal />
       <LupaConRuta />

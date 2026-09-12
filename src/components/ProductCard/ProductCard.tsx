@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { assetUrl } from '@src/entry/shared';
+import { formatearPrecio } from '@src/lib/formatearPrecio';
 import type { Product } from '@src/types/database';
 import { Shell, type TamanoTarjeta } from './styles';
 
@@ -8,13 +9,13 @@ export interface ProductCardProps {
   size: TamanoTarjeta;
   isIAContent?: boolean;
 }
-function formatPrice(price: number): string {
-  return new Intl.NumberFormat('es-MX', {
-    style: 'currency',
-    currency: 'MXN',
-    maximumFractionDigits: 0
-  }).format(price);
-}
+
+/*
+ * El precio va en la variante por defecto —`tarjeta`, sin centavos— porque en el
+ * catalogo lo que hace el cliente es COMPARAR. Un muro de «$449.00» junto a
+ * «$250.00» solo agrega dos cifras que nadie lee. Los centavos aparecen en el
+ * pedido, que es donde se paga.
+ */
 
 // Last-resort pool, only reached when a product carries no image_url at all.
 // The seed now points every product at a file that exists, so this should stay
@@ -134,11 +135,13 @@ return (
         <p className="tw-card-shell__description producto-card__description">{product.description}</p>
         <div className="tw-card-shell__footer">
           <div>
-            <strong className="tw-card-shell__price">{formatPrice(product.price_per_kg)}</strong>
+            <strong className="tw-card-shell__price">
+              {formatearPrecio(product.price_per_kg)}
+            </strong>
             <span className="tw-card-shell__unit">{priceUnit(product)}</span>
             {product.price_per_lb ? (
               <span className="tw-card-shell__price-alt">
-                {formatPrice(product.price_per_lb)} / lb
+                {formatearPrecio(product.price_per_lb)} / lb
               </span>
             ) : null}
           </div>

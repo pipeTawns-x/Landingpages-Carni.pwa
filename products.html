@@ -68,6 +68,7 @@
 </head>
 
 <body class="dark-premium">
+  <h1 class="visually-hidden">Productos - Carnicería El Señor de La Misericordia</h1>
   <!-- Alerta Offline -->
     <div class="offline-alert alert alert-warning d-none" role="alert">
         <i class="bi bi-wifi-off me-2"></i> Estás en modo offline. Algunas funciones pueden estar limitadas.
@@ -84,7 +85,7 @@
   </div>
 
   <!-- Main Header Maximalista Unificado -->
-  <header class="main-header" id="mainHeader" role="banner">
+  <header class="main-header" id="mainHeader">
     <!-- Mismo encabezado que la landing: tres zonas, logo centrado.
          Si esto se separa de index.html, el cliente siente que cambió de sitio
          al pasar al catálogo. Cualquier cambio va en los dos archivos. -->
@@ -202,10 +203,11 @@
         <div class="col-12 col-md-6 col-lg-4">
           <h5 class="fw-bold mb-3" style="color: #e4d1b0;">Carnicería El Señor de La Misericordia</h5>
           <p style="font-size: 0.9rem; color: #ccc; margin-bottom: 1rem;">Productos cárnicos frescos de la más alta calidad. Compromiso con la excelencia.</p>
+          <p lang="en" style="font-size: 0.9rem; color: #ccc; margin-bottom: 1rem;">Premium cuts, delivered to your door — San Luis Potosí, México.</p>
           <div class="d-flex gap-3">
-            <a href="#" style="color: #ccc; font-size: 1.5rem;"><i class="bi bi-facebook"></i></a>
-            <a href="#" style="color: #ccc; font-size: 1.5rem;"><i class="bi bi-instagram"></i></a>
-            <a href="#" style="color: #ccc; font-size: 1.5rem;"><i class="bi bi-whatsapp"></i></a>
+            <a href="#" aria-label="Facebook" style="color: #ccc; font-size: 1.5rem;"><i class="bi bi-facebook" aria-hidden="true"></i></a>
+            <a href="#" aria-label="Instagram" style="color: #ccc; font-size: 1.5rem;"><i class="bi bi-instagram" aria-hidden="true"></i></a>
+            <a href="#" aria-label="WhatsApp" style="color: #ccc; font-size: 1.5rem;"><i class="bi bi-whatsapp" aria-hidden="true"></i></a>
                 </div>
             </div>
 
@@ -233,7 +235,7 @@
                                     
       <!-- Bottom -->
       <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1.5rem; text-align: center;">
-        <p style="font-size: 0.85rem; color: #999; margin: 0;">© 2025 Carnicería El Señor de La Misericordia. Todos los derechos reservados.</p>
+        <p style="font-size: 0.85rem; color: #ADADAD; margin: 0;">© 2025 Carnicería El Señor de La Misericordia. Todos los derechos reservados.</p>
                                     </div>
                                     </div>
   </footer>
@@ -265,6 +267,42 @@
        the prev/next arrows of #productsCategorySlider, which no longer exists.
        The React chips wrap instead of scrolling, so there is nothing to drive. -->
   <script type="module" src="/src/entry/products.tsx"></script>
+
+  <!-- Asistente virtual (chatbot flotante, práctica M44) -->
+  <div class="chat-widget" data-carni-chat>
+    <button class="chat-floating-btn" id="chatToggle" type="button"
+      aria-label="Abrir asistente virtual" aria-expanded="false" aria-controls="chatPanel">
+      <i class="bi bi-chat-dots-fill chat-floating-btn__icon" aria-hidden="true"></i>
+      <i class="bi bi-x-lg chat-floating-btn__close" aria-hidden="true"></i>
+    </button>
+
+    <section class="chat-drawer" id="chatPanel" aria-hidden="true" aria-label="Ventana del asistente virtual">
+      <header class="chat-header">
+        <div class="chat-header__info">
+          <img class="chat-header__avatar" src="img/recursos_web/logo-user.png" alt="" aria-hidden="true">
+          <div class="chat-header__text">
+            <p class="chat-header__title">Asistente virtual</p>
+            <p class="chat-header__status"><span class="chat-header__dot" aria-hidden="true"></span> En línea</p>
+          </div>
+        </div>
+        <button class="chat-header__close" id="chatClose" type="button" aria-label="Cerrar asistente virtual">
+          <i class="bi bi-x-lg" aria-hidden="true"></i>
+        </button>
+      </header>
+
+      <div class="chat-messages" id="chatMessages" role="log" aria-live="polite" aria-label="Mensajes del chat"></div>
+
+      <form class="chat-input" id="chatForm" novalidate>
+        <label class="visually-hidden" for="chatInput">Escribe tu mensaje</label>
+        <input class="chat-input__field" id="chatInput" type="text" placeholder="Escribe tu mensaje..."
+          autocomplete="off" maxlength="500" required>
+        <button class="chat-input__send" id="chatSend" type="submit" aria-label="Enviar mensaje">
+          <i class="bi bi-send-fill" aria-hidden="true"></i>
+        </button>
+      </form>
+    </section>
+  </div>
+  <script type="module" src="js/modules/chatbot.js"></script>
 </body>
 
 </html>

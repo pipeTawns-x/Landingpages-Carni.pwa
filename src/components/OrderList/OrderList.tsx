@@ -1,3 +1,4 @@
+import { formatearPrecio } from '@src/lib/formatearPrecio';
 import type { OrderLine } from '@src/types/database';
 import { List, Empty } from './styles';
 
@@ -6,6 +7,13 @@ export interface OrderListProps {
   order: OrderLine[];
   onRemove: (lineId: string) => void;
 }
+
+/*
+ * Los precios de esta lista van en la variante `ticket` —con centavos— y no en
+ * la del catalogo. Aqui ya no se comparan cortes, se revisa lo que se va a
+ * pagar, y una linea redondeada no cuadra con el total que la suma.
+ */
+
 function unitLabel(unit: OrderLine['unit'], quantity: number): string {
   if (unit === 'unidad') {
     return quantity === 1 ? 'pieza' : 'piezas';
@@ -16,14 +24,6 @@ function unitLabel(unit: OrderLine['unit'], quantity: number): string {
   }
 
   return 'kg';
-}
-
-function formatPrice(price: number): string {
-  return new Intl.NumberFormat('es-MX', {
-    style: 'currency',
-    currency: 'MXN',
-    maximumFractionDigits: 2
-  }).format(price);
 }
 
 /**
@@ -52,11 +52,12 @@ export function OrderList({ order, onRemove }: OrderListProps): JSX.Element {
             <p className="order-list__meta">
               {/* The unit travels on the line. Hardcoding "kg" here billed a cap
                   as "1 kg × $250", contradicting the card it was added from. */}
-              {line.quantity} {unitLabel(line.unit, line.quantity)} × {formatPrice(line.pricePerKg)}
+              {line.quantity} {unitLabel(line.unit, line.quantity)} ×{' '}
+              {formatearPrecio(line.pricePerKg, 'ticket')}
             </p>
           </div>
           <strong className="order-list__line-total">
-            {formatPrice(line.pricePerKg * line.quantity)}
+            {formatearPrecio(line.pricePerKg * line.quantity, 'ticket')}
           </strong>
           <button
             aria-label={`Quitar ${line.name} del pedido`}
