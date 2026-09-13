@@ -10,15 +10,26 @@
 [![Responsive](https://img.shields.io/badge/Responsive-375%E2%86%92768%E2%86%921440-brightgreen)](https://github.com/pipeTawns-x/Landingpages-Carni.pwa)
 [![Branch](https://img.shields.io/badge/Branch-main-purple)](https://github.com/pipeTawns-x/Landingpages-Carni.pwa/tree/main)
 
+[![React](https://img.shields.io/badge/React%2018-61DAFB)](https://github.com/pipeTawns-x/Landingpages-Carni.pwa)
+[![TypeScript](https://img.shields.io/badge/TypeScript%205-3178C6)](https://github.com/pipeTawns-x/Landingpages-Carni.pwa)
+[![Vite](https://img.shields.io/badge/Vite%207-646CFF)](https://github.com/pipeTawns-x/Landingpages-Carni.pwa)
+[![Supabase](https://img.shields.io/badge/Supabase-3ECF8E)](https://github.com/pipeTawns-x/Landingpages-Carni.pwa)
+[![SCSS](https://img.shields.io/badge/SCSS%207--1-CC6699)](https://github.com/pipeTawns-x/Landingpages-Carni.pwa)
+[![Docker](https://img.shields.io/badge/Docker-2496ED)](https://github.com/pipeTawns-x/Landingpages-Carni.pwa)
+
 **[Demo en vivo — GitHub Pages](https://pipetawns-x.github.io/Landingpages-Carni.pwa/)**
 
 ## 📸 Capturas de pantalla
 
 | Vista | Descripción |
 |---|---|
-| ![Home](docs/screenshots/home.jpg) | Landing con categorías y asistente virtual |
-| ![Catálogo](docs/screenshots/products.jpg) | Catálogo de productos |
-| ![Acceso](docs/screenshots/access.jpg) | Acceso de clientes |
+| <img src="docs/screenshots/home.jpg" width="440" alt="Landing de Carni-mvp con categorías y asistente virtual"> | Landing con categorías y asistente virtual |
+| <img src="docs/screenshots/products.jpg" width="440" alt="Catálogo de productos de Carni-mvp"> | Catálogo de productos |
+| <img src="docs/screenshots/access.jpg" width="440" alt="Pantalla de acceso de clientes con login y registro"> | Acceso de clientes |
+| <img src="public/img/recursos_web/carniLogin.png" width="440" alt="Pantalla de inicio de sesión de Carni-mvp"> | Pantalla de inicio de sesión |
+| <img src="public/img/recursos_web/carniRegistro.png" width="440" alt="Pantalla de registro de nuevos clientes"> | Pantalla de registro |
+
+Todas las capturas son reales del sitio publicado en GitHub Pages.
 
 ## Práctica m29 · React III — dónde se cumple cada requisito
 
