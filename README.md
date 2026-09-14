@@ -31,6 +31,17 @@
 
 Todas las capturas son reales del sitio publicado en GitHub Pages.
 
+## 🧭 Ejemplo de uso
+
+Carni-mvp es la virtualización de un negocio real con integración de IA. Un recorrido por la [demo en vivo](https://pipetawns-x.github.io/Landingpages-Carni.pwa/):
+
+1. Entra al catálogo (`products.html`): los productos se cargan desde Supabase.
+2. Abre un producto: en su ficha puedes dejar observaciones para el carnicero y tocar **Agregar al pedido**.
+3. Abre el carrito desde el botón del encabezado para revisar tu pedido y continuar.
+4. Si tienes dudas, el asistente virtual responde sobre productos, precios, horarios, ubicación, pedidos y envíos.
+
+La integración de IA vive en el panel de administración (`dashboar.html`): el módulo BuildAds prepara campañas y genera la voz con IA a través de ElevenLabs. Ese módulo necesita el servidor del proyecto y una llave de ElevenLabs, así que no está activo en la demo de GitHub Pages.
+
 ## Práctica m29 · React III — dónde se cumple cada requisito
 
 Esta práctica no es un ejercicio aparte: **está construida dentro del producto
