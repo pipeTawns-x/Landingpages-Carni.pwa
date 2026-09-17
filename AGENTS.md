@@ -26,6 +26,7 @@ Si una regla local contradice la capa global, gana la capa global y la regla loc
 ## Objetivo del Repo
 
 Carni-mvp es un MVP frontend para una carniceria con landing, catalogo, auth, carrito, PWA y dashboard admin base.
+Tiene un backend Django en construccion dentro de `backend/`, que trabaja junto con Supabase sobre la misma base de datos.
 La meta local es evolucionar el producto sin romper la base funcional actual.
 
 ## Estructura agentica local
@@ -80,6 +81,20 @@ Viven en `.claude/skills/<nombre>/SKILL.md`. Estuvieron en `agents/skills/` hast
 - Todo comando `npm` se ejecuta dentro de Docker o `.devcontainer/`; nunca en el host.
 - El flujo de Node/Vite se ejecuta dentro de `.devcontainer/`.
 - Documentar como actual solo lo que realmente existe y funciona en el repo.
+
+### Backend Django (`backend/`)
+
+- Supabase es la base de datos, el login y RLS; Django agrega la logica de negocio, el panel protegido en el servidor y la API sobre esa misma base. Django no reemplaza a Supabase.
+- El entorno del backend vive solo en `backend/.env`, privado y fuera de git, documentado con comentarios dentro del mismo archivo. No se crean `.env.example` ni otras variantes.
+- Configuracion obligatoria leida desde el entorno: si falta una variable, falla con un mensaje claro. Nada de valores secretos por defecto en el codigo.
+- Las tablas propias de Django van en el esquema `django` (`search_path=django,public`). Las tablas de `public` pertenecen a `supabase/migrations`; Django las usa con `managed = False` y nunca cambia su estructura.
+- No correr `migrate` si el esquema `django` y el rol de Postgres de Django no existen.
+- Django se conecta con un rol de Postgres propio, nunca con `postgres` ni `service_role` fuera del entorno local.
+- Precios y cantidades con `DecimalField`, nunca `FloatField`.
+- Las vistas que modifican datos exigen usuario autenticado y validan en el servidor; nunca confiar solo en el frontend.
+- Django nunca guarda contrasenas de clientes: los usuarios viven en Supabase Auth.
+- Dependencias con `uv` (`backend/pyproject.toml` y `uv.lock`); `ruff check` y `ruff format --check` deben pasar.
+- Las migraciones autogeneradas de Django no pasan por la revision de GGA.
 
 ## Servidor de desarrollo
 
