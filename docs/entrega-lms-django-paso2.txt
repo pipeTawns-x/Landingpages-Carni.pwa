@@ -1,0 +1,38 @@
+Paso 2 de la práctica del módulo de Django (M13): aislé Django en su propio esquema y rol de Postgres, sobre el mismo proyecto de siempre.
+
+La tienda en línea de la Carnicería El Señor de La Misericordia, el negocio de mi hermana aquí en San Luis Potosí, ya usa Supabase para la base de datos, el login y el RLS. En este paso le di a Django lo que le faltaba para trabajar en esa misma base sin pisarse con Supabase: un esquema propio (también llamado django), un rol de Postgres exclusivo, permisos acotados y políticas RLS pensadas para ese rol. La regla es simple: lo que es de Supabase vive en public, lo que es de Django vive en django, y ninguno toca lo del otro.
+
+Para correrlo:
+git clone -b practicas-ebac https://github.com/pipeTawns-x/Landingpages-Carni.pwa.git
+cd Landingpages-Carni.pwa
+supabase start
+cd backend
+# backend/.env es local y privado; las claves necesarias y su uso se documentan
+# con comentarios dentro del mismo archivo (no existe .env.example en el repo)
+uv sync
+uv run python manage.py check
+uv run python manage.py migrate
+
+Commit del paso: e5a1cf49
+Push: rama practicas-ebac (https://github.com/pipeTawns-x/Landingpages-Carni.pwa/tree/practicas-ebac)
+
+Dónde está cada requisito:
+- Migración que crea esquema y rol django → supabase/migrations/20260918235409_django_schema_role.sql
+  (SQL: CREATE SCHEMA django, CREATE ROLE django, GRANTs de esquema, tablas public seleccionadas y secuencias)
+- RLS para el rol django en tablas compartidas → política products_django_role_all, categories_django_role_all y order_items_django_role_select (FOR ALL / FOR SELECT al rol django, sin BYPASSRLS)
+- Guardia para no romper public → backend/config/checks.py (system check config.E001: si el esquema django no existe, manage.py se detiene con mensaje claro)
+- Registro del guardia → backend/config/__init__.py
+- Script que fija la contraseña del rol django desde backend/.env sin imprimirla → backend/scripts/set_django_role_password.sh
+- Conexión de Django con su rol → backend/config/settings.py (search_path=django,public, POSTGRES_USER=django desde backend/.env)
+
+Qué se verificó y qué resultado dio:
+- migración de Supabase aplicada: esquema django existe, rol django existe
+- permisos reales comprobados con has_schema_privilege / has_table_privilege / has_sequence_privilege (USAGE+CREATE en esquema django, USAGE en public, SELECT/INSERT/UPDATE/DELETE en products, SELECT/INSERT en categories, SELECT en order_items, USAGE en ambas secuencias)
+- RLS sigue activa en products, categories y order_items (relrowsecurity = true)
+- public intacta: sigue con las 9 tablas originales, ninguna nueva
+- migrate de Django aplicado: tablas auth, admin, contenttypes y sessions SOLO en el esquema django (10 tablas: 9 de Django + django_migrations)
+- el guardia config.E001 funciona en los dos sentidos: pasa con esquema presente y falla con mensaje claro si el esquema falta (lo probé contra una base de scratch y la borré)
+
+Dos cosas que me llevo del módulo:
+- Un rol de base de datos compartido con otros sistemas no necesita (ni debe) tener la llave del edificio: al rol django le di justo lo que sus tablas usan, nada más. RLS sigue mandando sobre las tablas compartidas y Supabase conserva sus políticas para los usuarios de la app.
+- La parte que más valió fue el guardia: antes de dejar correr migrate, preferí que Django comprobara que su esquema existe. Si algún día el esquema no está, el error llega antes de tocar nada, y no se cae en el pozo de crear tablas en public, que no es su casa.
