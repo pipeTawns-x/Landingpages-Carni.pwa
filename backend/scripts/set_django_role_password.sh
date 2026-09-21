@@ -5,6 +5,11 @@
 # the local Supabase Postgres instance as the superuser (`postgres`). The
 # value is never printed, stored in history, or written anywhere else.
 #
+# It also never reaches the process list or the server log: the statement
+# travels through stdin instead of `psql -c` (arguments are visible to any
+# `ps` on the machine) and statement logging is turned off for this session
+# before the ALTER ROLE runs.
+#
 # Usage:
 #   backend/scripts/set_django_role_password.sh
 #
@@ -30,10 +35,17 @@ fi
 # credential; it connects with its own role and password from .env.
 export PGPASSWORD="${SUPABASE_DB_PASSWORD:-postgres}"
 
+# Single quotes inside the password are doubled, the way Postgres expects
+# them inside a quoted literal.
+ESCAPED_PASSWORD="${NEW_PASSWORD//\'/\'\'}"
+
 psql -h 127.0.0.1 -p 54322 -U postgres -d postgres \
   -v ON_ERROR_STOP=1 \
-  -c "ALTER ROLE django LOGIN PASSWORD '${NEW_PASSWORD}';" >/dev/null
+  --quiet --no-psqlrc --file - >/dev/null <<SQL
+SET log_statement = 'none';
+ALTER ROLE django LOGIN PASSWORD '${ESCAPED_PASSWORD}';
+SQL
 
-unset PGPASSWORD
+unset PGPASSWORD ESCAPED_PASSWORD NEW_PASSWORD
 
 echo "Password for role 'django' updated (value not printed)."
