@@ -1,60 +1,13 @@
-Práctica del módulo 13 (Django Views): resolví el CRUD dentro de mi proyecto real, la tienda en línea de la Carnicería El Señor de La Misericordia, el negocio de mi hermana aquí en San Luis Potosí.
+Buen día, profesor. Le comparto mi entrega de la práctica del módulo 13 (Django Views).
 
-En lugar de una app de ejemplo, las cinco vistas administran el catálogo que ya usa la tienda: el panel vive en /inventario/, corre sobre la misma base de datos del sitio y está protegido con login_required. Django trabaja en su propio esquema y con su propio rol de Postgres, así que convive con Supabase sin pisarlo.
+Resolví el CRUD dentro de mi proyecto real: la tienda en línea de la Carnicería El Señor de La Misericordia, el negocio de mi hermana aquí en San Luis Potosí. Las cinco vistas administran el catálogo que ya usa la tienda.
 
-Repositorio (rama practicas-ebac):
+Código (rama practicas-ebac):
 https://github.com/pipeTawns-x/Landingpages-Carni.pwa/tree/practicas-ebac
-Commit de esta entrega: 24725c6d
 
-Para correrlo:
-git clone -b practicas-ebac https://github.com/pipeTawns-x/Landingpages-Carni.pwa.git
-cd Landingpages-Carni.pwa
-supabase start
-cd backend
-# backend/.env es privado; cada variable está explicada con comentarios dentro del archivo
-uv sync
-uv run python manage.py migrate
-uv run python manage.py createsuperuser
-uv run python manage.py runserver
-# panel: http://127.0.0.1:8000/inventario/
+Pull request de la entrega, con el detalle técnico:
+https://github.com/pipeTawns-x/Landingpages-Carni.pwa/pull/10
 
-Atributos nuevos del modelo de producto:
-La consigna pide agregar atributos "por ejemplo: description, seller, color, product_dimensions". Los adapté al dominio de una carnicería, donde sí significan algo:
-- description ya existía en el producto y se conserva.
-- seller → proveedor del corte.
-- product_dimensions → grosor mínimo, máximo y de referencia, más el peso promedio por pieza.
-- color lo reemplacé por presentación (pieza o paquete), porque el color no aporta nada al vender carne.
-Estos atributos viven en el modelo CutSpec, que es la única tabla que Django crea y administra; el producto y la categoría son espejos (managed = False) de las tablas que ya existían. Así la migración es real y, al mismo tiempo, Django nunca modifica la estructura de las tablas del sitio.
+En el documento adjunto va la explicación del código, archivo por archivo.
 
-Dónde está cada requisito:
-- Atributos nuevos y migración → backend/inventory/models.py y backend/inventory/migrations/0001_initial.py
-- Registro en el admin → backend/inventory/admin.py (el producto con su ficha como inline)
-- list-view → product_list en backend/inventory/views.py + templates/inventory/product_list.html
-- detail-view → product_detail + templates/inventory/product_detail.html
-- create-view → product_create + templates/inventory/product_form.html
-- update-view → product_update + product_form.html y product_confirm_price_change.html
-- delete-view → product_delete + templates/inventory/product_confirm_delete.html
-- URLs → backend/inventory/urls.py, montadas en backend/config/urls.py bajo /inventario/
-- Formularios → backend/inventory/forms.py (ProductForm y CutSpecForm)
-- Búsqueda con Q y protección con login_required → backend/inventory/views.py
-
-Lo que agregué por encima de la consigna, porque el negocio lo necesita:
-- El precio por libra se calcula solo a partir del precio por kilo, así no pueden quedar desalineados.
-- Cambiar un precio o una cantidad mínima muestra una pantalla de confirmación con el antes y el después. Un dedazo de $289 a $28.9 se ve antes de guardarse.
-- Borrar un producto que ya aparece en pedidos no lo elimina: lo desactiva, para no romper el historial (la llave foránea es ON DELETE RESTRICT). Cuando el borrado sí procede, el sistema avisa de cuántas listas de favoritos salió el producto, porque esa relación sí se borra en cascada.
-- Precios y pesos con DecimalField, nunca con float, para que no aparezcan errores de redondeo en dinero.
-- Validación en el servidor: no se aceptan precios ni inventarios negativos, ni un grosor mínimo mayor que el máximo.
-
-Cómo probé el flujo completo:
-Corrí el recorrido de punta a punta contra la base real (alta, listado, búsqueda, detalle, edición, confirmación de precio y borrado), con 17 comprobaciones automáticas. Todas pasaron:
-- la lista y la búsqueda responden 200
-- al dar de alta un producto de $100.00 por kilo, el precio por libra queda en $45.36
-- abrir el formulario de edición no escribe nada en la base
-- cambiar el precio a $120.00 sin confirmar deja el precio en $100.00 y muestra la confirmación; al confirmar queda en $120.00 y la libra en $54.43
-- un precio negativo y un grosor mínimo mayor que el máximo se rechazan
-- un producto con pedidos se desactiva en lugar de borrarse
-- al terminar, la base queda con los mismos 53 productos del inicio, sin filas de prueba
-
-Dos cosas que me llevo del módulo:
-- Las vistas basadas en funciones son sencillas, pero el orden lo pone el patrón POST-redirect-GET: se guarda, se redirige y se avisa con messages. Así el usuario no reenvía el formulario al recargar.
-- Un CRUD en un negocio real no es solo crear y borrar. Borrar un corte que ya tiene pedidos rompería el historial, así que la operación correcta es desactivarlo. Esa regla no estaba en el enunciado; salió de mirar la base de datos y entender qué significa cada dato para la carnicería.
+Quedo atento a su retroalimentación. Muchas gracias.
