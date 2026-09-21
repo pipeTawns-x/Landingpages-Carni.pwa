@@ -6,7 +6,7 @@ Código (rama practicas-ebac):
 https://github.com/pipeTawns-x/Landingpages-Carni.pwa/tree/practicas-ebac
 
 Pull request de la entrega, con el detalle técnico:
-PR_URL
+https://github.com/pipeTawns-x/Landingpages-Carni.pwa/pull/10
 
 En el documento adjunto va la explicación del código, archivo por archivo.
 
