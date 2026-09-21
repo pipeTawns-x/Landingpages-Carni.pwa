@@ -27,7 +27,7 @@ Dónde está cada requisito:
 
 Qué se verificó y qué resultado dio:
 - migración de Supabase aplicada: esquema django existe, rol django existe
-- permisos reales comprobados con has_schema_privilege / has_table_privilege / has_sequence_privilege (USAGE+CREATE en esquema django, USAGE en public, SELECT/INSERT/UPDATE/DELETE en products, SELECT/INSERT en categories, SELECT en order_items, USAGE en ambas secuencias)
+- permisos reales comprobados con has_schema_privilege / has_table_privilege / has_sequence_privilege (USAGE+CREATE en esquema django, USAGE en public, SELECT/INSERT/UPDATE/DELETE en products y en categories, SELECT en order_items, USAGE en ambas secuencias)
 - RLS sigue activa en products, categories y order_items (relrowsecurity = true)
 - public intacta: sigue con las 9 tablas originales, ninguna nueva
 - migrate de Django aplicado: tablas auth, admin, contenttypes y sessions SOLO en el esquema django (10 tablas: 9 de Django + django_migrations)
