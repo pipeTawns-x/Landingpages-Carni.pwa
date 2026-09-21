@@ -1,0 +1,36 @@
+Panel de
+Administracion
+
+® Dashboard
+@ Productos
+
+&
+
+Clientes
+
+® Pedidos
+
+© Salir
+
+Productos
+
+Inventario base
+
+Vista minima operativa para evitar rutas rotas mientras se implementa el CRUD real. | FMuevorRopucro
+
+Stock por categoria Estado del inventario
+Lectura répida del inventario base para decisiones de reposicién.
+
+istribucién rapida entre disponibilidad, reserva y alertas.
+
+is... O
+
+eri @ Disponible @ Bajo stock @ Reservado
+
+Producto Categoria Precio Stock Estado
+Arrachera Premium Res $289 15 kg i
+Chuleta Especial Cerdo $180 20 kg
+
+Pechuga Fresca Pollo $120 8 kg Bajo stock
+
+https://pipetawns-x.github.io/Landingpages-Carni.pwa/admin-products.html

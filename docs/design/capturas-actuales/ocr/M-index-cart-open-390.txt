@@ -1,0 +1,8 @@
+Tu pedido x
+0 productos
+
+Tu pedido esta vacio. Agrega cortes desde el catdlogo
+y apareceran aqui.
+
+Total $0.00
+

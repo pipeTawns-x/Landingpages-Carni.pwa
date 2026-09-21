@@ -1,0 +1,39 @@
+a
+CARNICERIA
+
+Panel de
+Administracién
+
+Dashboard
+Productos
+Clientes
+Pedidos
+
+Salir
+
+Productos
+
+INVENTORY ATELIER
+
+Gestion visual de inventario con enfoque premium y
+operativo
+
+La vista de productos se convierte en un estudio de control para stock, pricing y
+activaciones comerciales, sin perder la tabla operativa existente como fallback
+
+seguro.
+Altas rapids Product tracer
+Prepara nuevos productos con lineamientos visuales, tags y oferta especial. Usa sefiales de stock y trazabilidad para decidir reposicion o promoci6n.
+
+tnventario pase | EMuevo rRopucro
+Vista minima operativa para evitar rutas rotas mientras se implementa el CRUD real.
+
+Stock por categoria Estado del inventario
+
+Lectura rapida del inventario base para decisiones de reposicién.
+
+Distribucién rapida entre disponibilidad, reserva y alertas.
+
+g
+
+Cerdo Pollo Premium, @ Disponible @ Bajo stock @ Reservado

@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Carni — Diseño actual</title>
+<style>
+  :root { --bg:#0e0e0f; --panel:#18181a; --line:#2a2a2d; --text:#ececec; --muted:#9a9a9f; --accent:#DC2626; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--text); font:14px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  header { padding:24px 32px; border-bottom:1px solid var(--line); }
+  header h1 { margin:0 0 4px; font-size:22px; }
+  header p { margin:0; color:var(--muted); }
+  nav { position:sticky; top:0; z-index:2; display:flex; flex-wrap:wrap; gap:6px; padding:10px 32px; background:rgba(14,14,15,.92); backdrop-filter:blur(6px); border-bottom:1px solid var(--line); }
+  nav a { color:var(--muted); text-decoration:none; padding:4px 10px; border:1px solid var(--line); border-radius:999px; font-size:12px; }
+  nav a:hover { color:var(--text); border-color:var(--accent); }
+  section { padding:28px 32px; border-bottom:1px solid var(--line); scroll-margin-top:56px; }
+  section h2 { margin:0 0 4px; font-size:18px; }
+  section .note { margin:0 0 16px; color:var(--muted); max-width:90ch; }
+  .group { margin:26px 0 0; font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); }
+  .row { display:grid; grid-template-columns:minmax(0,1fr) 420px; gap:24px; align-items:start; }
+  .col h3 { margin:0 0 8px; font-size:12px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); }
+  .frame { background:var(--panel); border:1px solid var(--line); border-radius:10px; overflow:auto; max-height:80vh; }
+  .frame + .frame { margin-top:12px; }
+  .frame img { display:block; width:100%; height:auto; }
+  .mobile .frame img { width:390px; max-width:100%; margin:0 auto; }
+  .cap { padding:6px 10px; font-size:11px; color:var(--muted); border-top:1px solid var(--line); background:var(--panel); position:sticky; bottom:0; }
+  .missing { display:grid; place-items:center; min-height:160px; padding:16px; text-align:center; color:var(--muted); border:1px dashed var(--line); border-radius:10px; }
+  @media (max-width: 900px) { .row { grid-template-columns:1fr; } section, header, nav { padding-left:16px; padding-right:16px; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>Carni — diseño actual (as-is)</h1>
+  <p>Capturas reales de https://pipetawns-x.github.io/Landingpages-Carni.pwa/ · izquierda: escritorio · derecha: móvil 390 px · 2026-09-17. Sin rediseño.</p>
+</header>
+<nav id="nav"></nav>
+<main id="board"></main>
+<script>
+const MISSING = 'Falta captura';
+const S = [
+  { g:'Componentes globales' },
+  { id:'hamburger', t:'Menú hamburguesa', n:'Drawer lateral. En móvil el ítem activo se marca en naranja, no en rojo.',
+    d:['02-index-menu-drawer-desktop.png'], m:['37-index-menu-open-390.png'] },
+  { id:'lupa', t:'Lupa (buscador)', n:'Overlay blanco sobre un sitio oscuro. "Lo nuevo" muestra Merch con imágenes rotas. Campo píldora con foco rectangular rojo adentro.',
+    d:['03-index-search-overlay-desktop.png'], m:['M-index-search-open-390.png'] },
+  { id:'carrito', t:'Carrito', n:'Escritorio: drawer con 3 productos. Móvil: estado vacío, botón deshabilitado en rojo apagado.',
+    d:['04-index-cart-drawer-desktop.png'], m:['M-index-cart-open-390.png'] },
+  { id:'chat', t:'Asistente virtual (chat)', n:'Burbuja roja flotante presente en todas las páginas públicas.',
+    d:['16-products-chat-open-desktop.png'], m:[] },
+  { g:'Landing — index.html' },
+  { id:'landing', t:'Landing completa', n:'Página completa. Hero con video, bento de categorías, destacado, reseñas, sobre nosotros, horario, contacto, footer.',
+    d:['D-index-full-1440.png'], m:['36-index-full-390-part01.png','36-index-full-390-part02.png','36-index-full-390-part03.png'] },
+  { id:'landing-secciones', t:'Landing por secciones', n:'Fotogramas del video (1796 px).',
+    d:['01-index-hero-desktop.png','06-index-categories-bento-desktop.png','07-index-featured-product-desktop.png','08-index-reviews-desktop.png','09-index-about-hours-desktop.png','10-index-contact-footer-desktop.png'], m:[] },
+  { id:'login-modal', t:'Login desde el header', n:'Modal de acceso abierto sobre la landing.',
+    d:['05-index-login-modal-desktop.png'], m:[] },
+  { g:'Web commerce — products.html' },
+  { id:'catalogo', t:'Catálogo', n:'Página completa: encabezado "Catálogo maestro", chips de filtro, grilla de tarjetas, "Otros productos", footer.',
+    d:['D-products-full-1440.png','12-products-grid-desktop.png','13-products-grid-end-footer-desktop.png'], m:['38-products-full-390-part01.png','38-products-full-390-part02.png','38-products-full-390-part03.png','38-products-full-390-part04.png','38-products-full-390-part05.png','38-products-full-390-part06.png','38-products-full-390-part07.png','38-products-full-390-part08.png','38-products-full-390-part09.png','38-products-full-390-part10.png'] },
+  { id:'filtros', t:'Filtros activos', n:'Chip activo en rojo.',
+    d:['11-products-catalog-header-desktop.png','14-products-filter-active-desktop.png','15-products-filter-merch-desktop.png'], m:[] },
+  { id:'ficha', t:'Ficha de producto (configuración)', n:'products.html?categoria=carnes-rojas#/producto/5 y fotogramas con los tres modos: por peso, por precio, por pieza.',
+    d:['D-product-detail-full-1440.png','17-product-detail-by-weight-desktop.png','21-product-detail-by-price-desktop.png','22-product-detail-by-piece-desktop.png','20-product-detail-breadcrumb-desktop.png','19-product-detail-loading-desktop.png'], m:['M-product-detail-full-390.png'] },
+  { id:'recomendados', t:'Recomendados', n:'"Cortes que valen la espera" y "También de carnes rojas".',
+    d:['18-product-detail-recommendations-desktop.png'], m:[] },
+  { g:'Acceso — accessweb.html' },
+  { id:'accessweb', t:'Accessweb', n:'Login, transición a registro y sección editorial. Campos con bloque claro a la izquierda; placeholders sin acentos.',
+    d:['D-accessweb-full-1440.png','23-accessweb-login-desktop.png','24-accessweb-register-desktop.png','25-accessweb-editorial-footer-desktop.png'], m:['39-accessweb-full-390.png'] },
+  { id:'offline', t:'Offline', n:'offline.html',
+    d:['41-offline-full-1440.png'], m:['40-offline-full-390.png'] },
+  { g:'Panel admin (requiere sesión)' },
+  { id:'dashboard', t:'Dashboard', n:'dashboar.html: sidebar, ribbons React, KPIs, gráficas, tabla DataTables, formulario BuildAds, menú de notificaciones.',
+    d:['26-admin-dashboard-top-desktop.png','28-admin-dashboard-kpis-charts-desktop.png','29-admin-dashboard-orders-table-desktop.png','30-admin-dashboard-buildads-form-desktop.png','27-admin-dashboard-notifications-menu-desktop.png'], m:null },
+  { id:'admin-productos', t:'Productos', n:'admin-products.html', d:['32-admin-products-ribbon-desktop.png','31-admin-products-desktop.png'], m:null },
+  { id:'admin-clientes', t:'Clientes', n:'admin-customers.html', d:['34-admin-customers-desktop.png','35-admin-customers-directory-desktop.png'], m:null },
+  { id:'admin-pedidos', t:'Pedidos', n:'admin-orders.html', d:['33-admin-orders-desktop.png'], m:null },
+  { id:'salir', t:'Salir', n:'No es una pantalla: "Salir" (sidebar) y "Cerrar sesión" (menú ADMIN) son enlaces a index.html y no cierran la sesión.', d:[], m:[] },
+];
+const nav = document.getElementById('nav'), board = document.getElementById('board');
+const frames = (files, missingText) => files && files.length
+  ? files.map(f => `<div class="frame"><img loading="lazy" src="${f}" alt="${f}"><div class="cap">${f}</div></div>`).join('')
+  : `<div class="missing">${missingText}</div>`;
+for (const s of S) {
+  if (s.g) { board.insertAdjacentHTML('beforeend', `<p class="group" style="padding:0 32px">${s.g}</p>`); continue; }
+  nav.insertAdjacentHTML('beforeend', `<a href="#${s.id}">${s.t}</a>`);
+  const mMsg = s.m === null ? 'Falta captura móvil: requiere sesión de admin (Brave → DevTools → 390 px)' : 'Sin captura móvil de este estado';
+  board.insertAdjacentHTML('beforeend', `<section id="${s.id}"><h2>${s.t}</h2><p class="note">${s.n}</p>
+    <div class="row"><div class="col"><h3>Escritorio</h3>${frames(s.d, 'Sin captura')}</div>
+    <div class="col mobile"><h3>Móvil 390 px</h3>${frames(s.m, mMsg)}</div></div></section>`);
+}
+</script>
+</body>
+</html>

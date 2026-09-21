@@ -6,7 +6,7 @@ Los blueprints guardan **decisiones** (por qué se hizo algo). Este archivo guar
 
 Estados: `abierto` · `en curso` · `congelado`
 
-Última revisión: 2026-09-07 (verificación de la Práctica 4 y merge de `main`)
+Última revisión: 2026-09-21 (auditoría del rediseño contra el código y el esquema)
 
 > **Aviso de techo.** El archivo queda en 21 pendientes abiertos (contados, no estimados). La regla del proyecto sigue en pie: pasar de ~20 no es un problema del archivo, es señal de que se acumulan decisiones sin tomar.
 
@@ -16,7 +16,17 @@ Estados: `abierto` · `en curso` · `congelado`
 
 ## 🔴 Seguridad — bloquean el merge a `main`
 
-Al 2026-08-25 **no queda ningún 🔴 vivo**. Lo único en esta sección está congelado con su módulo.
+Al 2026-09-21 hay **un 🔴 vivo**: P-42. Lo demás en esta sección está congelado con su módulo.
+
+### P-42 · "Salir" no cierra la sesión del administrador
+
+**Estado:** abierto · **Evidencia:** `dashboar.html:57`, `dashboar.html:98`, `admin-products.html:30`, `admin-orders.html:30`, `admin-customers.html:30`, `js/modules/core/auth.js:385`
+
+Los cinco enlaces de salida del panel son `<a href="index.html">` sin ningún manejador. `logout()` está exportada en `auth.js` y **no la llama nadie**, así que la sesión de Supabase sigue viva: quien vuelva a abrir `dashboar.html` entra sin credenciales. En una computadora compartida, eso es acceso ajeno al panel.
+
+**Arreglo:** dar id a cada enlace y enlazarlo a un manejador que espere `supabase.auth.signOut()` y después redirija; dejar el `href` como respaldo sin JavaScript.
+
+**Ojo:** no basta con borrar el token del navegador — hay que llamar a `signOut()` para invalidar la sesión del lado de Supabase.
 
 ### P-03 · Dos huecos en `server/routes/buildads.ts`
 
@@ -62,6 +72,18 @@ reescribe al construir. Medido sobre el build publicado, hay **cero** referencia
 **Arreglo:** resolver la ruta contra `import.meta.env.BASE_URL`, igual que hace
 `assetUrl()` en `src/entry/shared.tsx`. O borrar la función si sigue sin usarse.
 
+### P-41 · Las fotos del buscador salen rotas en GitHub Pages
+
+**Estado:** abierto · **Evidencia:** `src/components/Lupa/Lupa.tsx:537`, `src/components/Lupa/Lupa.tsx:560`, `src/entry/shared.tsx:19`, captura `docs/design/capturas-actuales/M-index-search-open-390.png`
+
+La lupa pinta `src={product.image_url ?? '/img/products/res.png'}` con la ruta tal cual viene de la base, que es absoluta (`/img/products/...`). En Netlify resuelve; en Pages el sitio cuelga de `/Landingpages-Carni.pwa/` y esas rutas dan 404, así que las sugerencias del buscador se ven sin foto. Es el único componente que no pasa por `assetUrl()`: `ProductCard`, `CategoryCard`, `Showcase`, `CartPanel`, `Relacionados`, `BannerEditorial`, `ProductoDetalle` y `products.tsx` sí lo usan.
+
+**Arreglo:** importar `assetUrl` de `src/entry/shared.tsx` y envolver las dos rutas, incluida la de respaldo.
+
+**Ojo:** no es un defecto de diseño. El rediseño del buscador no lo arregla, y la lista de Merch que aparece ahí es dato correcto del seed.
+
+---
+
 ### P-34 · Tres sitios de Netlify colgando del mismo repositorio
 
 **Estado:** abierto · **Evidencia:** medido por HTTP el 2026-09-02
@@ -84,16 +106,6 @@ cuál tiene dominio propio, y decida. **No se toca nada desde aquí** — borrar
 sitio de Netlify no se deshace.
 
 ## 🟠 Migración a React — landing
-
-### P-10 · Modal de corte premium huérfano
-
-**Estado:** resuelto · **Evidencia:** `products.html:415`, `js/modules/core/cart.js:526`
-
-`openPremiumOrderModal()` está conectada al flujo real: al confirmar, llama a `window.CarniCart.addItem()`, que abre el `#cartModal` con la lógica trifásica aplicada (weight/pieces/price + grosor). La limitación de `products.peso_promedio` (P-19/P-20) afecta solo el modo "por pieza" en productos no premium.
-
----
-
-## 🟡 Reglas del negocio que la base todavía no conoce
 
 ### P-19 · El despiece del pollo solo existe como texto, no como regla
 
@@ -459,7 +471,9 @@ Congelado hasta que el dueño de la carnicería entregue márgenes reales. **Con
 TANDA 1   CERRADA el 2026-09-02   los dos destinos publicados y verificados
 TANDA 2   P-19, P-20              modelar unidad de venta, pieza y despiece
           P-21                       ← el dashboard sale de ahí
-TANDA 3   P-05, P-35              deuda que dejó el despliegue: ruta absoluta
+TANDA 3   P-42                    sesión de admin que no se cierra — va primero
+          P-41                    fotos rotas del buscador en Pages
+          P-05, P-35              deuda que dejó el despliegue: ruta absoluta
                                      del service worker y el rojo de consola
 TANDA 4   P-34                    decidir los tres sitios de Netlify — es de Eduardo
 TANDA 5   P-15, P-16              animación scroll, escalas de 10 tonos

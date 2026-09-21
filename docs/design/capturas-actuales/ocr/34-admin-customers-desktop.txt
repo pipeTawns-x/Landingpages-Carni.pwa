@@ -1,0 +1,43 @@
+> *— Clientes
+
+CARNICERIA
+
+Panel de
+
+Administracion
+MERCY CLUB
+
+— Vista de clientes, lealtad y activaci6n comercial
+
+Esta capa eleva la secci6n de clientes a una lectura de comunidad: adquisicion,
+aientel afiliacion, score y ventanas de retencion para campajias futuras.
+
+@® Dashboard
+
+Pedidos
+
+ag
+
+Segmentaci6n Fidelizaci6n
+© Salir
+
+Detecta clientes activos, nuevos y con alta recurrencia para rewards o bundles. Prepara la base visual para score, puntos y experiencias premium del Mercy
+
+Club.
+
+Clientes activos Afiliados Nuevos esta semana
+
+128 42 9
+
+Crecimiento semanal
+Seguimiento visual de captacién para campafias y retencién.
+
+Canales de adquisicion
+Comparativa rapida entre web, WhatsApp, mostrador y referidos.
+
+a
+8 H
+
+Sem Sem Sem 3 Sem 4 Sem § Sem 6 @ Wed @ wnatsApp @ Mostracor @ Referidos
+
+https:f/pipetawns-x.github.io/Landingpages-Camibpbditcakbnt hina Se

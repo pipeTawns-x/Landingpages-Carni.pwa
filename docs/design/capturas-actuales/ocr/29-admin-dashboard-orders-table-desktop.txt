@@ -1,0 +1,47 @@
+Mostrar 10 registros
+
+ID Pedido
+
+ORD-1001
+ORD-1002
+ORD-1003
+
+ORD-1004
+ORD-1005
+
+Mostrando 1 a 5 de 5 registros
+
+Cliente
+
+Juan Pérez
+
+Maria Gonzalez
+
+Carlos Lopez
+
+Luis Rodriguez
+
+Fecha
+
+2023-10-15
+
+2023-10-14
+
+2023-10-14
+
+2023-10-13
+
+2023-10-12
+
+Total
+
+Rib Eye @ Fi
+
+© Toranawk @ Otros
+
+Rib Eye @ Filet Mignon @ Tomahawk
+
+Buscar:
+
+Acciones
+
