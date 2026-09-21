@@ -21,13 +21,18 @@ instead of two, mobile reachability).
 ## 0. How this run works
 
 1. **Read first:** `spec-rediseno-v1.md` §5, §5.1, §6, §7; this file; and the captures folder (every group names its files).
-2. **G0 first, and it is the only stop.** Build the three type specimens, stop, wait for Eduardo's letter (A, B or C).
-3. **After the letter, run G0.2 → G11 without stopping.** Self-review each group before moving to the next: build,
-   screenshot your own frames, check each criterion, fix what fails (max two rounds per group), write its row in the
-   report table, continue.
-4. **Never redraw an approved group.** If a later group needs a change in an earlier component, note it in the report
+2. **Attach the design tool's own skills before building.** `Create design system` for G0, `Frontend design` for every
+   screen group. They do not load by themselves.
+3. **G0 first, and it is the only stop.** Build the three type options applied to one real screen, stop, wait for
+   Eduardo's letter (A, B or C).
+4. **Run order after the letter — visible progress first:** G0.2–G0.7 → **G5 landing (a full improved page, desktop and
+   mobile)** → G1 lupa → G2 carrito → G3 header → G6 catálogo → G7 ficha → G8 accessweb → G9 vistas nuevas → G4 dashboard
+   → G10 admin → G11 coherencia. The landing comes early on purpose: Eduardo must see a finished page before the long tail.
+5. **No stopping after the letter.** Self-review each group before moving on: build, screenshot your own frames, check each
+   criterion, fix what fails (max two rounds per group), write its row in the report table, continue.
+6. **Never redraw an approved group.** If a later group needs a change in an earlier component, note it in the report
    and keep going.
-5. **Final report** at the end of the page: `ID | criterion | PASS/FAIL | evidence` for every group, the score per group,
+7. **Final report** at the end of the page: `ID | criterion | PASS/FAIL | evidence` for every group, the score per group,
    and the open items.
 
 ## 1. Canvas layout
@@ -62,7 +67,10 @@ If the tool cannot read the repository folder, Eduardo drags the whole `capturas
 
 ### G0 — Foundations (the only stop)
 
-- **G0.1** Three type specimens on the same set (H1, H2, body, label, price, button, one product card), desktop and mobile: A) Fraunces + Geist · B) Instrument Serif + Instrument Sans · C) Bricolage Grotesque + Geist. **Stop here and wait for the letter.**
+- **G0.1** Three type options, each applied to **the same real screen already improved** — the catalog header plus a row of
+  three product cards, desktop and mobile — so the choice is made on a working design, not on a specimen sheet:
+  A) Fraunces + Geist · B) Instrument Serif + Instrument Sans · C) Bricolage Grotesque + Geist.
+  Add your own one-line verdict per option and a recommendation. **Stop here and wait for the letter.**
 - **G0.2** Token sheet: colors with contrast ratios, type scale for 390 and 1440, 4 px spacing, radii, dark elevation.
 - **G0.3** Unified product card with a **unit-aware price block** (`/ kg` + lb secondary, `/ pieza`, `/ paquete` — spec §5). Variants: default, hover, pressed, out of stock, compact, offer (marked DESIGN-AHEAD).
 - **G0.4** Controls: pill buttons (primary red, secondary outline, ghost, icon), input (single tone, label above, red focus ring, error, disabled), chips, qty stepper.
