@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "inventory.apps.InventoryConfig",
 ]
 
 MIDDLEWARE = [
@@ -141,6 +142,13 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
+
+# Auth
+# https://docs.djangoproject.com/en/5.2/topics/auth/default/#the-login-required-decorator
+#
+# The course uses the built-in admin login page as the app's login page, so
+# @login_required redirects there instead of a dedicated login view.
+LOGIN_URL = "/admin/login/"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

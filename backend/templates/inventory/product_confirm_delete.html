@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}Eliminar producto · Carni MVP{% endblock %}
+
+{% block content %}
+  <div class="card">
+    <h1>¿Eliminar "{{ product.name }}"?</h1>
+    {% if order_count %}
+      <p class="message message-warning">
+        Este producto aparece en {{ order_count }} pedido{{ order_count|pluralize }}, así que
+        <strong>no se va a eliminar</strong>: se desactivará para conservar el historial.
+        Dejará de verse en la tienda.
+      </p>
+    {% else %}
+      <p>
+        Esta acción no se puede deshacer.
+        {% if favorite_count %}
+          El producto también saldrá de {{ favorite_count }} lista{{ favorite_count|pluralize }}
+          de favoritos de tus clientes.
+        {% endif %}
+      </p>
+    {% endif %}
+
+    <form method="post">
+      {% csrf_token %}
+      <div class="actions">
+        <button type="submit" class="btn btn-danger">Sí, eliminar</button>
+        <a href="{% url 'inventory:detail' product.id %}" class="btn btn-secondary">Cancelar</a>
+      </div>
+    </form>
+  </div>
+{% endblock %}

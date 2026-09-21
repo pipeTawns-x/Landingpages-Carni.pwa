@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}Productos · Carni MVP{% endblock %}
+
+{% block content %}
+  <div class="card">
+    <form method="get">
+      <div class="field">
+        <label for="q">Buscar por nombre o descripción</label>
+        <input
+          type="search"
+          id="q"
+          name="q"
+          value="{{ query }}"
+          placeholder="Ej. arrachera"
+        />
+      </div>
+      <div class="field">
+        <label for="category">Categoría</label>
+        <select id="category" name="category">
+          <option value="">Todas las categorías</option>
+          {% for category in categories %}
+            <option
+              value="{{ category.id }}"
+              {% if selected_category == category.id|stringformat:"s" %}selected{% endif %}
+            >
+              {{ category.name }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+      <button type="submit" class="btn">Buscar</button>
+    </form>
+  </div>
+
+  <div class="actions" style="margin-bottom: 1.25rem;">
+    <a href="{% url 'inventory:create' %}" class="btn">+ Nuevo producto</a>
+  </div>
+
+  {% if products %}
+    <div class="card">
+      <table>
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Categoría</th>
+            <th>Precio por kg</th>
+            <th>Inventario</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for product in products %}
+            <tr>
+              <td><a href="{% url 'inventory:detail' product.id %}">{{ product.name }}</a></td>
+              <td>{{ product.category.name }}</td>
+              <td>${{ product.price_per_kg }}</td>
+              <td>{{ product.stock }}</td>
+              <td>{% if product.is_active %}Activo{% else %}Inactivo{% endif %}</td>
+              <td class="actions">
+                <a href="{% url 'inventory:detail' product.id %}" class="btn btn-secondary">Ver</a>
+                <a href="{% url 'inventory:update' product.id %}" class="btn btn-secondary">Editar</a>
+                <a href="{% url 'inventory:delete' product.id %}" class="btn btn-danger">Eliminar</a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <p>No se encontraron productos con esos filtros.</p>
+    </div>
+  {% endif %}
+{% endblock %}

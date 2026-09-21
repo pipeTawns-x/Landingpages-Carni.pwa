@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}Carni MVP{% endblock %}</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --color-bg: #faf7f2;
+      --color-surface: #ffffff;
+      --color-border: #e2d9cc;
+      --color-text: #2b2320;
+      --color-muted: #6b5f52;
+      --color-primary: #8a2d2d;
+      --color-primary-dark: #6c2222;
+      --color-success: #2f6d3b;
+      --color-success-bg: #e6f2e8;
+      --color-warning: #8a5a12;
+      --color-warning-bg: #fbf0da;
+      --color-error: #a3312a;
+      --color-error-bg: #fbe7e5;
+      --radius: 8px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      background-color: var(--color-bg);
+      color: var(--color-text);
+      line-height: 1.5;
+    }
+
+    header {
+      background-color: var(--color-primary);
+      color: #fff;
+      padding: 1rem 1.5rem;
+    }
+
+    header a {
+      color: #fff;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+
+    main {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 1.5rem;
+    }
+
+    h1 {
+      margin-top: 0;
+    }
+
+    .card {
+      background-color: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      margin-bottom: 1.25rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th,
+    td {
+      text-align: left;
+      padding: 0.6rem 0.5rem;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 0.5rem 1rem;
+      border-radius: var(--radius);
+      border: 1px solid var(--color-primary);
+      background-color: var(--color-primary);
+      color: #fff;
+      text-decoration: none;
+      cursor: pointer;
+      font-size: 0.95rem;
+    }
+
+    .btn:hover {
+      background-color: var(--color-primary-dark);
+    }
+
+    .btn-secondary {
+      background-color: transparent;
+      color: var(--color-primary);
+    }
+
+    .btn-danger {
+      background-color: var(--color-error);
+      border-color: var(--color-error);
+    }
+
+    .actions {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    form .field {
+      margin-bottom: 1rem;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 0.3rem;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    input[type="search"],
+    input[type="url"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 0.5rem;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      font-size: 1rem;
+      background-color: #fff;
+      color: var(--color-text);
+      font-family: inherit;
+    }
+
+    .checkbox-field {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .checkbox-field input {
+      width: auto;
+    }
+
+    .checkbox-field label {
+      margin-bottom: 0;
+    }
+
+    small {
+      display: block;
+      color: var(--color-muted);
+      margin-top: 0.25rem;
+    }
+
+    .errorlist {
+      color: var(--color-error);
+      list-style: none;
+      padding: 0;
+      margin: 0.25rem 0 0;
+      font-size: 0.9rem;
+    }
+
+    .messages {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 1rem;
+    }
+
+    .message {
+      padding: 0.75rem 1rem;
+      border-radius: var(--radius);
+      margin-bottom: 0.5rem;
+    }
+
+    .message-success {
+      background-color: var(--color-success-bg);
+      color: var(--color-success);
+    }
+
+    .message-warning {
+      background-color: var(--color-warning-bg);
+      color: var(--color-warning);
+    }
+
+    .message-error {
+      background-color: var(--color-error-bg);
+      color: var(--color-error);
+    }
+
+    .empty-state {
+      text-align: center;
+      color: var(--color-muted);
+      padding: 2rem 0;
+    }
+
+    .before-after td.before {
+      color: var(--color-muted);
+      text-decoration: line-through;
+    }
+
+    .before-after td.after {
+      color: var(--color-success);
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="{% url 'inventory:list' %}">Carni MVP · Inventario</a>
+  </header>
+  <main>
+    {% include "messages.html" %}
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

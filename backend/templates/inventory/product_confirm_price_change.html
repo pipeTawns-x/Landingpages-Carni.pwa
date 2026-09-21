@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Confirmar cambio de precio · Carni MVP{% endblock %}
+
+{% block content %}
+  <div class="card">
+    <h1>Confirmar cambios en "{{ product.name }}"</h1>
+    <p>
+      Estás por cambiar datos sensibles de este producto. Revisa el cambio
+      antes de confirmarlo.
+    </p>
+
+    <table class="before-after">
+      <thead>
+        <tr>
+          <th>Campo</th>
+          <th>Antes</th>
+          <th>Después</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if price_changed %}
+          <tr>
+            <td>Precio por kg</td>
+            <td class="before">${{ old_price_per_kg }}</td>
+            <td class="after">${{ new_price_per_kg }}</td>
+          </tr>
+        {% endif %}
+        {% if min_quantity_changed %}
+          <tr>
+            <td>Cantidad mínima (kg)</td>
+            <td class="before">{{ old_min_quantity_kg }}</td>
+            <td class="after">{{ new_min_quantity_kg }}</td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+
+    <form method="post">
+      {% csrf_token %}
+      {% for key, value in hidden_fields.items %}
+        <input type="hidden" name="{{ key }}" value="{{ value }}" />
+      {% endfor %}
+      <input type="hidden" name="confirm" value="1" />
+      <div class="actions">
+        <button type="submit" class="btn">Confirmar cambio</button>
+        <a href="{% url 'inventory:detail' product.id %}" class="btn btn-secondary">Cancelar</a>
+      </div>
+    </form>
+  </div>
+{% endblock %}

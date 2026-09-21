@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}
+  {% if is_update %}Editar producto{% else %}Nuevo producto{% endif %} · Carni MVP
+{% endblock %}
+
+{% block content %}
+  <div class="card">
+    <h1>{% if is_update %}Editar producto{% else %}Nuevo producto{% endif %}</h1>
+    <form method="post">
+      {% csrf_token %}
+
+      <h2>Datos del producto</h2>
+      {% for field in product_form %}
+        <div class="field {% if field.field.widget.input_type == 'checkbox' %}checkbox-field{% endif %}">
+          {% if field.field.widget.input_type == 'checkbox' %}
+            {{ field }}
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {% else %}
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+          {% endif %}
+          {% if field.help_text %}<small>{{ field.help_text }}</small>{% endif %}
+          {{ field.errors }}
+        </div>
+      {% endfor %}
+
+      <h2>Especificación de corte (opcional)</h2>
+      {% for field in spec_form %}
+        <div class="field">
+          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+          {% if field.help_text %}<small>{{ field.help_text }}</small>{% endif %}
+          {{ field.errors }}
+        </div>
+      {% endfor %}
+
+      <div class="actions">
+        <button type="submit" class="btn">Guardar</button>
+        {% if is_update %}
+          <a href="{% url 'inventory:detail' product.id %}" class="btn btn-secondary">Cancelar</a>
+        {% else %}
+          <a href="{% url 'inventory:list' %}" class="btn btn-secondary">Cancelar</a>
+        {% endif %}
+      </div>
+    </form>
+  </div>
+{% endblock %}

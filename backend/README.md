@@ -50,9 +50,45 @@ uv run ruff check .
 uv run ruff format .
 ```
 
+## Inventory panel
+
+The `inventory` app is the staff panel for the catalog, served at
+`/inventario/` and protected with `login_required` (sign in through
+`/admin/login/`). `Category` and `Product` mirror the Supabase-owned tables
+with `managed = False`; `CutSpec` is the only Django-managed table and stores
+the data the storefront still lacks: average weight per piece, thickness range,
+supplier and presentation.
+
+Behaviour worth knowing before touching it:
+
+- `price_per_lb` is always derived from `price_per_kg`, so it is not editable.
+- Changing a price or a minimum quantity shows a before/after confirmation
+  before saving.
+- Deleting a product that appears in orders deactivates it instead, because
+  `order_items.product_id` is `ON DELETE RESTRICT`. When a delete does go
+  through, the panel reports how many favorite lists lost the product
+  (`favorites.product_id` cascades).
+
+### EBAC practice M13 — where each requirement lives
+
+| Requirement | File |
+| --- | --- |
+| New attributes on the product model | `inventory/models.py` (`CutSpec`: weight per piece, thickness min/max/default, supplier, presentation, notes) |
+| Migrations created and applied | `inventory/migrations/0001_initial.py` (only `CutSpec`; the mirrored tables emit no DDL) |
+| Admin registration | `inventory/admin.py` (product with the spec as an inline) |
+| list-view | `inventory/views.py::product_list` + `templates/inventory/product_list.html` |
+| detail-view | `inventory/views.py::product_detail` + `templates/inventory/product_detail.html` |
+| create-view | `inventory/views.py::product_create` + `templates/inventory/product_form.html` |
+| update-view | `inventory/views.py::product_update` + `product_form.html`, `product_confirm_price_change.html` |
+| delete-view | `inventory/views.py::product_delete` + `templates/inventory/product_confirm_delete.html` |
+| URLs | `inventory/urls.py` (namespace `inventory`), mounted in `config/urls.py` |
+| Forms | `inventory/forms.py` (`ProductForm`, `CutSpecForm`) |
+| Search and protection | `Q` filter in `product_list`; `login_required` on the five views, `LOGIN_URL` in `config/settings.py` |
+
 ## Warning
 
-**Do not run `manage.py migrate`** until the `django` schema and the Django
-database role exist in Supabase (created in a later step). Running migrate
-before that schema exists would create Django's tables in `public`, colliding
-with Supabase-owned tables.
+**Do not run `manage.py migrate`** unless the `django` schema and the Django
+database role exist in Supabase (they are created by
+`supabase/migrations/20260918235409_django_schema_role.sql`). Running migrate
+without that schema would create Django's tables in `public`, colliding with
+Supabase-owned tables. The system check `config.E001` stops that.

@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}{{ product.name }} · Carni MVP{% endblock %}
+
+{% block content %}
+  <div class="card">
+    <h1>{{ product.name }}</h1>
+    <p><strong>Categoría:</strong> {{ product.category.name }}</p>
+    <p><strong>Descripción:</strong> {{ product.description|default:"Sin descripción" }}</p>
+    <p><strong>Precio por kg:</strong> ${{ product.price_per_kg }}</p>
+    <p><strong>Precio por lb:</strong> ${{ product.price_per_lb }}</p>
+    <p><strong>Cantidad mínima (kg):</strong> {{ product.min_quantity_kg }}</p>
+    <p><strong>Inventario:</strong> {{ product.stock }}</p>
+    <p><strong>Estado:</strong> {% if product.is_active %}Activo{% else %}Inactivo{% endif %}</p>
+  </div>
+
+  <div class="card">
+    <h2>Especificación de corte</h2>
+    {% if spec %}
+      <p><strong>Peso promedio por pieza (kg):</strong> {{ spec.avg_piece_weight_kg|default:"—" }}</p>
+      <p><strong>Grosor mínimo (in):</strong> {{ spec.thickness_min_in|default:"—" }}</p>
+      <p><strong>Grosor máximo (in):</strong> {{ spec.thickness_max_in|default:"—" }}</p>
+      <p><strong>Grosor por defecto (in):</strong> {{ spec.thickness_default_in|default:"—" }}</p>
+      <p><strong>Proveedor:</strong> {{ spec.supplier|default:"—" }}</p>
+      <p><strong>Presentación:</strong> {{ spec.get_presentation_display|default:"—" }}</p>
+      <p><strong>Notas:</strong> {{ spec.notes|default:"—" }}</p>
+    {% else %}
+      <p>Este producto no tiene especificación de corte.</p>
+    {% endif %}
+  </div>
+
+  <div class="actions">
+    <a href="{% url 'inventory:list' %}" class="btn btn-secondary">← Volver al listado</a>
+    <a href="{% url 'inventory:update' product.id %}" class="btn">Editar</a>
+    <a href="{% url 'inventory:delete' product.id %}" class="btn btn-danger">Eliminar</a>
+  </div>
+{% endblock %}
