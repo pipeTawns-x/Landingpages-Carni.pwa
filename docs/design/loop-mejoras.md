@@ -44,7 +44,9 @@ craft gates. Read it once before drawing and follow its numbers.
    - **Block 1 — foundations and the first finished page:** G0 → G5 landing, complete at 1440 and 390.
    - **Block 2 — global pieces:** G1 lupa → G2 carrito → G3 header.
    - **Block 3 — store:** G6 catálogo → G7 ficha → G8 accessweb → G9 checkout, estado del pedido y perfil.
-   - **Block 4 — operation:** G4 dashboard → G10 admin and the Django screens → G11 consistency.
+   - **Block 4 — operation:** G4 dashboard → G10 admin, its settings and the Django screens.
+   - **Block 5 — new modules and closing:** G12 recipe book and nutrition → G13 Track Score, discounts and affiliates → G11 consistency.
+     These are views the product does not have yet: they are designed now so they can become specs and then code.
    At the end of each block write a `Reporte bloque N` frame with that block's table and open items, then continue.
 4. **Self-review inside each group:** build, screenshot your own frames, check every criterion, fix what fails, write the rows.
    **Two fix rounds maximum; a third failure is not retried** — mark it FAIL with one line saying why and move on. A silent skip is
