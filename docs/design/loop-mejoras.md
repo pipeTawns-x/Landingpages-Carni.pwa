@@ -113,6 +113,26 @@ the unnamed "Club Misericordia" tier card (feed it into G13), and one SaleAds sc
 1. `vistas-productos/`, `vistas-compras/` and the four root `vista*.png` files are **not Carni and not SaleAds**: they are an unrelated light-themed hardware-store demo. Use them for CRUD patterns only (inline status dropdown per row, order-detail modal, quick-entry-above-history table, trust badges, add-to-cart toast) and never for looks.
 2. Several of these references contradict the decided direction: hover microanimations, glow shadows, gradient CTAs and a catalog countdown timer. Take the structure, drop the effects. The BuildAds ads panel is a good blueprint but **BuildAds stays frozen** — do not design it in this run.
 
+## 2.2 Where to look for each piece
+
+`referencias/catalogo-recursos.md` has the full table with licences. Short map, so no group starts from a blank canvas:
+
+| Piece | Look at |
+|---|---|
+| Storefront chrome, dark | Refero: Shopify (dark, single accent on near-black) |
+| Product cards and catalog grid | Refero: Freitag (ruled grid) · HorizonX product-card anatomy · Nordic-Store spacing rhythm |
+| Cart, checkout, payment | HorizonX ecommerce and payment kits (structure only, they ship no code) |
+| Order tracking and delivery | HorizonX delivery cards (4-state card) · Refero: Uber (flat hairline cards, transit clarity) |
+| Admin dashboard, dark | Refero: Dovetail, Basedash, Trunk · HorizonX Verdara (KPI + export) · the Figma Make Carni dashboard in `~/Desktop/img` |
+| Admin CRUD patterns | The hardware-store demo in `~/Desktop/img`: inline status dropdown per row, order-detail modal, quick-entry above history |
+| Kanban de pedidos | The OMS material Eduardo gathered: board with drag on desktop, one-tap advance on touch, live updates |
+| Recipe book | Refero: Sweetgreen (food is the card) · Amrit Palace (warm serif, editorial menu) |
+| Profile and affiliates | HorizonX profile cards (stat rows, chips) · the "Club Misericordia" tier card in `~/Desktop/img` |
+| BuildAds / ProductAds | SaleAds screenshots in `~/Desktop/img` · Refero: ChatGPT layout (two columns, weight-only hierarchy) |
+| Component base for both stacks | FlyonUI (MIT, semantic Tailwind classes, works in React and in plain Django templates) |
+
+Take structure, never effects: no gradient CTAs, no glow shadows, no countdown timers, no hover-only affordances.
+
 ## 3. Criteria
 
 ### G0 — Foundations (the only stop)
@@ -136,7 +156,9 @@ the chat bubble floats above the overlay (`.chat-widget` z-index 3000 vs `.lupa`
 
 - **G1.1** The overlay is dark: one surface level above the page, never white. Mobile full screen, desktop a top sheet with a max width and the page dimmed underneath.
 - **G1.2** **One search affordance at a time.** While the overlay is open, the header's search control is not visible (the overlay covers it or replaces it) and the floating chat bubble is hidden. Show this as a two-frame comparison: header closed / overlay open.
-- **G1.3** One centered pill field, no icon inside it, focus shown on the pill itself (no inner rectangle). The close control is a single X at the top right, ≥ 44 px.
+- **G1.3** One centered pill field, no icon inside it, focus shown on the pill itself (no inner rectangle).
+- **G1.3b** **A visible X to leave the overlay**, top right, ≥ 44 px, present and reachable at 1440 AND at 390 — today the only
+  way out is guessing. Esc and tapping outside do the same, but the X is the one that must be seen without looking for it.
 - **G1.4** Empty state, in this order: trending terms as plain text links; recent searches with a "Borrar" action; then suggestions under a section title ("Lo nuevo"), as a grid of the compact card from Phase 0, with real meat photography. The page behind is dimmed while the field is active (Baymard).
 - **G1.5** Suggestion grid: 2 columns at 390, 4–6 at 1440, capped at **4–8 suggestions on mobile and 10 on desktop** (Baymard). Each card shows its correct unit (`/ kg`, `/ pieza`, `/ paquete`, spec §5) — never a kg+lb pair by default. Prices use tabular figures.
 - **G1.6** Typing state: live results with a result count, and the **predicted part of the term in bold — not what the customer typed** (Baymard).
@@ -233,7 +255,12 @@ The backend session is building the Django inventory panel (M13) and will use th
 - **G10.2** Orders: the six statuses as a board and as a table, with the icon+label chips from G4.4.
 - **G10.3** Customers: KPI row (clientes activos, nuevos esta semana, afiliados), directory table with search, and the customer
   detail with order history using the G4.4 chips.
-- **G10.2b** Orders board ready for the WhatsApp flow: each card shows the short command that advances it (`listo #104`),
+- **G10.2a** **Kanban de pedidos, the board itself** — the main way the shop works the day. Columns are the real statuses:
+  Pendiente · Confirmado · Preparando · Listo · Entregado, with Cancelado reachable but out of the flow. Card: folio, customer,
+  items with quantities, total, time waiting, delivery or pickup badge, and a note when the customer added items later.
+  States: column empty, card being dragged, card just moved, board with 40 cards, board at 390 px (columns become a swipeable
+  row of stacks). Drag is the desktop gesture; on touch, one visible "Avanzar" button does the same thing — never drag-only.
+- **G10.2b** The same board ready for the WhatsApp flow: each card shows the short command that advances it (`listo #104`),
   who changed the status and when, and a "pedido añadido" marker for orders merged later the same day.
   `DESIGN-AHEAD: integración WhatsApp + n8n pendiente` — design only, no automation exists yet.
 - **G10.3b** Settings panel: price per kg and per lb, the two minimum-order values (delivery `$150`, pickup `$0`), each with its
