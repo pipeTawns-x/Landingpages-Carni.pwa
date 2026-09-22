@@ -39,15 +39,24 @@ craft gates. Read it once before drawing and follow its numbers.
    sections that group names. Do not open the 59 captures or the whole OCR folder before drawing.
 2. **Attach the design tool's own skills before building.** `Create design system` for G0, `Frontend design` for every screen group.
    They do not load by themselves.
-3. **Four blocks, no waiting.** The run never stops for a human, but it publishes a block report so drift can be caught while it
-   continues:
-   - **Block 1 — foundations and the first finished page:** G0 → G5 landing, complete at 1440 and 390.
-   - **Block 2 — global pieces:** G1 lupa → G2 carrito → G3 header.
-   - **Block 3 — store:** G6 catálogo → G7 ficha → G8 accessweb → G9 checkout, estado del pedido y perfil.
-   - **Block 4 — operation:** G4 dashboard → G10 admin, its settings and the Django screens.
-   - **Block 5 — new modules and closing:** G12 recipe book and nutrition → G13 Track Score, discounts and affiliates → G11 consistency.
-     These are views the product does not have yet: they are designed now so they can become specs and then code.
-   At the end of each block write a `Reporte bloque N` frame with that block's table and open items, then continue.
+3. **Seven blocks, delivered two frames at a time.** The run never stops for a human, but it saves as it goes: a page is
+   never left half drawn.
+   - **Block 1 — foundations and the landing, with every global piece:** G0 tokens, card and controls → G3 header,
+     hamburger and side menu → G1 lupa → G2 carrito → G5 landing complete. These four pieces are global: they are drawn
+     once here and reused unchanged everywhere else.
+   - **Block 2 — web commerce:** G6 catálogo → G7 ficha de producto (configuración del corte).
+   - **Block 3 — accessweb and buying:** G8 login, registro, recuperación con código y offline → G9 checkout, confirmación
+     y estado del pedido.
+   - **Block 4 — admin panel:** G4 dashboard → G10 productos, pedidos, clientes, ajustes y las cinco pantallas Django.
+   - **Block 5 — customer profile, the whole view:** G9.3 the profile shell → G12 recetario y nutrición → G13 Track Score,
+     descuentos y afiliados. Recipes, nutrition widgets, level and affiliate link all live INSIDE this profile: it is one
+     coherent web for the ordinary customer, not four loose modules.
+   - **Block 6 — the plus modules, design only:** G14 BuildAds and ProductAds.
+   - **Block 7 — consistency:** G11.
+   **Rhythm inside every block: one view at a time, and a view means its two frames — escritorio 1440 and móvil 390.**
+   Finish the pair, write its row in the report table, then start the next pair. At the end of each block write a
+   `Reporte bloque N` frame with that block's table and open items, then continue. If the run is interrupted, everything
+   already reported must still stand on its own.
 4. **Self-review inside each group:** build, screenshot your own frames, check every criterion, fix what fails, write the rows.
    **Two fix rounds maximum; a third failure is not retried** — mark it FAIL with one line saying why and move on. A silent skip is
    worse than a declared failure.
@@ -90,7 +99,7 @@ Eduardo's own folder. Look at these five first, in this order:
 
 | File | Why |
 |---|---|
-| `stitch-landing/paletastitch.png` | The literal token sheet: #DC2626, #E4D1B0, #F59E0B, #050505. Colors confirm ours. **Its type (Plus Jakarta Sans + Inter) does not**: the decided pairing is Fraunces + Geist. |
+| `stitch-landing/paletastitch.png` | **Stitch mockups are old and outdated — use them only for the token sheet and for layout hints, never as the look to reproduce.** The literal token sheet: #DC2626, #E4D1B0, #F59E0B, #050505. Colors confirm ours. **Its type (Plus Jakarta Sans + Inter) does not**: the decided pairing is Fraunces + Geist. |
 | `Captura … 2026-04-16 a la(s) 2.42.28 p.m..png` | A Carni-branded dashboard already built in Figma Make, with real KPIs, charts, table and a written component spec. Closest thing to a finished admin. |
 | `mobileauthstitch.png` | The most finished mobile flow: mascot, "Datos esenciales" vs optional delivery data, two-tone states. Feed it into G8. |
 | `stitch-paneles/checkoutstitch.png` | Checkout as a drawer: delivery/pickup tabs, steppers, totals. Feed it into G9, but our payment is Stripe, not the WhatsApp CTA it shows. |
@@ -157,6 +166,12 @@ Today: the active item in the mobile drawer is amber, not red; the drawer looks 
 
 ### G4 — Admin dashboard
 
+References for this block, already researched: the Facebook reels catalogued in the spec appendix (admin shell in red and white,
+sidebar tooltips, tabbed product edit, inline status per row, price guard, confirm dialog), the "Dashboard-Redesign-for-Carni-MVP"
+Figma Make screens in `~/Desktop/img`, the hardware-store demo in that same folder — **it is a commerce admin like ours and its
+patterns are meant to be adapted to the butcher shop**, not dismissed — and the OMS/Kanban material Eduardo gathered
+(order board with drag-and-drop, status changed from the shop floor, real-time updates).
+
 Today: white Bootstrap tables inside a dark page, decorative "ribbons" ("Dashboard Matrix", "Agencia IA 360°") that carry no data, charts in a different visual language, unusable at 390 px.
 
 - **G4.1** One dark surface system: no white tables, no Bootstrap defaults. Tables use the Phase 0 tokens (borders, not shadows; 4 px grid).
@@ -218,6 +233,9 @@ The backend session is building the Django inventory panel (M13) and will use th
 - **G10.2** Orders: the six statuses as a board and as a table, with the icon+label chips from G4.4.
 - **G10.3** Customers: KPI row (clientes activos, nuevos esta semana, afiliados), directory table with search, and the customer
   detail with order history using the G4.4 chips.
+- **G10.2b** Orders board ready for the WhatsApp flow: each card shows the short command that advances it (`listo #104`),
+  who changed the status and when, and a "pedido añadido" marker for orders merged later the same day.
+  `DESIGN-AHEAD: integración WhatsApp + n8n pendiente` — design only, no automation exists yet.
 - **G10.3b** Settings panel: price per kg and per lb, the two minimum-order values (delivery `$150`, pickup `$0`), each with its
   inline validation state and a saved confirmation. Values come from `store_settings`, never hardcoded.
 - **G10.4** "Salir" with confirmation and a signed-out screen.
@@ -255,6 +273,22 @@ lot in three visits a month). Today only `profiles.points` exists, so every fram
 - **G13.4** Admin side: discounts per customer, granted and revoked, with the reason and who did it.
 - **G13.5** Admin side: affiliate rules — who qualifies, reward, caps.
 - **G13.6** Promo codes (`promotions` exists): admin list and the checkout field, both with their invalid, expired and applied states.
+
+### G14 — BuildAds and ProductAds (the plus modules, design only)
+
+Eduardo's reference for these is SaleAds (screenshots in `~/Desktop/img`, catalogued in `referencias/capturas-previas.md`):
+a campaign wizard (channel → objective → budget, location and language → AI-generated creative → ad account) and a
+"Mis estrategias" list of resumable campaign cards. BuildAds is the assisted version with human approval; ProductAds is the
+autonomous one. Neither has backend: every frame carries `DESIGN-AHEAD: módulo congelado, sin backend`.
+
+- **G14.1** Entry point inside the admin, with an empty state that promises one thing and has a single primary action.
+- **G14.2** Wizard, step by step: canal → objetivo → presupuesto, zona e idioma → creativo → cuenta. One decision per step,
+  progress visible, back always available.
+- **G14.3** Campaign list: cards with thumbnail strip, status chip, key rows and a resume action.
+- **G14.4** Creative review: the generated copy and image next to an editable brief, with explicit human approval before publishing.
+- **G14.5** ProductAds: the same surface in autonomous mode — what it decided, why, and the switch that stops it.
+- **G14.6** The AI surfaces are the only place where a second accent is allowed, and it is still not a gradient: the red stays
+  for commerce actions.
 
 ### G11 — Consistency pass
 
