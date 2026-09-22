@@ -20,20 +20,35 @@ instead of two, mobile reachability).
 
 ## 0. How this run works
 
-1. **Read first:** `spec-rediseno-v1.md` §5, §5.1, §6, §7; this file; and the captures folder (every group names its files).
-2. **Attach the design tool's own skills before building.** `Create design system` for G0, `Frontend design` for every
-   screen group. They do not load by themselves.
-3. **G0 first, and it is the only stop.** Build the three type options applied to one real screen, stop, wait for
-   Eduardo's letter (A, B or C).
-4. **Run order after the letter — visible progress first:** G0.2–G0.7 → **G5 landing (a full improved page, desktop and
-   mobile)** → G1 lupa → G2 carrito → G3 header → G6 catálogo → G7 ficha → G8 accessweb → G9 vistas nuevas → G4 dashboard
-   → G10 admin → G11 coherencia. The landing comes early on purpose: Eduardo must see a finished page before the long tail.
-5. **No stopping after the letter.** Self-review each group before moving on: build, screenshot your own frames, check each
-   criterion, fix what fails (max two rounds per group), write its row in the report table, continue.
-6. **Never redraw an approved group.** If a later group needs a change in an earlier component, note it in the report
-   and keep going.
-7. **Final report** at the end of the page: `ID | criterion | PASS/FAIL | evidence` for every group, the score per group,
-   and the open items.
+**Direction, decided — do not re-open it.** "Mostrador digital": restrained everywhere, warm in two places only (landing hero and
+empty states). Near-zero motion, no scroll-driven video, no command palette. It is the only candidate that survives mid-range Android
+over 4G and ports to server-rendered Django without JavaScript (`referencias/direcciones.md`, Direction 3). From Direction 1 it inherits
+one thing: the crop-variation rule for repeated photography (G0.7).
+
+**Type, decided — no specimen page.** Display: **Fraunces** (variable, optical size). UI, labels and every number: **Geist** (tabular
+figures, so no third family). Two families, no exceptions.
+
+**`direccion-visual.md` is binding**: tokens, type scale, character budgets for Spanish, component specs, motion budget and the ten
+craft gates. Read it once before drawing and follow its numbers.
+
+1. **Read per group, not everything up front.** `direccion-visual.md` at the start; then, per group, only the captures and spec
+   sections that group names. Do not open the 59 captures or the whole OCR folder before drawing.
+2. **Attach the design tool's own skills before building.** `Create design system` for G0, `Frontend design` for every screen group.
+   They do not load by themselves.
+3. **Four blocks, no waiting.** The run never stops for a human, but it publishes a block report so drift can be caught while it
+   continues:
+   - **Block 1 — foundations and the first finished page:** G0 → G5 landing, complete at 1440 and 390.
+   - **Block 2 — global pieces:** G1 lupa → G2 carrito → G3 header.
+   - **Block 3 — store:** G6 catálogo → G7 ficha → G8 accessweb → G9 checkout, estado del pedido y perfil.
+   - **Block 4 — operation:** G4 dashboard → G10 admin and the Django screens → G11 consistency.
+   At the end of each block write a `Reporte bloque N` frame with that block's table and open items, then continue.
+4. **Self-review inside each group:** build, screenshot your own frames, check every criterion, fix what fails, write the rows.
+   **Two fix rounds maximum; a third failure is not retried** — mark it FAIL with one line saying why and move on. A silent skip is
+   worse than a declared failure.
+5. **A frame that is not clearly better than its capture is a FAIL**, even if it satisfies the letter of the criterion. Every row
+   carries one line naming the improvement: contrast, hierarchy, rhythm, one affordance instead of two, reachability, density.
+6. **Never redraw an approved group.** If a later group needs a change in an earlier component, note it in the report and keep going.
+7. **Final report** at the end: `ID | criterion | PASS/FAIL | evidence` for every group, the score per block, and the open items.
 
 ## 1. Canvas layout
 
@@ -155,12 +170,16 @@ Today: white Bootstrap tables inside a dark page, decorative "ribbons" ("Dashboa
 - **G8.1** Login and register keep the sliding-panel idea (state strip), Phase 0 inputs and buttons, real Google and Facebook icons.
 - **G8.2** Frames for: input in error state with its inline message, error toast, submit in loading state.
 - **G8.3** Password recovery with a 6-digit code: request → "Revisa tu correo" → six code boxes with resend countdown → new password with strength meter → success, plus a branded email mock.
-- **G8.4** Offline page with the tokens.
+- **G8.4** Offline page as a real view: icon, one line of copy, the two actions ("Reintentar", "Ver mi pedido"), what stays visible
+  without connection, and the same page at 390.
 
 ### G9 — New views
 
 - **G9.1** Checkout: delivery toggle (A domicilio / Recoger en tienda), minimum message, order summary, customer data, address modal, card payment, primary CTA, success state (order number carries its DESIGN-AHEAD note).
 - **G9.2** Customer order status: Pendiente → Confirmado → Preparando → Listo → Entregado, plus Cancelado.
+- **G9.3** **Customer profile — this view does not exist in the product yet and is designed anyway.** Shell with sidebar (Mi cuenta,
+  Mis pedidos, Direcciones, Favoritos), orders list using the G4.4 chips, an empty state per section, and the same shell at 390 as a
+  drawer. Only data that exists: orders, `orders.delivery_address`, `favorites`. Anything else carries a DESIGN-AHEAD note.
 
 ### G10 — Admin, the rest, including the Django panel
 
@@ -168,9 +187,16 @@ The backend session is building the Django inventory panel (M13) and will use th
 
 - **G10.1** Products: list with search and filters, edit in tabs (Info, Imágenes, Precios, Oferta), invalid price state, delete confirmation dialog.
 - **G10.2** Orders: the six statuses as a board and as a table, with the icon+label chips from G4.4.
-- **G10.3** Customers directory with KPIs, and a settings panel for price per kg / per lb and the two minimum-order values.
+- **G10.3** Customers: KPI row (clientes activos, nuevos esta semana, afiliados), directory table with search, and the customer
+  detail with order history using the G4.4 chips.
+- **G10.3b** Settings panel: price per kg and per lb, the two minimum-order values (delivery `$150`, pickup `$0`), each with its
+  inline validation state and a saved confirmation. Values come from `store_settings`, never hardcoded.
 - **G10.4** "Salir" with confirmation and a signed-out screen.
-- **G10.5** **Django inventory screens** (same tokens, server-rendered, no React): list, detail, create/edit form, delete confirmation, login, empty state and error state.
+- **G10.5** **Django inventory screens, by their real template names** (they already exist in branch `practicas-ebac` under
+  `backend/templates/`): `base.html` shell with `messages.html` (success, warning, error), `inventory/product_list.html` (search,
+  empty state, error state), `inventory/product_detail.html`, `inventory/product_form.html` (create and edit, with field errors),
+  `inventory/product_confirm_delete.html`, and `inventory/product_confirm_price_change.html` — the price-change confirmation nobody
+  had designed — plus the Django login screen. All of them must be legible with plain HTML and CSS, no JavaScript.
 - **G10.6** Everything at 390: sidebar as drawer, tables as stacked cards.
 
 ### G11 — Consistency pass
