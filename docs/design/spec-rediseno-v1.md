@@ -61,11 +61,37 @@ checkout, admin.
   as implemented in `src/entry/products.tsx:211` and `src/components/Lupa/Lupa.tsx`:
   meat categories -> `/ kg` (with the per-lb price as secondary); `merch` -> `/ pieza`; `ofertas` without a per-lb price -> `/ paquete`.
   Any card, search result or cart line must render the unit that applies, never a fixed "kg + lb" pair.
-- No cost price exists in the data. There is no discount, offer-price or offer-date column: today an offer is a product row
-  inside the `ofertas` category (e.g. "Promoción Martes").
+- No cost price exists in the data (so the admin cannot show margin).
+- **Promotion codes DO exist**: table `promotions` (`code`, `discount_percent` 0–100, `min_purchase`, `valid_from`, `valid_until`,
+  `is_active`) plus the `apply_promotion()` function, both since the initial migration. A promo-code field at checkout is real,
+  not design-ahead. What does NOT exist is a per-product discount or offer-date column, so an "offer" on a product card is still
+  a product row inside the `ofertas` category (e.g. "Promoción Martes").
+- Roles in the database are only `customer` and `admin` (`profiles.role` CHECK). Butcher and delivery roles exist in the business
+  documents, not in the data.
+- Loyalty today is a single counter: `profiles.points` plus an admin-only `add_points()`. Levels, ledger and affiliates do not exist.
+- The Django inventory panel adds three real rules the design must show: the per-lb price is derived from the per-kg price and is
+  never typed; changing price or minimum quantity asks for confirmation showing before and after; deleting a product that has
+  orders deactivates it instead and warns how many favourite lists lose it.
 - `orders` stores `quantity_kg` only, has no payment column, no delivery fee and no human-readable order number
   (`orders.id` is a UUID). `orders.user_id` is NOT NULL and `create_order_with_items` rejects anonymous orders:
   checkout requires a signed-in customer.
+
+## 5.2 Scope Eduardo added on 2026-09-21 (design it, mark what has no data)
+
+- **The shop is not only meat.** It also sells fruit and vegetables, spices and chiles, merch, and prepared food
+  (enchiladas potosinas, flautas, litre tubs of beans, rice, spaghetti). Categories and sections must be creatable and
+  removable from the admin, so no design may hardcode the current nine categories.
+- **Track Score, three levels** to start, configurable by the admin: occasional buyer · frequent buyer · high-volume buyer
+  (the taquería that spends a lot in three visits a month). Levels, their thresholds, their discounts and what each level sees
+  are admin parameters, not code. Today only `profiles.points` exists — everything else is DESIGN-AHEAD.
+- **Affiliates configurable from the admin**: who qualifies, what reward they get, what they can see. No tables exist yet.
+- **Discounts per user or per level**, granted and revoked from the admin. Promo codes already exist (`promotions`), per-user
+  discounts do not.
+- **Recipe book** fed by an external recipe API, with Mexican, Argentinian and Spanish dishes tied to what the shop sells
+  (arrachera for a carne asada, enchiladas potosinas, asado, chimichurri). A recipe can be saved by the customer and links to the
+  products it needs. Purpose stated by Eduardo: keep people on the site before and after ordering.
+- **Calorie and protein counter** as small widgets in the customer profile, for the fit/runner audience.
+- Everything in this section is DESIGN-AHEAD unless the frame cites a real table.
 
 ## 5.1 Design-ahead (drawn now, no backend yet)
 

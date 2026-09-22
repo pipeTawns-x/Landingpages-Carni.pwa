@@ -28,6 +28,10 @@ one thing: the crop-variation rule for repeated photography (G0.7).
 **Type, decided — no specimen page.** Display: **Fraunces** (variable, optical size). UI, labels and every number: **Geist** (tabular
 figures, so no third family). Two families, no exceptions.
 
+**Component base:** FlyonUI (MIT, semantic Tailwind classes) is the base, because it is the only researched option that works in
+React and in plain Django templates with one Tailwind. Berry Django React and Tailwindadmin are React-only despite their names
+(`referencias/catalogo-recursos.md`).
+
 **`direccion-visual.md` is binding**: tokens, type scale, character budgets for Spanish, component specs, motion budget and the ten
 craft gates. Read it once before drawing and follow its numbers.
 
@@ -186,6 +190,9 @@ Today: white Bootstrap tables inside a dark page, decorative "ribbons" ("Dashboa
 The backend session is building the Django inventory panel (M13) and will use these tokens; its templates have not been written yet.
 
 - **G10.1** Products: list with search and filters, edit in tabs (Info, Imágenes, Precios, Oferta), invalid price state, delete confirmation dialog.
+- **G10.1b** Categories and sections are **created, renamed, reordered and removed from the admin**. The shop is not only meat: fruit and
+  vegetables, spices and chiles, merch and prepared food (enchiladas, flautas, litre tubs) all live as categories. No screen may hardcode
+  the current nine categories, and the catalog must look right with four categories or with twenty.
 - **G10.2** Orders: the six statuses as a board and as a table, with the icon+label chips from G4.4.
 - **G10.3** Customers: KPI row (clientes activos, nuevos esta semana, afiliados), directory table with search, and the customer
   detail with order history using the G4.4 chips.
@@ -198,6 +205,34 @@ The backend session is building the Django inventory panel (M13) and will use th
   `inventory/product_confirm_delete.html`, and `inventory/product_confirm_price_change.html` — the price-change confirmation nobody
   had designed — plus the Django login screen. All of them must be legible with plain HTML and CSS, no JavaScript.
 - **G10.6** Everything at 390: sidebar as drawer, tables as stacked cards.
+
+### G12 — Recipe book and nutrition widgets (new module, design-ahead)
+
+Purpose Eduardo stated: keep people on the site before and after ordering. Recipes are Mexican, Argentinian and Spanish, tied to
+what the shop sells (arrachera for carne asada, enchiladas potosinas, asado with chimichurri). Data comes from an external recipe
+API that has not been chosen yet: every frame carries `DESIGN-AHEAD: external recipe API not chosen`.
+
+- **G12.1** Recipe index: filter by dish type, by cut and by time; card with photo, title, time, difficulty and the cuts it needs.
+- **G12.2** Recipe detail: ingredients with the shop's own products marked, steps, and one primary action "Agregar los cortes al pedido"
+  that fills the cart with the products the recipe needs.
+- **G12.3** Saved recipes in the customer profile, with an empty state.
+- **G12.4** Nutrition widgets in the profile: calories and protein per order and per week, as two small cards. Plain numbers, no
+  medical claims, no gamified rings.
+- **G12.5** All of it at 390 first. Recipe photography is external: show the card working with a mediocre photo.
+
+### G13 — Track Score, discounts and affiliates (new module, design-ahead)
+
+Three levels to start, configurable by the admin: occasional buyer, frequent buyer, high-volume buyer (the taquería that spends a
+lot in three visits a month). Today only `profiles.points` exists, so every frame carries its `DESIGN-AHEAD` note.
+
+- **G13.1** Customer side: "Mi nivel" card with the current level, progress to the next one, and what the level gives. No invented numbers:
+  use visible placeholders labelled as such.
+- **G13.2** Customer side: affiliate panel with the link, its QR, referrals and rewards earned.
+- **G13.3** Admin side: levels table — name, threshold, discount, what the level sees — each row editable, with a confirmation that
+  shows before and after (the same pattern Django already uses for price changes).
+- **G13.4** Admin side: discounts per customer, granted and revoked, with the reason and who did it.
+- **G13.5** Admin side: affiliate rules — who qualifies, reward, caps.
+- **G13.6** Promo codes (`promotions` exists): admin list and the checkout field, both with their invalid, expired and applied states.
 
 ### G11 — Consistency pass
 
