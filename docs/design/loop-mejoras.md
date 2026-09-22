@@ -84,6 +84,26 @@ At the end of the page: the self-review table `ID | criterion | PASS/FAIL | evid
 If the tool cannot read the repository folder, Eduardo drags the whole `capturas-actuales` folder into the project
 **once**, at the start of the run. There are no further uploads.
 
+## 2.1 Prior art in `~/Desktop/img` (catalogued in `referencias/capturas-previas.md`)
+
+Eduardo's own folder. Look at these five first, in this order:
+
+| File | Why |
+|---|---|
+| `stitch-landing/paletastitch.png` | The literal token sheet: #DC2626, #E4D1B0, #F59E0B, #050505. Colors confirm ours. **Its type (Plus Jakarta Sans + Inter) does not**: the decided pairing is Fraunces + Geist. |
+| `Captura … 2026-04-16 a la(s) 2.42.28 p.m..png` | A Carni-branded dashboard already built in Figma Make, with real KPIs, charts, table and a written component spec. Closest thing to a finished admin. |
+| `mobileauthstitch.png` | The most finished mobile flow: mascot, "Datos esenciales" vs optional delivery data, two-tone states. Feed it into G8. |
+| `stitch-paneles/checkoutstitch.png` | Checkout as a drawer: delivery/pickup tabs, steppers, totals. Feed it into G9, but our payment is Stripe, not the WhatsApp CTA it shows. |
+| `Captura … 2026-06-10 a la(s) 1.46.18 p.m..png` | Today's real shipped home page: the baseline to beat. |
+
+Also usable: `stitch-paneles/dashboardstitch.png` (sidebar + colour-coded order list), `panelinventariostitch.png` (traceability timeline for premium cuts),
+`stitch-landing/catalogomaestrostitch.png` (bento mixing products, content and promo), `landingpagestitch.png` (loyalty banner as a site-wide unit),
+the unnamed "Club Misericordia" tier card (feed it into G13), and one SaleAds screen with tiered pricing (Principiante/Regular/Premium/VIP) that shows how a level changes the visible price.
+
+**Two warnings from that folder:**
+1. `vistas-productos/`, `vistas-compras/` and the four root `vista*.png` files are **not Carni and not SaleAds**: they are an unrelated light-themed hardware-store demo. Use them for CRUD patterns only (inline status dropdown per row, order-detail modal, quick-entry-above-history table, trust badges, add-to-cart toast) and never for looks.
+2. Several of these references contradict the decided direction: hover microanimations, glow shadows, gradient CTAs and a catalog countdown timer. Take the structure, drop the effects. The BuildAds ads panel is a good blueprint but **BuildAds stays frozen** — do not design it in this run.
+
 ## 3. Criteria
 
 ### G0 — Foundations (the only stop)
