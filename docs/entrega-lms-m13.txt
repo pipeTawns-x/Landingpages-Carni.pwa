@@ -1,13 +1,17 @@
-Buen día, profesor. Le comparto mi entrega de la práctica del módulo 13 (Django Views).
+¡Hola, profe! Espero que se encuentre bien.
 
-Resolví el CRUD dentro de mi proyecto real: la tienda en línea de la Carnicería El Señor de La Misericordia, el negocio de mi hermana aquí en San Luis Potosí. Las cinco vistas administran el catálogo que ya usa la tienda.
+Le comparto la práctica del módulo 13. Igual que en el bloque de frontend, la
+resolví dentro del proyecto que vengo trabajando: la tienda en línea de la
+Carnicería El Señor de La Misericordia, un negocio familiar de aquí de San Luis
+Potosí. Las cinco vistas administran el catálogo que la tienda ya usa.
 
-Código (rama practicas-ebac):
+Código, en la rama practicas-ebac:
 https://github.com/pipeTawns-x/Landingpages-Carni.pwa/tree/practicas-ebac
 
-Pull request de la entrega, con el detalle técnico:
+Pull request con el detalle de la entrega:
 https://github.com/pipeTawns-x/Landingpages-Carni.pwa/pull/10
 
-En el documento adjunto va la explicación del código, archivo por archivo.
+En el Word adjunto explico el código archivo por archivo, con capturas del panel
+corriendo.
 
-Quedo atento a su retroalimentación. Muchas gracias.
+Quedo atento a sus comentarios. Gracias.
