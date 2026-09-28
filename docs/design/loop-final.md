@@ -1,4 +1,12 @@
-Loop final de diseño, en tres pasadas. Trabaja sin preguntarme. Al cerrar cada pasada, deja su reporte en la página Índice y sigue con la siguiente. Si te detienes, vuelve a leer este archivo (docs/design/loop-final.md) y retoma en la pasada donde ibas.
+Loop final de diseño, en tres pasadas. Ejecuta solo la pasada que se te pida, sin preguntarme.
+
+- Trabaja ítem por ítem. Al cerrar cada ítem, anótalo en la Bitácora del Índice: el ítem, las pantallas que tocaste y las medidas. El Índice es el ítem 1.1; si todavía no existe, créalo primero.
+- Si te cortas, vuelve a leer este archivo y la Bitácora, y retoma en el primer ítem sin anotar. Nunca rehagas un ítem ya anotado.
+- Al cerrar la pasada:
+  - escribe su reporte en la Bitácora;
+  - escribe también en el chat "PASADA N LISTA" y el reporte;
+  - detente.
+- El orquestador de Claude Code verifica cada pasada antes de pedirte la siguiente.
 
 ANTES DE EMPEZAR
 1. Adjunta tus skills "Create design system", antes de tocar Componentes, y "Frontend design", en cada grupo de pantallas.
