@@ -25,7 +25,7 @@ Autorización: Eduardo autorizó el código el 2026-09-30 ("desarrollar el redis
 |---|---|---|---|
 | R0 | Presupuesto, export 1.1 medido (30 de 43), skills resueltas | orquestador | HECHO |
 | R1 | Investigación en paralelo (4 informes en `investigacion/`) | 4 agentes | HECHO (costó 46 puntos del límite de 5 h) |
-| R2 | Abogado del diablo sobre diseño + investigación + código; entrega la lista corta de cambios | 1 agente (opus) | PENDIENTE ← siguiente |
+| R2 | Abogado del diablo sobre diseño + investigación + código; entrega la lista corta de cambios. Lee primero `contexto-previo.md` (notas #714, #715, #718 de Engram, ya destiladas) | 1 agente (opus) | PENDIENTE ← siguiente |
 | R3 | Arquitecto: plano de construcción y criterios de aceptación por unidad | 1 agente (opus) | pendiente |
 | R4 | Desarrollo por unidades (ver "Unidades de R4") | escritores, uno por unidad | pendiente |
 | R5 | Revisión fresca, seguridad y pruebas | agentes | pendiente |
@@ -102,6 +102,10 @@ Cada una sale de la investigación. El abogado del diablo puede cambiarlas con r
 
 Las unidades con archivos distintos pueden ir en paralelo. Cada una termina con: typecheck y build dentro de Docker, y una captura en 390 y 1440.
 
+## Graphify (después del reinicio, no antes)
+
+Los grafos de código se regeneran solos con cada commit (sin gastar modelo). Falta indexar el diseño: `docs/design/rediseno/` (informes) y los `.dc.html` de `Diseño1.1.zip`. Graphify lo hace con el modelo, así que gasta límite: correrlo una vez al inicio de R2, solo sobre los informes y los tres `.dc.html` clave (Landing, AdminNav, Inicio de sesión), no sobre las capturas.
+
 ## Para retomar
 
 Cuando el límite se reinicie, escribe "retoma" en el chat de Claude Code del frente de diseño. El orquestador lee este archivo y sigue en R2:
@@ -113,3 +117,4 @@ Cuando el límite se reinicie, escribe "retoma" en el chat de Claude Code del fr
 
 - 2026-09-30 · R0 · 5 h 35 % · semanal 54 % · contexto 52 % · SIGO.
 - 2026-09-30 · R1 HECHO · 4 informes en `investigacion/` (1.9 MB con evidencias). 5 h **81 %** (se reinicia en 2 h 18 min) · semanal 59 % · contexto 55 % · **PAUSO**: la investigación gastó 46 puntos; lanzar Opus y escritores ahora los cortaría a medias.
+- 2026-09-30 · R2 preparado · contexto previo destilado en `contexto-previo.md`. 5 h **84 %** · semanal 59 % · contexto 58 % · sigue PAUSO. Graphify sobre el diseño queda para R2 porque usa el modelo.
