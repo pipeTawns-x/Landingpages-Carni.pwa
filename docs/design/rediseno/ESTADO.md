@@ -85,7 +85,7 @@ Cada una sale de la investigación. El abogado del diablo puede cambiarlas con r
 11. **Recursos:** el video (405 KB en 640×360 y el grande) y la mascota se copian a `public/`. Los assets pesados (uploads, capturas-actuales) no entran al repo.
 12. **Panel v1:** habla solo con Supabase (PostgREST/RPC), como hoy. Django queda aparte; no se le inventa una API.
 13. **Seguridad de pedidos:** se redacta una migración propuesta (cerrar INSERT/UPDATE directo en `orders` y `order_items`, revocar EXECUTE a `anon` en las SECURITY DEFINER, `search_path` fijo). **No se aplica**: `supabase/migrations` es contrato común con el chat de backend. Va como propuesta en `docs/design/rediseno/seguridad/` y en el handoff `handoff/chat-backend-desde-frontend`.
-14. **Commits de código:** `PATH=/opt/homebrew/bin:$PATH` para que GGA corra bien; si aun así falla, `--no-verify` y se avisa a Eduardo.
+14. **Commits:** `PATH=/opt/homebrew/bin:$PATH git commit ...` — con ese PATH el hook GGA pasó en el commit de la investigación (77d19808); sin él falla con "No provider configured". Si aun así falla, `--no-verify` y se avisa a Eduardo. Comprobar siempre con `git log -1` que el commit existe.
 15. **Correo y "confirmar con el dueño":** se usa el correo del sitio actual; "confirmar con el dueño" es nota interna y no sale al cliente.
 
 ## Unidades de R4 (cada una ≤ 15 % del límite de 5 h; una por ventana si hace falta)
