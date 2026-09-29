@@ -1,4 +1,4 @@
-Loop final de diseño, versión 2.1. Son tres pasadas. Hoy ejecutas solo la PASADA 1; las siguientes llegan con un mensaje corto: "Sigue con la PASADA N".
+Loop final de diseño, versión 2.2. Son tres pasadas más el cierre (3.3). Ejecuta lo que pida el mensaje de Eduardo. Si pide varias pasadas, sigue de corrido sin detenerte entre ellas; detente solo al terminar todo o si se acaba el límite de uso. Si se acaba, al oír "continúa" retomas desde la Bitácora.
 
 CÓMO TRABAJAR
 - Trabaja ítem por ítem, sin preguntarme.
@@ -247,7 +247,15 @@ Aceptación de la pasada 2:
   - el teléfono del cliente va enmascarado, por ejemplo +52 ••• ••• ••34.
 - 45 Ayudante del panel: la burbuja del asistente dentro del panel, abierta, contestando preguntas del negocio como "¿cuánto vendí esta semana?" o "¿qué cortes se están agotando?".
 
+3.3 Cierre del rediseño.
+- Miniaturas reales en el Índice: cada ficha muestra su pantalla real con un iframe de la página, de 390×844 escalado al 25 %, sin interacción (pointer-events: none), en lugar del hueco "miniatura pendiente". Si un iframe no carga, deja el hueco y anótalo.
+- Tabla de contraste medido (pendiente de 1.8): todos los estilos de texto del lienzo, color sobre su fondo, cada uno a 4.5:1 o más.
+- Revisión en pantalla de cada página que tocaste, en 390 y en 1440: 0 errores de consola y 0 imágenes rotas.
+- Reporte "REDISEÑO COMPLETO": las tablas de aceptación de las pasadas 1, 2 y 3 con lo medido, la revisión de abogado del diablo (los 3 puntos más débiles de todo el rediseño y cómo quedaron) y la lista de lo que falta de backend, de fotos y de decisiones del dueño.
+
 Aceptación final:
+- miniaturas: fichas con iframe que carga (anota cuántas de cuántas) y 0 imágenes rotas;
+- la tabla de contraste completa, con ningún estilo por debajo de 4.5:1;
 - 43 con 6 cifras, 3 periodos, 2 canales, 1 gráfica de 2 series y al menos 5 temas con conteo y tendencia, y "Sin respuesta" con sus 2 acciones;
 - 44 con "Corregir" en cada respuesta del asistente, la lista de correcciones con "editar" y "apagar", y el teléfono enmascarado;
 - 45 con la burbuja abierta y las 2 preguntas de ejemplo;

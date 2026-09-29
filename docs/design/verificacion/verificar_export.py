@@ -54,6 +54,28 @@ CHECKS = [
     ('"kcal por día"', "0", r"kcal por d[ií]a", True, lambda n: n == 0),
     ("Bitácora PARCIAL", "0", r"PARCIAL", False, lambda n: n == 0),
     ("Miniaturas dinámicas {{ p.mini }}", "0", r"\{\{\s*p\.mini\s*\}\}", False, lambda n: n == 0),
+    ('"salmón" como ejemplo sin resultados', ">=1", r"salm[oó]n", False, lambda n: n > 0),
+    # Pass 2
+    ("P2 · curva del Encabezado y la Tarjeta", ">=1", r"cubic-bezier\(0\.23,\s?1,\s?0\.32,\s?1\)", False, lambda n: n > 0),
+    ("P2 · curva de las hojas", ">=1", r"cubic-bezier\(0\.32,\s?0\.72,\s?0,\s?1\)", False, lambda n: n > 0),
+    ("P2 · video de portada", ">=1", r"portada-carne\.mp4", False, lambda n: n > 0),
+    ("P2 · contraste medido sobre el cuadro claro", ">=1", r"portada-carne-cuadro-claro", False, lambda n: n > 0),
+    ("P2 · Pagar al recoger o al recibir", ">=1", r"Pagar al recoger o al recibir", False, lambda n: n > 0),
+    ("P2 · Pocas piezas", ">=1", r"Pocas piezas", False, lambda n: n > 0),
+    ("P2 · Es todo lo disponible", ">=1", r"Es todo lo disponible", False, lambda n: n > 0),
+    ("P2 · foto pendiente", ">=10", r"foto pendiente", False, lambda n: n >= 10),
+    # Pass 3
+    ("P3 · curva del Acceso", ">=1", r"cubic-bezier\(0\.77,\s?0,\s?0\.175,\s?1\)", False, lambda n: n > 0),
+    ("P3 · mascota nueva", ">=1", r"(panel-escritorio|panel-movil|carnicero)-(ingresar|registro)", False, lambda n: n > 0),
+    ("P3 · Chatbot entre Clientes y BuildAds", ">=1", r"Clientes['\"],\s*['\"]Chatbot['\"],\s*['\"]BuildAds", False, lambda n: n > 0),
+    ("P3 · Corregir", ">=1", r"Corregir", False, lambda n: n > 0),
+    ('P3 · "me sirvió"', ">=1", r"me sirvi[oó]", False, lambda n: n > 0),
+    ("P3 · Enseñar la respuesta", ">=1", r"Enseñar la respuesta", False, lambda n: n > 0),
+    ("P3 · Pasar a preguntas frecuentes", ">=1", r"Pasar a preguntas frecuentes", False, lambda n: n > 0),
+    ("P3 · teléfono enmascarado", ">=1", r"•••", False, lambda n: n > 0),
+    # Close (3.3)
+    ("Cierre · miniaturas con iframe", ">=40", r"<iframe[^>]+\.dc\.html", False, lambda n: n >= 40),
+    ("Cierre · REDISEÑO COMPLETO", ">=1", r"REDISEÑO COMPLETO", False, lambda n: n > 0),
 ]
 
 
