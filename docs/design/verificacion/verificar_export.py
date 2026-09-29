@@ -56,7 +56,10 @@ CHECKS = [
     ("Miniaturas dinámicas {{ p.mini }}", "0", r"\{\{\s*p\.mini\s*\}\}", False, lambda n: n == 0),
     # --- loop-completo.md (A, B, C) ---
     ('"miniatura pendiente" / "foto pendiente" / "por tomar"', "0", r"miniatura pendiente|foto pendiente|por tomar", True, lambda n: n == 0),
-    ("Índice con miniatura viva (iframe) o thumbs/", ">=1", r"<iframe|thumbs/\d", False, lambda n: n > 0),
+    ("Índice con miniaturas (thumbs-*.jpg o iframe)", ">=16", r"<iframe|thumbs[-/][\w-]+\.(jpg|png)", False, lambda n: n >= 16),
+    ("Landing: sección Comentarios", ">=1", r">\s*Comentarios\s*<", True, lambda n: n > 0),
+    ("Landing: carrusel (scroll-snap)", ">=1", r"scroll-snap", False, lambda n: n > 0),
+    ("Landing: puntaje (estrellas / opiniones)", ">=1", r"opiniones|★", True, lambda n: n > 0),
     ("Movimiento: curva de hojas", ">=1", r"cubic-bezier\(0\.32,\s?0\.72,\s?0,\s?1\)", False, lambda n: n > 0),
     ("Acceso: 480 ms", ">=1", r"480\s?ms", False, lambda n: n > 0),
     ("Portada: video portada-carne.mp4", ">=1", r"portada-carne\.mp4", False, lambda n: n > 0),
@@ -96,6 +99,15 @@ def main():
                 continue
             if posixpath.normpath(posixpath.join(base, html.unescape(src))) not in present:
                 broken.append(f"{posixpath.basename(name)} → {src}")
+    # Landing section order requested by Eduardo (2026-09-29), checked after "Landing completa".
+    order = ["Todo lo del mostrador", "Filete Mignon", "Lo que se lleva la gente", "Ofertas",
+             "Preguntas frecuentes", "Carnicería de familia", "Horario", "Contacto", "Comentarios"]
+    landing = next((visible(t) for n, t in pages.items() if "Landing" in n), "")
+    tail = landing[landing.find("Landing completa"):] if "Landing completa" in landing else landing
+    tail = re.sub(r"<[^>]+>", " ", tail)
+    pos = [tail.find(s) for s in order]
+    in_order = all(p >= 0 for p in pos) and pos == sorted(pos)
+    rows.append(("Landing: orden de secciones", " → ".join(order), str(pos), "✓" if in_order else "✗", "Landing.dc.html"))
     passed = sum(r[3] == "✓" for r in rows)
     lines = [f"**{passed} de {len(rows)} criterios cumplen.** Imágenes locales rotas: {len(broken)}.", "",
              "| Criterio | Esperado | Encontrado | Estado | Dónde |", "|---|---|---|---|---|"]
