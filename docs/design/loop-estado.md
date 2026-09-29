@@ -41,3 +41,4 @@ U2 · Revisar el resultado real de la pasada 1: Eduardo exporta el .zip de Claud
 
 - 2026-09-28 17:10 · U0 · 5 h 23 % · semanal 26 % · contexto 26 % (sesión de preparación) · SIGO
 - 2026-09-29 02:00 · U1 PARCIAL · 5 h 94 % (se reinicia 03:30) · semanal 41 % · contexto 61 % · PAUSO YA
+- 2026-09-29 · U2 EN CURSO · verificación automática del export diseños1.zip: 19 de 24 criterios; fallan href="#" (1), logo en imagen (7 menciones), eje $15k (0), "picaña" (8) y 4 PARCIAL en la Bitácora. Informe: docs/design/verificacion/pasada-1/informe.md. Siguiente: revisar el contexto de los fallos y escribir el loop v3.
