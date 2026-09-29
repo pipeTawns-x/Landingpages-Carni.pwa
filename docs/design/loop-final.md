@@ -27,6 +27,7 @@ ANTES DE EMPEZAR
    - "Create design system", antes de tocar Componentes;
    - "Frontend design", en cada grupo de pantallas.
 2. Lee el repo por partes (rama pruebas, docs/design), no todo al inicio:
+   - datos/catalogo-real.md: el catálogo real, sacado de la base. Son 53 productos en 9 categorías, con precios, mínimos y fotos. Úsalo desde la pasada 1 y no inventes productos.
    - capturas-actuales/: el sitio de hoy. Al tocar una pantalla, compárala con su captura. No abras las 59 de golpe.
    - En la pasada 2:
      - skills/emil-kowalski/, con las reglas de animación de Emil Kowalski. En cada movimiento usa emil-design-eng, animate, review-animations (con STANDARDS.md), apple-design y mobile-native.
@@ -92,12 +93,12 @@ Pon lado a lado dos variantes de los íconos de contacto para que Eduardo elija:
 - "Asistente": en qué horario contesta y cuándo pasa la conversación a WhatsApp. Lleva "falta backend".
 
 1.6 Paquetes. La fuente es el Catálogo 2024 de la tienda, que dice textualmente "Todo paquete se requiere un 50% de anticipo" y "Los precios pueden ser modificados según la alta demanda". En la tienda se escribe así:
-- en las tarjetas de paquete de Ofertas: "Todo paquete requiere un 50 % de anticipo." y "Los precios pueden modificarse según la alta demanda.";
+- en las tarjetas de los 3 paquetes reales de Ofertas (datos/catalogo-real.md): "Todo paquete requiere un 50 % de anticipo." y "Los precios pueden modificarse según la alta demanda.";
 - en Compra, cuando el carrito lleva un paquete: "Anticipo del 50 %". Con paquete en el carrito, "Pagar al recoger o al recibir" cubre solo el resto; el anticipo se cobra con la pasarela alojada de 2.4, marcada "falta backend".
 - Todo va marcado "confirmar con el dueño", incluido cómo y cuándo se cobra el anticipo.
 
 1.7 BuildAds · "Catálogo de la semana". Hoy la tienda arma su catálogo a mano en Canva.
-- La pieza se arma sola con las ofertas y los cortes del sitio, en hoja A4 y en carrusel de Instagram de 1080×1350.
+- La pieza se arma sola con las ofertas y los cortes del sitio, en hoja A4 y en carrusel de Instagram de 1080×1350. Para el ejemplo usa las 4 ofertas reales de datos/catalogo-real.md, con sus precios.
 - Lleva "Descargar" y "Compartir".
 - Déjala lista para exportar a Canva.
 
@@ -171,7 +172,7 @@ Aceptación de la pasada 1 (con números):
 2.3 Catálogo y fotos.
 - Toda foto nueva lleva un solo tratamiento: el mismo fondo, la misma luz y un solo ángulo, 45° o cenital, como Louis Vuitton y Freitag. Elige el ángulo y anota cuál.
 - assets/fotos-referencia/ todavía no existe. Donde falte foto, pon "foto pendiente". Si Claude Code la crea, úsala solo como dirección de arte, rotulada "Referencia, no es el producto".
-- Una foto por producto: se elimina la regla G0.7 ("tres vecinos, una sola foto"). Si un producto no tiene foto propia, se marca "foto pendiente" en vez de repetir otra. Un marcador "foto pendiente" no cuenta como foto repetida; la misma fotografía en dos productos distintos, sí.
+- Una foto por producto: se elimina la regla G0.7 ("tres vecinos, una sola foto"). Si un producto no tiene foto propia, se marca "foto pendiente" en vez de repetir otra. Según datos/catalogo-real.md, solo 9 de los 53 productos tienen foto propia: los 8 Cortes Especiales y "Vacío en Oferta". Un marcador "foto pendiente" no cuenta como foto repetida; la misma fotografía en dos productos distintos, sí.
 - Las fotos con marca de agua o destello de IA (pollo, "Otros") se marcan "reemplazar".
 - Tarjeta de rejilla: foto, nombre, precio con unidad y un botón "+" de 44 px en contorno, sin relleno rojo. "Más quieta" quiere decir: sin insignias, sin sombra fuerte y sin rojo lleno. Conserva el hover de 2.1.
 - Rojo lleno (#DC2626):
@@ -181,13 +182,14 @@ Aceptación de la pasada 1 (con números):
   - Reporta el conteo de cada cuadro.
 - La ficha muestra galería solo si hay dos o más fotos distintas.
 - El stock va con unidad. El cliente ve "Disponible", "Pocas piezas" o "Agotado"; el número exacto (por ejemplo "18 kg") solo aparece en el panel. Al tope del contador, la ficha dice "Es todo lo disponible", sin número.
-- Del menú se ocultan las categorías con 0 productos (Frutas y verduras, Especias).
+- El menú muestra solo las 9 categorías reales de datos/catalogo-real.md. "Frutas y verduras" y "Especias" no existen en la base: se quitan.
 
 2.4 Compra, sin prometer lo que no existe.
 - Métodos de pago:
   - primero, "Pagar al recoger o al recibir";
   - la tarjeta va como segunda opción, a través de una pasarela alojada, sin campos de tarjeta dibujados, y marcada "falta backend".
 - Si el peso varía, pon una frase de ajuste junto al total.
+- Mínimos reales de la base: para recoger no hay mínimo; a domicilio el mínimo es $150.
 - Paquetes: como en 1.6.
 - "¿Tienes un código?" va plegado.
 
@@ -198,7 +200,7 @@ Aceptación de la pasada 2:
 - 0 cajas negras y 0 tarjetas sobre el video, y 1 solo botón principal en la franja;
 - 0 botones con relleno #DC2626 en la rejilla del Catálogo, y como máximo 1 por cuadro completo de 390 y de 1440;
 - el cliente ve solo "Disponible", "Pocas piezas" o "Agotado", y el número exacto solo en el panel;
-- 2 categorías con 0 productos ocultas en el menú;
+- el menú con solo las 9 categorías de la base;
 - en Compra, "Pagar al recoger o al recibir" va primero, la tarjeta va segunda con "falta backend" y hay 0 campos de tarjeta dibujados;
 - 0 marcos vacíos en "Sobre nosotros";
 - 0 fotos repetidas entre productos distintos.
