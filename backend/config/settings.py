@@ -55,6 +55,8 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "inventory.apps.InventoryConfig",
+    # EBAC M14 practice: course-only, not part of the store (see ecommerce/README.md).
+    "ecommerce.apps.EcommerceConfig",
 ]
 
 MIDDLEWARE = [

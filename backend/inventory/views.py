@@ -7,6 +7,7 @@ create, update, delete) backed by ModelForms, `get_object_or_404`,
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
 from django.db import connection
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
@@ -14,27 +15,39 @@ from django.shortcuts import get_object_or_404, redirect, render
 from inventory.forms import CutSpecForm, ProductForm
 from inventory.models import Category, CutSpec, Product
 
+PRODUCTS_PER_PAGE = 25
+
 
 @login_required
 def product_list(request):
-    """List products, with optional free-text search and category filter."""
+    """List products, paginated, with optional free-text search and category filter."""
     query = request.GET.get("q", "").strip()
     category_id = request.GET.get("category", "").strip()
 
-    products = Product.objects.select_related("category")
+    # The pk breaks ties between products with the same name, so a product
+    # cannot appear on two pages (or on none) when the list is paginated.
+    products = Product.objects.select_related("category").order_by("name", "pk")
 
     if query:
         products = products.filter(Q(name__icontains=query) | Q(description__icontains=query))
 
     # A hand-edited or stale query string must not break the list: a category
-    # that is not a number is ignored instead of raising ValueError.
-    if category_id.isdigit():
+    # that is not a number is ignored instead of raising ValueError. It has to
+    # be isdecimal(), not isdigit(): "²" passes isdigit() but int("²") raises.
+    if category_id.isdecimal():
         products = products.filter(category_id=int(category_id))
     else:
         category_id = ""
 
+    # get_page() never raises: a non-numeric page falls back to the first one
+    # and a page below 1 or past the end to the last, so a stale link still
+    # shows a list.
+    paginator = Paginator(products, PRODUCTS_PER_PAGE)
+    page_obj = paginator.get_page(request.GET.get("page"))
+
     context = {
-        "products": products,
+        "products": page_obj,
+        "page_obj": page_obj,
         "categories": Category.objects.all(),
         "query": query,
         "selected_category": category_id,

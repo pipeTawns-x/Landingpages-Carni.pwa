@@ -1,0 +1,20 @@
+¡Hola, profe! Espero que se encuentre bien.
+
+Le comparto la práctica del módulo 14, Django Models & Admin. La resolví en el
+mismo proyecto de las entregas anteriores, la tienda en línea de la Carnicería
+El Señor de La Misericordia. Los 500 productos de prueba viven en una app
+ecommerce con su propia tabla, así que borrar todo el queryset no toca el
+catálogo que la tienda vende.
+
+Código, en la rama practicas-ebac:
+https://github.com/pipeTawns-x/Landingpages-Carni.pwa/tree/practicas-ebac
+
+Pull request con el detalle de la entrega:
+https://github.com/pipeTawns-x/Landingpages-Carni.pwa/pull/13
+
+El fixture está en backend/ecommerce/fixtures/products/500Products.json. En el
+Word adjunto explico el código y dejo las capturas de cada paso.
+
+Quedo atento a sus comentarios.
+
+Salu2

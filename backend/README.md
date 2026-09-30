@@ -46,9 +46,12 @@ uv run python -c "from django.core.management.utils import get_random_secret_key
 ```bash
 uv run python manage.py check
 uv run python manage.py runserver
+uv run python manage.py test
 uv run ruff check .
 uv run ruff format .
 ```
+
+`manage.py test` runs on an in-memory SQLite database (see "Tests" below).
 
 ## Inventory panel
 
@@ -68,6 +71,13 @@ Behaviour worth knowing before touching it:
   `order_items.product_id` is `ON DELETE RESTRICT`. When a delete does go
   through, the panel reports how many favorite lists lost the product
   (`favorites.product_id` cascades).
+- The list is paginated, 25 per page (`PRODUCTS_PER_PAGE` in
+  `inventory/views.py`, using `Paginator.get_page`). `{% querystring %}` keeps
+  `q` and `category` in the page links. A page that is zero, negative or past
+  the end falls back to the last page, and a non-numeric one to the first.
+- `price_per_lb_for()` in `inventory/models.py` holds the price-per-lb formula
+  that `Product.save()` uses. Code that creates products with `bulk_create()`
+  skips `save()`, so it has to call the function itself.
 
 ### EBAC practice M13 — where each requirement lives
 
@@ -84,6 +94,34 @@ Behaviour worth knowing before touching it:
 | URLs | `inventory/urls.py` (namespace `inventory`), mounted in `config/urls.py` |
 | Forms | `inventory/forms.py` (`ProductForm`, `CutSpecForm`) |
 | Search and protection | `Q` filter in `product_list`; `login_required` on the five views, `LOGIN_URL` in `config/settings.py` |
+
+### EBAC practice M14 — Django Models & Admin
+
+The assigned practice (500 bulk-created products, fixture, admin) lives in the
+course-only app `ecommerce/`: see [`ecommerce/README.md`](ecommerce/README.md).
+Its adaptation to the store is the paginated product list and the test suite
+described in "Tests".
+
+## Tests
+
+```bash
+uv run python manage.py test
+```
+
+`manage.py test` uses `config/settings_test.py` (an in-memory SQLite database),
+even when `DJANGO_SETTINGS_MODULE` is exported in your shell. Only an explicit
+`--settings X` or `--settings=X` overrides it; do not point it at
+`config.settings`, because the `django` role cannot create a test database in
+Postgres. `Category` and `Product` are unmanaged mirrors of Supabase tables, so
+`config/test_runner.py` sets `managed = True` on them only while the tests run,
+which makes Django create their tables in the test database. The test settings
+import the regular ones, so the required variables (`backend/.env`) must be set
+even though the tests run on SQLite.
+
+`inventory/tests.py` covers `price_per_lb_for()` and the pagination. It starts
+from the fixture `inventory/fixtures/categories.json`, the 9 real categories
+dumped with `dumpdata inventory.Category`. The `config.E001` system check only
+runs against Postgres; other databases have no `django` schema to verify.
 
 ## Warning
 
