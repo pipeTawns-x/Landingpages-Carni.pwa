@@ -27,7 +27,7 @@ Autorización: Eduardo autorizó el código el 2026-09-30 ("desarrollar el redis
 | R1 | Investigación en paralelo (4 informes en `investigacion/`) | 4 agentes | HECHO (costó 46 puntos del límite de 5 h) |
 | R2 | Abogado del diablo → `05-abogado-del-diablo.md` | 1 agente (opus) | HECHO |
 | R3 | Arquitecto → `06-plano.md` | 1 agente (opus) | HECHO |
-| R4 | Desarrollo por unidades (ver "Unidades de R4") | escritores, uno por unidad | pendiente |
+| R4 | Desarrollo por unidades U0–U6 de `06-plano.md` §4 (ver "Unidades del plano") | orquestador + 4 escritores Sonnet en secuencia | EN CURSO |
 | R5 | Revisión fresca, seguridad y pruebas | agentes | pendiente |
 | R6 | Abrir en Brave y entregar a Eduardo | orquestador | pendiente |
 
@@ -106,12 +106,25 @@ Las unidades con archivos distintos pueden ir en paralelo. Cada una termina con:
 
 Los grafos de código se regeneran solos con cada commit (sin gastar modelo). Falta indexar el diseño: `docs/design/rediseno/` (informes) y los `.dc.html` de `Diseño1.1.zip`. Graphify lo hace con el modelo, así que gasta límite: correrlo una vez al inicio de R2, solo sobre los informes y los tres `.dc.html` clave (Landing, AdminNav, Inicio de sesión), no sobre las capturas.
 
+## Unidades del plano (`06-plano.md` §4; sustituyen a las U-A..U-G de arriba)
+
+| Unidad | Qué | Quién | Estado |
+|---|---|---|---|
+| U0 | Preparación: línea base, `.env`, video 360/720, mascota, semilla del catálogo | orquestador | HECHO (línea base `ea0cc7e7`; `EVAL_BASE=0`) |
+| U1 | Cimientos y carcasa: tokens, fuentes, datos, Hoja, Encabezado, menú, carrito, Pie | W1 (sonnet) + revisor | pendiente ← siguiente |
+| U2 | Landing en el orden fijado + Tarjeta + CarruselCortes; U2s propuesta de seguridad (guardián, opus) | W2 + revisor + guardián | pendiente |
+| U3 | Catálogo y Asistente | W3 + revisor | pendiente |
+| U4 | Carcasa del panel (cajón con X, `signOut`, guardia de admin) | W4 + revisor | pendiente |
+| U5 | Juicio dual ciego (opus) y corrección | 2 jueces + corrector | pendiente |
+| U6 | Verificación final, Brave y entrega | orquestador | pendiente |
+
+**Alcance de la primera entrega (decidido en `05` y `06`):** landing, catálogo con la misma Tarjeta, asistente y carcasa del panel. **Diferidos:** acceso (Ingresar/Registrarse con la mascota), ficha del producto, checkout y el resto del panel. Eduardo pidió mantener la edición en esas páginas: quedan para la segunda entrega y se le avisa.
+
+**GGA:** rechaza los commits de código por dos reglas viejas de `AGENTS.md` (SCSS co-locado; Tailwind "no es el estado actual"). No es un defecto del código. Los commits de la etapa van con `--no-verify` y se anota aquí. **Enmienda propuesta para AGENTS.md (pendiente de Eduardo):** registrar que Tailwind v4 está adoptado para las entradas nuevas del rediseño (`src/ui`, `src/landing`, `src/catalogo`, `src/asistente`, `src/panel`) y que `styles.scss` co-locado aplica solo a `src/components/`.
+
 ## Para retomar
 
-Cuando el límite se reinicie, escribe "retoma" en el chat de Claude Code del frente de diseño. El orquestador lee este archivo y sigue en R2:
-1. Mide el presupuesto.
-2. Lanza el abogado del diablo y el arquitecto con `model: opus` y con las rutas de las skills.
-3. Sigue con R4 por unidades.
+Escribe "retoma" en el chat de Claude Code del frente de diseño. El orquestador lee este archivo y `06-plano.md` §0.5, mide el presupuesto con `punto-de-control` y sigue en la primera unidad que no diga HECHO (hoy U1). Si un tramo del Workflow se cortó, lo reanuda con `resumeFromRunId` (ver la bitácora).
 
 ## Bitácora
 
@@ -121,3 +134,4 @@ Cuando el límite se reinicie, escribe "retoma" en el chat de Claude Code del fr
 - 2026-09-30 · RETOMA · el límite se reinició: 5 h **0 %** (4 h 52 min) · semanal 59 % · contexto 59 % · SIGO. Lanzado R2 + R3 (abogado del diablo y arquitecto, opus, en cadena) → `05-abogado-del-diablo.md` y `06-plano.md`. Graphify sobre el diseño se omite: los informes destilados cubren lo mismo y ahorra límite.
 - 2026-09-30 · Eduardo exige que el abogado del diablo y el arquitecto digan CÓMO se hace el rediseño con el stack agéntico: skills, si se usan agentes, cuántos y qué hace cada uno. Se detuvo la primera corrida y se relanzó como v2 (wf_46237072-6e5): el abogado critica el plan agéntico y propone una plantilla de roles; el arquitecto abre `06-plano.md` con la sección "0. Plan agéntico" (plantilla de agentes, orquestación, skills por fase, costo). Si se corta: `Workflow({scriptPath, resumeFromRunId: "wf_46237072-6e5"})`.
 - 2026-09-30 01:05 · R2 y R3 HECHOS · `05-abogado-del-diablo.md` (12 cambios) y `06-plano.md` (plano con plan agéntico, 127 KB, completo hasta §8). El arquitecto escribió el archivo y luego lo cortó el límite de sesión antes de devolver su resumen; el archivo está íntegro. Límite reiniciado: 5 h **6 %** · semanal **71 %** (alto: ahorrar) · contexto 62 %. Siguiente: leer §Resumen y §0 del plano y ejecutar U0.
+- 2026-09-30 · U0 HECHO · línea base `ea0cc7e7` (--no-verify: GGA por las dos reglas viejas de AGENTS.md), `.env` privado (REST 200), contenedor `carni-landing-dev` arriba (landing.html 200), video 360 = 292 KB y 720 = 1.17 MB sin audio, busto de la mascota en `public/img/mascota/`, semilla de 53 productos y 9 categorías, `EVAL_BASE=0`. 5 h ~10 % · semanal 71 % · SIGO.
