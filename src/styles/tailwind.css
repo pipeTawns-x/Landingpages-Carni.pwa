@@ -1,0 +1,87 @@
+/**
+ * Entrada de Tailwind v4 — SOLO para la landing nueva (landing.html).
+ *
+ * No la importa ninguna otra página. Es la regla de aislamiento de esta
+ * migración: el "preflight" de Tailwind (su reset global) nunca debe tocar
+ * index.html, products.html ni el resto del sitio, que siguen en SCSS 7-1 +
+ * Bootstrap. Cada página HTML de Vite carga su propio documento y su propio
+ * <head>, así que este archivo, importado solo desde src/entry/landing.tsx,
+ * queda confinado a ese documento por construcción.
+ *
+ * Tokens tomados de DESIGN.md (colores, radios, familias tipográficas). La
+ * escala de tamaños de texto de DESIGN.md (--text-display, --text-h1, …) NO
+ * se copia aquí a propósito: varios títulos de Landing.dc.html —el propio
+ * <h1> del hero y los <h2> de sección— usan tamaños que no coinciden con esa
+ * escala nombrada (el hero pasa de 40/44 a 68/72, no a los 64/68 de
+ * "Display"; los <h2> de sección usan 30/36 → 44/50, que no es ni "H1" ni
+ * "H2" tal cual). El archivo de diseño manda para esta página, así que la
+ * tipografía se escribe en cada componente con el valor exacto en px que
+ * aprobó Eduardo, en vez de forzarla a encajar en la escala con nombre.
+ * Quedó anotado en el reporte de la implementación.
+ */
+@import "tailwindcss";
+
+@theme {
+  --color-bg: #0b0b0c;
+  --color-surface-1: #151517;
+  --color-surface-2: #1c1c1f;
+  --color-surface-3: #232326;
+  --color-border: #3f3f46;
+  --color-text: #f5f3ef;
+  --color-text-muted: #a8a29b;
+  --color-red: #dc2626;
+  --color-red-hover: #c81e1e;
+  --color-danger: #f43f5e;
+  --color-sand: #e4d1b0;
+  --color-gold: #f59e0b;
+  --color-success: #059669;
+
+  --font-display: "Fraunces", ui-serif, serif;
+  --font-sans: "Geist", ui-sans-serif, sans-serif;
+
+  --radius-card: 1rem; /* 16px */
+  --radius-pill: 999px;
+}
+
+/* El giro de las reseñas (sección "Lo que dicen los clientes"): dos filas que
+   se desplazan en sentidos opuestos. Nombres iguales a los del diseño para
+   que quien compare Landing.dc.html contra este archivo los reconozca. */
+@keyframes carni-izq {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+@keyframes carni-der {
+  from {
+    transform: translateX(-50%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@layer base {
+  #landing-root {
+    background: var(--color-bg);
+    color: var(--color-text);
+  }
+
+  /* Foco visible e instante (0ms) en todo interactivo de la landing, como
+     pide el gate de accesibilidad. Un solo lugar en vez de repetir la clase
+     en cada botón/enlace de las diez secciones. */
+  #landing-root :is(a, button, input, [tabindex]):focus-visible {
+    outline: 2px solid var(--color-red);
+    outline-offset: 2px;
+  }
+
+  /* Movimiento reducido: el giro de reseñas queda quieto del todo, como en
+     el diseño (`@media (prefers-reduced-motion: reduce) { [data-giro] { animation: none !important } }`). */
+  @media (prefers-reduced-motion: reduce) {
+    #landing-root [data-giro] {
+      animation: none !important;
+    }
+  }
+}

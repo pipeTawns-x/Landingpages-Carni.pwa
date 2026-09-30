@@ -44,6 +44,7 @@
     "@babel/preset-env": "^8.0.2",
     "@babel/preset-react": "^8.0.1",
     "@babel/preset-typescript": "^8.0.1",
+    "@tailwindcss/vite": "^4.3.3",
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.3",
     "@testing-library/user-event": "^14.6.7",
@@ -56,6 +57,7 @@
     "jest-environment-jsdom": "^30.5.1",
     "sass": "^1.93.3",
     "serve": "^14.2.4",
+    "tailwindcss": "^4.3.3",
     "tsx": "^4.21.0",
     "typescript": "^6.0.2",
     "vite": "^7.1.12"

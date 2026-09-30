@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0B0B0C" />
+  <title>Cortes Premium a Tu Puerta | Carnicería El Señor de La Misericordia - SLP</title>
+  <meta name="description" content="🥩 Carnicería premium en San Luis Potosí. Arrachera $289/kg, Ribeye $399/kg, T-Bone $349/kg. Entrega a domicilio. Calidad garantizada.">
+  <link rel="icon" href="img/recursos_web/logo-user.png" type="image/png">
+
+  <!-- Fraunces (display) + Geist (UI/numerales), exactamente como en el diseño aprobado. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..700&family=Geist:wght@400..700&display=swap" rel="stylesheet">
+</head>
+<body class="m-0 bg-[#0B0B0C]">
+  <div id="landing-root"></div>
+
+  <!-- Mismo módulo que abre el cajón móvil en index.html/products.html. El
+       cajón en sí (#mobileDrawer) todavía no vive en esta página — su
+       visual lo cubre otra página de Claude Design — así que hoy el botón
+       está cableado pero es un no-op seguro: header.js comprueba que el
+       elemento exista antes de tocarlo. -->
+  <script type="module" src="js/modules/ui/header.js"></script>
+  <script type="module" src="./src/entry/landing.tsx"></script>
+</body>
+</html>
