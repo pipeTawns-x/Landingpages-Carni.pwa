@@ -43,7 +43,7 @@ Este archivo es el prompt maestro para continuar el trabajo en OpenCode con mode
 11. `npm`/`node` solo dentro de Docker: `docker exec carni-landing-dev <comando>` (puerto 3002). Tras editar desde el host hay que `docker restart carni-landing-dev` y esperar 8 s antes de medir (el bind mount no propaga cambios a Vite).
 12. **Commits con `--no-verify`.** El hook GGA llama a Claude y gasta los créditos de Claude de Eduardo, y además rechaza el código por dos reglas viejas de `AGENTS.md` (SCSS co-locado; "Tailwind no es el estado actual"). Se anota en cada commit de código. Siempre `git log -1` para confirmar que el commit existe.
 13. Nunca se hace `git add -A` ni `git add .`: el árbol tiene cambios ajenos (`.atl/skill-registry.md`, `docs/design/loop-final.md`, `docs/design/loop-v3.md`, `docs/design/mockups/`). Se añaden rutas exactas.
-14. Sin preguntar a Eduardo. Si algo bloquea de verdad, se anota en `ESTADO.md` como "BLOQUEADO: motivo" y se sigue con otra rebanada independiente.
+14. **`AGENTS.md` no se edita sin aprobación de Eduardo** (el paso 0 del mapa propone una enmienda: queda anotada en `ESTADO.md` como pendiente y no bloquea). Sin preguntar a Eduardo para lo demás. Si algo bloquea de verdad, se anota en `ESTADO.md` como "BLOQUEADO: motivo" y se sigue con otra rebanada independiente.
 
 ## 4 · Equipo de agentes y modelos gratuitos
 
