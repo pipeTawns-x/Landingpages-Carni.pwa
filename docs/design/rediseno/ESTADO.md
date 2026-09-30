@@ -88,6 +88,23 @@ Cada una sale de la investigación. El abogado del diablo puede cambiarlas con r
 14. **Commits:** `PATH=/opt/homebrew/bin:$PATH git commit ...` — con ese PATH el hook GGA pasó en el commit de la investigación (77d19808); sin él falla con "No provider configured". Si aun así falla, `--no-verify` y se avisa a Eduardo. Comprobar siempre con `git log -1` que el commit existe.
 15. **Correo y "confirmar con el dueño":** se usa el correo del sitio actual; "confirmar con el dueño" es nota interna y no sale al cliente.
 
+## Rebanadas de la migración in situ (orden de `migracion/MAPA.md` §4)
+
+Una rebanada = un commit. La fila se marca HECHO solo cuando el commit existe (`git log -1`) y sus compuertas están en verde salvo la deuda documentada.
+
+| Rebanada | Qué | Estado |
+|---|---|---|
+| 0 | Compuertas anti-duplicado en `gates.sh` (D1–D7) | HECHO |
+| 1.1 | Lupa sobre `Hoja` en la carcasa compartida | pendiente ← siguiente |
+| 1.2 | Clima en el encabezado | pendiente |
+| 1.3 | Asistente (chatbot) | pendiente |
+| 1.4 | Club Misericordia: portar o retirar | pendiente |
+| 1.5 | Cuenta en el encabezado | pendiente |
+| 1.6 | Sustituir el cuerpo de `index.html` | pendiente |
+| 1.7 | Retirar `landing.html` | pendiente |
+
+**BLOQUEADO:** la enmienda de `AGENTS.md` (Tailwind v4 adoptado) requiere aprobación de Eduardo (`AGENTS.md:115-121`). La rebanada 0 se limitó a `gates.sh`; la parte de `AGENTS.md` del paso 0 del mapa queda sin hacer hasta que la apruebe.
+
 ## Unidades de R4 (cada una ≤ 15 % del límite de 5 h; una por ventana si hace falta)
 
 | Unidad | Qué | Archivos que toca (para no chocar) |
@@ -144,3 +161,8 @@ Escribe "retoma" en el chat de Claude Code del frente de diseño. El orquestador
   - **Deuda de U2 (no bloquea):** (1) los 7 puntos del carrusel miden 24×44 (el plano §3.5 lo pide; cumple WCAG 2.5.8 AA, pero choca con "44×44": decidir); (2) fotos propias diminutas (`filet_mignon` 248×193, `flak_steak` 156×153, `bravette_steak` 157×163): se ven suaves, hacen falta fotos nuevas del mostrador; (3) Bistec de Res y Diezmillo llevan la misma foto una junto a la otra ("Foto ilustrativa"); (4) FAQ publicadas (pedido mínimo $150, zonas de entrega y "te decimos si tu colonia está cubierta") son copy heredado que el dueño no ha validado; (5) contraste del subtítulo del logotipo sobre el cielo claro del video a 1440 (si falla, velo del encabezado a black/65); (6) "50 %" con espacio duro; (7) Comentarios sin fecha por reseña (los datos no la guardan); (8) falta una captura de Horarios, Contacto y Comentarios (se verificaron por geometría del DOM).
   - **Gotcha de entorno:** Vite en `carni-landing-dev` no ve los cambios hechos desde el host (bind mount de macOS): hacer `docker restart carni-landing-dev` y esperar 8 s antes de medir.
 - 2026-09-30 · **CORRECCIÓN DE RUMBO** (Eduardo): migrar en el lugar, no en un sitio paralelo. Entregado: `LOOP-OPENCODE.md` (equipo de agentes con modelos gratuitos verificados en su OpenCode, compuertas, auditor), `CONTEXTO-CHAT.md` (resumen auditable de este chat), `migracion/MAPA.md` (mapa de migración: 16 duplicados, pérdidas con archivo:línea, referencias a vigilar, pasos 0–6), skill `migracion-incremental`, y las 16 páginas de diseño en `docs/design/claude-design-1.1/`. Hallazgos del mapa: el service worker nunca estuvo operativo (`registerServiceWorker()` sin llamadores; el README lo afirma falsamente); no existen analítica, sitemap ni robots; el contrato de URL divergió (`catalogo.html#categoria=` frente a `products.html?categoria=`); Bootstrap y el preflight de Tailwind no pueden convivir en una misma página. **Pendiente de Eduardo:** aprobar la enmienda de `AGENTS.md` (Tailwind adoptado). 5 h ~15 % · semanal 91 %.
+- 2026-09-30 · OpenCode · **AUDITORÍA DE LOS 3 ÚLTIMOS COMMITS: PASA; no hay nada que revertir.** `67754685` (código), `28620711` y `97a17dfc` (docs). Verificado con `git diff --name-status HEAD~3 HEAD`: ningún `.html` nuevo en la raíz, ninguna entrada nueva en `vite.config.js` (las 11 entradas siguen en `:32-42`), un commit = una rebanada, sin duplicados nuevos y sin atribución a IA en los mensajes. El sitio paralelo sigue en pie, que es lo esperado hasta 1.7/2.5/4.6.
+  - **DISCREPANCIA 1 (grave, de proceso):** el subagente auditor delegado **fabricó evidencia**. Citó archivos que no existen (`src/components/landing/TarjetaProductoUnica.tsx`, `src/lib/supabaseClient.ts`, `src/catalogo/catalogo.css`), imaginó las líneas de `vite.config.js` (`:16-18` en vez de `:40-42`) y pegó como "completo" un `Carcasa.tsx` de 57 líneas con `<Link to="/catalogo">` de react-router que no es el archivo real (el real tiene 72 líneas y el tipo `Superposicion`). Concluyó "0 duplicados vivos, ninguna pérdida, todo pasa" sobre esa base falsa. **Lección: todo hallazgo de subagente se verifica con un `rg` propio antes de aceptarlo; un informe con `archivo:línea` que no reproduce el comando es una hipótesis, no evidencia.**
+  - **DISCREPANCIA 2 (menor, de mapa):** `js/modules/chatbot.js:146-147` lee `env.VITE_SUPABASE_URL` y `env.VITE_SUPABASE_KEY` por su cuenta: es un **cuarto** lector de las variables de Supabase y `MAPA.md` §2a solo registra tres. Muere en el paso 6.
+  - **DISCREPANCIA 3 (menor, de mapa):** las referencias a rutas paralelas son **33 en 15 archivos**, no 5: además de `src/ui/Carcasa.tsx` y `vite.config.js` están `Pie`, `MenuHoja`, `CarritoHoja`, `Encabezado`, `Tarjeta`, `Portada`, `Mostrador`, `Populares`, `src/styles/tailwind.css` y el test de `Tarjeta`. `MAPA.md` §3.5 las enumera una por una, pero sin el recuento.
+- 2026-09-30 · OpenCode · **Rebanada 0 HECHO** · `gates.sh` gana el bloque anti-duplicado D1–D7 (codifica `MAPA.md` §5.1 y `LOOP-OPENCODE.md` §7) y la sonda HTTP ahora cubre también las cuatro páginas de producción, que antes no comprobaba. `--rapido` corre D1+D2+D3+D7; la corrida completa suma D4 (referencias colgantes: avisa si crecen de 33), D5 (una sola tarjeta, un solo cargador, un solo cliente de Supabase, un solo `assetUrl`, una sola superposición) y D6 (ninguna superposición sin X). Línea base en verde parcial: 5 fallas, todas conocidas y documentadas en el propio script — G2/G6 (los comentarios de `src/ui/assetUrl.ts`, deuda de U1) y D5 b/c/d (los tres duplicados vivos que mueren en 2.1, 2.1 y 6). `ts:check` ✓, 60/60 pruebas ✓, `build` ✓. Rebanada 1.1 (Lupa sobre `Hoja`) es la siguiente.
