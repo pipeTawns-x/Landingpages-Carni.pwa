@@ -1,123 +1,228 @@
-import { useEffect, useState } from 'react';
-import { IconoBuscar, IconoCarrito, IconoMenu } from './iconos';
+import { useEffect, useRef, useState } from 'react';
+import { IconoBuscar, IconoMenu, IconoPedido } from './iconos';
+import { Logotipo } from './Logotipo';
 
 export interface EncabezadoProps {
-  /** Cuántas líneas hay en el pedido — la insignia roja del carrito. */
+  /** True solo en la landing: el encabezado nace transparente sobre el video. */
+  sobrePortada: boolean;
+  /** Líneas del pedido: la insignia del carrito. */
   cuenta: number;
-  /** La landing la trae; otras páginas podrían no querer lupa. */
-  conLupa?: boolean;
+  menuAbierto: boolean;
+  carritoAbierto: boolean;
+  alAbrirMenu: () => void;
+  alAbrirCarrito: () => void;
+  /** 'catalogo.html#buscar' en la landing; '#buscar' en el catálogo. */
+  hrefBuscar: string;
 }
 
+/** Alto del encabezado sin la zona segura, en píxeles. Debe coincidir con las clases de abajo. */
+const ALTO_MOVIL = 56;
+const ALTO_ESCRITORIO = 72;
+const CONSULTA_ESCRITORIO = '(min-width: 1024px)';
+const CONSULTA_MOVIMIENTO_REDUCIDO = '(prefers-reduced-motion: reduce)';
+
 /**
- * El encabezado de la tienda: hamburguesa, logo centrado, lupa y carrito.
+ * ¿Ya pasó la portada por debajo del encabezado?
  *
- * Un solo componente responsivo — no dos instancias fijas por ancho como en
- * el canvas de diseño (Encabezado.dc.html tenía un `sc-if` para "movil" y
- * otro para "escritorio" porque el canvas solo sabe congelar anchos). Aquí
- * los dos son el mismo árbol, con clases `lg:` para el salto a escritorio, tal
- * como pide la decisión de "responsive, mobile-first" del encargo.
+ * Con el centinela `#fin-portada` (1 px al final de la portada) se usa un
+ * IntersectionObserver: la portada "termina" cuando el centinela sube por
+ * encima del borde inferior del encabezado. El margen del observador es el alto
+ * del encabezado y se recalcula al cruzar el punto de corte de escritorio.
  *
- * Sin nav de texto: el diseño no lleva enlaces visibles en el header (Inicio
- * / Productos / Contacto viven en el pie y en el menú del cajón), así que no
- * se inventó ninguno.
+ * Sin centinela (una página sin portada) o sin IntersectionObserver, el
+ * respaldo es el scroll: sólido a partir de 8 px. Es un oyente pasivo que se
+ * agrupa por cuadro de animación.
  */
-export function Encabezado({ cuenta, conLupa = true }: EncabezadoProps): JSX.Element {
-  const [conScroll, setConScroll] = useState(false);
+function usePasoPortada(activo: boolean): boolean {
+  const [paso, setPaso] = useState(false);
 
   useEffect(() => {
-    let cuadro = false;
+    if (!activo) {
+      return;
+    }
+
+    const escritorio = window.matchMedia(CONSULTA_ESCRITORIO);
+    const alto = (): number => (escritorio.matches ? ALTO_ESCRITORIO : ALTO_MOVIL);
+    const centinela = document.getElementById('fin-portada');
+
+    if (centinela && 'IntersectionObserver' in window) {
+      let observador: IntersectionObserver | null = null;
+
+      const observar = (): void => {
+        observador?.disconnect();
+        observador = new IntersectionObserver(
+          ([entrada]) => {
+            // Fuera del área y por encima: la portada ya quedó atrás. Fuera del
+            // área pero por debajo: la portada sigue ocupando la pantalla.
+            setPaso(!entrada.isIntersecting && entrada.boundingClientRect.top < alto());
+          },
+          { rootMargin: `-${alto()}px 0px 0px 0px` }
+        );
+        observador.observe(centinela);
+      };
+
+      observar();
+      escritorio.addEventListener('change', observar);
+      return () => {
+        escritorio.removeEventListener('change', observar);
+        observador?.disconnect();
+      };
+    }
+
+    let cuadro = 0;
     const evaluar = (): void => {
-      cuadro = false;
-      setConScroll(window.scrollY > 8);
+      cuadro = 0;
+      setPaso(window.scrollY >= 8);
     };
     const alScrollear = (): void => {
-      if (cuadro) return;
-      cuadro = true;
-      window.requestAnimationFrame(evaluar);
+      if (cuadro === 0) {
+        cuadro = window.requestAnimationFrame(evaluar);
+      }
     };
 
     evaluar();
     window.addEventListener('scroll', alScrollear, { passive: true });
-    return () => window.removeEventListener('scroll', alScrollear);
+    return () => {
+      window.removeEventListener('scroll', alScrollear);
+      window.cancelAnimationFrame(cuadro);
+    };
+  }, [activo]);
+
+  return paso;
+}
+
+/**
+ * Un "pop" breve en la insignia cuando la cuenta cambia.
+ *
+ * Se ignora durante los primeros 400 ms: al montar, el pedido guardado se
+ * hidrata y la cuenta salta de 0 a N. Eso es cargar la página, no agregar algo.
+ * Con movimiento reducido no hay pop.
+ */
+function usePopInsignia(cuenta: number) {
+  const insignia = useRef<HTMLSpanElement>(null);
+  const lista = useRef(false);
+  const anterior = useRef(cuenta);
+
+  useEffect(() => {
+    const temporizador = window.setTimeout(() => {
+      lista.current = true;
+    }, 400);
+    return () => window.clearTimeout(temporizador);
   }, []);
 
-  const fondo = conScroll ? 'bg-surface-1' : 'bg-bg';
-  const hayCuenta = cuenta > 0;
-  const etiquetaCarrito = `Mi carrito, ${cuenta} ${cuenta === 1 ? 'artículo' : 'artículos'}`;
+  useEffect(() => {
+    if (cuenta === anterior.current) {
+      return;
+    }
+    anterior.current = cuenta;
+
+    const elemento = insignia.current;
+    if (!lista.current || !elemento || typeof elemento.animate !== 'function') {
+      return;
+    }
+    if (window.matchMedia(CONSULTA_MOVIMIENTO_REDUCIDO).matches) {
+      return;
+    }
+
+    elemento.animate(
+      [{ transform: 'scale(1)' }, { transform: 'scale(1.15)', offset: 0.5 }, { transform: 'scale(1)' }],
+      { duration: 220, easing: 'cubic-bezier(0.23, 1, 0.32, 1)' }
+    );
+  }, [cuenta]);
+
+  return insignia;
+}
+
+const BOTON =
+  'grid size-11 shrink-0 place-items-center rounded-full text-text transition-[background-color,scale] duration-150 ease-out-strong hover:bg-surface-2 active:scale-95 motion-reduce:transition-none';
+
+/**
+ * El encabezado de la tienda: menú, marca, búsqueda y pedido.
+ *
+ * Dos estados, en `data-estado`:
+ *   - `sobre-video`: transparente, con un velo suave arriba para que los íconos
+ *     se lean sobre el video. Con un puntero fino encima, o con el foco del
+ *     teclado dentro, se vuelve casi negro para leer cómodo.
+ *   - `solido`: fondo sólido con una línea fina debajo. Es el único estado en
+ *     páginas sin portada y el que toma la landing al pasar la portada.
+ *
+ * En pantallas táctiles no hay hover: el efecto lo dan el paso a sólido y el
+ * `focus-within`.
+ */
+export function Encabezado({
+  sobrePortada,
+  cuenta,
+  menuAbierto,
+  carritoAbierto,
+  alAbrirMenu,
+  alAbrirCarrito,
+  hrefBuscar
+}: EncabezadoProps): JSX.Element {
+  const paso = usePasoPortada(sobrePortada);
+  const insignia = usePopInsignia(cuenta);
+  const estado = sobrePortada && !paso ? 'sobre-video' : 'solido';
 
   return (
     <header
-      className={`relative z-40 box-border flex h-14 items-center justify-between border-b border-border px-1.5 font-sans text-text transition-colors duration-200 lg:px-6 ${
-        conScroll ? 'lg:h-[60px]' : 'lg:h-[72px]'
-      } ${fondo}`}
+      data-estado={estado}
+      className="group fixed inset-x-0 top-0 z-40 h-[calc(3.5rem+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)] transition-[background-color,box-shadow] duration-240 ease-out-strong data-[estado=solido]:bg-bg data-[estado=solido]:shadow-[0_1px_0_rgb(255_255_255/0.08)] data-[estado=sobre-video]:bg-transparent data-[estado=sobre-video]:hover:bg-veil data-[estado=sobre-video]:focus-within:bg-veil motion-reduce:transition-none lg:h-[calc(4.5rem+env(safe-area-inset-top))]"
     >
-      {/* Hamburguesa: mecanismo real de js/modules/ui/header.js (id="menuToggle").
-          El cajón (#mobileDrawer) todavía no vive en esta página nueva — su
-          diseño visual queda cubierto por otra página de Claude Design, así
-          que el botón queda cableado y a la espera; hoy es un no-op seguro
-          (header.js comprueba que el elemento exista antes de tocarlo). */}
-      <button
-        id="menuToggle"
-        type="button"
-        aria-label="Abrir el menú"
-        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-transparent text-text lg:h-12 lg:w-12 lg:border-border lg:hover:border-sand"
-      >
-        <IconoMenu />
-      </button>
+      {/* Velo superior: solo sobre el video y solo sin hover ni foco dentro. */}
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 bg-linear-to-b from-black/55 via-black/28 via-55% to-transparent opacity-0 transition-opacity duration-240 ease-out-strong group-data-[estado=sobre-video]:opacity-100 group-data-[estado=sobre-video]:group-hover:opacity-0 group-data-[estado=sobre-video]:group-focus-within:opacity-0 motion-reduce:transition-none"
+      />
 
-      <a
-        href="index.html"
-        aria-label="Carnicería El Señor de La Misericordia, ir al inicio"
-        className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-1 leading-none text-text no-underline lg:gap-1.5"
-      >
-        <span className="pl-[0.16em] text-[17px] font-semibold tracking-[0.16em] lg:pl-[0.18em] lg:text-[22px] lg:tracking-[0.18em]">
-          CARNICERÍA
-        </span>
-        <span
-          className={`flex items-center gap-1.5 whitespace-nowrap text-[8.5px] font-medium tracking-[0.12em] text-sand lg:hidden`}
-        >
-          <span className="h-px w-3 bg-sand" />
-          EL SEÑOR DE LA MISERICORDIA
-          <span className="h-px w-3 bg-sand" />
-        </span>
-        {!conScroll ? (
-          <span className="hidden items-center gap-2 whitespace-nowrap text-[10px] font-medium tracking-[0.14em] text-sand lg:flex">
-            <span className="h-px w-5 bg-sand" />
-            EL SEÑOR DE LA MISERICORDIA
-            <span className="h-px w-5 bg-sand" />
-          </span>
-        ) : null}
-      </a>
-
-      <span className="flex items-center gap-2">
-        {conLupa ? (
-          <button
-            id="searchBtn"
-            type="button"
-            aria-label="Buscar"
-            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-transparent text-text lg:h-12 lg:w-12 lg:border-border lg:hover:border-sand"
-          >
-            <IconoBuscar />
-          </button>
-        ) : null}
+      <div className="relative grid h-full grid-cols-[1fr_auto_1fr] items-center px-1.5 lg:px-6">
         <button
-          id="cartBtn"
           type="button"
-          aria-label={etiquetaCarrito}
-          className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-transparent text-text lg:h-12 lg:w-12 lg:border-border lg:hover:border-sand"
+          data-abre="menu"
+          aria-label="Abrir el menú"
+          aria-haspopup="dialog"
+          aria-expanded={menuAbierto}
+          aria-controls="hoja-menu"
+          onClick={alAbrirMenu}
+          className={`justify-self-start ${BOTON}`}
         >
-          <IconoCarrito />
-          {hayCuenta ? (
-            <span
-              className={`absolute right-[3px] top-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-red px-1 text-[11px] font-semibold tabular-nums text-white lg:-right-0.5 lg:-top-0.5 lg:h-5 lg:min-w-[20px] lg:px-[5px] lg:text-xs ${
-                conScroll ? 'outline outline-2 outline-surface-1' : 'outline outline-2 outline-bg'
-              } lg:outline-2`}
-            >
-              {cuenta}
-            </span>
-          ) : null}
+          <IconoMenu />
         </button>
-      </span>
+
+        <a
+          href="landing.html"
+          aria-label="Carnicería El Señor de La Misericordia, ir al inicio"
+          className="justify-self-center rounded-control px-2 py-1 text-text no-underline"
+        >
+          <Logotipo tamano="encabezado" />
+        </a>
+
+        <div className="flex items-center justify-self-end">
+          <a href={hrefBuscar} aria-label="Buscar en el catálogo" className={BOTON}>
+            <IconoBuscar />
+          </a>
+
+          <button
+            type="button"
+            data-abre="carrito"
+            aria-label={`Abrir el pedido, ${cuenta} ${cuenta === 1 ? 'producto' : 'productos'}`}
+            aria-haspopup="dialog"
+            aria-expanded={carritoAbierto}
+            aria-controls="hoja-carrito"
+            onClick={alAbrirCarrito}
+            className={`relative ${BOTON}`}
+          >
+            <IconoPedido />
+            {cuenta > 0 ? (
+              <span
+                ref={insignia}
+                aria-hidden="true"
+                className="absolute top-0.5 right-0 grid h-5 min-w-5 place-items-center rounded-full bg-red px-1.5 text-meta leading-none font-semibold text-white tabular-nums"
+              >
+                {cuenta > 99 ? '99+' : cuenta}
+              </span>
+            ) : null}
+          </button>
+        </div>
+      </div>
     </header>
   );
 }

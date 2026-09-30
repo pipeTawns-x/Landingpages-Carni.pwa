@@ -1,51 +1,83 @@
 /**
- * Entrada de Tailwind v4 — SOLO para la landing nueva (landing.html).
+ * Entrada de Tailwind v4 para las tres páginas nuevas: landing.html,
+ * catalogo.html y panel.html.
  *
- * No la importa ninguna otra página. Es la regla de aislamiento de esta
- * migración: el "preflight" de Tailwind (su reset global) nunca debe tocar
- * index.html, products.html ni el resto del sitio, que siguen en SCSS 7-1 +
- * Bootstrap. Cada página HTML de Vite carga su propio documento y su propio
- * <head>, así que este archivo, importado solo desde src/entry/landing.tsx,
- * queda confinado a ese documento por construcción.
+ * No la importa ninguna página vieja. El "preflight" de Tailwind (su reset
+ * global) nunca debe tocar index.html, products.html ni el resto del sitio, que
+ * siguen en SCSS 7-1 con Bootstrap. Cada página de Vite carga su propio
+ * documento, así que este archivo, importado solo desde src/entry/landing.tsx,
+ * catalogo.tsx y panel.tsx, queda confinado a ellos por construcción.
  *
- * Tokens tomados de DESIGN.md (colores, radios, familias tipográficas). La
- * escala de tamaños de texto de DESIGN.md (--text-display, --text-h1, …) NO
- * se copia aquí a propósito: varios títulos de Landing.dc.html —el propio
- * <h1> del hero y los <h2> de sección— usan tamaños que no coinciden con esa
- * escala nombrada (el hero pasa de 40/44 a 68/72, no a los 64/68 de
- * "Display"; los <h2> de sección usan 30/36 → 44/50, que no es ni "H1" ni
- * "H2" tal cual). El archivo de diseño manda para esta página, así que la
- * tipografía se escribe en cada componente con el valor exacto en px que
- * aprobó Eduardo, en vez de forzarla a encajar en la escala con nombre.
- * Quedó anotado en el reporte de la implementación.
+ * Todo lo que se ve sale de este bloque `@theme`: color, tipografía, radios y
+ * movimiento. Los componentes usan solo estos tokens; los tamaños de texto y
+ * los radios por defecto de Tailwind no se usan (ver las reglas de uso del plano).
  */
-@import "tailwindcss";
+@import "tailwindcss" source(none);
+
+/*
+ * Dónde buscar clases. Sin esto Tailwind lee todo el repositorio, incluidos los
+ * documentos de diseño y las páginas viejas, y genera CSS para ejemplos que
+ * nadie renderiza. Solo cuentan las tres páginas y lo que importan sus entradas.
+ */
+@source "../../landing.html";
+@source "../../catalogo.html";
+@source "../../panel.html";
+@source "../../src";
+@source not "../components";
+@source not "../pages";
 
 @theme {
+  /* Color. Las superficies suben de luminosidad; el rojo solo rellena. */
   --color-bg: #0b0b0c;
   --color-surface-1: #151517;
   --color-surface-2: #1c1c1f;
   --color-surface-3: #232326;
-  --color-border: #3f3f46;
+  --color-border: #3f3f46;          /* SOLO hairlines decorativas (1,88:1). Nunca borde de un control. */
+  --color-border-control: #71717a;  /* campos, chips, conmutadores: >= 3,24:1 en bg y en las tres superficies */
   --color-text: #f5f3ef;
   --color-text-muted: #a8a29b;
-  --color-red: #dc2626;
-  --color-red-hover: #c81e1e;
-  --color-danger: #f43f5e;
-  --color-sand: #e4d1b0;
+  --color-red: #dc2626;             /* SOLO relleno (botón principal). Texto blanco encima: 4,83:1 */
+  --color-red-hover: #c81e1e;       /* texto blanco encima: 5,74:1 */
+  --color-red-text: #f05252;        /* rojo como texto: >= 4,50:1 en bg y en las tres superficies */
+  --color-sand: #e4d1b0;            /* anillo de foco, enlaces y detalles: 13,16:1 */
   --color-gold: #f59e0b;
   --color-success: #059669;
+  --color-danger: #f43f5e;
+  --color-veil: rgb(0 0 0 / 0.92);  /* encabezado con hover o con foco dentro */
 
-  --font-display: "Fraunces", ui-serif, serif;
-  --font-sans: "Geist", ui-sans-serif, sans-serif;
+  /* Tipografía autoalojada (Fontsource): los nombres de familia llevan "Variable". */
+  --font-display: "Fraunces Variable", ui-serif, Georgia, serif;
+  --font-sans: "Geist Variable", ui-sans-serif, system-ui, sans-serif;
 
-  --radius-card: 1rem; /* 16px */
-  --radius-pill: 999px;
+  /* Escala de 6 roles. Se borran los tamaños por defecto para que nadie use text-sm ni text-xl. */
+  --text-*: initial;
+  --text-meta: 0.8125rem;   --text-meta--line-height: 1.125rem;       /* 13/18: etiquetas, notas */
+  --text-ui: 0.9375rem;     --text-ui--line-height: 1.375rem;         /* 15/22: cuerpo e interfaz */
+  --text-lead: 1.125rem;    --text-lead--line-height: 1.625rem;       /* 18/26: entradillas */
+  --text-titulo: clamp(1.125rem, 1rem + 0.55vw, 1.5rem);              /* 18 a 24: tarjetas, h3 */
+  --text-titulo--line-height: 1.2;
+  --text-seccion: clamp(1.75rem, 1.25rem + 1.9vw, 3rem);              /* 28 a 48: h2 */
+  --text-seccion--line-height: 1.08;
+  --text-seccion--letter-spacing: -0.01em;
+  --text-portada: clamp(1.75rem, 1rem + 3.9vw, 4.5rem);               /* 30 a 360, 31 a 390, 72 a 1440: h1 */
+  --text-portada--line-height: 1.04;
+  --text-portada--letter-spacing: -0.015em;
+
+  /* Radios: candado documentado. */
+  --radius-control: 0.75rem;   /* campos, chips, filas táctiles, miniaturas */
+  --radius-card: 1rem;         /* Tarjeta de producto y bento */
+  --radius-dialog: 1.25rem;    /* diálogos centrados */
+  --radius-sheet: 1.5rem;      /* esquinas superiores de la hoja inferior; esquinas inferiores de la portada móvil */
+  --radius-pill: 9999px;       /* SOLO botones */
+
+  /* Movimiento: nunca ease-in; interfaz por debajo de 300 ms. */
+  --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);   /* presión, encabezado, puntos del carrusel */
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);        /* hojas y cajones */
 }
 
-/* El giro de las reseñas (sección "Lo que dicen los clientes"): dos filas que
-   se desplazan en sentidos opuestos. Nombres iguales a los del diseño para
-   que quien compare Landing.dc.html contra este archivo los reconozca. */
+@custom-variant reduced-transparency (@media (prefers-reduced-transparency: reduce));
+
+/* El giro de las reseñas: dos filas que se desplazan en sentidos opuestos. */
 @keyframes carni-izq {
   from {
     transform: translateX(0);
@@ -64,24 +96,77 @@
 }
 
 @layer base {
-  #landing-root {
-    background: var(--color-bg);
-    color: var(--color-text);
+  html {
+    color-scheme: dark;
+    scrollbar-gutter: stable;
+    /* Los enlaces internos (#preguntas, #contacto) no aterrizan bajo el encabezado fijo. */
+    scroll-padding-top: 5rem;
+    -webkit-text-size-adjust: 100%;
   }
 
-  /* Foco visible e instante (0ms) en todo interactivo de la landing, como
-     pide el gate de accesibilidad. Un solo lugar en vez de repetir la clase
-     en cada botón/enlace de las diez secciones. */
-  #landing-root :is(a, button, input, [tabindex]):focus-visible {
-    outline: 2px solid var(--color-red);
+  /* Bloquea el scroll bajo cualquier Hoja abierta. */
+  html:has(dialog:modal) {
+    overflow: hidden;
+  }
+
+  body {
+    margin: 0;
+    background: var(--color-bg);
+    color: var(--color-text);
+    font-family: var(--font-sans);
+    font-size: var(--text-ui);
+    line-height: var(--text-ui--line-height);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    text-wrap: balance;
+    margin: 0;
+  }
+
+  ::selection {
+    background: rgb(228 209 176 / 0.32);
+  }
+
+  /* Visible también sobre el rojo. */
+  :focus-visible {
+    outline: 2px solid var(--color-sand);
     outline-offset: 2px;
   }
 
-  /* Movimiento reducido: el giro de reseñas queda quieto del todo, como en
-     el diseño (`@media (prefers-reduced-motion: reduce) { [data-giro] { animation: none !important } }`). */
   @media (prefers-reduced-motion: reduce) {
-    #landing-root [data-giro] {
+    html {
+      scroll-behavior: auto;
+    }
+
+    [data-giro] {
       animation: none !important;
+    }
+
+    /* Las hojas no se desplazan ni se escalan: solo aparecen y desaparecen. */
+    dialog[data-superposicion] {
+      translate: none !important;
+      scale: none !important;
+      opacity: 0;
+      transition-duration: 150ms !important;
+    }
+
+    dialog[data-superposicion][open] {
+      opacity: 1;
+    }
+
+    dialog[data-superposicion]::backdrop {
+      transition-duration: 150ms !important;
+    }
+
+    @starting-style {
+      dialog[data-superposicion][open] {
+        opacity: 0;
+      }
     }
   }
 }

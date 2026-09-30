@@ -1,27 +1,17 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es-MX">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#0B0B0C" />
-  <title>Cortes Premium a Tu Puerta | Carnicería El Señor de La Misericordia - SLP</title>
-  <meta name="description" content="🥩 Carnicería premium en San Luis Potosí. Arrachera $289/kg, Ribeye $399/kg, T-Bone $349/kg. Entrega a domicilio. Calidad garantizada.">
+  <meta name="color-scheme" content="dark" />
+  <title>Carnicería El Señor de La Misericordia · San Luis Potosí</title>
+  <meta name="description" content="Carnicería familiar en San Luis Potosí. Cortes de res, cerdo y pollo, paquetes para asar y pedidos por WhatsApp.">
   <link rel="icon" href="img/recursos_web/logo-user.png" type="image/png">
-
-  <!-- Fraunces (display) + Geist (UI/numerales), exactamente como en el diseño aprobado. -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..700&family=Geist:wght@400..700&display=swap" rel="stylesheet">
+  <link rel="preload" as="image" href="img/Videos/portada-carne-poster.webp" fetchpriority="high">
 </head>
-<body class="m-0 bg-[#0B0B0C]">
-  <div id="landing-root"></div>
-
-  <!-- Mismo módulo que abre el cajón móvil en index.html/products.html. El
-       cajón en sí (#mobileDrawer) todavía no vive en esta página — su
-       visual lo cubre otra página de Claude Design — así que hoy el botón
-       está cableado pero es un no-op seguro: header.js comprueba que el
-       elemento exista antes de tocarlo. -->
-  <script type="module" src="js/modules/ui/header.js"></script>
+<body>
+  <div id="raiz"></div>
   <script type="module" src="./src/entry/landing.tsx"></script>
 </body>
 </html>

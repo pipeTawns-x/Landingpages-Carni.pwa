@@ -37,7 +37,9 @@ export default defineConfig({
         adminCustomers: resolve(__dirname, 'admin-customers.html'),
         adminOrders: resolve(__dirname, 'admin-orders.html'),
         offline: resolve(__dirname, 'offline.html'),
-        landing: resolve(__dirname, 'landing.html')
+        landing: resolve(__dirname, 'landing.html'),
+        catalogo: resolve(__dirname, 'catalogo.html'),
+        panel: resolve(__dirname, 'panel.html')
       }
     }
   },
