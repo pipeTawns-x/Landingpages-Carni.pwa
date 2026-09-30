@@ -25,7 +25,7 @@ Autorización: Eduardo autorizó el código el 2026-09-30 ("desarrollar el redis
 |---|---|---|---|
 | R0 | Presupuesto, export 1.1 medido (30 de 43), skills resueltas | orquestador | HECHO |
 | R1 | Investigación en paralelo (4 informes en `investigacion/`) | 4 agentes | HECHO (costó 46 puntos del límite de 5 h) |
-| R2 | Abogado del diablo sobre diseño + investigación + código; entrega la lista corta de cambios. Lee primero `contexto-previo.md` (notas #714, #715, #718 de Engram, ya destiladas) | 1 agente (opus) | PENDIENTE ← siguiente |
+| R2 | Abogado del diablo sobre diseño + investigación + código; entrega la lista corta de cambios. Lee primero `contexto-previo.md` (notas #714, #715, #718 de Engram, ya destiladas) | 1 agente (opus) | EN CURSO (wf_904699e7-545) |
 | R3 | Arquitecto: plano de construcción y criterios de aceptación por unidad | 1 agente (opus) | pendiente |
 | R4 | Desarrollo por unidades (ver "Unidades de R4") | escritores, uno por unidad | pendiente |
 | R5 | Revisión fresca, seguridad y pruebas | agentes | pendiente |
@@ -118,3 +118,4 @@ Cuando el límite se reinicie, escribe "retoma" en el chat de Claude Code del fr
 - 2026-09-30 · R0 · 5 h 35 % · semanal 54 % · contexto 52 % · SIGO.
 - 2026-09-30 · R1 HECHO · 4 informes en `investigacion/` (1.9 MB con evidencias). 5 h **81 %** (se reinicia en 2 h 18 min) · semanal 59 % · contexto 55 % · **PAUSO**: la investigación gastó 46 puntos; lanzar Opus y escritores ahora los cortaría a medias.
 - 2026-09-30 · R2 preparado · contexto previo destilado en `contexto-previo.md`. 5 h **84 %** · semanal 59 % · contexto 58 % · sigue PAUSO. Graphify sobre el diseño queda para R2 porque usa el modelo.
+- 2026-09-30 · RETOMA · el límite se reinició: 5 h **0 %** (4 h 52 min) · semanal 59 % · contexto 59 % · SIGO. Lanzado R2 + R3 (abogado del diablo y arquitecto, opus, en cadena) → `05-abogado-del-diablo.md` y `06-plano.md`. Graphify sobre el diseño se omite: los informes destilados cubren lo mismo y ahorra límite.
