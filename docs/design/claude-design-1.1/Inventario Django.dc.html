@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..700&family=Geist:wght@400..700&display=swap" rel="stylesheet">
+<style>
+  body { margin:0; background:#0B0B0C; color:#F5F3EF; }
+  a { color:#F5F3EF; text-decoration:underline; text-decoration-color:#E4D1B0; text-underline-offset:4px; }
+  a:hover { color:#E4D1B0; }
+</style>
+</helmet>
+
+<section id="b7" data-screen-label="Inventario Django" style="background:#0B0B0C;width:max-content;min-width:100%;box-sizing:border-box;padding:48px 48px 96px;font-family:Geist,system-ui,sans-serif;color:#F5F3EF;display:flex;flex-direction:column;gap:64px">
+
+  <div style="display:flex;flex-direction:column;gap:12px;max-width:980px">
+    <div style="font-size:12px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B">Carni · rediseño · inventario servido por Django</div>
+    <h1 style="margin:0;font-family:Fraunces,Georgia,serif;font-size:44px;line-height:50px;font-weight:480">28–33 — Inventario en HTML plano</h1>
+    <p style="margin:0;font-size:16px;line-height:26px;color:#A8A29B;max-width:76ch;text-wrap:pretty">Mismo estilo que el panel, pero cada acción es un enlace o un formulario que va al servidor: sin modales, sin arrastrar, sin nada que dependa de JavaScript. Menú del teléfono con &lt;details&gt;, borrado y cambio de precio como páginas de confirmación propias, errores devueltos por el formulario y mensajes de Django arriba. Una sola maqueta fluida por pantalla, mostrada a 390 y a 1440.</p>
+  </div>
+
+  <sc-for list="{{ pantallas }}" as="p" hint-placeholder-count="6">
+    <div data-screen-label="{{ p.id }} {{ p.nombre }}" style="display:flex;flex-direction:column;gap:16px">
+      <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap">
+        <span style="font-size:12px;font-weight:600;letter-spacing:0.04em;color:#DC2626">{{ p.id }}</span>
+        <h2 style="margin:0;font-family:Fraunces,serif;font-size:30px;line-height:36px;font-weight:440">{{ p.nombre }}</h2>
+        <span style="font-size:13px;line-height:18px;color:#A8A29B">{{ p.sub }}</span>
+      </div>
+      <div style="display:flex;gap:32px;align-items:flex-start">
+        <sc-for list="{{ p.marcos }}" as="m" hint-placeholder-count="2">
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="width:{{ m.w }};min-height:{{ m.h }};background:#0B0B0C;border:1px solid #3F3F46;border-radius:12px;overflow:hidden;box-sizing:border-box;display:flex;flex-direction:column">
+
+              <sc-if value="{{ p.conBarra }}">
+                <header style="min-height:60px;box-sizing:border-box;border-bottom:1px solid #3F3F46;background:#151517;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:0 {{ m.pad }}">
+                  <span style="display:flex;align-items:center;gap:14px"><span style="display:flex;flex-direction:column;gap:5px;line-height:1"><span style="font-size:16px;font-weight:600;letter-spacing:0.18em">CARNICERÍA</span><span style="font-size:9px;font-weight:500;letter-spacing:0.12em;color:#E4D1B0">EL SEÑOR DE LA MISERICORDIA</span></span><span style="width:1px;height:28px;background:#3F3F46"></span><span style="font-family:Fraunces,serif;font-size:19px;font-weight:460">Inventario</span></span>
+                  <sc-if value="{{ m.d }}"><nav style="display:flex;align-items:center;gap:4px;font-size:15px"><a href="Inventario Django.dc.html" style="min-height:44px;display:flex;align-items:center;padding:0 12px;color:#F5F3EF;text-decoration:none;border-bottom:2px solid #DC2626">Productos</a><a href="Inventario Django.dc.html" style="min-height:44px;display:flex;align-items:center;padding:0 12px;color:#A8A29B;text-decoration:none">Movimientos</a><a href="Panel administrativo.dc.html" style="min-height:44px;display:flex;align-items:center;padding:0 12px;color:#A8A29B;text-decoration:none">Panel de la tienda</a><span style="width:1px;height:24px;background:#3F3F46;margin:0 8px"></span><span style="font-size:14px;color:#A8A29B">Eduardo</span><button type="submit" style="height:44px;padding:0 14px;border-radius:999px;background:transparent;border:1px solid #3F3F46;color:#F5F3EF;font-family:Geist,system-ui,sans-serif;font-size:14px;cursor:pointer;margin-left:8px">Salir</button></nav></sc-if>
+                  <sc-if value="{{ m.mo }}"><span style="min-height:44px;display:flex;align-items:center;gap:8px;padding:0 14px;border-radius:999px;border:1px solid #3F3F46;font-size:15px">Menú <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"></path></svg></span></sc-if>
+                </header>
+              </sc-if>
+
+              <div style="flex:1;width:100%;max-width:{{ p.max }};margin:0 auto;box-sizing:border-box;padding:{{ m.cpad }};display:flex;flex-direction:column;gap:20px">
+
+                <sc-for list="{{ p.mensajes }}" as="x" hint-placeholder-count="1">
+                  <div role="{{ x.role }}" style="display:flex;gap:12px;align-items:flex-start;padding:14px 16px;border-radius:14px;background:#151517;border:1px solid {{ x.bd }}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="{{ x.ic }}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:0 0 20px;margin-top:1px"><path d="{{ x.path }}"></path></svg><span style="display:flex;flex-direction:column;gap:2px"><span style="font-size:15px;line-height:22px;font-weight:600">{{ x.t }}</span><span style="font-size:14px;line-height:20px;color:#A8A29B;text-wrap:pretty">{{ x.d }}</span></span></div>
+                </sc-for>
+
+                <sc-if value="{{ p.migas }}"><span style="font-size:14px;color:#A8A29B;display:flex;gap:6px;align-items:center;flex-wrap:wrap"><a href="Inventario Django.dc.html" style="min-height:44px;display:flex;align-items:center;color:#A8A29B;text-decoration-color:#3F3F46">Productos</a>/<span style="color:#F5F3EF">{{ p.migas }}</span></span></sc-if>
+
+                <sc-if value="{{ p.titulo }}">
+                  <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap">
+                    <div style="display:flex;flex-direction:column;gap:6px"><h3 style="margin:0;font-family:Fraunces,serif;font-size:{{ m.h3 }};line-height:1.15;font-weight:480;text-wrap:balance">{{ p.titulo }}</h3><sc-if value="{{ p.bajada }}"><span style="font-size:15px;line-height:22px;color:#A8A29B;text-wrap:pretty;font-variant-numeric:tabular-nums">{{ p.bajada }}</span></sc-if></div>
+                    <sc-if value="{{ p.nuevo }}"><a href="Inventario Django.dc.html" style="height:48px;display:inline-flex;align-items:center;gap:8px;padding:0 20px;border-radius:999px;background:#DC2626;color:#FFFFFF;font-size:15px;font-weight:600;text-decoration:none">+ Nuevo producto</a></sc-if>
+                  </div>
+                </sc-if>
+
+                <!-- 28 lista -->
+                <sc-if value="{{ p.lista }}">
+                  <form method="get" style="display:flex;gap:8px;flex-wrap:wrap">
+                    <span style="flex:1 1 220px;display:flex;align-items:center;height:48px;box-sizing:border-box;border-radius:999px;background:#151517;border:1px solid #3F3F46;padding:0 18px;font-size:15px;color:{{ p.buscaFg }}">{{ p.busca }}</span>
+                    <span style="flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;gap:10px;height:48px;box-sizing:border-box;border-radius:999px;background:#151517;border:1px solid #3F3F46;padding:0 16px;font-size:15px">Todas las categorías <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#A8A29B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"></path></svg></span>
+                    <button type="submit" style="flex:0 0 auto;height:48px;padding:0 20px;border-radius:999px;background:transparent;border:1px solid #E4D1B0;color:#F5F3EF;font-family:Geist,system-ui,sans-serif;font-size:15px;font-weight:600;cursor:pointer">Buscar</button>
+                  </form>
+                  <sc-if value="{{ p.filas }}">
+                    <ul style="list-style:none;margin:0;padding:0;display:grid;grid-template-columns:{{ m.colsL }};gap:{{ m.gapL }}">
+                      <sc-for list="{{ p.filas }}" as="r" hint-placeholder-count="8">
+                        <sc-if value="{{ m.d }}"><li style="display:flex;flex-direction:column;border-radius:16px;background:#151517;border:1px solid #3F3F46;overflow:hidden">
+                          <a href="Inventario Django.dc.html" style="position:relative;display:block;aspect-ratio:4/3;background:#1C1C1F;text-decoration:none"><img src="{{ r.f }}" alt="{{ r.n }}" style="width:100%;height:100%;object-fit:cover;display:block;filter:{{ r.filtro }}"><span style="position:absolute;top:10px;left:10px;font-size:12px;line-height:16px;font-weight:600;color:{{ r.sc }};background:#1C1C1F;border:1px solid #3F3F46;border-radius:999px;padding:4px 10px;font-variant-numeric:tabular-nums">{{ r.q }}</span></a>
+                          <div style="flex:1;padding:16px;display:flex;flex-direction:column;gap:6px">
+                            <span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#E4D1B0">{{ r.cat }}</span>
+                            <a href="Inventario Django.dc.html" style="font-family:Fraunces,serif;font-size:20px;line-height:25px;font-weight:440;color:{{ r.fg }};text-decoration:none">{{ r.n }}</a>
+                            <span style="display:flex;align-items:baseline;gap:6px;flex-wrap:wrap;font-variant-numeric:tabular-nums"><span style="font-size:20px;font-weight:600;color:{{ r.fg }}">{{ r.precio }}</span><span style="font-size:14px;color:#A8A29B">/ kg · {{ r.lb }} / lb</span></span>
+                            <span style="display:flex;gap:6px;margin-top:auto;padding-top:10px"><a href="Inventario Django.dc.html" style="flex:1;height:44px;display:flex;align-items:center;justify-content:center;border-radius:999px;border:1px solid #E4D1B0;color:#F5F3EF;font-size:14px;font-weight:600;text-decoration:none">Editar</a><a href="Inventario Django.dc.html" style="height:44px;display:flex;align-items:center;padding:0 12px;color:#A8A29B;font-size:14px;text-decoration-color:#3F3F46">Borrar</a></span>
+                          </div>
+                        </li></sc-if>
+                        <sc-if value="{{ m.mo }}"><li style="display:flex;flex-direction:column;gap:8px;padding:12px 12px 6px;border-radius:16px;background:#151517;border:1px solid #3F3F46">
+                          <span style="display:flex;gap:12px;align-items:center"><span style="width:68px;height:68px;flex:0 0 68px;border-radius:12px;overflow:hidden;background:#1C1C1F"><img src="{{ r.f }}" alt="{{ r.n }}" style="width:100%;height:100%;object-fit:cover;display:block;filter:{{ r.filtro }}"></span><span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px"><span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#E4D1B0">{{ r.cat }}</span><a href="Inventario Django.dc.html" style="font-family:Fraunces,serif;font-size:18px;line-height:22px;font-weight:440;color:{{ r.fg }};text-decoration:none">{{ r.n }}</a><span style="font-size:15px;font-weight:600;font-variant-numeric:tabular-nums;color:{{ r.fg }}">{{ r.precio }} <span style="font-size:13px;font-weight:400;color:#A8A29B">/ kg · {{ r.lb }} / lb</span></span></span></span>
+                          <span style="display:flex;align-items:center;justify-content:space-between;gap:8px;border-top:1px solid #3F3F46;padding-top:4px"><span style="font-size:14px;color:{{ r.sc }};font-variant-numeric:tabular-nums">Existencia: {{ r.q }}</span><span style="display:flex;gap:4px"><a href="Inventario Django.dc.html" style="min-height:44px;display:flex;align-items:center;padding:0 10px;font-size:14px;font-weight:600">Editar</a><a href="Inventario Django.dc.html" style="min-height:44px;display:flex;align-items:center;padding:0 10px;font-size:14px;color:#A8A29B;text-decoration-color:#3F3F46">Borrar</a></span></span>
+                        </li></sc-if>
+                      </sc-for>
+                    </ul>
+                    <nav style="display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:14px;color:#A8A29B;font-variant-numeric:tabular-nums"><span>Página 1 de 3 · 42 productos</span><a href="Inventario Django.dc.html" style="min-height:44px;display:flex;align-items:center;font-weight:600">Siguiente</a></nav>
+                  </sc-if>
+                  <sc-if value="{{ p.vacio }}">
+                    <div style="display:flex;flex-direction:column;align-items:flex-start;gap:12px;padding:32px 24px;border-radius:16px;border:1px dashed #3F3F46">
+                      <span style="font-family:Fraunces,serif;font-size:24px;line-height:30px;font-weight:460">Ningún producto se llama “salmón”</span>
+                      <span style="font-size:15px;line-height:23px;color:#A8A29B;text-wrap:pretty">La tienda no vende pescado. Revisa cómo se escribe o busca por categoría.</span>
+                      <span style="display:flex;gap:10px;flex-wrap:wrap;padding-top:4px"><a href="Inventario Django.dc.html" style="height:48px;display:inline-flex;align-items:center;padding:0 20px;border-radius:999px;background:#DC2626;color:#FFFFFF;font-size:15px;font-weight:600;text-decoration:none">Ver todos</a><a href="Inventario Django.dc.html" style="height:48px;display:inline-flex;align-items:center;padding:0 20px;border-radius:999px;border:1px solid #E4D1B0;color:#F5F3EF;font-size:15px;font-weight:600;text-decoration:none">Dar de alta “salmón”</a></span>
+                    </div>
+                  </sc-if>
+                </sc-if>
+
+                <!-- 29 detalle -->
+                <sc-if value="{{ p.detalle }}">
+                  <div style="display:grid;grid-template-columns:{{ m.cols }};gap:24px;align-items:start">
+                    <div style="border-radius:20px;overflow:hidden;background:#1C1C1F;aspect-ratio:4/3"><img src="public/img/products/rib-eye-alto.webp" alt="Rib Eye" style="width:100%;height:100%;object-fit:cover;display:block"></div>
+                    <div style="display:flex;flex-direction:column;gap:14px;padding:24px;border-radius:20px;background:#151517;border:1px solid #3F3F46">
+                    <span style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;font-variant-numeric:tabular-nums"><span style="font-size:40px;line-height:44px;font-weight:600">$579</span><span style="font-size:17px;color:#A8A29B">/ kg · $262.63 / lb</span></span>
+                    <dl style="margin:0;display:flex;flex-direction:column;border-top:1px solid #3F3F46">
+                      <sc-for list="{{ p.datos }}" as="x" hint-placeholder-count="7"><div style="display:flex;justify-content:space-between;gap:16px;min-height:48px;align-items:center;border-bottom:1px solid #3F3F46;font-size:15px"><dt style="color:#A8A29B">{{ x.k }}</dt><dd style="margin:0;font-weight:600;text-align:right;font-variant-numeric:tabular-nums">{{ x.v }}</dd></div></sc-for>
+                    </dl>
+                    </div>
+                  </div>
+                  <div style="display:flex;flex-direction:column;gap:10px;padding:20px 24px;border-radius:20px;background:#151517;border:1px solid #3F3F46"><span style="font-family:Fraunces,serif;font-size:22px;line-height:28px;font-weight:460">Últimos movimientos</span>
+                    <sc-for list="{{ p.movs }}" as="x" hint-placeholder-count="3"><div style="display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid #3F3F46;font-size:14px;font-variant-numeric:tabular-nums"><span style="color:#A8A29B">{{ x.f }}</span><span style="flex:1">{{ x.t }}</span><span style="font-weight:600">{{ x.q }}</span></div></sc-for>
+                  </div>
+                  <div style="display:flex;gap:10px;flex-wrap:wrap"><a href="Inventario Django.dc.html" style="height:48px;display:inline-flex;align-items:center;padding:0 22px;border-radius:999px;background:#DC2626;color:#FFFFFF;font-size:15px;font-weight:600;text-decoration:none">Editar</a><a href="Inventario Django.dc.html" style="height:48px;display:inline-flex;align-items:center;padding:0 22px;border-radius:999px;border:1px solid #E4D1B0;color:#F5F3EF;font-size:15px;font-weight:600;text-decoration:none">Cambiar precio</a><a href="Inventario Django.dc.html" style="height:48px;display:inline-flex;align-items:center;padding:0 16px;color:#A8A29B;font-size:15px;text-decoration-color:#3F3F46">Borrar</a></div>
+                </sc-if>
+
+                <!-- 30 formulario -->
+                <sc-if value="{{ p.form }}">
+                  <form method="post" style="display:flex;flex-direction:column;gap:18px;padding:{{ m.fpad }};border-radius:24px;background:#151517;border:1px solid #3F3F46">
+                    <span style="font-family:Fraunces,serif;font-size:22px;line-height:28px;font-weight:460">Datos del producto</span>
+                    <div style="display:grid;grid-template-columns:{{ m.cols }};gap:18px">
+                      <sc-for list="{{ p.campos }}" as="c" hint-placeholder-count="6">
+                        <label style="display:flex;flex-direction:column;gap:6px;grid-column:{{ c.span }}"><span style="font-size:14px;font-weight:600">{{ c.l }}<sc-if value="{{ c.req }}"><span style="color:#A8A29B;font-weight:400"> · obligatorio</span></sc-if></span><span style="display:flex;align-items:center;justify-content:space-between;min-height:{{ c.alto }};box-sizing:border-box;border-radius:14px;background:#0B0B0C;border:1px solid {{ c.bd }};padding:0 16px;font-size:16px;color:{{ c.fg }};font-variant-numeric:tabular-nums">{{ c.v }}<sc-if value="{{ c.sel }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#A8A29B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"></path></svg></sc-if></span><sc-if value="{{ c.error }}"><span style="display:flex;gap:8px;font-size:14px;line-height:20px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2" stroke-linecap="round" style="flex:0 0 18px;margin-top:1px"><circle cx="12" cy="12" r="9"></circle><path d="M12 7.5v5.5M12 16.5h.01"></path></svg>{{ c.error }}</span></sc-if><sc-if value="{{ c.ayuda }}"><span style="font-size:13px;line-height:18px;color:#A8A29B">{{ c.ayuda }}</span></sc-if></label>
+                      </sc-for>
+                    </div>
+                    <label style="display:flex;align-items:center;gap:12px;min-height:44px;font-size:15px"><span style="width:22px;height:22px;box-sizing:border-box;border-radius:6px;background:#DC2626;display:flex;align-items:center;justify-content:center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 9.5 17 19 7.5"></path></svg></span>Visible en la tienda</label>
+                    <div style="display:flex;gap:10px;flex-wrap:wrap;border-top:1px solid #3F3F46;padding-top:18px"><button type="submit" style="height:52px;padding:0 26px;border-radius:999px;background:#DC2626;border:none;color:#FFFFFF;font-family:Geist,system-ui,sans-serif;font-size:16px;font-weight:600;cursor:pointer">Guardar producto</button><a href="Inventario Django.dc.html" style="height:52px;display:inline-flex;align-items:center;padding:0 22px;border-radius:999px;border:1px solid #E4D1B0;color:#F5F3EF;font-size:16px;font-weight:600;text-decoration:none">Cancelar</a></div>
+                  </form>
+                </sc-if>
+
+                <!-- 31 / 32 confirmaciones -->
+                <sc-if value="{{ p.confirma }}">
+                  <form method="post" style="display:flex;flex-direction:column;gap:18px;padding:24px;border-radius:24px;background:#151517;border:1px solid #3F3F46">
+                    <sc-if value="{{ p.producto }}"><span style="display:flex;gap:14px;align-items:center;padding-bottom:18px;border-bottom:1px solid #3F3F46"><span style="width:72px;height:72px;flex:0 0 72px;border-radius:14px;overflow:hidden;background:#1C1C1F"><img src="{{ p.producto.f }}" alt="" style="width:100%;height:100%;object-fit:cover;display:block"></span><span style="display:flex;flex-direction:column;gap:3px"><span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#E4D1B0">{{ p.producto.cat }}</span><span style="font-family:Fraunces,serif;font-size:22px;line-height:27px;font-weight:440">{{ p.producto.n }}</span><span style="font-size:14px;color:#A8A29B;font-variant-numeric:tabular-nums">{{ p.producto.d }}</span></span></span></sc-if>
+                    <sc-if value="{{ p.antesDespues }}">
+                      <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center">
+                        <span style="display:flex;flex-direction:column;gap:2px;padding:16px;border-radius:14px;border:1px solid #3F3F46;background:#0B0B0C"><span style="font-size:13px;color:#A8A29B">Antes</span><span style="font-size:24px;font-weight:600;color:#A8A29B;text-decoration:line-through;font-variant-numeric:tabular-nums">$549 / kg</span><span style="font-size:13px;color:#A8A29B;font-variant-numeric:tabular-nums">$249.03 / lb</span></span>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#E4D1B0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+                        <span style="display:flex;flex-direction:column;gap:2px;padding:16px;border-radius:14px;border:1px solid #E4D1B0;background:#0B0B0C"><span style="font-size:13px;color:#A8A29B">Después</span><span style="font-size:24px;font-weight:600;font-variant-numeric:tabular-nums">$579 / kg</span><span style="font-size:13px;color:#A8A29B;font-variant-numeric:tabular-nums">$262.63 / lb</span></span>
+                      </div>
+                    </sc-if>
+                    <dl style="margin:0;display:flex;flex-direction:column;border-top:1px solid #3F3F46">
+                      <sc-for list="{{ p.datos }}" as="x" hint-placeholder-count="3"><div style="display:flex;justify-content:space-between;gap:16px;min-height:48px;align-items:center;border-bottom:1px solid #3F3F46;font-size:15px"><dt style="color:#A8A29B">{{ x.k }}</dt><dd style="margin:0;font-weight:600;text-align:right;font-variant-numeric:tabular-nums">{{ x.v }}</dd></div></sc-for>
+                    </dl>
+                    <div style="display:flex;gap:10px;flex-wrap:wrap"><button type="submit" style="height:52px;padding:0 24px;border-radius:999px;background:#DC2626;border:none;color:#FFFFFF;font-family:Geist,system-ui,sans-serif;font-size:16px;font-weight:600;cursor:pointer">{{ p.si }}</button><a href="Inventario Django.dc.html" style="height:52px;display:inline-flex;align-items:center;padding:0 22px;border-radius:999px;border:1px solid #E4D1B0;color:#F5F3EF;font-size:16px;font-weight:600;text-decoration:none">No, volver</a></div>
+                  </form>
+                </sc-if>
+
+                <!-- 33 ingreso -->
+                <sc-if value="{{ p.ingreso }}">
+                  <div style="display:flex;flex-direction:column;align-items:flex-start;gap:12px"><span style="display:flex;flex-direction:column;gap:6px;line-height:1;padding-bottom:8px"><span style="font-size:22px;font-weight:600;letter-spacing:0.18em">CARNICERÍA</span><span style="font-size:10px;font-weight:500;letter-spacing:0.14em;color:#E4D1B0">EL SEÑOR DE LA MISERICORDIA</span></span><h3 style="margin:0;font-family:Fraunces,serif;font-size:{{ m.h3 }};line-height:1.15;font-weight:480">Inventario de la carnicería</h3><span style="font-size:15px;line-height:22px;color:#A8A29B">Solo para el personal de la tienda.</span></div>
+                  <form method="post" style="display:flex;flex-direction:column;gap:16px;padding:{{ m.fpad }};border-radius:24px;background:#151517;border:1px solid #3F3F46">
+                    <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:14px;font-weight:600">Usuario</span><span style="display:flex;align-items:center;height:52px;box-sizing:border-box;border-radius:14px;background:#0B0B0C;border:1px solid #DC2626;padding:0 16px;font-size:16px">eduardo</span></label>
+                    <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:14px;font-weight:600">Contraseña</span><span style="display:flex;align-items:center;height:52px;box-sizing:border-box;border-radius:14px;background:#0B0B0C;border:1px solid #DC2626;padding:0 16px;font-size:16px;letter-spacing:0.18em">••••••••</span></label>
+                    <button type="submit" style="height:52px;border-radius:999px;background:#DC2626;border:none;color:#FFFFFF;font-family:Geist,system-ui,sans-serif;font-size:16px;font-weight:600;cursor:pointer">Ingresar</button>
+                  </form>
+                  <div style="display:flex;flex-direction:column;gap:10px;border-top:1px solid #3F3F46;padding-top:20px">
+                    <span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B">Los tres mensajes de Django, dentro del sitio</span>
+                    <sc-for list="{{ p.muestras }}" as="x" hint-placeholder-count="3">
+                      <div style="display:flex;gap:12px;align-items:flex-start;padding:14px 16px;border-radius:14px;background:#151517;border:1px solid {{ x.bd }}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="{{ x.ic }}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:0 0 20px;margin-top:1px"><path d="{{ x.path }}"></path></svg><span style="display:flex;flex-direction:column;gap:2px"><span style="font-size:15px;line-height:22px;font-weight:600">{{ x.t }}</span><span style="font-size:14px;line-height:20px;color:#A8A29B">{{ x.d }}</span></span></div>
+                    </sc-for>
+                  </div>
+                </sc-if>
+              </div>
+            </div>
+            <div style="font-size:13px;line-height:18px;font-weight:600">{{ p.nombre }} · {{ m.nombre }}</div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:4px;font-size:13px;line-height:19px;color:#A8A29B;max-width:1100px;text-wrap:pretty"><span><span style="color:#E4D1B0;font-weight:600">De lo nuestro · </span>{{ p.n }}</span><span><span style="color:#F5F3EF;font-weight:600">De lo mío · </span>{{ p.y }}</span><span><span style="color:#F5F3EF;font-weight:600">Mejora · </span>{{ p.m }}</span></div>
+    </div>
+  </sc-for>
+
+  <div style="display:flex;flex-direction:column;gap:16px">
+    <h2 style="margin:0;font-family:Fraunces,serif;font-size:30px;line-height:36px;font-weight:440">Autorrevisión · inventario Django</h2>
+    <div style="background:#151517;border:1px solid #3F3F46;border-radius:12px;overflow:hidden;width:1440px;max-width:100%">
+      <div style="display:grid;grid-template-columns:200px minmax(0,1fr) 100px minmax(0,1.2fr);font-size:12px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B;border-bottom:1px solid #3F3F46"><span style="padding:12px 16px">Criterio</span><span style="padding:12px 16px">Qué se midió</span><span style="padding:12px 16px">Estado</span><span style="padding:12px 16px">Corrección</span></div>
+      <sc-for list="{{ revision }}" as="c" hint-placeholder-count="6">
+        <div style="display:grid;grid-template-columns:200px minmax(0,1fr) 100px minmax(0,1.2fr);font-size:13px;line-height:18px;border-bottom:1px solid #3F3F46"><span style="padding:12px 16px">{{ c.c }}</span><span style="padding:12px 16px;color:#A8A29B">{{ c.m }}</span><span style="padding:12px 16px;color:#059669;font-weight:600">Pasa</span><span style="padding:12px 16px;color:#A8A29B">{{ c.x }}</span></div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div id="reporte-b7" data-screen-label="Reporte" style="width:1440px;max-width:100%;box-sizing:border-box;background:#151517;border:1px solid #3F3F46;border-radius:16px;padding:40px;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:48px">
+    <div style="display:flex;flex-direction:column;gap:20px">
+      <span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#E4D1B0">Reporte · inventario Django</span>
+      <span style="font-family:Fraunces,serif;font-size:40px;line-height:46px;font-weight:480">6 de 6 pantallas cerradas</span>
+      <div style="display:flex;flex-direction:column">
+        <sc-for list="{{ pantallas }}" as="p" hint-placeholder-count="6"><span style="display:grid;grid-template-columns:40px minmax(0,1fr) 80px;gap:12px;padding:12px 0;border-bottom:1px solid #3F3F46;font-size:15px;line-height:22px"><span style="color:#A8A29B">{{ p.id }}</span><span>{{ p.nombre }}</span><span style="color:#059669;font-weight:600">Listo</span></span></sc-for>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B">Pendientes</span>
+      <span style="font-size:15px;line-height:22px;text-wrap:pretty;border-bottom:1px solid #3F3F46;padding-bottom:12px">Falta backend: contar favoritos por producto (la tabla vive en Supabase, no en Django) y registrar movimientos de inventario.</span>
+      <span style="font-size:15px;line-height:22px;text-wrap:pretty;border-bottom:1px solid #3F3F46;padding-bottom:12px">El &lt;select&gt; nativo se estiliza hasta donde el navegador deja; en iOS abre la rueda del sistema.</span>
+      <span style="font-size:15px;line-height:22px;text-wrap:pretty">Los estilos van en un solo CSS estático de Django; esta lámina usa estilos en línea solo como maqueta.</span>
+    </div>
+  </div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const OK = 'M5 12.5 9.5 17 19 7.5', WARN = 'M12 9v4M12 16.5h.01M10.3 4.2 2.8 17.5A2 2 0 0 0 4.5 20.5h15a2 2 0 0 0 1.7-3L13.7 4.2a2 2 0 0 0-3.4 0Z', ERR = 'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18ZM12 7.5v5.5M12 16.5h.01';
+const msg = (tipo, t, d) => ({ t, d, role: tipo === 'error' ? 'alert' : 'status', bd: tipo === 'ok' ? '#059669' : (tipo === 'aviso' ? '#E4D1B0' : '#DC2626'), ic: tipo === 'ok' ? '#059669' : (tipo === 'aviso' ? '#E4D1B0' : '#DC2626'), path: tipo === 'ok' ? OK : (tipo === 'aviso' ? WARN : ERR) });
+const lb = p => '$' + (parseFloat(p.replace(/[^0-9.]/g, '')) * 0.4536).toFixed(2);
+const fila = (n, cat, precio, q, est, f) => ({ n, cat, precio, q, lb: lb(precio), f: 'public/img/products/' + f, filtro: est === 'ag' ? 'saturate(0.5) brightness(0.8)' : 'none', fg: est === 'ag' ? '#A8A29B' : '#F5F3EF', sc: est === 'ag' ? '#A8A29B' : (est === 'bajo' ? '#E4D1B0' : '#F5F3EF') });
+const campo = (l, v, o = {}) => ({ l, v: v || o.ph, fg: v ? '#F5F3EF' : '#A8A29B', bd: o.error ? '#DC2626' : '#3F3F46', error: o.error ?? null, ayuda: o.ayuda ?? null, req: !!o.req, sel: !!o.sel, alto: o.area ? '104px' : '52px', span: o.ancho ? '1 / -1' : 'auto' });
+const marcos = (h1, h2) => [
+  { nombre: 'móvil 390', w: '390px', h: h1 ?? '844px', pad: '16px', cpad: '24px 16px 40px', d: false, mo: true, cols: '1fr', h3: '30px', colsL: '1fr', gapL: '10px', fpad: '20px 16px' },
+  { nombre: 'escritorio 1440', w: '1440px', h: h2 ?? '844px', pad: '32px', cpad: '48px 32px 72px', d: true, mo: false, cols: '1fr 1fr', h3: '44px', colsL: 'repeat(4,minmax(0,1fr))', gapL: '20px', fpad: '32px' }
+];
+const base = { producto: null, conBarra: true, max: '1080px', mensajes: [], migas: null, titulo: null, bajada: null, nuevo: false, lista: false, filas: null, vacio: false, busca: '', buscaFg: '#A8A29B', detalle: false, datos: [], movs: [], form: false, campos: [], confirma: false, antesDespues: false, si: '', ingreso: false, muestras: [] };
+const FILAS = [fila('Rib Eye', 'Cortes especiales', '$579', '12 kg', '', 'rib-eye-alto.webp'), fila('Tomahawk', 'Cortes especiales', '$649', '3 pzas', 'bajo', 'tomahawk.webp'), fila('Arrachera', 'Cortes especiales', '$449', '28 kg', '', 'skirt_steak.webp'), fila('Top Sirloin', 'Cortes especiales', '$389', '35 kg', '', 'top_sirloin.webp'), fila('Bistec de Res', 'Carnes rojas', '$289', '80 kg', '', 'res.webp'), fila('Chambarete con Tuétano', 'Carnes rojas', '$189', 'Sin existencia', 'ag', 'res-detalle.webp'), fila('Flank Steak', 'Cortes especiales', '$399', '28 kg', '', 'flak_steak.webp'), fila('Chorizo Verde', 'Preparadas', '$149', '25 kg', '', 'preparadas.webp')];
+const P = [
+  { ...base, id: '28', nombre: 'Lista con buscador', sub: 'buscar y filtrar son un formulario GET · paginación con enlaces', marcos: marcos('1000px', '844px'), titulo: 'Productos', bajada: '42 productos · 5 con existencia baja · la misma tarjeta del sitio, sin JavaScript', nuevo: true, lista: true, filas: FILAS, busca: 'Buscar por nombre',
+    mensajes: [msg('ok', 'Guardaste “Arrachera”.', 'Ya aparece en la tienda con $449 / kg.')],
+    n: 'los productos, categorías, precios y existencias del inventario de Django, con alta, edición y borrado.', y: 'buscar y filtrar como formulario GET y el mensaje de Django arriba con borde verde.', m: 'deja de ser tabla: cada producto es una tarjeta del sistema con foto, categoría en beige, nombre en Fraunces, precio por kilo y libra y existencia en insignia; cuatro por fila en 1440 y tarjeta horizontal en 390, todo en HTML plano.' },
+  { ...base, id: '28b', nombre: 'Lista · estado vacío', sub: 'búsqueda sin resultados, con salida', marcos: marcos('600px', '600px'), titulo: 'Productos', nuevo: true, lista: true, vacio: true, busca: 'salmón', buscaFg: '#F5F3EF',
+    n: 'el buscador de la lista.', y: 'un vacío que dice qué no se encontró.', m: 'el vacío dice qué no se encontró y por qué; “Ver todos” es la salida principal y “Dar de alta” queda como secundaria.' },
+  { ...base, id: '29', nombre: 'Detalle', sub: 'lista de definiciones · movimientos · tres acciones como enlaces', marcos: marcos('1180px', '900px'), migas: 'Rib Eye', titulo: 'Rib Eye', bajada: 'Cortes especiales · visible en la tienda', detalle: true,
+    datos: [{ k: 'Precio por kilo', v: '$579.00' }, { k: 'Precio por libra', v: '$262.63' }, { k: 'Existencia', v: '12 kg' }, { k: 'Mínimo por pedido', v: '300 g' }, { k: 'Modos de venta', v: 'Por peso, por precio' }, { k: 'En pedidos', v: '87' }, { k: 'Última edición', v: '22 sep, 11:40 · Eduardo' }],
+    movs: [{ f: '22 sep', t: 'Cambio de precio $549 → $579', q: '' }, { f: '21 sep', t: 'Entrada de proveedor', q: '+15 kg' }, { f: '20 sep', t: 'Ventas del día', q: '−6.4 kg' }],
+    n: 'los datos del producto que guarda Django.', y: 'lista de definiciones con historial de movimientos.', m: 'el precio manda a 40 px con su libra, los datos y los movimientos viven en tarjetas y las tres acciones quedan a la vista.' },
+  { ...base, id: '30', nombre: 'Alta y edición con errores por campo', sub: 'el servidor devuelve el formulario con cada error debajo de su campo', marcos: marcos('1220px', '980px'), migas: 'Nuevo producto', titulo: 'Nuevo producto', form: true, max: '860px',
+    mensajes: [msg('error', 'Revisa los 2 campos marcados.', 'No se guardó nada todavía.')],
+    campos: [campo('Nombre', 'Arrachera', { req: true, ancho: true }), campo('Categoría', 'Cortes especiales', { req: true, sel: true }), campo('Precio por kilo', '$44.9', { req: true, error: 'Escribe el precio completo, por ejemplo 449.00.' }), campo('Existencia', '28', { ayuda: 'En kilos para carnes, en piezas para merch.' }), campo('Mínimo por pedido', '', { ph: '300 g', error: 'Falta el mínimo; para carnes suele ser 250 o 300 g.' }), campo('Descripción corta', 'Falda marinada, para asar entera', { ancho: true, area: true, ayuda: 'Se ve debajo del nombre en la Tarjeta. 60 caracteres máximo.' })],
+    n: 'los campos del modelo y la validación del servidor.', y: 'resumen del error en español y cada error debajo de su campo.', m: 'el formulario vive en una tarjeta con aire y campos más oscuros que su fondo, así se distingue qué se llena.' },
+  { ...base, id: '31', nombre: 'Confirmar borrado', sub: 'página propia, formulario POST · el producto con pedidos se desactiva', marcos: marcos('844px', '760px'), migas: 'Borrar', titulo: '¿Borrar “Chambarete con Tuétano”?', bajada: 'Tiene pedidos en su historial, así que no se borra: se desactiva y deja de verse en la tienda.', confirma: true, max: '720px', si: 'Sí, desactivar', producto: { f: 'public/img/products/res-detalle.webp', cat: 'Carnes rojas', n: 'Chambarete con Tuétano', d: '$189 / kg · sin existencia' },
+    datos: [{ k: 'Pedidos con este producto', v: '14' }, { k: 'Listas de favoritos que lo tienen', v: '6' }, { k: 'Qué verán esos clientes', v: '“Ya no disponible”' }],
+    n: 'la regla de negocio: un producto con pedidos no se borra, se desactiva.', y: 'página de confirmación propia con POST.', m: 'la tarjeta muestra qué producto es, cuántos pedidos y listas de favoritos toca y qué verán los clientes.' },
+  { ...base, id: '32', nombre: 'Confirmar cambio de precio', sub: 'antes y después en kilo y libra', marcos: marcos('844px', '760px'), migas: 'Cambiar precio', titulo: '¿Cambiar el precio del Rib Eye?', bajada: 'Los pedidos ya hechos conservan el precio de antes.', confirma: true, antesDespues: true, max: '720px', si: 'Sí, cambiar a $579', producto: { f: 'public/img/products/rib-eye-alto.webp', cat: 'Cortes especiales', n: 'Rib Eye', d: '12 kg en existencia · 87 pedidos' },
+    datos: [{ k: 'Diferencia', v: '+$30 / kg · +5.5 %' }, { k: 'Carritos abiertos con este producto', v: '4' }],
+    n: 'el cambio de precio del inventario.', y: 'antes tachado y después en beige, en kilo y libra.', m: 'el producto y su existencia arriba de la comparación, para confirmar sin dudar.' },
+  { ...base, id: '33', nombre: 'Ingreso y mensajes', sub: 'éxito, aviso y error con el mismo molde', marcos: marcos('900px', '900px'), conBarra: false, max: '440px', ingreso: true,
+    mensajes: [msg('error', 'Usuario o contraseña incorrectos.', 'Revisa mayúsculas. Tras 5 intentos se bloquea 15 minutos.')],
+    muestras: [msg('ok', 'Guardaste “Arrachera”.', 'Ya aparece en la tienda.'), msg('aviso', 'Tomahawk: quedan 3 piezas.', 'Considera reabastecer antes del fin de semana.'), msg('error', 'No se pudo guardar.', 'El servidor tardó demasiado. Intenta de nuevo.')],
+    n: 'el ingreso de Django para el personal.', y: 'el mismo campo y botón del sitio y los tres mensajes con un solo molde.', m: 'el logotipo del sitio en lugar del login azul del admin y el formulario en tarjeta.' }
+];
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      pantallas: P,
+      revision: [
+        { c: 'Se lee en el teléfono', m: 'Títulos 30 px, datos 15 px, renglones apilados en 390', x: 'Sin cambios necesarios.' },
+        { c: 'Contraste', m: 'Mensajes con tinta #F5F3EF sobre #151517; el color va solo en borde e ícono', x: 'Intento 1: el texto del error iba en rojo; se pasó a tinta clara como en Inicio de sesión.' },
+        { c: 'Botones de 44 px', m: 'Enlaces Editar/Borrar con 44 de alto, botones 48–52, casilla con fila de 44', x: 'Intento 1: “Editar · Borrar” como texto de 14 px sin área; se les dio 44.' },
+        { c: 'Sin JavaScript', m: 'Menú con details, confirmaciones como páginas, búsqueda GET, formularios POST', x: 'Sin cambios necesarios.' },
+        { c: 'Nada se sale ni se corta', m: '“Chambarete con Tuétano” y las descripciones envuelven; una sola maqueta fluida', x: 'Sin cambios necesarios.' },
+        { c: 'Mejor que lo viejo', m: 'Contra el admin por defecto de Django y la tabla de la captura 30', x: 'Ver las líneas de mejora.' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

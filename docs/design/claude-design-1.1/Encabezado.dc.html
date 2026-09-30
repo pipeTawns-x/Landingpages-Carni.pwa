@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..700&family=Geist:wght@400..700&display=swap" rel="stylesheet">
+<style>body{margin:0;background:#0B0B0C;color:#F5F3EF}a{color:#DC2626}a:hover{color:#E4D1B0}</style>
+</helmet>
+<sc-if value="{{ movil }}" hint-placeholder-val="{{ true }}">
+  <header style="position:relative;height:56px;box-sizing:border-box;background:{{ fondo }};border-bottom:1px solid #3F3F46;display:flex;align-items:center;justify-content:space-between;padding:0 6px;font-family:Geist,system-ui,sans-serif;color:#F5F3EF">
+    <button aria-label="Abrir el menú" style="width:44px;height:44px;border:none;background:transparent;color:#F5F3EF;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:999px">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3.5 7h17M3.5 12h17M3.5 17h17"></path></svg>
+    </button>
+    <a href="Landing.dc.html" aria-label="Carnicería El Señor de La Misericordia, ir al inicio" style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:4px;line-height:1;color:#F5F3EF;text-decoration:none">
+      <span style="font-size:17px;font-weight:560;letter-spacing:0.2em;padding-left:0.2em">CARNICERÍA</span>
+      <span style="display:flex;align-items:center;gap:7px;font-size:9px;font-weight:500;letter-spacing:0.14em;padding-left:0.14em;color:#E4D1B0;white-space:nowrap"><span style="width:14px;height:1px;background:#E4D1B0"></span>EL SEÑOR DE LA MISERICORDIA<span style="width:14px;height:1px;background:#E4D1B0"></span></span>
+    </a>
+    <span style="display:flex;align-items:center">
+      <sc-if value="{{ conLupa }}" hint-placeholder-val="{{ true }}">
+        <button aria-label="Buscar" style="width:44px;height:44px;border:none;background:transparent;color:#F5F3EF;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:999px">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m16.5 16.5 4 4"></path></svg>
+        </button>
+      </sc-if>
+      <button aria-label="{{ etiquetaCarrito }}" style="position:relative;width:44px;height:44px;border:none;background:transparent;color:#F5F3EF;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:999px">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h12l-1.2 12.2a1 1 0 0 1-1 .8H8.2a1 1 0 0 1-1-.8Z"></path><path d="M9 7V5.5a3 3 0 0 1 6 0V7"></path></svg>
+        <sc-if value="{{ hayCuenta }}" hint-placeholder-val="{{ true }}"><span style="position:absolute;top:4px;right:3px;min-width:18px;height:18px;padding:0 4px;box-sizing:border-box;border-radius:999px;background:#DC2626;color:#FFFFFF;font-size:11px;line-height:18px;font-weight:600;text-align:center;font-variant-numeric:tabular-nums;outline:2px solid {{ fondo }}">{{ cuenta }}</span></sc-if>
+      </button>
+    </span>
+  </header>
+</sc-if>
+<sc-if value="{{ escritorio }}">
+  <header style="position:relative;height:{{ altoD }};box-sizing:border-box;background:{{ fondo }};border-bottom:1px solid #3F3F46;display:flex;align-items:center;justify-content:space-between;padding:0 24px;font-family:Geist,system-ui,sans-serif;color:#F5F3EF;transition:height 200ms ease">
+    <button aria-label="Abrir el menú" style="width:48px;height:48px;border:1px solid #3F3F46;background:transparent;color:#F5F3EF;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:999px" style-hover="border-color:#E4D1B0">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3.5 7h17M3.5 12h17M3.5 17h17"></path></svg>
+    </button>
+    <a href="Landing.dc.html" aria-label="Carnicería El Señor de La Misericordia, ir al inicio" style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:6px;line-height:1;color:#F5F3EF;text-decoration:none">
+      <span style="font-size:22px;font-weight:560;letter-spacing:0.22em;padding-left:0.22em">CARNICERÍA</span>
+      <sc-if value="{{ subtitulo }}" hint-placeholder-val="{{ true }}"><span style="display:flex;align-items:center;gap:10px;font-size:10px;font-weight:500;letter-spacing:0.16em;padding-left:0.16em;color:#E4D1B0;white-space:nowrap"><span style="width:24px;height:1px;background:#E4D1B0"></span>EL SEÑOR DE LA MISERICORDIA<span style="width:24px;height:1px;background:#E4D1B0"></span></span></sc-if>
+    </a>
+    <span style="display:flex;align-items:center;gap:8px">
+      <sc-if value="{{ conLupa }}" hint-placeholder-val="{{ true }}">
+        <button aria-label="Buscar" style="width:48px;height:48px;border:1px solid #3F3F46;background:transparent;color:#F5F3EF;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:999px" style-hover="border-color:#E4D1B0">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m16.5 16.5 4 4"></path></svg>
+        </button>
+      </sc-if>
+      <button aria-label="{{ etiquetaCarrito }}" style="position:relative;width:48px;height:48px;border:1px solid #3F3F46;background:transparent;color:#F5F3EF;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:999px" style-hover="border-color:#E4D1B0">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h12l-1.2 12.2a1 1 0 0 1-1 .8H8.2a1 1 0 0 1-1-.8Z"></path><path d="M9 7V5.5a3 3 0 0 1 6 0V7"></path></svg>
+        <sc-if value="{{ hayCuenta }}" hint-placeholder-val="{{ true }}"><span style="position:absolute;top:-2px;right:-2px;min-width:20px;height:20px;padding:0 5px;box-sizing:border-box;border-radius:999px;background:#DC2626;color:#FFFFFF;font-size:12px;line-height:20px;font-weight:600;text-align:center;font-variant-numeric:tabular-nums;outline:2px solid {{ fondo }}">{{ cuenta }}</span></sc-if>
+      </button>
+    </span>
+  </header>
+</sc-if>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:72},&quot;ancho&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;movil&quot;,&quot;escritorio&quot;],&quot;default&quot;:&quot;escritorio&quot;,&quot;tsType&quot;:&quot;'movil'|'escritorio'&quot;},&quot;scroll&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;},&quot;cuenta&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:3,&quot;tsType&quot;:&quot;number&quot;},&quot;sinLupa&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const p = this.props;
+    const d = (p.ancho ?? 'movil') === 'escritorio';
+    const s = !!p.scroll;
+    const n = p.cuenta ?? 3;
+    return {
+      movil: !d, escritorio: d,
+      fondo: s ? '#151517' : '#0B0B0C',
+      altoD: s ? '60px' : '72px',
+      subtitulo: !s,
+      conLupa: !(p.sinLupa ?? false),
+      cuenta: n, hayCuenta: n > 0,
+      etiquetaCarrito: 'Mi carrito, ' + n + (n === 1 ? ' artículo' : ' artículos')
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,1353 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..700&family=Geist:wght@400..700&display=swap" rel="stylesheet">
+<style>
+  body { margin:0; background:#0B0B0C; color:#F5F3EF; }
+  a { color:#DC2626; text-decoration:none; }
+  a:hover { color:#E4D1B0; }
+</style>
+</helmet>
+
+<section id="b1-final" data-screen-label="Componentes" style="background:#0B0B0C;width:max-content;min-width:100%;box-sizing:border-box;padding:48px 48px 96px;font-family:Geist,system-ui,sans-serif;color:#F5F3EF;display:flex;flex-direction:column;gap:64px;border-bottom:1px solid #3F3F46">
+
+  <div style="display:flex;flex-direction:column;gap:12px;max-width:960px">
+    <div style="font-size:12px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B">Carni · rediseño · componentes</div>
+    <h1 style="margin:0;font-family:Fraunces,Georgia,serif;font-size:44px;line-height:50px;font-weight:480">Componentes · 01 a 06 y 49</h1>
+    <p style="margin:0;font-size:16px;line-height:26px;color:#A8A29B;max-width:72ch;text-wrap:pretty">Solo lo nuevo: encabezado con scroll, categorías como chips, buscador sin lupa adentro con sus tres estados, y el panel del asistente. Tarjeta, encabezado y pie ya viven como componentes (<span style="color:#F5F3EF">Tarjeta</span>, <span style="color:#F5F3EF">Encabezado</span>, <span style="color:#F5F3EF">Pie</span>) y todas las pantallas los importan idénticos. Lo aprobado en la primera pasada sigue abajo, sin rehacer.</p>
+  </div>
+
+  <!-- ===== 49 · LOGOTIPO Y MONOGRAMA ===== -->
+  <div id="s49" style="display:flex;flex-direction:column;gap:16px">
+    <div style="display:flex;align-items:baseline;gap:16px"><span style="font-size:14px;font-weight:600;color:#E4D1B0;font-variant-numeric:tabular-nums">49</span><h2 style="margin:0;font-family:Fraunces,serif;font-size:30px;line-height:36px;font-weight:440;color:#F5F3EF">Logotipo y monograma</h2></div>
+    <div style="display:flex;gap:32px;align-items:flex-start">
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="width:390px;height:844px;background:#0B0B0C;border:1px solid #3F3F46;border-radius:12px;overflow:hidden;box-sizing:border-box;padding:20px 16px;display:flex;flex-direction:column;gap:12px">
+          <div style="display:flex;flex-direction:column;gap:12px;padding:20px;border-radius:16px;background:#151517;border:1px solid #3F3F46"><span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B">Logotipo · encabezado 390</span><span style="display:flex;justify-content:center;padding:14px 0"><span style="display:flex;flex-direction:column;align-items:center;gap:5px;line-height:1;color:#F5F3EF"><span style="font-size:20px;font-weight:560;letter-spacing:0.22em;padding-left:0.22em">CARNICERÍA</span><span style="display:flex;align-items:center;gap:8px;font-size:9px;font-weight:500;letter-spacing:0.16em;padding-left:0.16em;color:#E4D1B0;white-space:nowrap"><span style="width:16px;height:1px;background:#E4D1B0"></span>EL SEÑOR DE LA MISERICORDIA<span style="width:16px;height:1px;background:#E4D1B0"></span></span></span></span></div>
+          <div style="display:flex;flex-direction:column;gap:12px;padding:20px;border-radius:16px;background:#151517;border:1px solid #3F3F46"><span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B">Monograma · ícono de la app 512</span><span style="display:flex;justify-content:center"><img src="public/img/marca/monograma-512.png" alt="Monograma de 512 px mostrado a 168 px" width="168" height="168" style="width:168px;height:168px;display:block;flex:0 0 168px;border:1px solid #3F3F46;border-radius:12px;image-rendering:auto"></span></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div style="display:flex;flex-direction:column;gap:12px;padding:20px;border-radius:16px;background:#151517;border:1px solid #3F3F46"><span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B">Redes · 320</span><span style="display:flex;justify-content:center"><img src="public/img/marca/monograma-320-circular.png" alt="Foto de perfil circular de 320 px" width="96" height="96" style="width:96px;height:96px;display:block;flex:0 0 96px;border:1px solid #3F3F46;border-radius:999px;image-rendering:auto"></span></div>
+            <div style="display:flex;flex-direction:column;gap:12px;padding:20px;border-radius:16px;background:#151517;border:1px solid #3F3F46"><span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B">Favicon</span><span style="display:flex;justify-content:center;align-items:flex-end;gap:14px;height:96px"><img src="public/img/marca/favicon-32.png" alt="Favicon de 32 px al doble" width="64" height="64" style="width:64px;height:64px;display:block;flex:0 0 64px;border:1px solid #3F3F46;border-radius:12px;image-rendering:auto"><img src="public/img/marca/favicon-16.png" alt="Favicon de 16 px al doble" width="32" height="32" style="width:32px;height:32px;display:block;flex:0 0 32px;border:1px solid #3F3F46;border-radius:4px;image-rendering:pixelated"><img src="public/img/marca/favicon-16.png" alt="Favicon de 16 px a tamaño real" width="16" height="16" style="width:16px;height:16px;display:block;flex:0 0 16px;border:1px solid #3F3F46;border-radius:4px;image-rendering:pixelated"></span></div>
+          </div>
+          <span style="font-size:13px;line-height:19px;color:#A8A29B;text-wrap:pretty">Archivos en public/img/marca: monograma-512.png, monograma-320-circular.png, favicon-32.png y favicon-16.png.</span>
+        </div>
+        <div style="font-size:13px;line-height:18px;font-weight:600;color:#F5F3EF">Logotipo y monograma · móvil 390</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="width:1440px;height:844px;background:#0B0B0C;border:1px solid #3F3F46;border-radius:12px;overflow:hidden;box-sizing:border-box;padding:40px;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:24px">
+          <div style="display:flex;flex-direction:column;gap:24px">
+            <div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:40px;border-radius:20px;background:#151517;border:1px solid #3F3F46">
+              <span style="display:flex;flex-direction:column;align-items:center;gap:8px;line-height:1;color:#F5F3EF"><span style="font-size:30px;font-weight:560;letter-spacing:0.22em;padding-left:0.22em">CARNICERÍA</span><span style="display:flex;align-items:center;gap:12px;font-size:12px;font-weight:500;letter-spacing:0.16em;padding-left:0.16em;color:#E4D1B0;white-space:nowrap"><span style="width:28px;height:1px;background:#E4D1B0"></span>EL SEÑOR DE LA MISERICORDIA<span style="width:28px;height:1px;background:#E4D1B0"></span></span></span>
+              <div style="display:grid;grid-template-columns:repeat(3,auto);gap:12px 32px;font-size:14px;line-height:20px;color:#A8A29B;font-variant-numeric:tabular-nums"><span>CARNICERÍA · Geist 560</span><span>espaciado 0.22em</span><span>30 / 22 / 20 / 17 px</span><span>Subtítulo · Geist 500</span><span>espaciado 0.16em</span><span>líneas de 1 px · 28 / 24 / 16 / 14 px</span></div>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px">
+              <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;height:132px;border-radius:16px;background:#F5F3EF"><span style="display:flex;flex-direction:column;align-items:center;gap:5px;line-height:1;color:#0B0B0C"><span style="font-size:18px;font-weight:560;letter-spacing:0.22em;padding-left:0.22em">CARNICERÍA</span><span style="font-size:9px;font-weight:500;letter-spacing:0.16em;color:#3F3F46">EL SEÑOR DE LA MISERICORDIA</span></span><span style="font-size:13px;color:#3F3F46">Sobre papel · tickets e impresos</span></div>
+              <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;height:132px;border-radius:16px;background:#DC2626"><span style="display:flex;flex-direction:column;align-items:center;gap:5px;line-height:1;color:#FFFFFF"><span style="font-size:18px;font-weight:560;letter-spacing:0.22em;padding-left:0.22em">CARNICERÍA</span><span style="font-size:9px;font-weight:500;letter-spacing:0.16em">EL SEÑOR DE LA MISERICORDIA</span></span><span style="font-size:13px;color:#FFFFFF">Sobre rojo · solo el panel del acceso</span></div>
+              <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;height:132px;border-radius:16px;background:#151517;border:1px solid #3F3F46"><span style="display:flex;flex-direction:column;align-items:flex-start;gap:5px;line-height:1"><span style="font-size:18px;font-weight:560;letter-spacing:0.22em">CARNICERÍA</span><span style="font-size:9px;font-weight:500;letter-spacing:0.16em;color:#E4D1B0">EL SEÑOR DE LA MISERICORDIA</span></span><span style="font-size:13px;color:#A8A29B">A la izquierda · panel y pie</span></div>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto 1fr;gap:16px">
+            <div style="grid-column:1 / -1;display:flex;align-items:center;gap:24px;padding:24px;border-radius:20px;background:#151517;border:1px solid #3F3F46"><img src="public/img/marca/monograma-512.png" alt="Monograma de 512 px para el ícono de la app" width="200" height="200" style="width:200px;height:200px;display:block;flex:0 0 200px;border:1px solid #3F3F46;border-radius:12px;image-rendering:auto"><span style="display:flex;flex-direction:column;gap:6px"><span style="font-family:Fraunces,serif;font-size:24px;line-height:30px;font-weight:460">Ícono de la app</span><span style="font-size:15px;line-height:22px;color:#A8A29B">512 × 512 · “C” a 600 y “MISERICORDIA” en beige entre dos líneas.</span></span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;border-radius:20px;background:#151517;border:1px solid #3F3F46"><img src="public/img/marca/monograma-320-circular.png" alt="Foto de perfil circular para Facebook e Instagram" width="140" height="140" style="width:140px;height:140px;display:block;flex:0 0 140px;border:1px solid #3F3F46;border-radius:999px;image-rendering:auto"><span style="font-size:14px;line-height:20px;color:#A8A29B;text-align:center">320 × 320 circular<br>Facebook e Instagram</span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;border-radius:20px;background:#151517;border:1px solid #3F3F46"><span style="display:flex;align-items:flex-end;gap:20px"><img src="public/img/marca/favicon-32.png" alt="Favicon de 32 px al triple" width="96" height="96" style="width:96px;height:96px;display:block;flex:0 0 96px;border:1px solid #3F3F46;border-radius:12px;image-rendering:auto"><img src="public/img/marca/favicon-16.png" alt="Favicon de 16 px a tamaño real" width="16" height="16" style="width:16px;height:16px;display:block;flex:0 0 16px;border:1px solid #3F3F46;border-radius:4px;image-rendering:pixelated"><img src="public/img/marca/favicon-32.png" alt="Favicon de 32 px a tamaño real" width="32" height="32" style="width:32px;height:32px;display:block;flex:0 0 32px;border:1px solid #3F3F46;border-radius:4px;image-rendering:pixelated"></span><span style="font-size:14px;line-height:20px;color:#A8A29B;text-align:center">Favicon 32 y 16 · “C” a 700<br>se lee a 16 px</span></div>
+          </div>
+        </div>
+        <div style="font-size:13px;line-height:18px;font-weight:600;color:#F5F3EF">Logotipo y monograma · escritorio 1440</div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:4px;font-size:13px;line-height:19px;color:#A8A29B;max-width:1100px;text-wrap:pretty"><span><span style="color:#E4D1B0;font-weight:600">De lo nuestro · </span>el nombre completo de la tienda, “Carnicería · El Señor de La Misericordia”, que ya vivía en el letrero y en el sello redondo.</span><span><span style="color:#F5F3EF;font-weight:600">De lo mío · </span>logotipo tipográfico en Geist y un monograma “C” para donde no cabe el nombre.</span><span><span style="color:#F5F3EF;font-weight:600">Mejora · </span>CARNICERÍA a 560 de grosor con 0.22em de espaciado compensado a la izquierda; subtítulo a 0.16em entre dos líneas de 1 px; el monograma se lee a 16 px porque la “C” ocupa el 90 % del cuadro y suelta el subtítulo por debajo de 160 px.</span></div>
+  </div>
+
+  <!-- ===== 1 · ENCABEZADO ===== -->
+  <div style="display:flex;flex-direction:column;gap:16px">
+    <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap">
+      <span style="font-size:12px;font-weight:600;letter-spacing:0.04em;color:#DC2626">01</span>
+      <h2 style="margin:0;font-family:Fraunces,serif;font-size:30px;line-height:36px;font-weight:440">Encabezado · normal y con scroll</h2>
+      <span style="font-size:13px;line-height:18px;color:#A8A29B">una sola familia de íconos: trazo 1.8, puntas redondas, 20 px</span>
+    </div>
+    <div style="display:flex;gap:28px;align-items:flex-start;flex-wrap:wrap">
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="width:390px;height:220px;background:#0B0B0C;border:1px solid #3F3F46;border-radius:12px;overflow:hidden;box-sizing:border-box">
+          <dc-import name="Encabezado" ancho="movil" hint-size="100%,56px"></dc-import>
+          <div style="padding:20px 16px;display:flex;flex-direction:column;gap:8px">
+            <span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#E4D1B0">San Luis Potosí</span>
+            <span style="font-family:Fraunces,serif;font-size:32px;line-height:38px;font-weight:480">Cortes del día, listos para el asador</span>
+          </div>
+        </div>
+        <div style="font-size:13px;line-height:18px;font-weight:600;color:#F5F3EF">Encabezado · móvil 390 · arriba</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="width:390px;height:220px;background:#0B0B0C;border:1px solid #3F3F46;border-radius:12px;overflow:hidden;box-sizing:border-box;position:relative">
+          <div style="position:absolute;left:16px;right:16px;top:20px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px">
+            <div style="aspect-ratio:4/5;border-radius:16px;overflow:hidden;border:1px solid #3F3F46"><img src="public/img/products/rib-eye.webp" alt="" style="width:100%;height:100%;object-fit:cover;display:block"></div>
+            <div style="aspect-ratio:4/5;border-radius:16px;overflow:hidden;border:1px solid #3F3F46"><img src="public/img/products/tomahawk.webp" alt="" style="width:100%;height:100%;object-fit:cover;display:block"></div>
+          </div>
+          <div style="position:absolute;left:0;right:0;top:0"><dc-import name="Encabezado" ancho="movil" scroll="{{ true }}" hint-size="100%,56px"></dc-import></div>
+        </div>
+        <div style="font-size:13px;line-height:18px;font-weight:600;color:#F5F3EF">Encabezado · móvil 390 · con scroll</div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:20px">
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="width:1440px;height:150px;background:#0B0B0C;border:1px solid #3F3F46;border-radius:12px;overflow:hidden;box-sizing:border-box">
+          <dc-import name="Encabezado" ancho="escritorio" hint-size="100%,72px"></dc-import>
+          <div style="padding:24px 32px;font-family:Fraunces,serif;font-size:40px;line-height:44px;font-weight:480">Cortes del día, listos para el asador</div>
+        </div>
+        <div style="font-size:13px;line-height:18px;font-weight:600;color:#F5F3EF">Encabezado · escritorio 1440 · arriba · 72 px</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="width:1440px;height:150px;background:#0B0B0C;border:1px solid #3F3F46;border-radius:12px;overflow:hidden;box-sizing:border-box;position:relative">
+          <div style="position:absolute;left:32px;right:32px;top:24px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px">
+            <div style="height:200px;border-radius:16px;overflow:hidden;border:1px solid #3F3F46"><img src="public/img/products/rib-eye.webp" alt="" style="width:100%;height:100%;object-fit:cover;display:block"></div>
+            <div style="height:200px;border-radius:16px;overflow:hidden;border:1px solid #3F3F46"><img src="public/img/products/tomahawk.webp" alt="" style="width:100%;height:100%;object-fit:cover;display:block"></div>
+            <div style="height:200px;border-radius:16px;overflow:hidden;border:1px solid #3F3F46"><img src="public/img/products/porterhouse.webp" alt="" style="width:100%;height:100%;object-fit:cover;display:block"></div>
+            <div style="height:200px;border-radius:16px;overflow:hidden;border:1px solid #3F3F46"><img src="public/img/products/filet_mignon.webp" alt="" style="width:100%;height:100%;object-fit:cover;display:block"></div>
+          </div>
+          <div style="position:absolute;left:0;right:0;top:0"><dc-import name="Encabezado" ancho="escritorio" scroll="{{ true }}" activo="Catálogo" hint-size="100%,60px"></dc-import></div>
+        </div>
+        <div style="font-size:13px;line-height:18px;font-weight:600;color:#F5F3EF">Encabezado · escritorio 1440 · con scroll · 60 px</div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:4px;font-size:13px;line-height:19px;color:#A8A29B;max-width:1100px;text-wrap:pretty"><span><span style="color:#E4D1B0;font-weight:600">De lo nuestro · </span>hamburguesa a la izquierda, logo al centro, lupa y carrito a la derecha, igual en 390 y en 1440; el nombre completo de la carnicería con su línea “El Señor de La Misericordia”.</span><span><span style="color:#F5F3EF;font-weight:600">De lo mío · </span>íconos de un solo trazo en botones de 44 / 48 px y el tono de tarjeta al bajar (60 px en escritorio).</span><span><span style="color:#F5F3EF;font-weight:600">Mejora · </span>el logo pasa de la foto del letrero, con su fondo y la “Ñ” mal dibujada, a un logotipo tipográfico nítido; sin buscador comprimido ni fila de menú de texto, que se quitó del sitio a propósito.</span></div>
+  </div>
+
+  <!-- ===== 2 · MENÚ ===== -->
+  <div style="display:flex;flex-direction:column;gap:16px">
+    <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap">
+      <span style="font-size:12px;font-weight:600;letter-spacing:0.04em;color:#DC2626">02</span>
+      <h2 style="margin:0;font-family:Fraunces,serif;font-size:30px;line-height:36px;font-weight:440">Menú lateral con categorías en chips</h2>
+      <span style="font-size:13px;line-height:18px;color:#A8A29B">altura completa · chips de 44 px · activo en rojo · cerrar de 44 px · Ver productos y Mi carrito siempre visibles</span>
+    </div>
+    <div style="display:flex;gap:28px;align-items:flex-start;flex-wrap:wrap">
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="width:390px;height:844px;background:#0B0B0C;border:1px solid #3F3F46;border-radius:12px;overflow:hidden;box-sizing:border-box;position:relative">
+          <dc-import name="Encabezado" ancho="movil" hint-size="100%,56px"></dc-import>
+          <div style="position:absolute;inset:0;background:rgba(11,11,12,0.72)"></div>
+          <div style="position:absolute;top:0;bottom:0;left:0;width:328px;background:#1C1C1F;border-right:1px solid #3F3F46;border-radius:0 24px 24px 0;display:flex;flex-direction:column;box-sizing:border-box">
+            <div style="height:64px;flex:0 0 64px;display:flex;align-items:center;justify-content:space-between;padding:0 10px 0 16px;border-bottom:1px solid #3F3F46">
+              <span style="display:flex;flex-direction:column;align-items:flex-start;gap:5px;line-height:1"><span style="font-size:17px;font-weight:600;letter-spacing:0.16em">CARNICERÍA</span><span style="font-size:8.5px;font-weight:500;letter-spacing:0.12em;color:#E4D1B0">EL SEÑOR DE LA MISERICORDIA</span></span>
+              <button aria-label="Cerrar el menú" style="width:44px;height:44px;border:1px solid #3F3F46;background:#151517;color:#F5F3EF;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:999px">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg>
+              </button>
+            </div>
+            <div style="flex:1 1 auto;overflow:hidden;padding:20px 16px;display:flex;flex-direction:column;gap:24px">
+              <div style="display:flex;flex-direction:column;gap:12px">
+                <span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B">Categorías</span>
+                <div style="display:flex;flex-wrap:wrap;gap:8px">
+                  <span aria-current="true" style="min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;background:#DC2626;border:1px solid #DC2626;color:#FFFFFF;font-size:15px;font-weight:600">Carnes rojas</span>
+                  <span style="min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;background:#151517;border:1px solid #3F3F46;color:#F5F3EF;font-size:15px">Cortes especiales</span>
+                  <span style="min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;background:#151517;border:1px solid #3F3F46;color:#F5F3EF;font-size:15px">Cerdo</span>
+                  <span style="min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;background:#151517;border:1px solid #3F3F46;color:#F5F3EF;font-size:15px">Pollo</span>
+                  <span style="min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;background:#151517;border:1px solid #3F3F46;color:#F5F3EF;font-size:15px">Embutidos</span>
+                  <span style="min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;background:#151517;border:1px solid #3F3F46;color:#F5F3EF;font-size:15px">Preparadas</span>
+                  <span style="min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;background:#151517;border:1px solid #3F3F46;color:#F5F3EF;font-size:15px">Ofertas</span>
+                  <span style="min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;background:#151517;border:1px solid #3F3F46;color:#F5F3EF;font-size:15px">Merch</span>
+                  <span style="min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;background:#151517;border:1px solid #3F3F46;color:#F5F3EF;font-size:15px">Otros</span>
+                </div>
+              </div>
+              <div style="display:flex;flex-direction:column">
+                <span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B;padding-bottom:4px">Páginas</span>
+                <span style="height:44px;display:flex;align-items:center;font-size:16px;color:#A8A29B">Inicio</span>
+                <span style="height:44px;display:flex;align-items:center;gap:10px;font-size:16px;font-weight:600;color:#F5F3EF"><span style="width:3px;height:20px;border-radius:999px;background:#DC2626"></span>Catálogo</span>
+                <span style="height:44px;display:flex;align-items:center;font-size:16px;color:#A8A29B">Recetario</span>
+                <span style="height:44px;display:flex;align-items:center;font-size:16px;color:#A8A29B">Nosotros</span>
+                <span style="height:44px;display:flex;align-items:center;font-size:16px;color:#A8A29B">Mi cuenta</span>
+              </div>
+            </div>
+            <div style="flex:0 0 auto;border-top:1px solid #3F3F46;padding:16px;display:flex;flex-direction:column;gap:8px">
+              <button style="font-family:Geist,system-ui,sans-serif;font-size:15px;font-weight:600;color:#FFFFFF;background:#DC2626;border:none;border-radius:999px;height:48px;width:100%;cursor:pointer">Ver productos</button>
+              <button style="font-family:Geist,system-ui,sans-serif;font-size:15px;font-weight:600;color:#F5F3EF;background:transparent;border:1px solid #E4D1B0;border-radius:999px;height:48px;width:100%;cursor:pointer">Mi carrito · 3</button>
+            </div>
+          </div>
+        </div>
+        <div style="font-size:13px;line-height:18px;font-weight:600;color:#F5F3EF">Menú abierto · móvil 390</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="width:1440px;height:844px;background:#0B0B0C;border:1px solid #3F3F46;border-radius:12px;overflow:hidden;box-sizing:border-box;position:relative">
+          <dc-import name="Encabezado" ancho="escritorio" activo="Catálogo" hint-size="100%,72px"></dc-import>
+          <div style="padding:32px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px">
+            <div style="height:420px;border-radius:16px;overflow:hidden;border:1px solid #3F3F46"><img src="public/img/products/res.webp" alt="" style="width:100%;height:100%;object-fit:cover;display:block"></div>
+            <div style="height:420px;border-radius:16px;overflow:hidden;border:1px solid #3F3F46"><img src="public/img/products/res-alto.webp" alt="" style="width:100%;height:100%;object-fit:cover;display:block"></div>
+            <div style="height:420px;border-radius:16px;overflow:hidden;border:1px solid #3F3F46"><img src="public/img/products/res-detalle.webp" alt="" style="width:100%;height:100%;object-fit:cover;display:block"></div>
+            <div style="height:420px;border-radius:16px;overflow:hidden;border:1px solid #3F3F46"><img src="public/img/products/premium.webp" alt="" style="width:100%;height:100%;object-fit:cover;display:block"></div>
+          </div>
+          <div style="position:absolute;inset:0;background:rgba(11,11,12,0.72)"></div>
+          <div style="position:absolute;top:0;bottom:0;left:0;width:400px;background:#1C1C1F;border-right:1px solid #3F3F46;border-radius:0 24px 24px 0;display:flex;flex-direction:column;box-sizing:border-box">
+            <div style="height:72px;flex:0 0 72px;display:flex;align-items:center;justify-content:space-between;padding:0 16px 0 24px;border-bottom:1px solid #3F3F46">
+              <span style="font-family:Fraunces,serif;font-size:22px;line-height:28px;font-weight:440">Menú</span>
+              <button aria-label="Cerrar el menú" style="width:44px;height:44px;border:1px solid #3F3F46;background:#151517;color:#F5F3EF;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:999px">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg>
+              </button>
+            </div>
+            <div style="flex:1 1 auto;overflow:hidden;padding:24px;display:flex;flex-direction:column;gap:28px">
+              <div style="display:flex;flex-direction:column;gap:12px">
+                <span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B">Categorías</span>
+                <div style="display:flex;flex-wrap:wrap;gap:8px">
+                  <span aria-current="true" style="min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;background:#DC2626;border:1px solid #DC2626;color:#FFFFFF;font-size:15px;font-weight:600">Carnes rojas</span>
+                  <span style="min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;background:#151517;border:1px solid #3F3F46;color:#F5F3EF;font-size:15px">Cortes especiales</span>
+                  <span style="min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;background:#151517;border:1px solid #3F3F46;color:#F5F3EF;font-size:15px">Cerdo</span>
+                  <span style="min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;background:#151517;border:1px solid #3F3F46;color:#F5F3EF;font-size:15px">Pollo</span>
+                  <span style="min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;background:#151517;border:1px solid #3F3F46;color:#F5F3EF;font-size:15px">Embutidos</span>
+                  <span style="min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;background:#151517;border:1px solid #3F3F46;color:#F5F3EF;font-size:15px">Preparadas</span>
+                  <span style="min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;background:#151517;border:1px solid #3F3F46;color:#F5F3EF;font-size:15px">Ofertas</span>
+                  <span style="min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;background:#151517;border:1px solid #3F3F46;color:#F5F3EF;font-size:15px">Merch</span>
+                  <span style="min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;background:#151517;border:1px solid #3F3F46;color:#F5F3EF;font-size:15px">Otros</span>
+                </div>
+              </div>
+              <div style="display:flex;flex-direction:column">
+                <span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B;padding-bottom:4px">Páginas</span>
+                <span style="height:44px;display:flex;align-items:center;font-size:16px;color:#A8A29B">Inicio</span>
+                <span style="height:44px;display:flex;align-items:center;gap:10px;font-size:16px;font-weight:600;color:#F5F3EF"><span style="width:3px;height:20px;border-radius:999px;background:#DC2626"></span>Catálogo</span>
+                <span style="height:44px;display:flex;align-items:center;font-size:16px;color:#A8A29B">Recetario</span>
+                <span style="height:44px;display:flex;align-items:center;font-size:16px;color:#A8A29B">Nosotros</span>
+                <span style="height:44px;display:flex;align-items:center;font-size:16px;color:#A8A29B">Mi cuenta</span>
+              </div>
+            </div>
+            <div style="flex:0 0 auto;border-top:1px solid #3F3F46;padding:20px 24px;display:flex;gap:8px">
+              <button style="flex:1;font-family:Geist,system-ui,sans-serif;font-size:15px;font-weight:600;color:#FFFFFF;background:#DC2626;border:none;border-radius:999px;height:48px;cursor:pointer">Ver productos</button>
+              <button style="flex:1;font-family:Geist,system-ui,sans-serif;font-size:15px;font-weight:600;color:#F5F3EF;background:transparent;border:1px solid #E4D1B0;border-radius:999px;height:48px;cursor:pointer">Mi carrito · 3</button>
+            </div>
+          </div>
+        </div>
+        <div style="font-size:13px;line-height:18px;font-weight:600;color:#F5F3EF">Menú abierto · escritorio 1440</div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:4px;font-size:13px;line-height:19px;color:#A8A29B;max-width:1100px;text-wrap:pretty"><span><span style="color:#E4D1B0;font-weight:600">De lo nuestro · </span>el panel lateral con las categorías del sitio y “Ver productos”.</span><span><span style="color:#F5F3EF;font-weight:600">De lo mío · </span>categorías en chips de 44 px, activo en rojo lleno y la página activa con filete rojo.</span><span><span style="color:#F5F3EF;font-weight:600">Mejora · </span>el activo ya no va en ámbar y los dos botones quedan anclados abajo en vez de perderse al final de la lista.</span></div>
+  </div>
+
+  <!-- ===== 3 · BUSCADOR ===== -->
+  <div style="display:flex;flex-direction:column;gap:16px">
+    <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap">
+      <span style="font-size:12px;font-weight:600;letter-spacing:0.04em;color:#DC2626">03</span>
+      <h2 style="margin:0;font-family:Fraunces,serif;font-size:30px;line-height:36px;font-weight:440">Buscador a pantalla completa · tres estados</h2>
+      <span style="font-size:13px;line-height:18px;color:#A8A29B">campo sin ícono adentro · tendencia como enlaces · recientes que se borran · una sola lupa: encabezado y burbuja del chat se ocultan</span>
+    </div>
+    <div style="display:flex;gap:28px;align-items:flex-start;flex-wrap:wrap">
+
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="width:390px;height:844px;background:#0B0B0C;border:1px solid #3F3F46;border-radius:12px;overflow:hidden;box-sizing:border-box;display:flex;flex-direction:column">
+          <div style="height:64px;flex:0 0 64px;display:flex;align-items:center;justify-content:space-between;padding:0 8px 0 16px">
+            <span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B">Buscar en la carnicería</span>
+            <button aria-label="Cerrar la búsqueda" style="width:48px;height:48px;border-radius:999px;border:1px solid #3F3F46;background:#1C1C1F;color:#F5F3EF;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
+          </div>
+          <div style="padding:8px 16px 24px"><span style="display:flex;align-items:center;height:56px;box-sizing:border-box;background:#151517;border:1px solid #DC2626;outline:2px solid #DC2626;outline-offset:2px;border-radius:999px;padding:0 22px;font-size:17px;color:#A8A29B">¿Qué corte buscas?</span></div>
+          <div style="flex:1 1 auto;overflow:hidden;padding:0 16px;display:flex;flex-direction:column;gap:24px">
+            <div style="display:flex;flex-direction:column;gap:4px">
+              <span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B">Lo más buscado esta semana</span>
+              <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:16px">
+                <a href="Catálogo y ficha.dc.html" style="min-height:44px;display:flex;align-items:center;font-size:17px;color:#F5F3EF;text-decoration:underline;text-decoration-color:#E4D1B0;text-underline-offset:5px">Arrachera</a>
+                <a href="Catálogo y ficha.dc.html" style="min-height:44px;display:flex;align-items:center;font-size:17px;color:#F5F3EF;text-decoration:underline;text-decoration-color:#E4D1B0;text-underline-offset:5px">Rib Eye</a>
+                <a href="Catálogo y ficha.dc.html" style="min-height:44px;display:flex;align-items:center;font-size:17px;color:#F5F3EF;text-decoration:underline;text-decoration-color:#E4D1B0;text-underline-offset:5px">Chorizo verde</a>
+                <a href="Catálogo y ficha.dc.html" style="min-height:44px;display:flex;align-items:center;font-size:17px;color:#F5F3EF;text-decoration:underline;text-decoration-color:#E4D1B0;text-underline-offset:5px">Pierna y muslo</a>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column">
+              <div style="display:flex;align-items:center;justify-content:space-between">
+                <span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B">Recientes</span>
+                <button style="height:44px;padding:0 4px;font-family:Geist,system-ui,sans-serif;font-size:14px;color:#F5F3EF;background:transparent;border:none;cursor:pointer;text-decoration:underline;text-decoration-color:#3F3F46;text-underline-offset:4px">Borrar todo</button>
+              </div>
+              <span style="height:48px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #3F3F46"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A8A29B" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="8"></circle><path d="M12 8v4l2.5 2"></path></svg><span style="flex:1;font-size:16px">costilla de cerdo</span><button aria-label="Quitar costilla de cerdo de recientes" style="width:44px;height:44px;border:none;background:transparent;color:#A8A29B;display:flex;align-items:center;justify-content:center;cursor:pointer;margin-right:-10px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M7 7l10 10M17 7 7 17"></path></svg></button></span>
+              <span style="height:48px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #3F3F46"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A8A29B" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="8"></circle><path d="M12 8v4l2.5 2"></path></svg><span style="flex:1;font-size:16px">tomahawk</span><button aria-label="Quitar tomahawk de recientes" style="width:44px;height:44px;border:none;background:transparent;color:#A8A29B;display:flex;align-items:center;justify-content:center;cursor:pointer;margin-right:-10px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M7 7l10 10M17 7 7 17"></path></svg></button></span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B">Para empezar</span>
+              <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px">
+                <dc-import name="Tarjeta" variante="chica" boton="{{ false }}" foto="public/img/products/skirt_steak.webp" cat="Especiales" nombre="Arrachera" precio="$449" unidad="kg" hint-size="100%,88px"></dc-import>
+                <dc-import name="Tarjeta" variante="chica" boton="{{ false }}" foto="public/img/products/rib-eye.webp" cat="Especiales" nombre="Rib Eye" precio="$549" unidad="kg" hint-size="100%,88px"></dc-import>
+                <dc-import name="Tarjeta" variante="chica" boton="{{ false }}" foto="public/img/products/res.webp" cat="Res" nombre="Diezmillo" precio="$249" unidad="kg" hint-size="100%,88px"></dc-import>
+                <dc-import name="Tarjeta" variante="chica" boton="{{ false }}" foto="public/img/products/cerdo.webp" pos="30% 50%" cat="Cerdo" nombre="Chuleta" precio="$169" unidad="kg" hint-size="100%,88px"></dc-import>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="font-size:13px;line-height:18px;font-weight:600;color:#F5F3EF">Buscador · vacío · móvil 390</div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="width:390px;height:844px;background:#0B0B0C;border:1px solid #3F3F46;border-radius:12px;overflow:hidden;box-sizing:border-box;display:flex;flex-direction:column">
+          <div style="height:64px;flex:0 0 64px;display:flex;align-items:center;justify-content:space-between;padding:0 8px 0 16px">
+            <span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B">Buscar en la carnicería</span>
+            <button aria-label="Cerrar la búsqueda" style="width:48px;height:48px;border-radius:999px;border:1px solid #3F3F46;background:#1C1C1F;color:#F5F3EF;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
+          </div>
+          <div style="padding:8px 16px 24px"><span style="display:flex;align-items:center;height:56px;box-sizing:border-box;background:#151517;border:1px solid #DC2626;outline:2px solid #DC2626;outline-offset:2px;border-radius:999px;padding:0 22px;font-size:17px;color:#F5F3EF">rib<span style="width:1px;height:22px;background:#DC2626;margin-left:1px"></span></span></div>
+          <div style="flex:1 1 auto;overflow:hidden;padding:0 16px;display:flex;flex-direction:column;gap:16px">
+            <span style="font-size:14px;line-height:20px;color:#A8A29B"><span style="color:#F5F3EF;font-weight:600;font-variant-numeric:tabular-nums">3 productos</span> para “rib”</span>
+            <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px">
+              <dc-import name="Tarjeta" variante="chica" boton="{{ false }}" foto="public/img/products/rib-eye.webp" cat="Especiales" nombre="Rib Eye" precio="$549" unidad="kg" hint-size="100%,88px"></dc-import>
+              <dc-import name="Tarjeta" variante="chica" boton="{{ false }}" foto="public/img/products/tomahawk.webp" cat="Especiales" nombre="Tomahawk" precio="$649" unidad="kg" hint-size="100%,88px"></dc-import>
+              <dc-import name="Tarjeta" variante="chica" boton="{{ false }}" foto="public/img/products/premium.webp" cat="Ofertas" nombre="Parrillada Familiar" precio="$3,249" unidad="paquete" hint-size="100%,88px"></dc-import>
+            </div>
+            <span style="font-size:13px;line-height:18px;color:#A8A29B;text-wrap:pretty">Tomahawk y la parrillada aparecen porque su descripción dice “rib eye”.</span>
+            <div style="display:flex;flex-direction:column;border-top:1px solid #3F3F46;padding-top:8px">
+              <span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B;padding:8px 0 4px">También puedes buscar</span>
+              <a href="Catálogo y ficha.dc.html" style="min-height:44px;display:flex;align-items:center;font-size:17px;color:#F5F3EF;text-decoration:none"><span style="font-weight:600">rib</span>&nbsp;eye para asador</a>
+              <a href="Catálogo y ficha.dc.html" style="min-height:44px;display:flex;align-items:center;font-size:17px;color:#F5F3EF;text-decoration:none">costilla (<span style="font-weight:600">rib</span>s)</a>
+            </div>
+            <button style="height:48px;border-radius:999px;background:transparent;border:1px solid #E4D1B0;color:#F5F3EF;font-family:Geist,system-ui,sans-serif;font-size:15px;font-weight:600;cursor:pointer">Ver los 3 en el catálogo</button>
+          </div>
+        </div>
+        <div style="font-size:13px;line-height:18px;font-weight:600;color:#F5F3EF">Buscador · escribiendo con resultados · móvil 390</div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="width:390px;height:844px;background:#0B0B0C;border:1px solid #3F3F46;border-radius:12px;overflow:hidden;box-sizing:border-box;display:flex;flex-direction:column">
+          <div style="height:64px;flex:0 0 64px;display:flex;align-items:center;justify-content:space-between;padding:0 8px 0 16px">
+            <span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B">Buscar en la carnicería</span>
+            <button aria-label="Cerrar la búsqueda" style="width:48px;height:48px;border-radius:999px;border:1px solid #3F3F46;background:#1C1C1F;color:#F5F3EF;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
+          </div>
+          <div style="padding:8px 16px 24px"><span style="display:flex;align-items:center;height:56px;box-sizing:border-box;background:#151517;border:1px solid #DC2626;outline:2px solid #DC2626;outline-offset:2px;border-radius:999px;padding:0 22px;font-size:17px;color:#F5F3EF">salmón<span style="width:1px;height:22px;background:#DC2626;margin-left:1px"></span></span></div>
+          <div style="flex:1 1 auto;overflow:hidden;padding:0 16px;display:flex;flex-direction:column;gap:20px">
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <span style="font-family:Fraunces,serif;font-size:24px;line-height:30px;font-weight:440;text-wrap:balance">No tenemos “salmón” en el mostrador</span>
+              <span style="font-size:15px;line-height:22px;color:#A8A29B;text-wrap:pretty">Somos carnicería: no vendemos pescado. Para el asador, estos sí los tenemos:</span>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px">
+              <dc-import name="Tarjeta" variante="chica" boton="{{ false }}" foto="public/img/products/top_sirloin.webp" cat="Especiales" nombre="Top Sirloin" precio="$389" unidad="kg" hint-size="100%,88px"></dc-import>
+              <dc-import name="Tarjeta" variante="chica" boton="{{ false }}" foto="public/img/products/skirt_steak.webp" cat="Especiales" nombre="Arrachera" precio="$449" unidad="kg" hint-size="100%,88px"></dc-import>
+              <dc-import name="Tarjeta" variante="chica" boton="{{ false }}" foto="public/img/products/flak_steak.webp" cat="Especiales" nombre="Flank Steak" precio="$399" unidad="kg" hint-size="100%,88px"></dc-import>
+              <dc-import name="Tarjeta" variante="chica" boton="{{ false }}" foto="public/img/products/ney_york_strip.webp" cat="Especiales" nombre="New York" precio="$529" unidad="kg" hint-size="100%,88px"></dc-import>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B">O busca por categoría</span>
+              <div style="display:flex;flex-wrap:wrap;gap:8px">
+                <span style="min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;background:#151517;border:1px solid #3F3F46;color:#F5F3EF;font-size:15px">Cortes especiales</span>
+                <span style="min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;background:#151517;border:1px solid #3F3F46;color:#F5F3EF;font-size:15px">Carnes rojas</span>
+                <span style="min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;background:#151517;border:1px solid #3F3F46;color:#F5F3EF;font-size:15px">Ofertas</span>
+              </div>
+            </div>
+            <button style="height:48px;border-radius:999px;background:transparent;border:1px solid #E4D1B0;color:#F5F3EF;font-family:Geist,system-ui,sans-serif;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 0-3.2 6.4L20 19.5l-1-3.2A8 8 0 0 0 20 12Z"></path></svg>Pregúntale al carnicero por WhatsApp</button>
+          </div>
+        </div>
+        <div style="font-size:13px;line-height:18px;font-weight:600;color:#F5F3EF">Buscador · sin resultados · móvil 390</div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:28px">
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="width:1440px;min-height:900px;background:#0B0B0C;border:1px solid #3F3F46;border-radius:12px;overflow:hidden;box-sizing:border-box;display:flex;flex-direction:column;padding-bottom:56px">
+          <div style="height:88px;flex:0 0 88px;display:flex;align-items:center;justify-content:space-between;padding:0 24px 0 48px">
+            <span style="display:flex;flex-direction:column;gap:6px;line-height:1"><span style="font-size:18px;font-weight:600;letter-spacing:0.18em">CARNICERÍA</span><span style="font-size:12px;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B">Buscar en la carnicería</span></span>
+            <span style="display:flex;align-items:center;gap:14px"><span style="font-size:13px;color:#A8A29B">Esc para cerrar</span><button aria-label="Cerrar la búsqueda" style="width:52px;height:52px;border-radius:999px;border:1px solid #3F3F46;background:#1C1C1F;color:#F5F3EF;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg></button></span>
+          </div>
+          <div style="padding:8px 0 20px;display:flex;justify-content:center"><span style="width:760px;display:flex;align-items:center;height:64px;box-sizing:border-box;background:#151517;border:1px solid #DC2626;outline:2px solid #DC2626;outline-offset:2px;border-radius:999px;padding:0 30px;font-size:20px;color:#A8A29B">¿Qué corte buscas?</span></div>
+          <div style="display:flex;justify-content:center;align-items:center;gap:8px 28px;flex-wrap:wrap;padding:0 48px 8px">
+            <span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B">Lo más buscado</span><a href="Catálogo y ficha.dc.html" style="min-height:44px;display:flex;align-items:center;font-size:17px;color:#F5F3EF;text-decoration:underline;text-decoration-color:#E4D1B0;text-underline-offset:5px">Arrachera</a><a href="Catálogo y ficha.dc.html" style="min-height:44px;display:flex;align-items:center;font-size:17px;color:#F5F3EF;text-decoration:underline;text-decoration-color:#E4D1B0;text-underline-offset:5px">Rib Eye</a><a href="Catálogo y ficha.dc.html" style="min-height:44px;display:flex;align-items:center;font-size:17px;color:#F5F3EF;text-decoration:underline;text-decoration-color:#E4D1B0;text-underline-offset:5px">Chorizo verde</a><a href="Catálogo y ficha.dc.html" style="min-height:44px;display:flex;align-items:center;font-size:17px;color:#F5F3EF;text-decoration:underline;text-decoration-color:#E4D1B0;text-underline-offset:5px">Pierna y muslo</a>
+          </div>
+          <div style="display:flex;justify-content:center;align-items:center;gap:8px;flex-wrap:wrap;padding:0 48px 48px"><span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B;margin-right:6px">Recientes</span><span style="min-height:44px;display:inline-flex;align-items:center;gap:4px;padding:0 4px 0 16px;border-radius:999px;background:#151517;border:1px solid #3F3F46;font-size:15px">costilla de cerdo<button aria-label="Quitar costilla de cerdo de recientes" style="width:40px;height:40px;border:none;background:transparent;color:#A8A29B;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:999px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M7 7l10 10M17 7 7 17"></path></svg></button></span><span style="min-height:44px;display:inline-flex;align-items:center;gap:4px;padding:0 4px 0 16px;border-radius:999px;background:#151517;border:1px solid #3F3F46;font-size:15px">tomahawk<button aria-label="Quitar tomahawk de recientes" style="width:40px;height:40px;border:none;background:transparent;color:#A8A29B;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:999px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M7 7l10 10M17 7 7 17"></path></svg></button></span><button style="height:44px;padding:0 8px;font-family:Geist,system-ui,sans-serif;font-size:14px;color:#F5F3EF;background:transparent;border:none;cursor:pointer;text-decoration:underline;text-decoration-color:#3F3F46;text-underline-offset:4px">Borrar todo</button></div>
+          <div style="padding:0 48px;display:flex;flex-direction:column;gap:56px">
+            <div style="display:flex;flex-direction:column;gap:20px">
+              <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px"><span style="display:flex;flex-direction:column;gap:4px"><span style="font-family:Fraunces,serif;font-size:32px;line-height:38px;font-weight:460">Lo nuevo</span><span style="font-size:15px;line-height:22px;color:#A8A29B">Recién llegado al mostrador</span></span><a href="Catálogo y ficha.dc.html" style="height:44px;display:flex;align-items:center;gap:8px;font-size:15px;font-weight:600;color:#F5F3EF">Ver lo nuevo<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E4D1B0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a></div>
+              <div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:20px"><dc-import name="Tarjeta" foto="public/img/products/merch.webp" cat="Merch" nombre="Gorra Bordada" desc="Con el logo de la carnicería" precio="$250" unidad="pieza" hint-size="100%,560px"></dc-import><dc-import name="Tarjeta" foto="public/img/products/premium.webp" cat="Ofertas" nombre="Paquete Asador 4 a 6 Personas" desc="Arrachera, chorizo argentino, cebolla cambray y carbón" precio="$1,599" unidad="paquete" hint-size="100%,560px"></dc-import><dc-import name="Tarjeta" foto="public/img/products/tomahawk.webp" cat="Cortes especiales" nombre="Tomahawk" desc="Rib eye con el hueso largo entero" precio="$649" unidad="kg" hint-size="100%,560px"></dc-import><dc-import name="Tarjeta" foto="public/img/products/filet_mignon.webp" cat="Cortes especiales" nombre="Filete Mignon" desc="La parte más suave, poca grasa" precio="$689" unidad="kg" hint-size="100%,560px"></dc-import><dc-import name="Tarjeta" foto="public/img/products/preparadas.webp" cat="Preparadas" nombre="Chorizo Verde" desc="Receta de la casa, por peso o por precio" precio="$149" unidad="kg" hint-size="100%,560px"></dc-import></div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:20px">
+              <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px"><span style="display:flex;flex-direction:column;gap:4px"><span style="font-family:Fraunces,serif;font-size:32px;line-height:38px;font-weight:460">Más pedidos</span><span style="font-size:15px;line-height:22px;color:#A8A29B">Lo que más se llevan los vecinos esta semana</span></span><a href="Catálogo y ficha.dc.html" style="height:44px;display:flex;align-items:center;gap:8px;font-size:15px;font-weight:600;color:#F5F3EF">Ver el catálogo<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E4D1B0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a></div>
+              <div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:20px"><dc-import name="Tarjeta" foto="public/img/products/skirt_steak.webp" cat="Cortes especiales" nombre="Arrachera" desc="Falda marinada, para asar entera" precio="$449" unidad="kg" hint-size="100%,560px"></dc-import><dc-import name="Tarjeta" foto="public/img/products/res.webp" pos="30% 50%" cat="Carnes rojas" nombre="Bistec de Res" desc="Pulpa delgada, sartén o comal" precio="$289" unidad="kg" hint-size="100%,560px"></dc-import><dc-import name="Tarjeta" foto="public/img/products/top_sirloin.webp" cat="Cortes especiales" nombre="Top Sirloin" desc="Entre precio y suavidad" precio="$389" unidad="kg" hint-size="100%,560px"></dc-import><dc-import name="Tarjeta" foto="public/img/products/flak_steak.webp" cat="Cortes especiales" nombre="Flank Steak" desc="Fibra larga, para asar entero" precio="$399" unidad="kg" hint-size="100%,560px"></dc-import><dc-import name="Tarjeta" foto="public/img/products/res.webp" pos="75% 60%" cat="Carnes rojas" nombre="Diezmillo" desc="Jaspeado, aguanta cocción larga" precio="$249" unidad="kg" hint-size="100%,560px"></dc-import></div>
+            </div>
+          </div>
+        </div>
+        <div style="font-size:13px;line-height:18px;font-weight:600;color:#F5F3EF">Buscador · vacío · escritorio 1440 · filas de tarjetas grandes</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="width:1440px;min-height:900px;background:#0B0B0C;border:1px solid #3F3F46;border-radius:12px;overflow:hidden;box-sizing:border-box;display:flex;flex-direction:column;padding-bottom:56px">
+          <div style="height:88px;flex:0 0 88px;display:flex;align-items:center;justify-content:space-between;padding:0 24px 0 48px">
+            <span style="display:flex;flex-direction:column;gap:6px;line-height:1"><span style="font-size:18px;font-weight:600;letter-spacing:0.18em">CARNICERÍA</span><span style="font-size:12px;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B">Buscar en la carnicería</span></span>
+            <span style="display:flex;align-items:center;gap:14px"><span style="font-size:13px;color:#A8A29B">Esc para cerrar</span><button aria-label="Cerrar la búsqueda" style="width:52px;height:52px;border-radius:999px;border:1px solid #3F3F46;background:#1C1C1F;color:#F5F3EF;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg></button></span>
+          </div>
+          <div style="padding:8px 0 20px;display:flex;justify-content:center"><span style="width:760px;display:flex;align-items:center;height:64px;box-sizing:border-box;background:#151517;border:1px solid #DC2626;outline:2px solid #DC2626;outline-offset:2px;border-radius:999px;padding:0 30px;font-size:20px;color:#F5F3EF">rib<span style="width:1px;height:26px;background:#DC2626;margin-left:1px"></span></span></div>
+          <div style="padding:16px 48px 0;display:flex;flex-direction:column;gap:56px">
+            <div style="display:flex;flex-direction:column;gap:20px">
+              <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px"><span style="display:flex;flex-direction:column;gap:4px"><span style="font-family:Fraunces,serif;font-size:32px;line-height:38px;font-weight:460">3 productos para “rib”</span><span style="font-size:15px;line-height:22px;color:#A8A29B">Tomahawk y la parrillada aparecen porque su descripción dice “rib eye”.</span></span><a href="Catálogo y ficha.dc.html" style="height:44px;display:flex;align-items:center;gap:8px;font-size:15px;font-weight:600;color:#F5F3EF">Ver los 3 en el catálogo<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E4D1B0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a></div>
+              <div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:20px"><dc-import name="Tarjeta" foto="public/img/products/rib-eye.webp" cat="Cortes especiales" nombre="Rib Eye" desc="Jaspeado y jugoso, para el asador" precio="$549" unidad="kg" hint-size="100%,560px"></dc-import><dc-import name="Tarjeta" foto="public/img/products/tomahawk.webp" cat="Cortes especiales" nombre="Tomahawk" desc="Rib eye con el hueso largo entero" precio="$649" unidad="kg" hint-size="100%,560px"></dc-import><dc-import name="Tarjeta" foto="public/img/products/premium-alto.webp" cat="Ofertas" nombre="Paquete Parrillada Familiar" desc="Rib eye, costilla, pollo marinado y embutidos" precio="$3,249" unidad="paquete" hint-size="100%,560px"></dc-import>
+                <div style="grid-column:span 2;align-self:start;display:flex;flex-direction:column;gap:8px;padding:28px;border-radius:16px;background:#151517;border:1px solid #3F3F46">
+                  <span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B;padding-bottom:4px">También puedes buscar</span>
+                  <a href="Catálogo y ficha.dc.html" style="min-height:44px;display:flex;align-items:center;font-size:18px;color:#F5F3EF;text-decoration:none"><span style="font-weight:600">rib</span>&nbsp;eye para asador</a>
+                  <a href="Catálogo y ficha.dc.html" style="min-height:44px;display:flex;align-items:center;font-size:18px;color:#F5F3EF;text-decoration:none">costilla (<span style="font-weight:600">rib</span>s)</a>
+                  <a href="Catálogo y ficha.dc.html" style="min-height:44px;display:flex;align-items:center;font-size:18px;color:#F5F3EF;text-decoration:none">paquete parrillada</a>
+                </div></div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:20px">
+              <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px"><span style="display:flex;flex-direction:column;gap:4px"><span style="font-family:Fraunces,serif;font-size:32px;line-height:38px;font-weight:460">Más pedidos</span></span></div>
+              <div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:20px"><dc-import name="Tarjeta" foto="public/img/products/skirt_steak.webp" cat="Cortes especiales" nombre="Arrachera" desc="Falda marinada, para asar entera" precio="$449" unidad="kg" hint-size="100%,560px"></dc-import><dc-import name="Tarjeta" foto="public/img/products/res.webp" pos="30% 50%" cat="Carnes rojas" nombre="Bistec de Res" desc="Pulpa delgada, sartén o comal" precio="$289" unidad="kg" hint-size="100%,560px"></dc-import><dc-import name="Tarjeta" foto="public/img/products/top_sirloin.webp" cat="Cortes especiales" nombre="Top Sirloin" desc="Entre precio y suavidad" precio="$389" unidad="kg" hint-size="100%,560px"></dc-import><dc-import name="Tarjeta" foto="public/img/products/flak_steak.webp" cat="Cortes especiales" nombre="Flank Steak" desc="Fibra larga, para asar entero" precio="$399" unidad="kg" hint-size="100%,560px"></dc-import><dc-import name="Tarjeta" foto="public/img/products/res.webp" pos="75% 60%" cat="Carnes rojas" nombre="Diezmillo" desc="Jaspeado, aguanta cocción larga" precio="$249" unidad="kg" hint-size="100%,560px"></dc-import></div>
+            </div>
+          </div>
+        </div>
+        <div style="font-size:13px;line-height:18px;font-weight:600;color:#F5F3EF">Buscador · escribiendo con resultados · escritorio 1440</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="width:1440px;min-height:900px;background:#0B0B0C;border:1px solid #3F3F46;border-radius:12px;overflow:hidden;box-sizing:border-box;display:flex;flex-direction:column;padding-bottom:56px">
+          <div style="height:88px;flex:0 0 88px;display:flex;align-items:center;justify-content:space-between;padding:0 24px 0 48px">
+            <span style="display:flex;flex-direction:column;gap:6px;line-height:1"><span style="font-size:18px;font-weight:600;letter-spacing:0.18em">CARNICERÍA</span><span style="font-size:12px;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B">Buscar en la carnicería</span></span>
+            <span style="display:flex;align-items:center;gap:14px"><span style="font-size:13px;color:#A8A29B">Esc para cerrar</span><button aria-label="Cerrar la búsqueda" style="width:52px;height:52px;border-radius:999px;border:1px solid #3F3F46;background:#1C1C1F;color:#F5F3EF;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg></button></span>
+          </div>
+          <div style="padding:8px 0 20px;display:flex;justify-content:center"><span style="width:760px;display:flex;align-items:center;height:64px;box-sizing:border-box;background:#151517;border:1px solid #DC2626;outline:2px solid #DC2626;outline-offset:2px;border-radius:999px;padding:0 30px;font-size:20px;color:#F5F3EF">salmón<span style="width:1px;height:26px;background:#DC2626;margin-left:1px"></span></span></div>
+          <div style="padding:16px 48px 0;display:flex;flex-direction:column;gap:48px">
+            <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:48px;padding:32px;border-radius:20px;background:#151517;border:1px solid #3F3F46">
+              <div style="display:flex;flex-direction:column;gap:10px;max-width:640px"><span style="font-family:Fraunces,serif;font-size:36px;line-height:42px;font-weight:460;text-wrap:balance">No tenemos “salmón” en el mostrador</span><span style="font-size:17px;line-height:26px;color:#A8A29B;text-wrap:pretty">Somos carnicería: no vendemos pescado ni mariscos. Si es para el asador, estos cortes salen bien.</span></div>
+              <button style="flex:0 0 auto;height:48px;padding:0 24px;border-radius:999px;background:transparent;border:1px solid #E4D1B0;color:#F5F3EF;font-family:Geist,system-ui,sans-serif;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:8px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 0-3.2 6.4L20 19.5l-1-3.2A8 8 0 0 0 20 12Z"></path></svg>Pregúntale al carnicero por WhatsApp</button>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:20px">
+              <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px"><span style="display:flex;flex-direction:column;gap:4px"><span style="font-family:Fraunces,serif;font-size:32px;line-height:38px;font-weight:460">Cortes parecidos para el asador</span></span><a href="Catálogo y ficha.dc.html" style="height:44px;display:flex;align-items:center;gap:8px;font-size:15px;font-weight:600;color:#F5F3EF">Ver cortes especiales<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E4D1B0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a></div>
+              <div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:20px"><dc-import name="Tarjeta" foto="public/img/products/top_sirloin.webp" cat="Cortes especiales" nombre="Top Sirloin" desc="Entre precio y suavidad" precio="$389" unidad="kg" hint-size="100%,560px"></dc-import><dc-import name="Tarjeta" foto="public/img/products/skirt_steak.webp" cat="Cortes especiales" nombre="Arrachera" desc="Falda marinada, para asar entera" precio="$449" unidad="kg" hint-size="100%,560px"></dc-import><dc-import name="Tarjeta" foto="public/img/products/flak_steak.webp" cat="Cortes especiales" nombre="Flank Steak" desc="Fibra larga, para asar entero" precio="$399" unidad="kg" hint-size="100%,560px"></dc-import><dc-import name="Tarjeta" foto="public/img/products/ney_york_strip.webp" cat="Cortes especiales" nombre="New York Strip" desc="Lomo con su capa de grasa" precio="$529" unidad="kg" hint-size="100%,560px"></dc-import><dc-import name="Tarjeta" foto="public/img/products/filet_mignon.webp" cat="Cortes especiales" nombre="Filete Mignon" desc="La parte más suave, poca grasa" precio="$689" unidad="kg" hint-size="100%,560px"></dc-import></div>
+            </div>
+          </div>
+        </div>
+        <div style="font-size:13px;line-height:18px;font-weight:600;color:#F5F3EF">Buscador · sin resultados · escritorio 1440</div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:4px;font-size:13px;line-height:19px;color:#A8A29B;max-width:1100px;text-wrap:pretty"><span><span style="color:#E4D1B0;font-weight:600">De lo nuestro · </span>la X arriba a la derecha, “Búsquedas de tendencias” y la fila “Lo nuevo” de la captura 03.</span><span><span style="color:#F5F3EF;font-weight:600">De lo mío · </span>overlay oscuro, campo sin lupa adentro, una sola lupa abierta (encabezado y burbuja se ocultan); el móvil queda como estaba.</span><span><span style="color:#F5F3EF;font-weight:600">Mejora · </span>en escritorio las sugerencias son filas con título (“Lo nuevo”, “Más pedidos”) de Tarjetas grandes donde manda la foto, cinco por fila, en lugar de miniaturas rotas en fondo blanco; X de 52 px siempre visible.</span></div>
+  </div>
+
+  <!-- ===== 6 · ASISTENTE ===== -->
+  <div style="display:flex;flex-direction:column;gap:16px">
+    <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap">
+      <span style="font-size:12px;font-weight:600;letter-spacing:0.04em;color:#DC2626">06</span>
+      <h2 style="margin:0;font-family:Fraunces,serif;font-size:30px;line-height:36px;font-weight:440">Burbuja y panel del asistente</h2>
+      <span style="font-size:13px;line-height:18px;color:#A8A29B">título claro · respuestas rápidas de 44 px · campo de un solo tono · sin emojis</span>
+      <span style="font-size:12px;line-height:16px;font-weight:600;color:#0B0B0C;background:#F59E0B;border-radius:999px;padding:4px 10px">falta backend</span>
+    </div>
+    <div style="display:flex;gap:28px;align-items:flex-start;flex-wrap:wrap">
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="width:390px;height:844px;background:#0B0B0C;border:1px solid #3F3F46;border-radius:12px;overflow:hidden;box-sizing:border-box;position:relative">
+          <dc-import name="Encabezado" ancho="movil" hint-size="100%,56px"></dc-import>
+          <div style="position:absolute;inset:0;background:rgba(11,11,12,0.72)"></div>
+          <div style="position:absolute;left:0;right:0;bottom:0;height:760px;background:#1C1C1F;border:1px solid #3F3F46;border-bottom:none;border-radius:28px 28px 0 0;display:flex;flex-direction:column;box-sizing:border-box">
+            <div style="display:flex;justify-content:center;padding-top:8px"><span style="width:40px;height:4px;border-radius:999px;background:#3F3F46"></span></div>
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:12px 12px 16px 20px;border-bottom:1px solid #3F3F46">
+              <span style="display:flex;flex-direction:column;gap:4px">
+                <span style="font-family:Fraunces,serif;font-size:22px;line-height:28px;font-weight:440">Asistente de la carnicería</span>
+                <span style="font-size:13px;line-height:18px;color:#A8A29B">Cortes, horarios, precios y entregas</span>
+              </span>
+              <button aria-label="Cerrar el asistente" style="width:44px;height:44px;flex:0 0 44px;border:1px solid #3F3F46;background:#151517;color:#F5F3EF;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:999px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
+            </div>
+            <div style="flex:1 1 auto;overflow:hidden;padding:20px 16px;display:flex;flex-direction:column;gap:12px">
+              <span style="align-self:flex-start;max-width:85%;background:#151517;border:1px solid #3F3F46;border-radius:16px 16px 16px 4px;padding:12px 14px;font-size:15px;line-height:22px;text-wrap:pretty">Hola, soy el asistente de Carnicería El Señor de La Misericordia. Pregúntame por cortes, horarios, precios o entregas.</span>
+              <span style="align-self:flex-end;max-width:80%;background:#E4D1B0;color:#0B0B0C;border-radius:16px 16px 4px 16px;padding:12px 14px;font-size:15px;line-height:22px">¿Hasta qué hora abren el sábado?</span>
+              <span style="align-self:flex-start;max-width:85%;background:#151517;border:1px solid #3F3F46;border-radius:16px 16px 16px 4px;padding:12px 14px;font-size:15px;line-height:22px;text-wrap:pretty">De lunes a sábado, de 8:00 a 17:00. Domingos y festivos cerramos.</span>
+              <span style="align-self:flex-end;max-width:80%;background:#E4D1B0;color:#0B0B0C;border-radius:16px 16px 4px 16px;padding:12px 14px;font-size:15px;line-height:22px">¿Llevan a domicilio?</span>
+              <span style="align-self:flex-start;max-width:85%;background:#151517;border:1px solid #3F3F46;border-radius:16px 16px 16px 4px;padding:12px 14px;font-size:15px;line-height:22px;text-wrap:pretty">Sí, en zonas participantes de San Luis Potosí. El mínimo para entrega es de $150; si pasas a recoger no hay mínimo.</span>
+            </div>
+            <div style="padding:0 16px 12px;display:flex;gap:8px;flex-wrap:wrap">
+              <span style="min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;background:#151517;border:1px solid #3F3F46;color:#F5F3EF;font-size:15px">Cortes para asar</span>
+              <span style="min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;background:#151517;border:1px solid #3F3F46;color:#F5F3EF;font-size:15px">Cómo llegar</span>
+              <span style="min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;background:#151517;border:1px solid #3F3F46;color:#F5F3EF;font-size:15px">Hablar por WhatsApp</span>
+            </div>
+            <div style="border-top:1px solid #3F3F46;padding:12px 16px 24px;display:flex;gap:8px;align-items:center">
+              <span style="flex:1;height:48px;box-sizing:border-box;display:flex;align-items:center;padding:0 18px;border-radius:999px;background:#151517;border:1px solid #3F3F46;font-size:16px;color:#A8A29B">Escribe tu pregunta</span>
+              <button aria-label="Enviar" style="width:48px;height:48px;flex:0 0 48px;border-radius:999px;background:#DC2626;border:none;color:#FFFFFF;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></button>
+            </div>
+          </div>
+        </div>
+        <div style="font-size:13px;line-height:18px;font-weight:600;color:#F5F3EF">Asistente abierto · móvil 390 · hoja desde abajo</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="width:1440px;height:844px;background:#0B0B0C;border:1px solid #3F3F46;border-radius:12px;overflow:hidden;box-sizing:border-box;position:relative">
+          <dc-import name="Encabezado" ancho="escritorio" hint-size="100%,72px"></dc-import>
+          <div style="padding:48px 32px;display:flex;flex-direction:column;gap:16px;max-width:760px">
+            <span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#E4D1B0">San Luis Potosí</span>
+            <span style="font-family:Fraunces,serif;font-size:56px;line-height:62px;font-weight:480">Cortes del día, listos para el asador</span>
+          </div>
+          <span style="position:absolute;left:32px;bottom:32px;display:flex;align-items:center;gap:10px;height:48px;padding:0 18px;border-radius:999px;background:#151517;border:1px solid #E4D1B0;font-size:15px;font-weight:500;color:#F5F3EF">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E4D1B0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 0-3.2 6.4L20 19.5l-1-3.2A8 8 0 0 0 20 12Z"></path></svg>
+            ¿Te ayudo con el corte?</span>
+          <span style="position:absolute;left:32px;bottom:88px;font-size:13px;color:#A8A29B">burbuja cerrada, para comparar</span>
+          <div style="position:absolute;right:32px;bottom:32px;width:400px;height:640px;background:#1C1C1F;border:1px solid #3F3F46;border-radius:20px;display:flex;flex-direction:column;box-sizing:border-box;overflow:hidden">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:16px 12px 16px 20px;border-bottom:1px solid #3F3F46">
+              <span style="display:flex;flex-direction:column;gap:4px">
+                <span style="font-family:Fraunces,serif;font-size:22px;line-height:28px;font-weight:440">Asistente de la carnicería</span>
+                <span style="font-size:13px;line-height:18px;color:#A8A29B">Cortes, horarios, precios y entregas</span>
+              </span>
+              <button aria-label="Cerrar el asistente" style="width:44px;height:44px;flex:0 0 44px;border:1px solid #3F3F46;background:#151517;color:#F5F3EF;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:999px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
+            </div>
+            <div style="flex:1 1 auto;overflow:hidden;padding:20px 16px;display:flex;flex-direction:column;gap:12px">
+              <span style="align-self:flex-start;max-width:85%;background:#151517;border:1px solid #3F3F46;border-radius:16px 16px 16px 4px;padding:12px 14px;font-size:15px;line-height:22px;text-wrap:pretty">Hola, soy el asistente de Carnicería El Señor de La Misericordia. Pregúntame por cortes, horarios, precios o entregas.</span>
+              <span style="align-self:flex-end;max-width:80%;background:#E4D1B0;color:#0B0B0C;border-radius:16px 16px 4px 16px;padding:12px 14px;font-size:15px;line-height:22px">¿Qué corte me recomiendas para asar entero?</span>
+              <span style="align-self:flex-start;max-width:85%;background:#151517;border:1px solid #3F3F46;border-radius:16px 16px 16px 4px;padding:12px 14px;font-size:15px;line-height:22px;text-wrap:pretty">El Flank Steak: corte plano de fibra larga, ideal para asar entero y rebanar contra la fibra.</span>
+              <dc-import name="Tarjeta" variante="chica" foto="public/img/products/flak_steak.webp" cat="Cortes especiales" nombre="Flank Steak" precio="$399" unidad="kg" hint-size="100%,90px"></dc-import>
+            </div>
+            <div style="padding:0 16px 12px;display:flex;gap:8px;flex-wrap:wrap">
+              <span style="min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;background:#151517;border:1px solid #3F3F46;color:#F5F3EF;font-size:15px">Horarios</span>
+              <span style="min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;background:#151517;border:1px solid #3F3F46;color:#F5F3EF;font-size:15px">Hablar por WhatsApp</span>
+            </div>
+            <div style="border-top:1px solid #3F3F46;padding:12px 16px 16px;display:flex;gap:8px;align-items:center">
+              <span style="flex:1;height:48px;box-sizing:border-box;display:flex;align-items:center;padding:0 18px;border-radius:999px;background:#151517;border:1px solid #3F3F46;font-size:16px;color:#A8A29B">Escribe tu pregunta</span>
+              <button aria-label="Enviar" style="width:48px;height:48px;flex:0 0 48px;border-radius:999px;background:#DC2626;border:none;color:#FFFFFF;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></button>
+            </div>
+          </div>
+        </div>
+        <div style="font-size:13px;line-height:18px;font-weight:600;color:#F5F3EF">Asistente abierto · escritorio 1440 · panel de 400 px</div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:4px;font-size:13px;line-height:19px;color:#A8A29B;max-width:1100px;text-wrap:pretty"><span><span style="color:#E4D1B0;font-weight:600">De lo nuestro · </span>la burbuja del asistente en todas las páginas y sus respuestas de horario, entrega y cortes.</span><span><span style="color:#F5F3EF;font-weight:600">De lo mío · </span>título claro, respuestas rápidas de 44 px y la Tarjeta chica para recomendar.</span><span><span style="color:#F5F3EF;font-weight:600">Mejora · </span>sin emojis, con salida humana por WhatsApp. Falta backend: hoy responde por palabras clave (chatbot.js), no con el catálogo real.</span></div>
+  </div>
+
+  <!-- ===== AUTORREVISIÓN + REPORTE ===== -->
+  <div style="display:flex;flex-direction:column;gap:16px">
+    <h2 style="margin:0;font-family:Fraunces,serif;font-size:30px;line-height:36px;font-weight:440">Autorrevisión de lo nuevo</h2>
+    <div style="background:#151517;border:1px solid #3F3F46;border-radius:12px;overflow:hidden;width:1440px;max-width:100%">
+      <div style="display:grid;grid-template-columns:200px minmax(0,1fr) 100px minmax(0,1.2fr);font-size:12px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B;border-bottom:1px solid #3F3F46"><span style="padding:12px 16px">Criterio</span><span style="padding:12px 16px">Qué se midió</span><span style="padding:12px 16px">Estado</span><span style="padding:12px 16px">Corrección</span></div>
+      <div style="display:grid;grid-template-columns:200px minmax(0,1fr) 100px minmax(0,1.2fr);font-size:13px;line-height:18px;border-bottom:1px solid #3F3F46"><span style="padding:12px 16px">Se lee en el teléfono</span><span style="padding:12px 16px;color:#A8A29B">Cuerpo 15–17 px, títulos Fraunces 22–32 px en 390</span><span style="padding:12px 16px;color:#059669;font-weight:600">Pasa</span><span style="padding:12px 16px;color:#A8A29B">Intento 1: la tendencia en chips de 13 px; pasó a enlaces de 17 px.</span></div>
+      <div style="display:grid;grid-template-columns:200px minmax(0,1fr) 100px minmax(0,1.2fr);font-size:13px;line-height:18px;border-bottom:1px solid #3F3F46"><span style="padding:12px 16px">Contraste</span><span style="padding:12px 16px;color:#A8A29B">#F5F3EF sobre #1C1C1F 15.6:1 · #A8A29B sobre #0B0B0C 7.9:1 · tinta sobre beige 13.2:1</span><span style="padding:12px 16px;color:#059669;font-weight:600">Pasa</span><span style="padding:12px 16px;color:#A8A29B">La burbuja del cliente va en beige con tinta oscura, no en rojo: el rojo queda para acciones.</span></div>
+      <div style="display:grid;grid-template-columns:200px minmax(0,1fr) 100px minmax(0,1.2fr);font-size:13px;line-height:18px;border-bottom:1px solid #3F3F46"><span style="padding:12px 16px">Botones de 44 px</span><span style="padding:12px 16px;color:#A8A29B">X 48, cerrar menú 44, chips 44, quitar reciente 44, “Borrar todo” 44 de alto</span><span style="padding:12px 16px;color:#059669;font-weight:600">Pasa</span><span style="padding:12px 16px;color:#A8A29B">Intento 1: “Limpiar” de la primera pasada medía 18 px de alto; ahora “Borrar todo” mide 44.</span></div>
+      <div style="display:grid;grid-template-columns:200px minmax(0,1fr) 100px minmax(0,1.2fr);font-size:13px;line-height:18px;border-bottom:1px solid #3F3F46"><span style="padding:12px 16px">Misma tarjeta, mismos botones</span><span style="padding:12px 16px;color:#A8A29B">Sugerencias y chat importan Tarjeta chica; botones rojo lleno y contorno beige</span><span style="padding:12px 16px;color:#059669;font-weight:600">Pasa</span><span style="padding:12px 16px;color:#A8A29B">En 390 a dos columnas la chica va sin “+” (toda la fila es el botón) para que el nombre no se parta.</span></div>
+      <div style="display:grid;grid-template-columns:200px minmax(0,1fr) 100px minmax(0,1.2fr);font-size:13px;line-height:18px;border-bottom:1px solid #3F3F46"><span style="padding:12px 16px">Ningún texto se corta</span><span style="padding:12px 16px;color:#A8A29B">Sin elipsis en nombres; chips y títulos envuelven</span><span style="padding:12px 16px;color:#059669;font-weight:600">Pasa</span><span style="padding:12px 16px;color:#A8A29B">Se quitó el nowrap con elipsis de la chica original; “Paquete Parrillada Familiar” envuelve en dos líneas.</span></div>
+      <div style="display:grid;grid-template-columns:200px minmax(0,1fr) 100px minmax(0,1.2fr);font-size:13px;line-height:18px"><span style="padding:12px 16px">Mejor que lo viejo</span><span style="padding:12px 16px;color:#A8A29B">Contra capturas 02, 03, 05 y 16</span><span style="padding:12px 16px;color:#059669;font-weight:600">Pasa</span><span style="padding:12px 16px;color:#A8A29B">Un solo buscador visible, activo en rojo, chat con título, sin fotos rotas.</span></div>
+    </div>
+  </div>
+
+  <div id="reporte-b1" data-screen-label="Reporte" style="width:1440px;max-width:100%;box-sizing:border-box;background:#151517;border:1px solid #3F3F46;border-radius:16px;padding:40px;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:48px">
+    <div style="display:flex;flex-direction:column;gap:20px">
+      <span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#E4D1B0">Reporte · Componentes · componentes globales</span>
+      <span style="font-family:Fraunces,serif;font-size:40px;line-height:46px;font-weight:480">6 de 6 pantallas cerradas</span>
+      <div style="display:flex;flex-direction:column">
+        <span style="display:grid;grid-template-columns:40px minmax(0,1fr) 80px;gap:12px;padding:12px 0;border-bottom:1px solid #3F3F46;font-size:15px;line-height:22px"><span style="color:#A8A29B;font-variant-numeric:tabular-nums">01</span><span>Encabezado normal y con scroll, una familia de íconos</span><span style="color:#059669;font-weight:600">Listo</span></span>
+        <span style="display:grid;grid-template-columns:40px minmax(0,1fr) 80px;gap:12px;padding:12px 0;border-bottom:1px solid #3F3F46;font-size:15px;line-height:22px"><span style="color:#A8A29B;font-variant-numeric:tabular-nums">02</span><span>Menú lateral a altura completa, categorías en chips, activo en rojo</span><span style="color:#059669;font-weight:600">Listo</span></span>
+        <span style="display:grid;grid-template-columns:40px minmax(0,1fr) 80px;gap:12px;padding:12px 0;border-bottom:1px solid #3F3F46;font-size:15px;line-height:22px"><span style="color:#A8A29B;font-variant-numeric:tabular-nums">03</span><span>Buscador oscuro: vacío, escribiendo y sin resultados</span><span style="color:#059669;font-weight:600">Listo</span></span>
+        <span style="display:grid;grid-template-columns:40px minmax(0,1fr) 80px;gap:12px;padding:12px 0;border-bottom:1px solid #3F3F46;font-size:15px;line-height:22px"><span style="color:#A8A29B;font-variant-numeric:tabular-nums">04</span><span>Tarjeta única con kg + lb, pieza, paquete y sus cuatro variantes</span><span style="color:#059669;font-weight:600">Listo</span></span>
+        <span style="display:grid;grid-template-columns:40px minmax(0,1fr) 80px;gap:12px;padding:12px 0;border-bottom:1px solid #3F3F46;font-size:15px;line-height:22px"><span style="color:#A8A29B;font-variant-numeric:tabular-nums">05</span><span>Carrito: hoja con agarradera, cajón de 440 px, barra de $150, vacío con sugerencias</span><span style="color:#059669;font-weight:600">Listo</span></span>
+        <span style="display:grid;grid-template-columns:40px minmax(0,1fr) 80px;gap:12px;padding:12px 0;font-size:15px;line-height:22px"><span style="color:#A8A29B;font-variant-numeric:tabular-nums">06</span><span>Burbuja y panel del asistente con título</span><span style="color:#059669;font-weight:600">Listo</span></span>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B">Pendientes</span>
+      <span style="font-size:15px;line-height:22px;text-wrap:pretty;border-bottom:1px solid #3F3F46;padding-bottom:12px">Chips de 32 px de la primera pasada: corregidos a 44 px en el cierre (Cierre).</span>
+      <span style="font-size:15px;line-height:22px;text-wrap:pretty;border-bottom:1px solid #3F3F46;padding-bottom:12px">El correo aparece de dos formas en el repo (carniceriasenmisericordia.com en el pie, carniceriamisericordia.com en chatbot.js). Se usó la del pie; confirmar con el dueño.</span>
+      <span style="font-size:15px;line-height:22px;text-wrap:pretty;border-bottom:1px solid #3F3F46;padding-bottom:12px">Falta backend: ofertas sin columna de precio anterior, asistente por palabras clave, “lo más buscado” sin registro de búsquedas.</span>
+      <span style="font-size:15px;line-height:22px;text-wrap:pretty">La búsqueda G1 de la primera pasada (lupa dentro del campo, tendencia en chips) queda reemplazada por la 03 de esta hoja.</span>
+    </div>
+  </div>
+</section>
+
+<section style="padding:48px 48px 96px;font-family:Geist,system-ui,sans-serif;color:#F5F3EF;display:flex;flex-direction:column;gap:64px">
+
+  <div style="display:flex;flex-direction:column;gap:12px;max-width:900px">
+    <div style="font-size:12px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B">Carni · componentes · fundamentos</div>
+    <h1 style="margin:0;font-family:Fraunces,Georgia,serif;font-size:44px;line-height:50px;font-weight:480;color:#F5F3EF">Fundamentos · 04 Tarjeta · 05 Carrito</h1>
+    <p style="margin:0;font-size:16px;line-height:26px;color:#A8A29B;max-width:70ch;text-wrap:pretty">Dirección "mostrador digital", tipografía Fraunces + Geist y base FlyonUI: decididas, no se reabren. Todos los números vienen de <span style="color:#F5F3EF">direccion-visual.md</span>. Cada vista se dibujó primero a 390 y después a 1440. La tabla de autorrevisión cierra la página.</p>
+  </div>
+
+  <!-- ===================== G0.2 TOKENS ===================== -->
+  <div style="display:flex;flex-direction:column;gap:16px">
+    <div style="display:flex;align-items:baseline;gap:12px">
+      <span style="font-family:Geist;font-size:12px;font-weight:600;letter-spacing:0.04em;color:#DC2626">G0.2</span>
+      <h2 style="margin:0;font-family:Fraunces,serif;font-size:30px;line-height:36px;font-weight:440">Hoja de tokens</h2>
+      <span style="font-size:13px;line-height:18px;color:#A8A29B">color con ratio de contraste · escala tipográfica 390/1440 · espaciado 4 px · radios · elevación</span>
+    </div>
+
+    <div style="display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start">
+
+      <div style="width:620px;background:#151517;border:1px solid #3F3F46;border-radius:12px;padding:24px;box-sizing:border-box;display:flex;flex-direction:column;gap:16px">
+        <div style="font-size:12px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B">Color · superficie y tinta</div>
+        <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px">
+          <div style="display:flex;gap:12px;align-items:center"><span style="width:44px;height:44px;border-radius:8px;background:#0B0B0C;border:1px solid #3F3F46;flex:0 0 44px"></span><span style="display:flex;flex-direction:column"><span style="font-size:13px;font-weight:600">bg · #0B0B0C</span><span style="font-size:13px;color:#A8A29B">fondo de página</span></span></div>
+          <div style="display:flex;gap:12px;align-items:center"><span style="width:44px;height:44px;border-radius:8px;background:#151517;border:1px solid #3F3F46;flex:0 0 44px"></span><span style="display:flex;flex-direction:column"><span style="font-size:13px;font-weight:600">surface-1 · #151517</span><span style="font-size:13px;color:#A8A29B">tarjeta sobre página</span></span></div>
+          <div style="display:flex;gap:12px;align-items:center"><span style="width:44px;height:44px;border-radius:8px;background:#1C1C1F;border:1px solid #3F3F46;flex:0 0 44px"></span><span style="display:flex;flex-direction:column"><span style="font-size:13px;font-weight:600">surface-2 · #1C1C1F</span><span style="font-size:13px;color:#A8A29B">overlay sobre página</span></span></div>
+          <div style="display:flex;gap:12px;align-items:center"><span style="width:44px;height:44px;border-radius:8px;background:#232326;border:1px solid #3F3F46;flex:0 0 44px"></span><span style="display:flex;flex-direction:column"><span style="font-size:13px;font-weight:600">surface-3 · #232326</span><span style="font-size:13px;color:#A8A29B">hoja sobre overlay</span></span></div>
+          <div style="display:flex;gap:12px;align-items:center"><span style="width:44px;height:44px;border-radius:8px;background:#3F3F46;flex:0 0 44px"></span><span style="display:flex;flex-direction:column"><span style="font-size:13px;font-weight:600">border · #3F3F46</span><span style="font-size:13px;color:#A8A29B">3.1:1 vs bg · sólo filetes</span></span></div>
+          <div style="display:flex;gap:12px;align-items:center"><span style="width:44px;height:44px;border-radius:8px;background:#F5F3EF;flex:0 0 44px"></span><span style="display:flex;flex-direction:column"><span style="font-size:13px;font-weight:600">text · #F5F3EF</span><span style="font-size:13px;color:#A8A29B">18.9:1</span></span></div>
+          <div style="display:flex;gap:12px;align-items:center"><span style="width:44px;height:44px;border-radius:8px;background:#A8A29B;flex:0 0 44px"></span><span style="display:flex;flex-direction:column"><span style="font-size:13px;font-weight:600">text-muted · #A8A29B</span><span style="font-size:13px;color:#A8A29B">8.1:1 · gris cálido</span></span></div>
+          <div style="display:flex;gap:12px;align-items:center"><span style="width:44px;height:44px;border-radius:8px;background:#DC2626;flex:0 0 44px"></span><span style="display:flex;flex-direction:column"><span style="font-size:13px;font-weight:600">red · #DC2626</span><span style="font-size:13px;color:#A8A29B">blanco sobre rojo 4.53:1</span></span></div>
+          <div style="display:flex;gap:12px;align-items:center"><span style="width:44px;height:44px;border-radius:8px;background:#C81E1E;flex:0 0 44px"></span><span style="display:flex;flex-direction:column"><span style="font-size:13px;font-weight:600">red-hover · #C81E1E</span><span style="font-size:13px;color:#A8A29B">hover del primario</span></span></div>
+          <div style="display:flex;gap:12px;align-items:center"><span style="width:44px;height:44px;border-radius:8px;background:#F43F5E;flex:0 0 44px"></span><span style="display:flex;flex-direction:column"><span style="font-size:13px;font-weight:600">danger · #F43F5E</span><span style="font-size:13px;color:#A8A29B">4.6:1 · error, matiz propio</span></span></div>
+          <div style="display:flex;gap:12px;align-items:center"><span style="width:44px;height:44px;border-radius:8px;background:#E4D1B0;flex:0 0 44px"></span><span style="display:flex;flex-direction:column"><span style="font-size:13px;font-weight:600">sand · #E4D1B0</span><span style="font-size:13px;color:#A8A29B">13.7:1 · acentos, asas</span></span></div>
+          <div style="display:flex;gap:12px;align-items:center"><span style="width:44px;height:44px;border-radius:8px;background:#F59E0B;flex:0 0 44px"></span><span style="display:flex;flex-direction:column"><span style="font-size:13px;font-weight:600">gold · #F59E0B</span><span style="font-size:13px;color:#A8A29B">8.4:1 · sólo estrellas</span></span></div>
+          <div style="display:flex;gap:12px;align-items:center"><span style="width:44px;height:44px;border-radius:8px;background:#059669;flex:0 0 44px"></span><span style="display:flex;flex-direction:column"><span style="font-size:13px;font-weight:600">success · #059669</span><span style="font-size:13px;color:#A8A29B">6.2:1 · sólo Entregado</span></span></div>
+        </div>
+        <div style="font-size:13px;line-height:18px;color:#A8A29B;border-top:1px solid #3F3F46;padding-top:12px">Elevación: página → surface-1 → surface-2 → surface-3. Las superficies se separan por filete, nunca por sombra ni por su propio contraste.</div>
+      </div>
+
+      <div style="width:520px;background:#151517;border:1px solid #3F3F46;border-radius:12px;padding:24px;box-sizing:border-box;display:flex;flex-direction:column;gap:20px">
+        <div style="font-size:12px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B">Tipografía · Fraunces + Geist</div>
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <div style="font-family:Fraunces,serif;font-size:64px;line-height:68px;font-weight:480;letter-spacing:-0.04em;font-variation-settings:'opsz' 96">Cortes</div>
+          <div style="font-size:13px;color:#A8A29B">Display · Fraunces 40/44 a 390 · 64/68 opsz 96 a 1440 · track −0.04em</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <div style="font-family:Fraunces,serif;font-size:44px;line-height:50px;font-weight:480;font-variation-settings:'opsz' 72">Catálogo maestro</div>
+          <div style="font-size:13px;color:#A8A29B">H1 · 32/38 a 390 · 44/50 a 1440</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <div style="font-family:Fraunces,serif;font-size:30px;line-height:36px;font-weight:440;font-variation-settings:'opsz' 48">Lo que se lleva la gente</div>
+          <div style="font-size:13px;color:#A8A29B">H2 · 24/30 a 390 · 30/36 a 1440</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <div style="font-family:Fraunces,serif;font-size:22px;line-height:28px;font-weight:440;font-variation-settings:'opsz' 24">Chambarete con tuétano</div>
+          <div style="font-size:13px;color:#A8A29B">H3 / nombre de tarjeta · 20/26 a 390 · 22/28 a 1440</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <p style="margin:0;font-size:16px;line-height:26px;color:#F5F3EF;max-width:65ch">Cuerpo en Geist 16/26. Aquí reunimos los productos más buscados de la carnicería para que cualquier cliente encuentre res, pollo, cerdo y especiales.</p>
+          <div style="font-size:13px;color:#A8A29B">Body · 16/24 a 390 · 16/26 y medida 65–75ch a 1440</div>
+        </div>
+        <div style="display:flex;align-items:baseline;gap:12px;font-variant-numeric:tabular-nums">
+          <span style="font-size:22px;line-height:26px;font-weight:600">$189</span>
+          <span style="font-size:16px;line-height:20px;color:#A8A29B">/ kg</span>
+          <span style="font-size:16px;line-height:20px;color:#A8A29B">$85.73 / lb</span>
+          <span style="font-size:13px;color:#A8A29B">Price · Geist tabular 600 + 400</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#E4D1B0">Carnes rojas</span>
+          <span style="font-size:13px;color:#A8A29B">Label · 12/16, +0.04em, versalita alta</span>
+        </div>
+        <div style="border-top:1px solid #3F3F46;padding-top:12px;display:flex;flex-direction:column;gap:6px">
+          <div style="font-size:12px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B">Presupuesto de caracteres (español)</div>
+          <div style="font-size:13px;line-height:18px;color:#A8A29B">Display 28 / 48 · H1 34 / 60 · H2 42 / 70 · H3 38 / 48 · botón 18 / 24 · chip 14 / 18. Cadenas de prueba que ya caben en esta página: “Carnicería El Señor de La Misericordia”, “Chambarete con tuétano para caldo”, “Continuar con el pedido”.</div>
+        </div>
+      </div>
+
+      <div style="width:340px;background:#151517;border:1px solid #3F3F46;border-radius:12px;padding:24px;box-sizing:border-box;display:flex;flex-direction:column;gap:18px">
+        <div style="font-size:12px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B">Espaciado · base 4 px</div>
+        <div style="display:flex;align-items:flex-end;gap:6px">
+          <span style="width:4px;height:4px;background:#DC2626"></span>
+          <span style="width:8px;height:8px;background:#DC2626"></span>
+          <span style="width:12px;height:12px;background:#DC2626"></span>
+          <span style="width:16px;height:16px;background:#DC2626"></span>
+          <span style="width:20px;height:20px;background:#DC2626"></span>
+          <span style="width:24px;height:24px;background:#DC2626"></span>
+          <span style="width:32px;height:32px;background:#DC2626"></span>
+          <span style="width:48px;height:48px;background:#DC2626"></span>
+        </div>
+        <div style="font-size:13px;line-height:18px;color:#A8A29B">4 · 8 · 12 · 16 · 20 · 24 · 32 · 48 · 64 · 96</div>
+        <div style="border-top:1px solid #3F3F46;padding-top:16px;display:flex;flex-direction:column;gap:12px">
+          <div style="font-size:12px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B">Radios</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <span style="width:64px;height:48px;border:1px solid #3F3F46;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#A8A29B">16</span>
+            <span style="width:64px;height:48px;border:1px solid #3F3F46;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#A8A29B">12</span>
+            <span style="width:64px;height:48px;border:1px solid #3F3F46;border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#A8A29B">20</span>
+            <span style="width:64px;height:48px;border:1px solid #3F3F46;border-radius:999px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#A8A29B">999</span>
+          </div>
+          <div style="font-size:13px;line-height:18px;color:#A8A29B">tarjeta 16 · input 12 · diálogo 20 · píldora 999 · hoja móvil 24 arriba · cajón escritorio 16 a la izquierda</div>
+        </div>
+        <div style="border-top:1px solid #3F3F46;padding-top:16px;display:flex;flex-direction:column;gap:8px">
+          <div style="font-size:12px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B">Movimiento</div>
+          <div style="font-size:13px;line-height:18px;color:#A8A29B">hover/press 80–160 ms · hoja 240–320 ms · salida 30 % más rápida · <span style="color:#F5F3EF">cubic-bezier(.16,1,.3,1)</span> · anillo de foco 0 ms. Sólo opacity y transform.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== G0.3 TARJETA ===================== -->
+  <div style="display:flex;flex-direction:column;gap:16px">
+    <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap">
+      <span style="font-family:Geist;font-size:12px;font-weight:600;letter-spacing:0.04em;color:#DC2626">04</span>
+      <h2 style="margin:0;font-family:Fraunces,serif;font-size:30px;line-height:36px;font-weight:440">La tarjeta única</h2>
+      <span style="font-size:13px;line-height:18px;color:#A8A29B">precio consciente de la unidad · catálogo, recomendaciones, ofertas y resultados de búsqueda reusan esta misma tarjeta</span>
+    </div>
+
+    <div style="display:flex;gap:28px;align-items:flex-start;flex-wrap:wrap">
+
+      <div style="display:flex;flex-direction:column;gap:8px;width:300px">
+        <div style="font-size:12px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B">Antes · catálogo · 1796</div>
+        <img src="docs/design/capturas-actuales/12-products-grid-desktop.png" alt="Rejilla de productos actual" style="width:300px;border:1px solid #3F3F46;border-radius:12px;display:block">
+        <div style="font-size:13px;line-height:18px;color:#A8A29B;text-wrap:pretty">Precio por kg y por libra al mismo peso; el nombre del corte compite con la descripción; “80 en stock” en versalitas sueltas sobre la foto.</div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:12px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B">Tarjeta · rejilla · móvil 390</div>
+        <div style="width:390px;background:#0B0B0C;border:1px solid #3F3F46;border-radius:12px;padding:16px;box-sizing:border-box;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px">
+          <div style="background:#151517;border:1px solid #3F3F46;border-radius:16px;overflow:hidden;display:flex;flex-direction:column">
+            <div style="position:relative;aspect-ratio:4/5;background:#1C1C1F">
+              <img src="public/img/products/pollo.webp" alt="Alas adobadas" style="width:100%;height:100%;object-fit:cover;object-position:50% 40%;display:block">
+              <span style="position:absolute;top:8px;left:8px;font-size:12px;line-height:16px;font-weight:500;color:#F5F3EF;background:#1C1C1F;border:1px solid #3F3F46;border-radius:999px;padding:4px 8px;font-variant-numeric:tabular-nums">80 en stock</span>
+            </div>
+            <div style="padding:16px;display:flex;flex-direction:column;gap:8px">
+              <span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#E4D1B0">Pollo</span>
+              <span style="font-family:Fraunces,serif;font-size:20px;line-height:26px;font-weight:440">Alas Adobadas</span>
+              <span style="font-size:13px;line-height:18px;color:#A8A29B">Adobo de la casa · para asador</span>
+              <div style="display:flex;align-items:baseline;gap:6px;font-variant-numeric:tabular-nums"><span style="font-size:18px;line-height:22px;font-weight:600">$129</span><span style="font-size:14px;line-height:18px;color:#A8A29B">/ kg</span></div>
+              <span style="font-size:14px;line-height:18px;color:#A8A29B;font-variant-numeric:tabular-nums">$59 / lb</span>
+              <button style="margin-top:4px;font-family:Geist;font-size:15px;line-height:20px;font-weight:600;color:#fff;background:#DC2626;border:none;border-radius:999px;height:44px;cursor:pointer;width:100%">Agregar</button>
+            </div>
+          </div>
+          <div style="background:#151517;border:1px solid #3F3F46;border-radius:16px;overflow:hidden;display:flex;flex-direction:column">
+            <div style="position:relative;aspect-ratio:4/5;background:#1C1C1F">
+              <img src="public/img/products/merch.webp" alt="Gorra bordada" style="width:100%;height:100%;object-fit:cover;display:block">
+              <span style="position:absolute;top:8px;left:8px;font-size:12px;line-height:16px;font-weight:500;color:#F5F3EF;background:#1C1C1F;border:1px solid #3F3F46;border-radius:999px;padding:4px 8px;font-variant-numeric:tabular-nums">40 en stock</span>
+            </div>
+            <div style="padding:16px;display:flex;flex-direction:column;gap:8px">
+              <span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#E4D1B0">Merch</span>
+              <span style="font-family:Fraunces,serif;font-size:20px;line-height:26px;font-weight:440">Gorra Bordada</span>
+              <span style="font-size:13px;line-height:18px;color:#A8A29B">Logo bordado · talla ajustable</span>
+              <div style="display:flex;align-items:baseline;gap:6px;font-variant-numeric:tabular-nums"><span style="font-size:18px;line-height:22px;font-weight:600">$250</span><span style="font-size:14px;line-height:18px;color:#A8A29B">/ pieza</span></div>
+              <span style="font-size:13px;line-height:18px;color:#A8A29B">Sin precio por libra</span>
+              <button style="margin-top:4px;font-family:Geist;font-size:15px;line-height:20px;font-weight:600;color:#fff;background:#DC2626;border:none;border-radius:999px;height:44px;cursor:pointer;width:100%">Agregar</button>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px;font-size:13px;line-height:19px;color:#A8A29B;max-width:390px;text-wrap:pretty"><span><span style="color:#E4D1B0;font-weight:600">De lo nuestro · </span>foto, nombre, precio “/ kg” y botón para agregar, como en el catálogo del sitio.</span><span><span style="color:#F5F3EF;font-weight:600">De lo mío · </span>categoría en beige, descripción corta, libra debajo y variantes sin stock, oferta y chica.</span><span><span style="color:#F5F3EF;font-weight:600">Mejora · </span>el precio principal domina, la unidad la decide la categoría (kg y lb, pieza o paquete) y el botón mide 44 px a todo el ancho.</span></div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:12px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B">Tarjeta · rejilla · escritorio 1440</div>
+        <div style="width:1440px;background:#0B0B0C;border:1px solid #3F3F46;border-radius:12px;padding:32px;box-sizing:border-box;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px">
+          <div style="background:#151517;border:1px solid #3F3F46;border-radius:16px;overflow:hidden;display:flex;flex-direction:column">
+            <div style="position:relative;aspect-ratio:4/5;background:#1C1C1F">
+              <img src="public/img/products/pollo.webp" alt="Alas adobadas" style="width:100%;height:100%;object-fit:cover;object-position:50% 40%;display:block">
+              <span style="position:absolute;top:12px;left:12px;font-size:12px;line-height:16px;font-weight:500;color:#F5F3EF;background:#1C1C1F;border:1px solid #3F3F46;border-radius:999px;padding:4px 10px;font-variant-numeric:tabular-nums">80 en stock</span>
+            </div>
+            <div style="padding:16px;display:flex;flex-direction:column;gap:8px">
+              <span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#E4D1B0">Pollo</span>
+              <span style="font-family:Fraunces,serif;font-size:22px;line-height:28px;font-weight:440">Alas Adobadas</span>
+              <span style="font-size:13px;line-height:18px;color:#A8A29B">Adobo de la casa, listas para el asador</span>
+              <div style="display:flex;align-items:baseline;gap:8px;font-variant-numeric:tabular-nums"><span style="font-size:22px;line-height:26px;font-weight:600">$129</span><span style="font-size:16px;line-height:20px;color:#A8A29B">/ kg</span></div>
+              <span style="font-size:16px;line-height:20px;color:#A8A29B;font-variant-numeric:tabular-nums">$59 / lb</span>
+              <button style="margin-top:4px;font-family:Geist;font-size:15px;line-height:20px;font-weight:600;color:#fff;background:#DC2626;border:none;border-radius:999px;height:44px;cursor:pointer;width:100%">Agregar</button>
+            </div>
+          </div>
+          <div style="background:#151517;border:1px solid #3F3F46;border-radius:16px;overflow:hidden;display:flex;flex-direction:column">
+            <div style="position:relative;aspect-ratio:4/5;background:#1C1C1F">
+              <img src="public/img/products/pollo-detalle.webp" alt="Alas naturales" style="width:100%;height:100%;object-fit:cover;object-position:30% 60%;display:block">
+              <span style="position:absolute;top:12px;left:12px;font-size:12px;line-height:16px;font-weight:500;color:#F5F3EF;background:#1C1C1F;border:1px solid #3F3F46;border-radius:999px;padding:4px 10px;font-variant-numeric:tabular-nums">95 en stock</span>
+            </div>
+            <div style="padding:16px;display:flex;flex-direction:column;gap:8px">
+              <span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#E4D1B0">Pollo</span>
+              <span style="font-family:Fraunces,serif;font-size:22px;line-height:28px;font-weight:440">Alas Naturales</span>
+              <span style="font-size:13px;line-height:18px;color:#A8A29B">Limpias, sin sazonar, tres segmentos</span>
+              <div style="display:flex;align-items:baseline;gap:8px;font-variant-numeric:tabular-nums"><span style="font-size:22px;line-height:26px;font-weight:600">$109</span><span style="font-size:16px;line-height:20px;color:#A8A29B">/ kg</span></div>
+              <span style="font-size:16px;line-height:20px;color:#A8A29B;font-variant-numeric:tabular-nums">$49 / lb</span>
+              <button style="margin-top:4px;font-family:Geist;font-size:15px;line-height:20px;font-weight:600;color:#fff;background:#DC2626;border:none;border-radius:999px;height:44px;cursor:pointer;width:100%">Agregar</button>
+            </div>
+          </div>
+          <div style="background:#151517;border:1px solid #3F3F46;border-radius:16px;overflow:hidden;display:flex;flex-direction:column">
+            <div style="position:relative;aspect-ratio:4/5;background:#1C1C1F;overflow:hidden">
+              <img src="public/img/products/pollo.webp" alt="Pollo marinado" style="width:100%;height:100%;object-fit:cover;object-position:70% 75%;transform:scale(1.15);display:block">
+              <span style="position:absolute;top:12px;left:12px;font-size:12px;line-height:16px;font-weight:500;color:#F5F3EF;background:#1C1C1F;border:1px solid #3F3F46;border-radius:999px;padding:4px 10px;font-variant-numeric:tabular-nums">30 en stock</span>
+            </div>
+            <div style="padding:16px;display:flex;flex-direction:column;gap:8px">
+              <span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#E4D1B0">Preparadas</span>
+              <span style="font-family:Fraunces,serif;font-size:22px;line-height:28px;font-weight:440">Pollo Marinado</span>
+              <span style="font-size:13px;line-height:18px;color:#A8A29B">Marinado 12 h · pieza entera abierta</span>
+              <div style="display:flex;align-items:baseline;gap:8px;font-variant-numeric:tabular-nums"><span style="font-size:22px;line-height:26px;font-weight:600">$149</span><span style="font-size:16px;line-height:20px;color:#A8A29B">/ kg</span></div>
+              <span style="font-size:16px;line-height:20px;color:#A8A29B;font-variant-numeric:tabular-nums">$67.60 / lb</span>
+              <button style="margin-top:4px;font-family:Geist;font-size:15px;line-height:20px;font-weight:600;color:#fff;background:#DC2626;border:none;border-radius:999px;height:44px;cursor:pointer;width:100%">Agregar</button>
+            </div>
+          </div>
+          <div style="background:#151517;border:1px solid #3F3F46;border-radius:16px;overflow:hidden;display:flex;flex-direction:column">
+            <div style="position:relative;aspect-ratio:4/5;background:#1C1C1F">
+              <img src="public/img/products/merch.webp" alt="Delantal de carnicero" style="width:100%;height:100%;object-fit:cover;object-position:40% 30%;display:block">
+              <span style="position:absolute;top:12px;left:12px;font-size:12px;line-height:16px;font-weight:500;color:#F5F3EF;background:#1C1C1F;border:1px solid #3F3F46;border-radius:999px;padding:4px 10px;font-variant-numeric:tabular-nums">25 en stock</span>
+            </div>
+            <div style="padding:16px;display:flex;flex-direction:column;gap:8px">
+              <span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#E4D1B0">Merch</span>
+              <span style="font-family:Fraunces,serif;font-size:22px;line-height:28px;font-weight:440">Delantal de Carnicero</span>
+              <span style="font-size:13px;line-height:18px;color:#A8A29B">Lona encerada, resistente a manchas</span>
+              <div style="display:flex;align-items:baseline;gap:8px;font-variant-numeric:tabular-nums"><span style="font-size:22px;line-height:26px;font-weight:600">$380</span><span style="font-size:16px;line-height:20px;color:#A8A29B">/ pieza</span></div>
+              <span style="font-size:13px;line-height:18px;color:#A8A29B">Sin precio por libra</span>
+              <button style="margin-top:4px;font-family:Geist;font-size:15px;line-height:20px;font-weight:600;color:#fff;background:#DC2626;border:none;border-radius:999px;height:44px;cursor:pointer;width:100%">Agregar</button>
+            </div>
+          </div>
+        </div>
+        <div style="font-size:13px;line-height:18px;color:#A8A29B;max-width:900px;text-wrap:pretty">Mejora sobre la captura: una sola tarjeta para todas las categorías, filete en vez de sombra, foto 4:5 constante (la captura mezcla altos) y la unidad correcta por categoría en vez del par kg+lb fijo.</div>
+      </div>
+    </div>
+
+    <!-- variantes -->
+    <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">
+      <div style="font-size:12px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B">Variantes · default · hover · pressed · agotado · compacta · oferta</div>
+      <div style="background:#0B0B0C;border:1px solid #3F3F46;border-radius:12px;padding:24px;display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap">
+
+        <div style="width:240px;display:flex;flex-direction:column;gap:8px">
+          <div style="background:#151517;border:1px solid #3F3F46;border-radius:16px;overflow:hidden">
+            <div style="aspect-ratio:4/5;background:#1C1C1F"><img src="public/img/products/pollo.webp" alt="" style="width:100%;height:100%;object-fit:cover;display:block"></div>
+            <div style="padding:16px;display:flex;flex-direction:column;gap:6px">
+              <span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#E4D1B0">Pollo</span>
+              <span style="font-family:Fraunces,serif;font-size:20px;line-height:26px;font-weight:440">Alas Adobadas</span>
+              <div style="display:flex;align-items:baseline;gap:6px;font-variant-numeric:tabular-nums"><span style="font-size:18px;font-weight:600">$129</span><span style="font-size:14px;color:#A8A29B">/ kg</span></div>
+              <button style="font-family:Geist;font-size:15px;font-weight:600;color:#fff;background:#DC2626;border:none;border-radius:999px;height:44px;width:100%;cursor:pointer">Agregar</button>
+            </div>
+          </div>
+          <span style="font-size:13px;color:#A8A29B">default</span>
+        </div>
+
+        <div style="width:240px;display:flex;flex-direction:column;gap:8px">
+          <div style="background:#151517;border:1px solid rgba(220,38,38,0.3);border-radius:16px;overflow:hidden;transform:translateY(-2px)">
+            <div style="aspect-ratio:4/5;background:#1C1C1F"><img src="public/img/products/pollo.webp" alt="" style="width:100%;height:100%;object-fit:cover;display:block"></div>
+            <div style="padding:16px;display:flex;flex-direction:column;gap:6px">
+              <span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#E4D1B0">Pollo</span>
+              <span style="font-family:Fraunces,serif;font-size:20px;line-height:26px;font-weight:440">Alas Adobadas</span>
+              <div style="display:flex;align-items:baseline;gap:6px;font-variant-numeric:tabular-nums"><span style="font-size:18px;font-weight:600">$129</span><span style="font-size:14px;color:#A8A29B">/ kg</span></div>
+              <button style="font-family:Geist;font-size:15px;font-weight:600;color:#fff;background:#C81E1E;border:none;border-radius:999px;height:44px;width:100%;cursor:pointer">Agregar</button>
+            </div>
+          </div>
+          <span style="font-size:13px;color:#A8A29B">hover · escritorio · −2 px, filete rojo 30 %, 160 ms</span>
+        </div>
+
+        <div style="width:240px;display:flex;flex-direction:column;gap:8px">
+          <div style="background:#151517;border:1px solid #3F3F46;border-radius:16px;overflow:hidden;transform:scale(0.98)">
+            <div style="aspect-ratio:4/5;background:#1C1C1F"><img src="public/img/products/pollo.webp" alt="" style="width:100%;height:100%;object-fit:cover;display:block"></div>
+            <div style="padding:16px;display:flex;flex-direction:column;gap:6px">
+              <span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#E4D1B0">Pollo</span>
+              <span style="font-family:Fraunces,serif;font-size:20px;line-height:26px;font-weight:440">Alas Adobadas</span>
+              <div style="display:flex;align-items:baseline;gap:6px;font-variant-numeric:tabular-nums"><span style="font-size:18px;font-weight:600">$129</span><span style="font-size:14px;color:#A8A29B">/ kg</span></div>
+              <button style="font-family:Geist;font-size:15px;font-weight:600;color:#fff;background:#C81E1E;border:none;border-radius:999px;height:44px;width:100%;cursor:pointer;box-shadow:inset 0 0 0 2px rgba(245,243,239,0.12)">Agregar</button>
+            </div>
+          </div>
+          <span style="font-size:13px;color:#A8A29B">pressed · escala 0.98, 80 ms</span>
+        </div>
+
+        <div style="width:240px;display:flex;flex-direction:column;gap:8px">
+          <div style="background:#151517;border:1px solid #3F3F46;border-radius:16px;overflow:hidden">
+            <div style="position:relative;aspect-ratio:4/5;background:#1C1C1F">
+              <img src="public/img/products/pollo.webp" alt="" style="width:100%;height:100%;object-fit:cover;display:block;filter:saturate(0.6)">
+              <span style="position:absolute;top:8px;left:8px;font-size:12px;line-height:16px;font-weight:500;color:#A8A29B;background:#1C1C1F;border:1px solid #3F3F46;border-radius:999px;padding:4px 8px">Sin stock</span>
+            </div>
+            <div style="padding:16px;display:flex;flex-direction:column;gap:6px">
+              <span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#E4D1B0">Pollo</span>
+              <span style="font-family:Fraunces,serif;font-size:20px;line-height:26px;font-weight:440;color:#A8A29B">Alas Adobadas</span>
+              <div style="display:flex;align-items:baseline;gap:6px;font-variant-numeric:tabular-nums;color:#A8A29B"><span style="font-size:18px;font-weight:600">$129</span><span style="font-size:14px">/ kg</span></div>
+              <button disabled="disabled" style="font-family:Geist;font-size:15px;font-weight:600;color:#A8A29B;background:#1C1C1F;border:1px solid #3F3F46;border-radius:999px;height:44px;width:100%;cursor:not-allowed">Sin stock</button>
+            </div>
+          </div>
+          <span style="font-size:13px;color:#A8A29B">agotado · foto desaturada 40 %, badge gris</span>
+        </div>
+
+        <div style="width:200px;display:flex;flex-direction:column;gap:8px">
+          <div style="background:#151517;border:1px solid #3F3F46;border-radius:16px;overflow:hidden;display:flex;gap:12px;padding:12px;align-items:center">
+            <div style="width:64px;height:64px;flex:0 0 64px;border-radius:12px;overflow:hidden;background:#1C1C1F"><img src="public/img/products/pollo.webp" alt="" style="width:100%;height:100%;object-fit:cover;display:block"></div>
+            <div style="display:flex;flex-direction:column;gap:4px;min-width:0">
+              <span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#E4D1B0">Pollo</span>
+              <span style="font-family:Fraunces,serif;font-size:16px;line-height:20px;font-weight:440;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Alas Adobadas</span>
+              <div style="display:flex;align-items:baseline;gap:4px;font-variant-numeric:tabular-nums"><span style="font-size:15px;font-weight:600">$129</span><span style="font-size:13px;color:#A8A29B">/ kg</span></div>
+            </div>
+          </div>
+          <span style="font-size:13px;color:#A8A29B">compacta · resultados de búsqueda y carruseles · imagen 1:1, nombre a una línea</span>
+        </div>
+
+        <div style="width:240px;display:flex;flex-direction:column;gap:8px">
+          <div style="background:#151517;border:1px solid #3F3F46;border-radius:16px;overflow:hidden;position:relative">
+            <div style="position:absolute;top:0;right:0;background:#F59E0B;color:#0B0B0C;font-size:12px;line-height:16px;font-weight:600;padding:6px 12px;border-bottom-left-radius:12px">Oferta</div>
+            <div style="aspect-ratio:4/5;background:#1C1C1F"><img src="public/img/products/cerdo-alto.webp" alt="Paquete Carnitas" style="width:100%;height:100%;object-fit:cover;display:block"></div>
+            <div style="padding:16px;display:flex;flex-direction:column;gap:6px">
+              <span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#E4D1B0">Ofertas</span>
+              <span style="font-family:Fraunces,serif;font-size:20px;line-height:26px;font-weight:440">Paquete Carnitas</span>
+              <div style="display:flex;align-items:baseline;gap:6px;font-variant-numeric:tabular-nums"><span style="font-size:18px;font-weight:600">$389</span><span style="font-size:14px;color:#A8A29B">/ paquete</span></div>
+              <span style="display:flex;flex-direction:column;gap:2px;padding-top:6px;border-top:1px solid #3F3F46;font-size:12px;line-height:17px;color:#A8A29B"><span>Todo paquete requiere un 50 % de anticipo.</span><span>Los precios pueden modificarse según la alta demanda.</span><span style="color:#E4D1B0;font-weight:600">Confirmar con el dueño</span></span>
+              <button style="font-family:Geist;font-size:15px;font-weight:600;color:#fff;background:#DC2626;border:none;border-radius:999px;height:44px;width:100%;cursor:pointer">Agregar</button>
+            </div>
+          </div>
+          <span style="font-size:13px;color:#A8A29B">Paquete real de la base. Sin precio anterior: no existe columna de descuento ni de fecha de oferta.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== G0.7 FOTOGRAFÍA ===================== -->
+  <div style="display:flex;flex-direction:column;gap:16px">
+    <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap">
+      <span style="font-family:Geist;font-size:12px;font-weight:600;letter-spacing:0.04em;color:#DC2626">G0.7</span>
+      <h2 style="margin:0;font-family:Fraunces,serif;font-size:30px;line-height:36px;font-weight:440">Tres vecinos, una sola foto</h2>
+      <span style="font-size:13px;line-height:18px;color:#A8A29B">misma imagen de categoría, tres recortes distintos, y el texto carga la diferencia</span>
+    </div>
+    <div style="background:#0B0B0C;border:1px solid #3F3F46;border-radius:12px;padding:24px;display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start">
+      <div style="width:240px;background:#151517;border:1px solid #3F3F46;border-radius:16px;overflow:hidden">
+        <div style="aspect-ratio:4/5;background:#1C1C1F;overflow:hidden"><img src="public/img/products/embutidos.webp" alt="" style="width:100%;height:100%;object-fit:cover;object-position:20% 30%;display:block"></div>
+        <div style="padding:16px;display:flex;flex-direction:column;gap:6px">
+          <span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#E4D1B0">Embutidos</span>
+          <span style="font-family:Fraunces,serif;font-size:20px;line-height:26px;font-weight:440">Longaniza</span>
+          <span style="font-size:13px;line-height:18px;color:#A8A29B">Curada en casa · atada a mano</span>
+          <div style="display:flex;align-items:baseline;gap:6px;font-variant-numeric:tabular-nums"><span style="font-size:18px;font-weight:600">$199</span><span style="font-size:14px;color:#A8A29B">/ kg</span></div>
+        </div>
+      </div>
+      <div style="width:240px;background:#151517;border:1px solid #3F3F46;border-radius:16px;overflow:hidden">
+        <div style="aspect-ratio:4/5;background:#1C1C1F;overflow:hidden"><img src="public/img/products/embutidos.webp" alt="" style="width:100%;height:100%;object-fit:cover;object-position:80% 55%;transform:scale(1.2);display:block"></div>
+        <div style="padding:16px;display:flex;flex-direction:column;gap:6px">
+          <span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#E4D1B0">Embutidos</span>
+          <span style="font-family:Fraunces,serif;font-size:20px;line-height:26px;font-weight:440">Chorizo Rojo</span>
+          <span style="font-size:13px;line-height:18px;color:#A8A29B">Molido grueso · chile guajillo</span>
+          <div style="display:flex;align-items:baseline;gap:6px;font-variant-numeric:tabular-nums"><span style="font-size:18px;font-weight:600">$179</span><span style="font-size:14px;color:#A8A29B">/ kg</span></div>
+        </div>
+      </div>
+      <div style="width:240px;background:#151517;border:1px solid #3F3F46;border-radius:16px;overflow:hidden;position:relative">
+        <div style="position:absolute;z-index:1;top:8px;left:8px;font-size:12px;line-height:16px;font-weight:500;color:#F5F3EF;background:#1C1C1F;border:1px solid #3F3F46;border-radius:999px;padding:4px 8px;font-variant-numeric:tabular-nums">12 en stock</div>
+        <div style="aspect-ratio:4/5;background:#1C1C1F;overflow:hidden"><img src="public/img/products/embutidos.webp" alt="" style="width:100%;height:100%;object-fit:cover;object-position:50% 85%;transform:scale(1.35);display:block"></div>
+        <div style="padding:16px;display:flex;flex-direction:column;gap:6px">
+          <span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#E4D1B0">Embutidos</span>
+          <span style="font-family:Fraunces,serif;font-size:20px;line-height:26px;font-weight:440">Chorizo Verde</span>
+          <span style="font-size:13px;line-height:18px;color:#A8A29B">Con cilantro y tomate verde</span>
+          <div style="display:flex;align-items:baseline;gap:6px;font-variant-numeric:tabular-nums"><span style="font-size:18px;font-weight:600">$185</span><span style="font-size:14px;color:#A8A29B">/ kg</span></div>
+        </div>
+      </div>
+      <div style="width:300px;font-size:13px;line-height:18px;color:#A8A29B;text-wrap:pretty">Orden de lectura: etiqueta de categoría → nombre → línea de detalle del corte. El recorte cambia el foco y el badge de stock rompe la repetición. Ninguna tarjeta depende de tener foto propia.</div>
+    </div>
+  </div>
+
+  <!-- ===================== G0.4 / G0.5 CONTROLES ===================== -->
+  <div style="display:flex;flex-direction:column;gap:16px">
+    <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap">
+      <span style="font-family:Geist;font-size:12px;font-weight:600;letter-spacing:0.04em;color:#DC2626">G0.4 · G0.5</span>
+      <h2 style="margin:0;font-family:Fraunces,serif;font-size:30px;line-height:36px;font-weight:440">Controles y copy con acentos</h2>
+      <span style="font-size:13px;line-height:18px;color:#A8A29B">botones píldora · input de un solo tono · chips · stepper</span>
+    </div>
+
+    <div style="display:flex;gap:28px;align-items:flex-start;flex-wrap:wrap">
+
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:12px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B">Controles · móvil 390</div>
+        <div style="width:390px;background:#0B0B0C;border:1px solid #3F3F46;border-radius:12px;padding:20px;box-sizing:border-box;display:flex;flex-direction:column;gap:20px">
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <button style="font-family:Geist;font-size:15px;line-height:20px;font-weight:600;color:#fff;background:#DC2626;border:none;border-radius:999px;height:44px;width:100%;cursor:pointer">Continuar con el pedido</button>
+            <button style="font-family:Geist;font-size:15px;line-height:20px;font-weight:600;color:#F5F3EF;background:transparent;border:1px solid #E4D1B0;border-radius:999px;height:44px;width:100%;cursor:pointer">Seguir viendo cortes</button>
+            <button style="font-family:Geist;font-size:15px;line-height:20px;font-weight:600;color:#F5F3EF;background:transparent;border:none;height:44px;cursor:pointer;text-align:left;padding:0" style-hover="text-decoration:underline">Vaciar el carrito</button>
+            <div style="display:flex;gap:12px">
+              <span style="width:44px;height:44px;border-radius:999px;border:1px solid #3F3F46;background:#151517;display:flex;align-items:center;justify-content:center;color:#F5F3EF;font-size:20px">＋</span>
+              <span style="width:44px;height:44px;border-radius:999px;border:2px solid #DC2626;background:#151517;display:flex;align-items:center;justify-content:center;color:#F5F3EF;font-size:20px;outline:2px solid #DC2626;outline-offset:2px">＋</span>
+              <span style="font-size:13px;line-height:18px;color:#A8A29B;align-self:center">botón de icono 44×44 · foco 2 px rojo, sin transición</span>
+            </div>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:12px;border-top:1px solid #3F3F46;padding-top:20px">
+            <label style="display:flex;flex-direction:column;gap:6px">
+              <span style="font-size:13px;line-height:18px;font-weight:500;color:#F5F3EF">Correo electrónico</span>
+              <span style="display:flex;align-items:center;height:48px;background:#151517;border:1px solid #3F3F46;border-radius:12px;padding:0 14px;font-size:16px;color:#A8A29B">tu@correo.com</span>
+            </label>
+            <label style="display:flex;flex-direction:column;gap:6px">
+              <span style="font-size:13px;line-height:18px;font-weight:500;color:#F5F3EF">Contraseña</span>
+              <span style="display:flex;align-items:center;height:48px;background:#151517;border:1px solid #DC2626;border-radius:12px;padding:0 14px;font-size:16px;color:#F5F3EF;outline:2px solid #DC2626;outline-offset:2px">••••••••</span>
+              <span style="font-size:13px;line-height:18px;color:#A8A29B">foco: anillo rojo de 2 px sobre el propio campo</span>
+            </label>
+            <label style="display:flex;flex-direction:column;gap:6px">
+              <span style="font-size:13px;line-height:18px;font-weight:500;color:#F5F3EF">Contraseña</span>
+              <span style="display:flex;align-items:center;height:48px;background:#151517;border:1px solid #F43F5E;border-radius:12px;padding:0 14px;font-size:16px;color:#F5F3EF">••••</span>
+              <span style="font-size:13px;line-height:18px;color:#F43F5E">La contraseña necesita al menos 8 caracteres.</span>
+            </label>
+            <label style="display:flex;flex-direction:column;gap:6px;opacity:0.4">
+              <span style="font-size:13px;line-height:18px;font-weight:500;color:#F5F3EF">Teléfono</span>
+              <span style="display:flex;align-items:center;height:48px;background:#151517;border:1px solid #3F3F46;border-radius:12px;padding:0 14px;font-size:16px;color:#A8A29B">10 dígitos</span>
+            </label>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:12px;border-top:1px solid #3F3F46;padding-top:20px">
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <span style="min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;background:#DC2626;color:#FFFFFF;font-size:15px;font-weight:600">Todo</span>
+              <span style="min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;background:#1C1C1F;border:1px solid #3F3F46;color:#F5F3EF;font-size:15px">Pollo</span>
+              <span style="min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;background:#1C1C1F;border:1px solid #3F3F46;color:#F5F3EF;font-size:15px">Verduras</span>
+            </div>
+            <div style="font-size:13px;line-height:18px;color:#A8A29B">Los chips se generan desde las categorías del admin: ninguna pantalla fija la lista (G10.1b).</div>
+            <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap">
+              <span style="display:inline-flex;align-items:center;height:44px;border:1px solid #3F3F46;border-radius:999px;background:#151517;overflow:hidden">
+                <span style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;color:#F5F3EF;font-size:18px">−</span>
+                <span style="min-width:32px;text-align:center;font-size:16px;font-weight:600;font-variant-numeric:tabular-nums">1</span>
+                <span style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;color:#F5F3EF;font-size:18px">+</span>
+              </span>
+              <span style="display:inline-flex;align-items:center;height:44px;border:1px solid #3F3F46;border-radius:999px;background:#151517;overflow:hidden">
+                <span style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;color:#F5F3EF;font-size:18px">−</span>
+                <span style="min-width:32px;text-align:center;font-size:16px;font-weight:600;font-variant-numeric:tabular-nums">12</span>
+                <span style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;color:#A8A29B;font-size:18px;background:#1C1C1F">+</span>
+              </span>
+              <span style="font-size:13px;line-height:18px;color:#A8A29B">Stock disponible: 12</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:12px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B">Controles · escritorio 1440</div>
+        <div style="width:1440px;background:#0B0B0C;border:1px solid #3F3F46;border-radius:12px;padding:32px;box-sizing:border-box;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:32px">
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <div style="font-size:12px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B">Botones</div>
+            <div style="display:flex;gap:12px;flex-wrap:wrap">
+              <button style="font-family:Geist;font-size:15px;font-weight:600;color:#fff;background:#DC2626;border:none;border-radius:999px;height:44px;padding:0 24px;cursor:pointer">Agregar al pedido</button>
+              <button style="font-family:Geist;font-size:15px;font-weight:600;color:#fff;background:#C81E1E;border:none;border-radius:999px;height:44px;padding:0 24px;cursor:pointer">Agregar al pedido</button>
+              <button style="font-family:Geist;font-size:15px;font-weight:600;color:#fff;background:#DC2626;border:none;border-radius:999px;height:44px;padding:0 24px;cursor:pointer;outline:2px solid #DC2626;outline-offset:2px">Agregar al pedido</button>
+            </div>
+            <div style="font-size:13px;line-height:18px;color:#A8A29B">default · hover #C81E1E · foco con anillo de 2 px y 2 px de separación</div>
+            <div style="display:flex;gap:12px;flex-wrap:wrap">
+              <button style="font-family:Geist;font-size:15px;font-weight:600;color:#F5F3EF;background:transparent;border:1px solid #E4D1B0;border-radius:999px;height:44px;padding:0 24px;cursor:pointer">Ver el catálogo</button>
+              <button style="font-family:Geist;font-size:15px;font-weight:600;color:#A8A29B;background:#1C1C1F;border:1px solid #3F3F46;border-radius:999px;height:44px;padding:0 24px;cursor:not-allowed">Sin stock</button>
+            </div>
+            <div style="font-size:13px;line-height:18px;color:#A8A29B">secundario de contorno arena · deshabilitado sin rojo apagado</div>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <div style="font-size:12px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B">Campos</div>
+            <label style="display:flex;flex-direction:column;gap:6px">
+              <span style="font-size:13px;font-weight:500">Correo electrónico</span>
+              <span style="display:flex;align-items:center;height:48px;background:#151517;border:1px solid #3F3F46;border-radius:12px;padding:0 14px;font-size:16px;color:#A8A29B">tu@correo.com</span>
+            </label>
+            <label style="display:flex;flex-direction:column;gap:6px">
+              <span style="font-size:13px;font-weight:500">Contraseña</span>
+              <span style="display:flex;align-items:center;height:48px;background:#151517;border:1px solid #F43F5E;border-radius:12px;padding:0 14px;font-size:16px;color:#F5F3EF">••••</span>
+              <span style="font-size:13px;color:#F43F5E">La contraseña necesita al menos 8 caracteres.</span>
+            </label>
+            <div style="font-size:13px;line-height:18px;color:#A8A29B">Un solo tono de campo, etiqueta arriba, acentos en el copy: “Contraseña”, “Correo electrónico” (G0.5). Desaparece el bloque claro a la izquierda de la captura actual.</div>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <div style="font-size:12px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B">Chips y cantidad</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <span style="min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;background:#DC2626;color:#FFFFFF;font-size:15px;font-weight:600">Todo el catálogo</span>
+              <span style="min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;background:#1C1C1F;border:1px solid #3F3F46;color:#F5F3EF;font-size:15px">Cortes especiales</span>
+              <span style="min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;background:#1C1C1F;border:1px solid #3F3F46;color:#F5F3EF;font-size:15px">Preparadas</span>
+            </div>
+            <div style="display:flex;gap:16px;align-items:center">
+              <span style="display:inline-flex;align-items:center;height:44px;border:1px solid #3F3F46;border-radius:999px;background:#151517;overflow:hidden">
+                <span style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;font-size:18px">−</span>
+                <span style="min-width:32px;text-align:center;font-size:16px;font-weight:600;font-variant-numeric:tabular-nums">2</span>
+                <span style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;font-size:18px">+</span>
+              </span>
+              <span style="font-size:13px;color:#A8A29B">Fila de 44 px, número tabular de 32 px mínimo</span>
+            </div>
+            <div style="font-size:13px;line-height:18px;color:#A8A29B">El chip activo es la única píldora rellena permitida: la navegación nunca usa relleno (G3.2).</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== G0.6 DESIGN.md ===================== -->
+  <div style="display:flex;flex-direction:column;gap:16px">
+    <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap">
+      <span style="font-family:Geist;font-size:12px;font-weight:600;letter-spacing:0.04em;color:#DC2626">G0.6</span>
+      <h2 style="margin:0;font-family:Fraunces,serif;font-size:30px;line-height:36px;font-weight:440">Contrato de tokens para copiar al repo</h2>
+      <span style="font-size:13px;line-height:18px;color:#A8A29B">mismo contrato para la tienda React y para las plantillas Django</span>
+    </div>
+    <div style="display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start">
+      <pre style="margin:0;width:700px;background:#151517;border:1px solid #3F3F46;border-radius:12px;padding:24px;box-sizing:border-box;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;line-height:20px;color:#F5F3EF;white-space:pre-wrap">---
+name: Carni — Mostrador digital
+description: Carnicería El Señor de La Misericordia. Near-black storefront, one red accent, warm only in hero and empty states.
+colors:
+  bg: "#0B0B0C"
+  surface-1: "#151517"
+  surface-2: "#1C1C1F"
+  surface-3: "#232326"
+  border: "#3F3F46"
+  text: "#F5F3EF"
+  text-muted: "#A8A29B"
+  red: "#DC2626"
+  red-hover: "#C81E1E"
+  danger: "#F43F5E"
+  sand: "#E4D1B0"
+  gold: "#F59E0B"
+  success: "#059669"
+typography:
+  display: Fraunces (variable, opsz 9–144)
+  ui: Geist (tabular figures)
+rounded: card 16 · input 12 · dialog 20 · pill 999 · sheet 24 top
+spacing: 4 8 12 16 20 24 32 48 64 96
+components: product-card · button · input · chip · qty-stepper · status-chip · kpi-card · sheet
+---</pre>
+      <pre style="margin:0;width:620px;background:#151517;border:1px solid #3F3F46;border-radius:12px;padding:24px;box-sizing:border-box;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;line-height:20px;color:#F5F3EF;white-space:pre-wrap">@theme {
+  --color-bg: #0B0B0C;
+  --color-surface-1: #151517;
+  --color-surface-2: #1C1C1F;
+  --color-surface-3: #232326;
+  --color-border: #3F3F46;
+  --color-text: #F5F3EF;
+  --color-text-muted: #A8A29B;
+  --color-red: #DC2626;
+  --color-red-hover: #C81E1E;
+  --color-danger: #F43F5E;
+  --color-sand: #E4D1B0;
+  --color-gold: #F59E0B;
+  --color-success: #059669;
+
+  --font-display: "Fraunces", Georgia, serif;
+  --font-sans: "Geist", system-ui, sans-serif;
+
+  --radius-card: 16px;
+  --radius-input: 12px;
+  --radius-dialog: 20px;
+  --radius-sheet: 24px;
+
+  --ease-out-expo: cubic-bezier(.16, 1, .3, 1);
+}</pre>
+    </div>
+  </div>
+
+  <!-- ===================== REPORTE G0 ===================== -->
+  <div style="display:flex;flex-direction:column;gap:12px">
+    <h2 style="margin:0;font-family:Fraunces,serif;font-size:30px;line-height:36px;font-weight:440">Autorrevisión G0</h2>
+    <div style="background:#151517;border:1px solid #3F3F46;border-radius:12px;overflow:hidden;width:1440px;max-width:100%">
+      <div style="display:grid;grid-template-columns:70px 1fr 90px 1.1fr;gap:0;font-size:12px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B;border-bottom:1px solid #3F3F46">
+        <span style="padding:12px 16px">ID</span><span style="padding:12px 16px">Criterio</span><span style="padding:12px 16px">Estado</span><span style="padding:12px 16px">Evidencia y mejora</span>
+      </div>
+      <div style="display:grid;grid-template-columns:70px 1fr 90px 1.1fr;font-size:13px;line-height:18px;border-bottom:1px solid #3F3F46">
+        <span style="padding:12px 16px;color:#A8A29B">G0.2</span><span style="padding:12px 16px">Tokens con contraste, escala 390/1440, 4 px, radios, elevación</span><span style="padding:12px 16px;color:#059669;font-weight:600">PASS</span><span style="padding:12px 16px;color:#A8A29B">Frame “Color · superficie y tinta”: 13 tokens con ratio medido; cuatro superficies separadas por filete. Mejora: la captura actual mezcla dos rojos (#DC2626 y #c8302f); aquí queda uno.</span>
+      </div>
+      <div style="display:grid;grid-template-columns:70px 1fr 90px 1.1fr;font-size:13px;line-height:18px;border-bottom:1px solid #3F3F46">
+        <span style="padding:12px 16px;color:#A8A29B">G0.3</span><span style="padding:12px 16px">Tarjeta única con precio consciente de la unidad y seis variantes</span><span style="padding:12px 16px;color:#059669;font-weight:600">PASS</span><span style="padding:12px 16px;color:#A8A29B">Rejillas 390 y 1440 + tira de variantes: kg con lb secundario, pieza y paquete. Mejora: jerarquía de precio (18/22 sobre 14/18) frente al par del mismo peso en la captura 12.</span>
+      </div>
+      <div style="display:grid;grid-template-columns:70px 1fr 90px 1.1fr;font-size:13px;line-height:18px;border-bottom:1px solid #3F3F46">
+        <span style="padding:12px 16px;color:#A8A29B">G0.4</span><span style="padding:12px 16px">Botones, campos, chips y stepper</span><span style="padding:12px 16px;color:#059669;font-weight:600">PASS</span><span style="padding:12px 16px;color:#A8A29B">Frames de controles 390 y 1440: alturas 44/48 px, foco de 2 px sin transición, stepper al máximo con “Stock disponible: 12”. Mejora: una sola familia de botones donde la captura 23 mezcla rectángulo y píldora.</span>
+      </div>
+      <div style="display:grid;grid-template-columns:70px 1fr 90px 1.1fr;font-size:13px;line-height:18px;border-bottom:1px solid #3F3F46">
+        <span style="padding:12px 16px;color:#A8A29B">G0.5</span><span style="padding:12px 16px">“Contraseña” y “Correo electrónico” con acentos</span><span style="padding:12px 16px;color:#059669;font-weight:600">PASS</span><span style="padding:12px 16px;color:#A8A29B">Etiquetas de los dos campos en ambos frames. Mejora: la captura 23 muestra “Contrasena” y “Correo electronico”.</span>
+      </div>
+      <div style="display:grid;grid-template-columns:70px 1fr 90px 1.1fr;font-size:13px;line-height:18px;border-bottom:1px solid #3F3F46">
+        <span style="padding:12px 16px;color:#A8A29B">G0.6</span><span style="padding:12px 16px">DESIGN.md + bloque @theme como frame copiable</span><span style="padding:12px 16px;color:#059669;font-weight:600">PASS</span><span style="padding:12px 16px;color:#A8A29B">Dos bloques de código con los mismos 13 colores y los radios de esta página. Mejora: un contrato único para React y Django en vez de tokens duplicados en SCSS y en carniTheme.ts.</span>
+      </div>
+      <div style="display:grid;grid-template-columns:70px 1fr 90px 1.1fr;font-size:13px;line-height:18px">
+        <span style="padding:12px 16px;color:#A8A29B">G0.7</span><span style="padding:12px 16px">La tarjeta funciona con foto repetida</span><span style="padding:12px 16px;color:#059669;font-weight:600">PASS</span><span style="padding:12px 16px;color:#A8A29B">Frame “Tres vecinos, una sola foto”: misma imagen, tres recortes, y etiqueta + nombre + detalle del corte cargan la diferencia. Mejora: hoy cuatro productos idénticos en la rejilla se distinguen sólo por el nombre.</span>
+      </div>
+    </div>
+    <div style="font-size:13px;line-height:18px;color:#A8A29B;max-width:900px;text-wrap:pretty">G0.1 no aplica: la tipografía quedó decidida en la sección 0 de loop-mejoras.md (Fraunces + Geist), así que no hay hoja de especímenes ni alto. Puntuación G0: 6/6 criterios aplicables. Abierto: la variante de oferta arrastra su nota DESIGN-AHEAD hasta que exista columna de descuento.</div>
+  </div>
+
+  <!-- ===================== G3 HEADER Y MENÚ ===================== -->
+
+  <div style="display:flex;flex-direction:column;gap:16px">
+    <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap">
+      <span style="font-family:Geist;font-size:12px;font-weight:600;letter-spacing:0.04em;color:#DC2626">05</span>
+      <h2 style="margin:0;font-family:Fraunces,serif;font-size:30px;line-height:36px;font-weight:440">Carrito, mínimo de entrega y estado vacío</h2>
+      <span style="font-size:13px;line-height:18px;color:#A8A29B">hoja desde abajo en móvil · cajón a la derecha en escritorio · mínimo $150 a domicilio, recoger sin mínimo</span>
+    </div>
+
+    <div style="display:flex;gap:28px;align-items:flex-start;flex-wrap:wrap">
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:12px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B">Carrito · hoja · móvil 390</div>
+        <div style="width:390px;height:780px;background:#0B0B0C;border:1px solid #3F3F46;border-radius:12px;overflow:hidden;box-sizing:border-box;position:relative">
+          <div style="position:absolute;inset:0;background:rgba(11,11,12,0.72)"></div>
+          <div style="position:absolute;left:0;right:0;bottom:0;top:96px;background:#1C1C1F;border-top:1px solid #3F3F46;border-radius:24px 24px 0 0;display:flex;flex-direction:column">
+            <div style="padding:10px 0 0;display:flex;justify-content:center"><span style="width:40px;height:4px;border-radius:999px;background:#3F3F46"></span></div>
+            <div style="padding:8px 16px 12px;display:flex;align-items:center;justify-content:space-between">
+              <span style="font-family:Fraunces,serif;font-size:24px;line-height:30px;font-weight:440;color:#F5F3EF">Tu pedido</span>
+              <button aria-label="Cerrar el carrito" style="width:44px;height:44px;border-radius:999px;border:1px solid #3F3F46;background:#151517;color:#F5F3EF;display:flex;align-items:center;justify-content:center;cursor:pointer">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg>
+              </button>
+            </div>
+            <div style="padding:0 16px 12px">
+              <div style="background:#151517;border:1px solid #3F3F46;border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:8px">
+                <span style="font-size:14px;line-height:18px;color:#F5F3EF">Te faltan <span style="font-weight:600;font-variant-numeric:tabular-nums">$32</span> para entrega a domicilio</span>
+                <span style="height:6px;border-radius:999px;background:#232326;display:block;overflow:hidden"><span style="display:block;width:79%;height:6px;border-radius:999px;background:#DC2626"></span></span>
+                <span style="font-size:13px;line-height:18px;color:#A8A29B">Mínimo $150 a domicilio · recoger en tienda no tiene mínimo</span>
+              </div>
+            </div>
+            <div style="flex:1;overflow:hidden;padding:0 16px;display:flex;flex-direction:column;gap:12px">
+              <div style="display:flex;gap:12px;align-items:flex-start;border-bottom:1px solid #3F3F46;padding-bottom:12px">
+                <span style="width:64px;height:64px;flex:0 0 64px;border-radius:12px;overflow:hidden;background:#232326"><img src="public/img/products/embutidos.webp" alt="" style="width:100%;height:100%;object-fit:cover;display:block"></span>
+                <span style="flex:1;display:flex;flex-direction:column;gap:6px;min-width:0">
+                  <span style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
+                    <span style="font-family:Fraunces,serif;font-size:17px;line-height:22px;font-weight:440;color:#F5F3EF">Chorizo Rojo</span>
+                    <button aria-label="Quitar Chorizo Rojo" style="width:44px;height:44px;margin:-10px -10px 0 0;border:none;background:transparent;color:#A8A29B;display:flex;align-items:center;justify-content:center;cursor:pointer">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 7h14M9 7V5.5h6V7M7.5 7l.8 12h7.4l.8-12"></path></svg>
+                    </button>
+                  </span>
+                  <span style="font-size:13px;line-height:18px;color:#A8A29B">Por peso · 0.5 kg · molido grueso</span>
+                  <span style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+                    <span style="display:inline-flex;align-items:center;height:44px;border:1px solid #3F3F46;border-radius:999px;background:#151517;overflow:hidden">
+                      <span style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;color:#F5F3EF;font-size:18px">−</span>
+                      <span style="min-width:28px;text-align:center;font-size:15px;font-weight:600;font-variant-numeric:tabular-nums">1</span>
+                      <span style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;color:#F5F3EF;font-size:18px">+</span>
+                    </span>
+                    <span style="font-size:17px;font-weight:600;font-variant-numeric:tabular-nums;color:#F5F3EF">$89.50</span>
+                  </span>
+                </span>
+              </div>
+              <div style="display:flex;gap:12px;align-items:flex-start">
+                <span style="width:64px;height:64px;flex:0 0 64px;border-radius:12px;overflow:hidden;background:#232326"><img src="public/img/products/pollo.webp" alt="" style="width:100%;height:100%;object-fit:cover;display:block"></span>
+                <span style="flex:1;display:flex;flex-direction:column;gap:6px;min-width:0">
+                  <span style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
+                    <span style="font-family:Fraunces,serif;font-size:17px;line-height:22px;font-weight:440;color:#F5F3EF">Alas Adobadas</span>
+                    <button aria-label="Quitar Alas Adobadas" style="width:44px;height:44px;margin:-10px -10px 0 0;border:none;background:transparent;color:#A8A29B;display:flex;align-items:center;justify-content:center;cursor:pointer">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 7h14M9 7V5.5h6V7M7.5 7l.8 12h7.4l.8-12"></path></svg>
+                    </button>
+                  </span>
+                  <span style="font-size:13px;line-height:18px;color:#A8A29B">Por precio · $28.50</span>
+                  <span style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+                    <span style="display:inline-flex;align-items:center;height:44px;border:1px solid #3F3F46;border-radius:999px;background:#151517;overflow:hidden">
+                      <span style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;color:#F5F3EF;font-size:18px">−</span>
+                      <span style="min-width:28px;text-align:center;font-size:15px;font-weight:600;font-variant-numeric:tabular-nums">1</span>
+                      <span style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;color:#F5F3EF;font-size:18px">+</span>
+                    </span>
+                    <span style="font-size:17px;font-weight:600;font-variant-numeric:tabular-nums;color:#F5F3EF">$28.50</span>
+                  </span>
+                </span>
+              </div>
+            </div>
+            <div style="border-top:1px solid #3F3F46;padding:16px;display:flex;flex-direction:column;gap:10px;background:#1C1C1F">
+              <span style="display:flex;justify-content:space-between;font-size:15px;color:#A8A29B">Subtotal<span style="font-variant-numeric:tabular-nums;color:#F5F3EF">$118.00</span></span>
+              <span style="display:flex;justify-content:space-between;font-size:15px;color:#A8A29B">Entrega<span style="font-variant-numeric:tabular-nums">se calcula al elegir</span></span>
+              <span style="display:flex;justify-content:space-between;align-items:baseline;font-size:17px;font-weight:600;color:#F5F3EF;border-top:1px solid #3F3F46;padding-top:10px">Total<span style="font-size:22px;font-variant-numeric:tabular-nums">$118.00</span></span>
+              <button style="font-family:Geist;font-size:15px;font-weight:600;color:#fff;background:#DC2626;border:none;border-radius:999px;height:48px;width:100%;cursor:pointer">Continuar con el pedido</button>
+              <button style="font-family:Geist;font-size:15px;font-weight:600;color:#F5F3EF;background:transparent;border:none;height:44px;cursor:pointer">Seguir viendo cortes</button>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px;font-size:13px;line-height:19px;color:#A8A29B;max-width:390px;text-wrap:pretty"><span><span style="color:#E4D1B0;font-weight:600">De lo nuestro · </span>“Tu pedido”, las líneas con foto, precio y quitar, el total y “Continuar con el pedido”.</span><span><span style="color:#F5F3EF;font-weight:600">De lo mío · </span>hoja desde abajo con agarradera y el modo escrito bajo cada nombre.</span><span><span style="color:#F5F3EF;font-weight:600">Mejora · </span>no se pierde el contexto y el total con su botón de 48 px no se va con el scroll.</span></div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:12px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B">Carrito vacío · móvil 390</div>
+        <div style="width:390px;height:780px;background:#0B0B0C;border:1px solid #3F3F46;border-radius:12px;overflow:hidden;box-sizing:border-box;position:relative">
+          <div style="position:absolute;inset:0;background:rgba(11,11,12,0.72)"></div>
+          <div style="position:absolute;left:0;right:0;bottom:0;top:180px;background:#1C1C1F;border-top:1px solid #3F3F46;border-radius:24px 24px 0 0;display:flex;flex-direction:column">
+            <div style="padding:10px 0 0;display:flex;justify-content:center"><span style="width:40px;height:4px;border-radius:999px;background:#3F3F46"></span></div>
+            <div style="padding:8px 16px 12px;display:flex;align-items:center;justify-content:space-between">
+              <span style="font-family:Fraunces,serif;font-size:24px;line-height:30px;font-weight:440;color:#F5F3EF">Tu pedido</span>
+              <button aria-label="Cerrar el carrito" style="width:44px;height:44px;border-radius:999px;border:1px solid #3F3F46;background:#151517;color:#F5F3EF;display:flex;align-items:center;justify-content:center;cursor:pointer">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg>
+              </button>
+            </div>
+            <div style="padding:16px;display:flex;flex-direction:column;gap:8px;align-items:flex-start">
+              <span style="width:48px;height:48px;border-radius:999px;border:1px solid #E4D1B0;display:flex;align-items:center;justify-content:center;color:#E4D1B0">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h12l-1.2 12.2a1 1 0 0 1-1 .8H8.2a1 1 0 0 1-1-.8Z"></path><path d="M9 7V5.5a3 3 0 0 1 6 0V7"></path></svg>
+              </span>
+              <span style="font-family:Fraunces,serif;font-size:22px;line-height:28px;font-weight:440;color:#F5F3EF">Todavía no hay nada en el pedido</span>
+              <p style="margin:0;font-size:15px;line-height:22px;color:#A8A29B">Empezá por lo que más se lleva la gente esta semana.</p>
+            </div>
+            <div style="flex:1;overflow:hidden;padding:0 16px;display:flex;flex-direction:column;gap:10px">
+              <span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B">Sugerencias del mostrador</span>
+              <span style="background:#151517;border:1px solid #3F3F46;border-radius:16px;display:flex;gap:12px;padding:12px;align-items:center">
+                <span style="width:56px;height:56px;flex:0 0 56px;border-radius:12px;overflow:hidden;background:#232326"><img src="public/img/products/embutidos.webp" alt="" style="width:100%;height:100%;object-fit:cover;display:block"></span>
+                <span style="flex:1;display:flex;flex-direction:column;gap:2px;min-width:0">
+                  <span style="font-size:11px;line-height:14px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#E4D1B0">Embutidos</span>
+                  <span style="font-family:Fraunces,serif;font-size:16px;line-height:20px;font-weight:440">Chorizo Verde</span>
+                  <span style="font-size:14px;font-weight:600;font-variant-numeric:tabular-nums">$185 <span style="color:#A8A29B;font-weight:400">/ kg</span></span>
+                </span>
+                <button aria-label="Agregar Chorizo Verde" style="width:44px;height:44px;flex:0 0 44px;border-radius:999px;background:#DC2626;border:none;color:#fff;font-size:20px;cursor:pointer">+</button>
+              </span>
+              <span style="background:#151517;border:1px solid #3F3F46;border-radius:16px;display:flex;gap:12px;padding:12px;align-items:center">
+                <span style="width:56px;height:56px;flex:0 0 56px;border-radius:12px;overflow:hidden;background:#232326"><img src="public/img/products/pollo-detalle.webp" alt="" style="width:100%;height:100%;object-fit:cover;display:block"></span>
+                <span style="flex:1;display:flex;flex-direction:column;gap:2px;min-width:0">
+                  <span style="font-size:11px;line-height:14px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#E4D1B0">Pollo</span>
+                  <span style="font-family:Fraunces,serif;font-size:16px;line-height:20px;font-weight:440">Alas Naturales</span>
+                  <span style="font-size:14px;font-weight:600;font-variant-numeric:tabular-nums">$109 <span style="color:#A8A29B;font-weight:400">/ kg</span></span>
+                </span>
+                <button aria-label="Agregar Alas Naturales" style="width:44px;height:44px;flex:0 0 44px;border-radius:999px;background:#DC2626;border:none;color:#fff;font-size:20px;cursor:pointer">+</button>
+              </span>
+            </div>
+            <div style="border-top:1px solid #3F3F46;padding:16px">
+              <button style="font-family:Geist;font-size:15px;font-weight:600;color:#F5F3EF;background:transparent;border:1px solid #E4D1B0;border-radius:999px;height:48px;width:100%;cursor:pointer">Ver el catálogo completo</button>
+            </div>
+          </div>
+          <span style="position:absolute;right:16px;top:118px;display:flex;align-items:center;gap:10px;height:48px;padding:0 16px;border-radius:999px;background:#151517;border:1px solid #E4D1B0;color:#F5F3EF;font-size:14px;font-weight:500">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E4D1B0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 0-3.2 6.4L20 19.5l-1-3.2A7.9 7.9 0 0 0 20 12Z"></path></svg>
+            ¿Te ayudo con el corte?
+          </span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px;font-size:13px;line-height:19px;color:#A8A29B;max-width:390px;text-wrap:pretty"><span><span style="color:#E4D1B0;font-weight:600">De lo nuestro · </span>el mensaje de pedido vacío y el botón para volver al catálogo.</span><span><span style="color:#F5F3EF;font-weight:600">De lo mío · </span>dos productos reales con botón + de 44 px.</span><span><span style="color:#F5F3EF;font-weight:600">Mejora · </span>el vacío invita a comprar en lugar de ser una línea gris centrada.</span></div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div style="font-size:12px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B">Carrito · cajón derecho · escritorio 1440</div>
+      <div style="width:1440px;height:840px;background:#0B0B0C;border:1px solid #3F3F46;border-radius:12px;overflow:hidden;box-sizing:border-box;position:relative">
+        <div style="height:72px;box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;padding:0 32px;border-bottom:1px solid #3F3F46;opacity:0.5">
+          <span style="display:flex;align-items:center;gap:10px">
+            <span style="width:32px;height:32px;border-radius:8px;background:#DC2626;display:flex;align-items:center;justify-content:center;font-family:Fraunces,serif;font-size:19px;font-weight:600;color:#fff">C</span>
+            <span style="font-family:Fraunces,serif;font-size:21px;font-weight:500;color:#F5F3EF">Carni</span>
+          </span>
+          <span style="font-size:15px;color:#A8A29B">Catálogo · Ofertas · Recetario</span>
+        </div>
+        <div style="position:absolute;inset:0;background:rgba(11,11,12,0.72)"></div>
+        <div style="position:absolute;top:0;bottom:0;right:0;width:440px;background:#1C1C1F;border-left:1px solid #3F3F46;border-radius:16px 0 0 16px;display:flex;flex-direction:column">
+          <div style="height:72px;flex:0 0 72px;display:flex;align-items:center;justify-content:space-between;padding:0 12px 0 24px;border-bottom:1px solid #3F3F46">
+            <span style="font-family:Fraunces,serif;font-size:24px;line-height:30px;font-weight:440;color:#F5F3EF">Tu pedido · 3</span>
+            <button aria-label="Cerrar el carrito" style="width:44px;height:44px;border-radius:999px;border:1px solid #3F3F46;background:#151517;color:#F5F3EF;display:flex;align-items:center;justify-content:center;cursor:pointer">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg>
+            </button>
+          </div>
+          <div style="padding:16px 24px 0">
+            <div style="background:#151517;border:1px solid #059669;border-radius:12px;padding:12px;display:flex;align-items:center;gap:10px">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 9.5 17 19 7.5"></path></svg>
+              <span style="font-size:14px;line-height:18px;color:#F5F3EF">Ya alcanzas la entrega a domicilio</span>
+            </div>
+          </div>
+          <div style="flex:1;overflow:hidden;padding:16px 24px;display:flex;flex-direction:column;gap:14px">
+            <div style="display:flex;gap:14px;align-items:flex-start;border-bottom:1px solid #3F3F46;padding-bottom:14px">
+              <span style="width:72px;height:72px;flex:0 0 72px;border-radius:12px;overflow:hidden;background:#232326"><img src="public/img/products/embutidos.webp" alt="" style="width:100%;height:100%;object-fit:cover;display:block"></span>
+              <span style="flex:1;display:flex;flex-direction:column;gap:6px;min-width:0">
+                <span style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
+                  <span style="font-family:Fraunces,serif;font-size:18px;line-height:24px;font-weight:440;color:#F5F3EF">Chorizo Rojo</span>
+                  <button aria-label="Quitar Chorizo Rojo" style="width:44px;height:44px;margin:-10px -10px 0 0;border:none;background:transparent;color:#A8A29B;display:flex;align-items:center;justify-content:center;cursor:pointer">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 7h14M9 7V5.5h6V7M7.5 7l.8 12h7.4l.8-12"></path></svg>
+                  </button>
+                </span>
+                <span style="font-size:13px;line-height:18px;color:#A8A29B">Por peso · 1 kg · molido grueso</span>
+                <span style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+                  <span style="display:inline-flex;align-items:center;height:44px;border:1px solid #3F3F46;border-radius:999px;background:#151517;overflow:hidden">
+                    <span style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;color:#F5F3EF;font-size:18px">−</span>
+                    <span style="min-width:28px;text-align:center;font-size:15px;font-weight:600;font-variant-numeric:tabular-nums">1</span>
+                    <span style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;color:#F5F3EF;font-size:18px">+</span>
+                  </span>
+                  <span style="font-size:18px;font-weight:600;font-variant-numeric:tabular-nums;color:#F5F3EF">$179.00</span>
+                </span>
+              </span>
+            </div>
+            <div style="display:flex;gap:14px;align-items:flex-start;border-bottom:1px solid #3F3F46;padding-bottom:14px">
+              <span style="width:72px;height:72px;flex:0 0 72px;border-radius:12px;overflow:hidden;background:#232326"><img src="public/img/products/pollo.webp" alt="" style="width:100%;height:100%;object-fit:cover;display:block"></span>
+              <span style="flex:1;display:flex;flex-direction:column;gap:6px;min-width:0">
+                <span style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
+                  <span style="font-family:Fraunces,serif;font-size:18px;line-height:24px;font-weight:440;color:#F5F3EF">Alas Adobadas</span>
+                  <button aria-label="Quitar Alas Adobadas" style="width:44px;height:44px;margin:-10px -10px 0 0;border:none;background:transparent;color:#A8A29B;display:flex;align-items:center;justify-content:center;cursor:pointer">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 7h14M9 7V5.5h6V7M7.5 7l.8 12h7.4l.8-12"></path></svg>
+                  </button>
+                </span>
+                <span style="font-size:13px;line-height:18px;color:#A8A29B">Por peso · 1.5 kg</span>
+                <span style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+                  <span style="display:inline-flex;align-items:center;height:44px;border:1px solid #3F3F46;border-radius:999px;background:#151517;overflow:hidden">
+                    <span style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;color:#F5F3EF;font-size:18px">−</span>
+                    <span style="min-width:28px;text-align:center;font-size:15px;font-weight:600;font-variant-numeric:tabular-nums">1</span>
+                    <span style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;color:#F5F3EF;font-size:18px">+</span>
+                  </span>
+                  <span style="font-size:18px;font-weight:600;font-variant-numeric:tabular-nums;color:#F5F3EF">$193.50</span>
+                </span>
+              </span>
+            </div>
+            <div style="display:flex;gap:14px;align-items:flex-start">
+              <span style="width:72px;height:72px;flex:0 0 72px;border-radius:12px;overflow:hidden;background:#232326"><img src="public/img/products/merch.webp" alt="" style="width:100%;height:100%;object-fit:cover;display:block"></span>
+              <span style="flex:1;display:flex;flex-direction:column;gap:6px;min-width:0">
+                <span style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
+                  <span style="font-family:Fraunces,serif;font-size:18px;line-height:24px;font-weight:440;color:#F5F3EF">Gorra Bordada</span>
+                  <button aria-label="Quitar Gorra Bordada" style="width:44px;height:44px;margin:-10px -10px 0 0;border:none;background:transparent;color:#A8A29B;display:flex;align-items:center;justify-content:center;cursor:pointer">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 7h14M9 7V5.5h6V7M7.5 7l.8 12h7.4l.8-12"></path></svg>
+                  </button>
+                </span>
+                <span style="font-size:13px;line-height:18px;color:#A8A29B">Por pieza · talla ajustable</span>
+                <span style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+                  <span style="display:inline-flex;align-items:center;height:44px;border:1px solid #3F3F46;border-radius:999px;background:#151517;overflow:hidden">
+                    <span style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;color:#F5F3EF;font-size:18px">−</span>
+                    <span style="min-width:28px;text-align:center;font-size:15px;font-weight:600;font-variant-numeric:tabular-nums">1</span>
+                    <span style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;color:#F5F3EF;font-size:18px">+</span>
+                  </span>
+                  <span style="font-size:18px;font-weight:600;font-variant-numeric:tabular-nums;color:#F5F3EF">$250.00</span>
+                </span>
+              </span>
+            </div>
+          </div>
+          <div style="border-top:1px solid #3F3F46;padding:20px 24px;display:flex;flex-direction:column;gap:10px">
+            <span style="display:flex;justify-content:space-between;font-size:15px;color:#A8A29B">Subtotal<span style="font-variant-numeric:tabular-nums;color:#F5F3EF">$622.50</span></span>
+            <span style="display:flex;justify-content:space-between;font-size:15px;color:#A8A29B">Entrega a domicilio<span style="font-variant-numeric:tabular-nums;color:#F5F3EF">Sin costo</span></span>
+            <span style="display:flex;justify-content:space-between;align-items:baseline;font-size:17px;font-weight:600;color:#F5F3EF;border-top:1px solid #3F3F46;padding-top:10px">Total<span style="font-size:24px;font-variant-numeric:tabular-nums">$622.50</span></span>
+            <button style="font-family:Geist;font-size:15px;font-weight:600;color:#fff;background:#DC2626;border:none;border-radius:999px;height:48px;width:100%;cursor:pointer">Continuar con el pedido</button>
+            <button style="font-family:Geist;font-size:15px;font-weight:600;color:#F5F3EF;background:transparent;border:none;height:44px;cursor:pointer">Seguir viendo cortes</button>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:4px;font-size:13px;line-height:19px;color:#A8A29B;max-width:1100px;text-wrap:pretty"><span><span style="color:#E4D1B0;font-weight:600">De lo nuestro · </span>el cajón derecho de la captura 04 con sus renglones y “Continuar con el pedido”.</span><span><span style="color:#F5F3EF;font-weight:600">De lo mío · </span>barra “Te faltan $X” hacia los $150 y cada renglón con su modo: por peso, por precio o por pieza.</span><span><span style="color:#F5F3EF;font-weight:600">Mejora · </span>la página sigue visible detrás, el mínimo cumplido se avisa en verde y la entrega a domicilio sale sin costo.</span></div>
+    </div>
+
+    <div style="background:#151517;border:1px solid #3F3F46;border-radius:12px;overflow:hidden;width:1440px;max-width:100%">
+      <div style="display:grid;grid-template-columns:70px 1fr 90px 1.1fr;font-size:12px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B;border-bottom:1px solid #3F3F46">
+        <span style="padding:12px 16px">ID</span><span style="padding:12px 16px">Criterio</span><span style="padding:12px 16px">Estado</span><span style="padding:12px 16px">Evidencia y mejora</span>
+      </div>
+      <div style="display:grid;grid-template-columns:70px 1fr 90px 1.1fr;font-size:13px;line-height:18px;border-bottom:1px solid #3F3F46">
+        <span style="padding:12px 16px;color:#A8A29B">G2.1</span><span style="padding:12px 16px">Hoja desde abajo en móvil, cajón derecho en escritorio</span><span style="padding:12px 16px;color:#059669;font-weight:600">PASS</span><span style="padding:12px 16px;color:#A8A29B">Hoja con asa y radio 24 arriba; cajón de 440 px con radio 16 en el borde interior.</span>
+      </div>
+      <div style="display:grid;grid-template-columns:70px 1fr 90px 1.1fr;font-size:13px;line-height:18px;border-bottom:1px solid #3F3F46">
+        <span style="padding:12px 16px;color:#A8A29B">G2.2</span><span style="padding:12px 16px">Renglón con foto, nombre, modo, cantidad, precio y quitar</span><span style="padding:12px 16px;color:#059669;font-weight:600">PASS</span><span style="padding:12px 16px;color:#A8A29B">Los seis datos en cada renglón de ambos frames; stepper y botón de quitar de 44 px.</span>
+      </div>
+      <div style="display:grid;grid-template-columns:70px 1fr 90px 1.1fr;font-size:13px;line-height:18px;border-bottom:1px solid #3F3F46">
+        <span style="padding:12px 16px;color:#A8A29B">G2.3</span><span style="padding:12px 16px">Barra de mínimo $150 con sus dos estados y la excepción de recoger</span><span style="padding:12px 16px;color:#059669;font-weight:600">PASS</span><span style="padding:12px 16px;color:#A8A29B">Móvil: “Te faltan $32” al 79 % con la nota de recoger sin mínimo. Escritorio: aviso verde de mínimo cumplido.</span>
+      </div>
+      <div style="display:grid;grid-template-columns:70px 1fr 90px 1.1fr;font-size:13px;line-height:18px;border-bottom:1px solid #3F3F46">
+        <span style="padding:12px 16px;color:#A8A29B">G2.4</span><span style="padding:12px 16px">Subtotal, total y “Continuar con el pedido” siempre visibles</span><span style="padding:12px 16px;color:#059669;font-weight:600">PASS</span><span style="padding:12px 16px;color:#A8A29B">Pie fijo en los dos frames, CTA de 48 px, cifras tabulares alineadas a la derecha.</span>
+      </div>
+      <div style="display:grid;grid-template-columns:70px 1fr 90px 1.1fr;font-size:13px;line-height:18px">
+        <span style="padding:12px 16px;color:#A8A29B">G2.5</span><span style="padding:12px 16px">Estado vacío con sugerencias y burbuja del asistente sin emoji</span><span style="padding:12px 16px;color:#059669;font-weight:600">PASS</span><span style="padding:12px 16px;color:#A8A29B">Frame “Carrito vacío”: dos sugerencias con la tarjeta compacta y la píldora “¿Te ayudo con el corte?” con icono de trazo.</span>
+      </div>
+    </div>
+  </div>
+
+</section>
+</x-dc>
+</body>
+</html>

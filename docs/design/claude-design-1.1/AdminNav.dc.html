@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..700&family=Geist:wght@400..700&display=swap" rel="stylesheet">
+<style>body{margin:0;background:#0B0B0C;color:#F5F3EF}a{color:#DC2626}a:hover{color:#E4D1B0}</style>
+</helmet>
+<sc-if value="{{ lateral }}" hint-placeholder-val="{{ true }}">
+  <aside style="height:100%;min-height:100%;box-sizing:border-box;background:#151517;border-right:1px solid #3F3F46;display:flex;flex-direction:column;font-family:Geist,system-ui,sans-serif;color:#F5F3EF">
+    <div style="height:72px;flex:0 0 72px;display:flex;align-items:center;gap:10px;padding:0 20px;border-bottom:1px solid #3F3F46">
+      <span style="display:flex;flex-direction:column;gap:6px;line-height:1"><span style="font-size:18px;font-weight:600;letter-spacing:0.18em">CARNICERÍA</span><span style="font-size:11px;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B">Panel de la tienda</span></span>
+    </div>
+    <nav style="flex:1;padding:16px 12px;display:flex;flex-direction:column;gap:2px">
+      <sc-for list="{{ items }}" as="i" hint-placeholder-count="7">
+        <sc-if value="{{ i.on }}"><a href="{{ i.href }}" aria-current="page" style="min-height:44px;display:flex;align-items:center;gap:12px;padding:0 12px;border-radius:12px;background:rgba(220,38,38,0.12);color:#F5F3EF;font-size:15px;font-weight:600;text-decoration:none;position:relative"><span style="position:absolute;left:0;top:12px;bottom:12px;width:3px;border-radius:999px;background:#DC2626"></span><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="{{ i.icono }}"></path></svg><span style="flex:1">{{ i.t }}</span><sc-if value="{{ i.n }}"><span style="min-width:22px;height:22px;padding:0 6px;box-sizing:border-box;border-radius:999px;background:#1C1C1F;border:1px solid #3F3F46;font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;font-variant-numeric:tabular-nums">{{ i.n }}</span></sc-if></a></sc-if>
+        <sc-if value="{{ i.off }}"><a href="{{ i.href }}" style="min-height:44px;display:flex;align-items:center;gap:12px;padding:0 12px;border-radius:12px;color:#A8A29B;font-size:15px;text-decoration:none" style-hover="color:#F5F3EF;background:#1C1C1F"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="{{ i.icono }}"></path></svg><span style="flex:1">{{ i.t }}</span><sc-if value="{{ i.n }}"><span style="min-width:22px;height:22px;padding:0 6px;box-sizing:border-box;border-radius:999px;background:#1C1C1F;border:1px solid #3F3F46;font-size:12px;font-weight:600;color:#F5F3EF;display:flex;align-items:center;justify-content:center;font-variant-numeric:tabular-nums">{{ i.n }}</span></sc-if></a></sc-if>
+      </sc-for>
+    </nav>
+    <div style="border-top:1px solid #3F3F46;padding:12px;display:flex;flex-direction:column;gap:4px">
+      <span style="display:flex;align-items:center;gap:10px;padding:8px 12px"><span style="width:36px;height:36px;border-radius:999px;background:#E4D1B0;color:#0B0B0C;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600">ET</span><span style="display:flex;flex-direction:column;line-height:1.2"><span style="font-size:14px;font-weight:600">Eduardo Torres</span><span style="font-size:12px;color:#A8A29B">Administrador</span></span></span>
+      <a href="Productos, clientes y ajustes.dc.html" style="min-height:44px;display:flex;align-items:center;gap:12px;padding:0 12px;border-radius:12px;color:#A8A29B;font-size:15px;text-decoration:none" style-hover="color:#F5F3EF;background:#1C1C1F"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4M9 16l-4-4 4-4M5 12h10"></path></svg>Cerrar sesión</a>
+    </div>
+  </aside>
+</sc-if>
+<sc-if value="{{ arriba }}">
+  <header style="height:56px;box-sizing:border-box;background:#0B0B0C;border-bottom:1px solid #3F3F46;display:flex;align-items:center;gap:4px;padding:0 6px;font-family:Geist,system-ui,sans-serif;color:#F5F3EF">
+    <button aria-label="{{ etiquetaIzq }}" style="width:44px;height:44px;flex:0 0 44px;border:none;background:transparent;color:#F5F3EF;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:999px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="{{ iconoIzq }}"></path></svg></button>
+    <span style="flex:1;min-width:0;font-family:Fraunces,serif;font-size:20px;line-height:24px;font-weight:460">{{ titulo }}</span>
+    <sc-if value="{{ accion }}"><button aria-label="{{ accion }}" style="width:44px;height:44px;flex:0 0 44px;border-radius:999px;background:#DC2626;border:none;color:#FFFFFF;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg></button></sc-if>
+  </header>
+</sc-if>
+<sc-if value="{{ abajo }}">
+  <nav style="height:72px;box-sizing:border-box;background:#151517;border-top:1px solid #3F3F46;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));padding:4px 4px 8px;font-family:Geist,system-ui,sans-serif">
+    <sc-for list="{{ tabs }}" as="i" hint-placeholder-count="5">
+      <a href="{{ i.href }}" style="min-height:56px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:{{ i.c }};font-size:12px;font-weight:{{ i.w }};text-decoration:none;position:relative"><span style="position:relative;display:flex"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="{{ i.icono }}"></path></svg><sc-if value="{{ i.n }}"><span style="position:absolute;top:-6px;right:-12px;min-width:18px;height:18px;padding:0 5px;box-sizing:border-box;border-radius:999px;background:#DC2626;color:#FFFFFF;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center">{{ i.n }}</span></sc-if></span>{{ i.t }}</a>
+    </sc-for>
+  </nav>
+</sc-if>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:248,&quot;height&quot;:900},&quot;ancho&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;escritorio&quot;,&quot;movil-arriba&quot;,&quot;movil-abajo&quot;],&quot;default&quot;:&quot;escritorio&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;activo&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Inicio&quot;,&quot;Pedidos&quot;,&quot;Productos&quot;,&quot;Clientes&quot;,&quot;BuildAds&quot;,&quot;ProductAds&quot;,&quot;Ajustes&quot;],&quot;default&quot;:&quot;Inicio&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;titulo&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;accion&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;atras&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;},&quot;pedidos&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:7,&quot;tsType&quot;:&quot;number&quot;}}">
+const IC = {
+  Inicio: 'M4 11.5 12 5l8 6.5V19a1 1 0 0 1-1 1h-4.5v-5h-5v5H5a1 1 0 0 1-1-1Z',
+  Pedidos: 'M4 5h4.5v14H4zM9.75 5h4.5v9h-4.5zM15.5 5H20v11h-4.5z',
+  Productos: 'M20 13.5 13.5 20a1.5 1.5 0 0 1-2.1 0L4 12.6V4h8.6l7.4 7.4a1.5 1.5 0 0 1 0 2.1ZM8.5 8.5h.01',
+  Clientes: 'M9 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7ZM3 20a6 6 0 0 1 12 0M16 4.3a3.5 3.5 0 0 1 0 6.4M21 20a6 6 0 0 0-3.5-5.4',
+  BuildAds: 'M4 10v4a1 1 0 0 0 1 1h2l6 4V5L7 9H5a1 1 0 0 0-1 1ZM17 9a4 4 0 0 1 0 6',
+  ProductAds: 'M13 3 5 13.5h6L10 21l8-10.5h-6Z',
+  Ajustes: 'M4 7h10M18 7h2M4 17h4M12 17h8M16 5v4M10 15v4',
+  Más: 'M5 12h.01M12 12h.01M19 12h.01'
+};
+class Component extends DCLogic {
+  renderVals() {
+    const p = this.props;
+    const a = p.ancho ?? 'escritorio';
+    const act = p.activo ?? 'Inicio';
+    const cuenta = { Pedidos: p.pedidos ?? 7 };
+    const HREF = { Inicio: 'Panel administrativo.dc.html', Pedidos: 'Panel administrativo.dc.html', Productos: 'Productos, clientes y ajustes.dc.html', Clientes: 'Productos, clientes y ajustes.dc.html', Ajustes: 'Productos, clientes y ajustes.dc.html', 'Más': 'Productos, clientes y ajustes.dc.html', BuildAds: 'BuildAds y ProductAds.dc.html', ProductAds: 'BuildAds y ProductAds.dc.html' };
+    return {
+      lateral: a === 'escritorio', arriba: a === 'movil-arriba', abajo: a === 'movil-abajo',
+      items: ['Inicio', 'Pedidos', 'Productos', 'Clientes', 'BuildAds', 'ProductAds', 'Ajustes'].map(t => ({ t, href: HREF[t], icono: IC[t], on: t === act, off: t !== act, n: cuenta[t] ?? null })),
+      tabs: ['Inicio', 'Pedidos', 'Productos', 'Clientes', 'Más'].map(t => {
+        const on = t === act || (t === 'Más' && (act === 'Ajustes' || act === 'BuildAds' || act === 'ProductAds'));
+        return { t, href: HREF[t], icono: IC[t], c: on ? '#DC2626' : '#A8A29B', w: on ? 600 : 500, n: cuenta[t] ?? null };
+      }),
+      titulo: p.titulo ?? act,
+      accion: p.accion ?? null,
+      iconoIzq: p.atras ? 'm15 5-7 7 7 7' : 'M3 6h18M3 12h18M3 18h18',
+      etiquetaIzq: p.atras ? 'Volver' : 'Abrir el menú'
+    };
+  }
+}
+</script>
+</body>
+</html>

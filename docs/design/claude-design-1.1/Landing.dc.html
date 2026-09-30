@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..700&family=Geist:wght@400..700&display=swap" rel="stylesheet">
+<style>
+  body { margin:0; background:#0B0B0C; color:#F5F3EF; }
+  a { color:#DC2626; text-decoration:none; }
+  a:hover { color:#E4D1B0; }
+  @keyframes carni-izq { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  @keyframes carni-der { from { transform: translateX(-50%); } to { transform: translateX(0); } }
+  @media (prefers-reduced-motion: reduce) { [data-giro] { animation: none !important; } }
+@keyframes palabra { from { opacity:0; transform:translateY(0.35em); } to { opacity:1; transform:none; } }
+@media (prefers-reduced-motion: reduce) { [data-palabra] { animation:none !important; opacity:1 !important; transform:none !important; } }
+</style>
+</helmet>
+
+
+
+<section id="b2" data-screen-label="Landing" style="background:#0B0B0C;width:max-content;min-width:100%;box-sizing:border-box;padding:48px 48px 96px;font-family:Geist,system-ui,sans-serif;color:#F5F3EF;display:flex;flex-direction:column;gap:48px">
+
+  <div style="display:flex;flex-direction:column;gap:12px;max-width:960px">
+    <div style="font-size:12px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B">Carni · rediseño · landing</div>
+    <h1 style="margin:0;font-family:Fraunces,Georgia,serif;font-size:44px;line-height:50px;font-weight:480">07 — Landing completa</h1>
+    <p style="margin:0;font-size:16px;line-height:26px;color:#A8A29B;max-width:72ch;text-wrap:pretty">Once secciones: portada, mostrador, Filete Mignon en carrusel, lo que se lleva la gente, ofertas, preguntas, carnicería de familia, horarios y puntaje, contacto y dirección, comentarios y pie. Datos reales del repo: catálogo y precios de cargar-catalogo-y-admin.sql, reseñas de src/data/resenas.ts, horario y dirección del schema.org de index.html. Encabezado, tarjeta y pie son los componentes de Componentes, importados sin cambios.</p>
+  </div>
+
+  <div style="display:flex;gap:32px;align-items:flex-start">
+
+    <!-- ================= MÓVIL 390 ================= -->
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div style="font-size:13px;line-height:18px;font-weight:600">Landing · móvil 390</div>
+      <div data-screen-label="Landing móvil" style="width:390px;background:#0B0B0C;border:1px solid #3F3F46;border-radius:12px;overflow:hidden;box-sizing:border-box;position:relative">
+        <dc-import name="Encabezado" ancho="movil" hint-size="100%,56px"></dc-import>
+
+        <!-- portada · a sangre, 700 px = 83 % de 844 -->
+        <div style="position:relative;height:700px;overflow:hidden;background:#0B0B0C">
+          <video autoplay="" muted="" loop="" playsinline="" src="uploads/video-portada-carne.mp4" poster="uploads/video-portada-carne-poster.jpg" aria-label="Video de la carnicería: el cuchillo sobre el corte y la parrilla" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 50%;display:block"></video><div style="position:absolute;inset:0;background:linear-gradient(to bottom, rgba(11,11,12,0) 40%, rgba(11,11,12,0.55) 65%, rgba(11,11,12,0.8) 100%)"></div>
+          <button aria-label="Pausar el video" style="position:absolute;right:12px;top:12px;width:44px;height:44px;border-radius:999px;background:rgba(11,11,12,0.6);border:1px solid #52525B;color:#F5F3EF;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"></rect><rect x="14" y="5" width="4" height="14" rx="1"></rect></svg></button>
+          <div style="position:absolute;left:16px;right:16px;top:455px;display:flex;flex-direction:column;gap:20px">
+            <h2 style="margin:0;font-family:Fraunces,serif;font-size:56px;line-height:56px;font-weight:480;letter-spacing:-0.03em;color:#F5F3EF;text-align:left"><span data-palabra="" style="display:inline-block;margin-right:0.22em;animation:palabra 420ms cubic-bezier(0.23,1,0.32,1) 0ms both">Cortes</span><span data-palabra="" style="display:inline-block;margin-right:0.22em;animation:palabra 420ms cubic-bezier(0.23,1,0.32,1) 50ms both">del</span><span data-palabra="" style="display:inline-block;margin-right:0.22em;animation:palabra 420ms cubic-bezier(0.23,1,0.32,1) 100ms both">día</span><span data-palabra="" style="display:inline-block;margin-right:0.22em;animation:palabra 420ms cubic-bezier(0.23,1,0.32,1) 150ms both">para</span><span data-palabra="" style="display:inline-block;margin-right:0.22em;animation:palabra 420ms cubic-bezier(0.23,1,0.32,1) 200ms both">tu</span><span data-palabra="" style="display:inline-block;margin-right:0.22em;animation:palabra 420ms cubic-bezier(0.23,1,0.32,1) 250ms both">asador</span></h2>
+            <a href="Catálogo y ficha.dc.html" style="height:52px;box-sizing:border-box;border-radius:999px;background:#DC2626;color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:600;text-decoration:none">Ver productos</a>
+          </div>
+        </div>
+        <div style="margin:24px 16px 0;border-top:1px solid #3F3F46">
+          <sc-for list="{{ datos }}" as="x" hint-placeholder-count="3">
+            <div style="display:flex;flex-direction:column;gap:2px;padding:12px 0;border-bottom:1px solid #3F3F46"><span style="font-size:13px;line-height:18px;color:#A8A29B">{{ x.k }}</span><span style="font-size:16px;line-height:22px;font-weight:600;font-variant-numeric:tabular-nums">{{ x.v }}</span></div>
+          </sc-for>
+        </div>
+
+        <!-- bento -->
+        <div style="padding:56px 16px 0;display:flex;flex-direction:column;gap:20px">
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#E4D1B0">Categorías</span>
+            <h2 style="margin:0;font-family:Fraunces,serif;font-size:30px;line-height:36px;font-weight:460">Todo lo del mostrador</h2>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:152px;gap:10px">
+            <sc-for list="{{ bentoM }}" as="t" hint-placeholder-count="9">
+              <a href="Catálogo y ficha.dc.html" style="grid-column:span {{ t.c }};grid-row:span {{ t.r }};display:flex;flex-direction:column;border:1px solid #3F3F46;border-radius:16px;overflow:hidden;background:#151517;color:#F5F3EF;text-decoration:none;min-height:0">
+                <span style="flex:1 1 auto;min-height:0;background:#1C1C1F;display:block"><img src="{{ t.f }}" alt="" style="width:100%;height:100%;object-fit:cover;object-position:{{ t.p }};display:block"></span>
+                <sc-if value="{{ t.grande }}">
+                  <span style="flex:0 0 auto;padding:12px 14px;display:flex;flex-direction:column;gap:2px"><span style="font-family:Fraunces,serif;font-size:22px;line-height:26px;font-weight:460">{{ t.n }}</span><span style="font-size:13px;line-height:18px;color:#A8A29B;text-wrap:pretty">{{ t.d }}</span></span>
+                </sc-if>
+                <sc-if value="{{ t.chico }}">
+                  <span style="flex:0 0 44px;padding:0 12px;display:flex;align-items:center;justify-content:space-between;gap:6px"><span style="font-size:15px;line-height:18px;font-weight:600">{{ t.n }}</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E4D1B0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex:0 0 16px"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span>
+                </sc-if>
+              </a>
+            </sc-for>
+          </div>
+        </div>
+
+        <!-- destacado -->
+        <div style="padding:56px 16px 0;display:flex;flex-direction:column;gap:16px">
+          <span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#E4D1B0">De la vitrina</span>
+          <div data-carrusel="M" style="display:flex;flex-direction:column;gap:8px">
+            <div style="position:relative">
+              <div ref="{{ refM }}" onScroll="{{ scrollM }}" role="region" aria-label="Cortes especiales, 8 fotos" tabindex="0" style="display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;border-radius:24px;height:300px;background:#1C1C1F">
+                <sc-for list="{{ cortes }}" as="c" hint-placeholder-count="8"><div style="flex:0 0 100%;scroll-snap-align:start;position:relative"><img src="{{ c.f }}" alt="{{ c.n }}" style="width:100%;height:100%;object-fit:cover;display:block"><span style="position:absolute;left:12px;bottom:12px;display:flex;align-items:center;gap:8px;height:32px;padding:0 12px;border-radius:999px;background:rgba(11,11,12,0.78);color:#F5F3EF;font-size:13px;font-weight:600">{{ c.n }} · {{ c.p }}</span></div></sc-for>
+              </div>
+            </div>
+            <div style="display:flex;justify-content:center;gap:0">
+              <sc-for list="{{ dotsM }}" as="d" hint-placeholder-count="8"><button aria-label="{{ d.l }}" onClick="{{ d.go }}" style="width:28px;height:28px;padding:0;background:transparent;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer"><span style="width:{{ d.w }};height:8px;border-radius:999px;background:{{ d.bg }};transition:width 160ms cubic-bezier(0.23,1,0.32,1)"></span></button></sc-for>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B">Cortes especiales · 20 en stock</span>
+            <h2 style="margin:0;font-family:Fraunces,serif;font-size:34px;line-height:40px;font-weight:460">Filete Mignon</h2>
+            <p style="margin:0;font-size:16px;line-height:24px;color:#A8A29B;text-wrap:pretty">La parte más suave del animal. Poca grasa, textura de mantequilla. La pieza de 1¼ pulgadas sale en unos 250 g.</p>
+            <div style="display:flex;align-items:baseline;gap:8px;font-variant-numeric:tabular-nums;padding-top:4px"><span style="font-size:28px;line-height:32px;font-weight:600">$689</span><span style="font-size:16px;color:#A8A29B">/ kg</span><span style="font-size:15px;color:#A8A29B;margin-left:8px">$312.53 / lb</span></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;padding-top:6px">
+              <button style="height:48px;border-radius:999px;background:#DC2626;border:none;color:#FFFFFF;font-family:Geist,system-ui,sans-serif;font-size:15px;font-weight:600;cursor:pointer">Agregar</button>
+              <button style="height:48px;border-radius:999px;background:transparent;border:1px solid #E4D1B0;color:#F5F3EF;font-family:Geist,system-ui,sans-serif;font-size:15px;font-weight:600;cursor:pointer">Ver la ficha</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- lo que se lleva la gente -->
+        <div style="padding:56px 16px 0;display:flex;flex-direction:column;gap:20px">
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#E4D1B0">Los más pedidos</span>
+            <h2 style="margin:0;font-family:Fraunces,serif;font-size:30px;line-height:36px;font-weight:460">Lo que se lleva la gente</h2>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px">
+            <sc-for list="{{ mas }}" as="p" hint-placeholder-count="4">
+              <dc-import name="Tarjeta" foto="{{ p.f }}" pos="{{ p.pos }}" cat="{{ p.cat }}" nombre="{{ p.n }}" desc="{{ p.d }}" precio="{{ p.precio }}" unidad="{{ p.u }}" stock="{{ p.s }}" hint-size="100%,440px"></dc-import>
+            </sc-for>
+          </div>
+        </div>
+
+        <!-- ofertas -->
+        <div style="padding:56px 0 0;display:flex;flex-direction:column;gap:20px">
+          <div style="padding:0 16px;display:flex;flex-direction:column;gap:8px">
+            <span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#E4D1B0">Esta semana</span>
+            <h2 style="margin:0;font-family:Fraunces,serif;font-size:30px;line-height:36px;font-weight:460">Ofertas</h2>
+            <span style="font-size:14px;line-height:20px;color:#A8A29B">Precio por paquete, no por kilo. Sujetos a existencia.</span>
+          </div>
+          <div style="display:flex;gap:12px;overflow-x:auto;padding:0 16px 4px;scroll-snap-type:x mandatory;scrollbar-width:none">
+            <sc-for list="{{ ofertas }}" as="p" hint-placeholder-count="4">
+              <div style="flex:0 0 240px;scroll-snap-align:start"><dc-import name="Tarjeta" variante="oferta" foto="{{ p.f }}" pos="{{ p.pos }}" cat="Ofertas" nombre="{{ p.n }}" desc="{{ p.d }}" precio="{{ p.precio }}" unidad="{{ p.u }}" stock="{{ p.s }}" hint-size="100%,520px"></dc-import></div>
+            </sc-for>
+          </div>
+        </div>
+
+        <!-- preguntas -->
+        <div style="padding:56px 16px 0;display:flex;flex-direction:column;gap:16px">
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#E4D1B0">Antes de pedir</span>
+            <h2 style="margin:0;font-family:Fraunces,serif;font-size:30px;line-height:36px;font-weight:460">Preguntas frecuentes</h2>
+          </div>
+          <div style="border-top:1px solid #3F3F46">
+            <sc-for list="{{ faq }}" as="q" hint-placeholder-count="5">
+              <div style="border-bottom:1px solid #3F3F46">
+                <button onClick="{{ q.alternar }}" aria-expanded="{{ q.abierta }}" style="width:100%;min-height:60px;padding:14px 0;background:transparent;border:none;color:#F5F3EF;font-family:Geist,system-ui,sans-serif;font-size:16px;line-height:22px;font-weight:600;text-align:left;display:flex;align-items:center;justify-content:space-between;gap:16px;cursor:pointer">{{ q.p }}<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#E4D1B0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex:0 0 20px;transform:{{ q.rot }};transition:transform 200ms"><path d="m6 9 6 6 6-6"></path></svg></button>
+                <sc-if value="{{ q.abierta }}"><div style="padding:0 32px 20px 0;display:flex;flex-direction:column;gap:8px;align-items:flex-start"><p style="margin:0;font-size:15px;line-height:24px;color:#A8A29B;text-wrap:pretty">{{ q.r }}</p><sc-if value="{{ q.tag }}"><span style="font-size:12px;line-height:16px;font-weight:600;color:#0B0B0C;background:#F59E0B;border-radius:999px;padding:4px 10px">{{ q.tag }}</span></sc-if></div></sc-if>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <!-- nosotros -->
+        <div style="padding:56px 16px 0;display:flex;flex-direction:column;gap:16px">
+          <div style="display:grid;grid-template-columns:1fr;border-radius:24px;background:#151517;border:1px solid #3F3F46;overflow:hidden">
+            <div style="display:flex;flex-direction:column;gap:6px;padding:22px 20px;"><span style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap"><span style="font-family:Fraunces,serif;font-size:48px;line-height:1;font-weight:460;letter-spacing:-0.02em;font-variant-numeric:tabular-nums;color:#F5F3EF">4.7</span><svg width="22" height="22" viewBox="0 0 24 24" fill="#F59E0B" aria-hidden="true"><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9Z"></path></svg><span style="font-size:16px;font-weight:600;color:#E4D1B0">de 5 en Google</span></span><span style="font-size:14px;line-height:22px;color:#A8A29B">61 opiniones de clientes</span></div><div style="display:flex;flex-direction:column;gap:6px;padding:22px 20px;border-top:1px solid #3F3F46;"><span style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap"><span style="font-family:Fraunces,serif;font-size:48px;line-height:1;font-weight:460;letter-spacing:-0.02em;font-variant-numeric:tabular-nums;color:#F5F3EF">53</span><span style="font-size:16px;font-weight:600;color:#E4D1B0">productos en el mostrador</span></span><span style="font-size:14px;line-height:22px;color:#A8A29B">en 9 categorías, cortados al momento</span></div><div style="display:flex;flex-direction:column;gap:6px;padding:22px 20px;border-top:1px solid #3F3F46;"><span style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap"><span style="font-family:Fraunces,serif;font-size:48px;line-height:1;font-weight:460;letter-spacing:-0.02em;font-variant-numeric:tabular-nums;color:#F5F3EF">8:00–17:00</span><span style="font-size:16px;font-weight:600;color:#E4D1B0">de lunes a sábado</span></span><span style="font-size:14px;line-height:22px;color:#A8A29B">domingos y festivos cerrado</span></div>
+          </div>
+          <span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#E4D1B0">Sobre nosotros</span>
+          <h2 style="margin:0;font-family:Fraunces,serif;font-size:30px;line-height:36px;font-weight:460;text-wrap:balance">Carnicería de familia, pieza por pieza</h2>
+          <p style="margin:0;font-size:16px;line-height:25px;color:#A8A29B;text-wrap:pretty">Somos El Señor de La Misericordia, una carnicería familiar de la colonia Manuel J. Othón. Seleccionamos pieza por pieza, todos los días, y la cortamos como la pides.</p>
+          <p style="margin:0;font-size:16px;line-height:25px;color:#A8A29B;text-wrap:pretty">Quien vuelve, vuelve por la atención de los dueños, porque sabemos de dónde viene cada corte y por precios justos.</p>
+          <div style="display:flex;flex-direction:column;gap:14px;padding:20px;border-radius:20px;background:#151517;border:1px solid #3F3F46;margin-top:4px">
+            <span style="display:flex;align-items:center;gap:14px"><span style="width:44px;height:44px;flex:0 0 44px;box-sizing:border-box;border-radius:999px;background:#1C1C1F;border:1px solid #3F3F46;display:flex;align-items:center;justify-content:center;color:#E4D1B0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11Z"></path><circle cx="12" cy="10" r="2.5"></circle></svg></span><span style="font-family:Fraunces,serif;font-size:22px;line-height:26px;font-weight:460">Ubicación</span></span>
+            <span style="display:flex;flex-direction:column;gap:2px"><span style="font-size:16px;line-height:23px">Agua Marina 110, Manuel J. Othón</span><span style="font-size:15px;line-height:22px;color:#A8A29B">78150 San Luis Potosí, S.L.P.</span></span>
+            <a href="https://www.google.com/maps/search/?api=1&amp;query=Agua+Marina+110,+Manuel+J.+Oth%C3%B3n,+San+Luis+Potos%C3%AD" target="_blank" rel="noopener" style="height:48px;box-sizing:border-box;border-radius:999px;border:1px solid #E4D1B0;color:#F5F3EF;display:flex;align-items:center;justify-content:center;gap:8px;padding:0 22px;font-size:15px;font-weight:600;text-decoration:none;font-variant-numeric:tabular-nums" style-hover="border-color:#F5F3EF">Cómo llegar</a>
+          </div>
+        </div>
+
+        <!-- horario -->
+        <div style="padding:56px 16px 0">
+          <div style="display:flex;flex-direction:column;padding:20px 20px 6px;border-radius:24px;background:#151517;border:1px solid #3F3F46">
+            <span style="display:flex;align-items:center;gap:14px;padding-bottom:14px"><span style="width:44px;height:44px;flex:0 0 44px;box-sizing:border-box;border-radius:999px;background:#1C1C1F;border:1px solid #3F3F46;display:flex;align-items:center;justify-content:center;color:#E4D1B0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3.2 2"></path></svg></span><h2 style="margin:0;font-family:Fraunces,serif;font-size:26px;line-height:32px;font-weight:460">Horarios y puntaje</h2></span>
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:60px;border-top:1px solid #3F3F46"><span style="font-size:16px">Lunes a sábado</span><span style="font-size:20px;font-weight:600;font-variant-numeric:tabular-nums">8:00 – 17:00</span></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:60px;border-top:1px solid #3F3F46"><span style="font-size:16px">Domingos y festivos</span><span style="font-size:20px;font-weight:600;color:#A8A29B">Cerrado</span></div>
+<div style="display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:60px;border-top:1px solid #3F3F46"><span style="display:flex;flex-direction:column;gap:2px"><span style="font-size:16px">Calificación de la tienda</span><span style="font-size:13px;color:#E4D1B0">ejemplo · confirmar con el dueño</span></span><span style="display:flex;align-items:center;gap:8px"><span style="color:#F59E0B;font-size:18px;letter-spacing:1px" aria-label="4.7 de 5 estrellas">★★★★★</span><span style="font-size:20px;font-weight:600;font-variant-numeric:tabular-nums">4.7</span><span style="font-size:14px;color:#A8A29B">61 opiniones</span></span></div>
+          </div>
+        </div>
+
+        <!-- contacto directo -->
+        <div style="padding:56px 16px 56px;display:flex;flex-direction:column;gap:14px">
+          <h2 style="margin:0 0 6px;font-family:Fraunces,serif;font-size:30px;line-height:36px;font-weight:460">Contacto y dirección</h2>
+            <div style="display:flex;flex-direction:column;gap:16px;padding:20px;border-radius:20px;background:#151517;border:1px solid #3F3F46">
+              <span style="display:flex;align-items:center;gap:14px"><span style="width:48px;height:48px;flex:0 0 48px;box-sizing:border-box;border-radius:999px;background:#1C1C1F;border:1px solid #3F3F46;display:flex;align-items:center;justify-content:center;color:#E4D1B0"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16.4v2.8a1.9 1.9 0 0 1-2 1.9 18.7 18.7 0 0 1-8.2-2.9 18.4 18.4 0 0 1-5.7-5.7A18.7 18.7 0 0 1 2.2 4.2 1.9 1.9 0 0 1 4.1 2.1h2.8a1.9 1.9 0 0 1 1.9 1.6c.1.9.4 1.8.7 2.7a1.9 1.9 0 0 1-.4 2L7.9 9.6a15 15 0 0 0 5.7 5.7l1.2-1.2a1.9 1.9 0 0 1 2-.4c.9.3 1.8.6 2.7.7a1.9 1.9 0 0 1 1.6 2Z"></path></svg></span><span style="display:flex;flex-direction:column;gap:2px"><span style="font-family:Fraunces,serif;font-size:22px;line-height:26px;font-weight:460">Teléfono</span><span style="font-size:15px;line-height:20px;color:#A8A29B">Llama directamente</span></span></span>
+              <a href="tel:+524442715470" style="height:48px;box-sizing:border-box;border-radius:999px;border:1px solid #E4D1B0;color:#F5F3EF;display:flex;align-items:center;justify-content:center;gap:8px;padding:0 22px;font-size:15px;font-weight:600;text-decoration:none;font-variant-numeric:tabular-nums" style-hover="border-color:#F5F3EF">+52 444 271 5470</a>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:16px;padding:20px;border-radius:20px;background:#151517;border:1px solid #3F3F46">
+              <span style="display:flex;align-items:center;gap:14px"><span style="width:48px;height:48px;flex:0 0 48px;box-sizing:border-box;border-radius:999px;background:#1C1C1F;border:1px solid #3F3F46;display:flex;align-items:center;justify-content:center;color:#E4D1B0"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"></path></svg></span><span style="display:flex;flex-direction:column;gap:2px"><span style="font-family:Fraunces,serif;font-size:22px;line-height:26px;font-weight:460">WhatsApp</span><span style="font-size:15px;line-height:20px;color:#A8A29B">Mensajes directos</span></span></span>
+              <a href="https://wa.me/524442715470" style="height:48px;box-sizing:border-box;border-radius:999px;background:#DC2626;color:#FFFFFF;display:flex;align-items:center;justify-content:center;gap:8px;padding:0 22px;font-size:15px;font-weight:600;text-decoration:none" style-hover="background:#C81E1E">Chatear</a>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:16px;padding:20px;border-radius:20px;background:#151517;border:1px solid #3F3F46">
+              <span style="display:flex;align-items:center;gap:14px"><span style="width:48px;height:48px;flex:0 0 48px;box-sizing:border-box;border-radius:999px;background:#1C1C1F;border:1px solid #3F3F46;display:flex;align-items:center;justify-content:center;color:#E4D1B0"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="m3.5 7 8.5 6 8.5-6"></path></svg></span><span style="display:flex;flex-direction:column;gap:2px"><span style="font-family:Fraunces,serif;font-size:22px;line-height:26px;font-weight:460">Correo</span><span style="font-size:15px;line-height:20px;color:#A8A29B">Escríbenos</span></span></span>
+              <a href="mailto:contacto@carniceriasenmisericordia.com" style="height:48px;box-sizing:border-box;border-radius:999px;border:1px solid #E4D1B0;color:#F5F3EF;display:flex;align-items:center;justify-content:center;gap:8px;padding:0 22px;font-size:15px;font-weight:600;text-decoration:none;font-variant-numeric:tabular-nums" style-hover="border-color:#F5F3EF">Enviar correo</a>
+            </div>
+          <a href="https://www.facebook.com/profile.php?id=100054786668816" target="_blank" rel="noopener" style="min-height:64px;box-sizing:border-box;display:flex;align-items:center;gap:14px;padding:10px 16px 10px 10px;border-radius:20px;border:1px solid #3F3F46;color:#F5F3EF;text-decoration:none" style-hover="border-color:#E4D1B0"><span style="width:44px;height:44px;flex:0 0 44px;box-sizing:border-box;border-radius:999px;background:#1C1C1F;border:1px solid #3F3F46;display:flex;align-items:center;justify-content:center;color:#E4D1B0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3.5h-2.5A4 4 0 0 0 9.5 7.5V10H7v3.5h2.5v7h3.5v-7h2.6l.6-3.5H13V7.8c0-.6.4-.8 1-.8h2Z"></path></svg></span><span style="flex:1;display:flex;flex-direction:column;gap:2px"><span style="font-size:16px;line-height:22px;font-weight:600">Síguenos en Facebook</span><span style="font-size:14px;line-height:20px;color:#A8A29B">Ofertas y cortes del día</span></span><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#E4D1B0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex:0 0 20px"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+          <a href="https://www.instagram.com/carniceria.misericordia/" target="_blank" rel="noopener" style="min-height:64px;box-sizing:border-box;display:flex;align-items:center;gap:14px;padding:10px 16px 10px 10px;border-radius:20px;border:1px solid #3F3F46;color:#F5F3EF;text-decoration:none" style-hover="border-color:#E4D1B0"><span style="width:44px;height:44px;flex:0 0 44px;box-sizing:border-box;border-radius:999px;background:#1C1C1F;border:1px solid #3F3F46;display:flex;align-items:center;justify-content:center;color:#E4D1B0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="5"></rect><circle cx="12" cy="12" r="3.8"></circle><path d="M17.2 6.8h.01"></path></svg></span><span style="flex:1;display:flex;flex-direction:column;gap:2px"><span style="font-size:16px;line-height:22px;font-weight:600">Síguenos en Instagram</span><span style="font-size:14px;line-height:20px;color:#A8A29B">@carniceria.misericordia</span></span><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#E4D1B0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex:0 0 20px"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+          <a href="https://www.google.com/maps/search/?api=1&amp;query=Agua+Marina+110,+Manuel+J.+Oth%C3%B3n,+San+Luis+Potos%C3%AD" target="_blank" rel="noopener" style="display:flex;flex-direction:column;border-radius:20px;overflow:hidden;background:#151517;border:1px solid #3F3F46;color:#F5F3EF;text-decoration:none"><iframe title="Mapa: Agua Marina 110, Manuel J. Othón, San Luis Potosí" src="https://maps.google.com/maps?q=Agua%20Marina%20110%2C%20Manuel%20J.%20Oth%C3%B3n%2C%20San%20Luis%20Potos%C3%AD&amp;z=16&amp;output=embed" loading="lazy" style="width:100%;height:200px;border:0;display:block;pointer-events:none;filter:grayscale(0.4)"></iframe><span style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:16px 20px"><span style="display:flex;flex-direction:column;gap:2px"><span style="font-size:16px;font-weight:600">Agua Marina 110, Manuel J. Othón</span><span style="font-size:14px;color:#A8A29B">San Luis Potosí, S.L.P.</span></span><span style="font-size:15px;font-weight:600;color:#E4D1B0">Cómo llegar →</span></span></a>
+        </div>
+
+        <!-- comentarios -->
+        <div style="padding:56px 0 0;display:flex;flex-direction:column;gap:20px">
+          <div style="padding:0 16px;display:flex;flex-direction:column;gap:12px">
+            <span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#E4D1B0">ejemplo · en producción salen de Google o Facebook · falta backend</span>
+            <h2 style="margin:0;font-family:Fraunces,serif;font-size:30px;line-height:36px;font-weight:460">Comentarios</h2>
+            <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+              <span style="font-family:Fraunces,serif;font-size:48px;line-height:52px;font-weight:480;font-variant-numeric:tabular-nums">4.7</span>
+              <span style="display:flex;flex-direction:column;gap:4px">
+                <span aria-label="4.7 de 5 estrellas" style="display:flex;gap:2px">
+                  <sc-for list="{{ estrellas }}" as="e" hint-placeholder-count="5"><span style="position:relative;width:18px;height:18px;display:block"><svg width="18" height="18" viewBox="0 0 24 24" style="position:absolute;inset:0"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z" fill="#3F3F46"></path></svg><span style="position:absolute;top:0;left:0;bottom:0;width:{{ e.w }};overflow:hidden"><svg width="18" height="18" viewBox="0 0 24 24"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z" fill="#F59E0B"></path></svg></span></span></sc-for>
+                </span>
+                <a href="https://www.google.com/maps/search/?api=1&amp;query=Agua+Marina+110,+Manuel+J.+Oth%C3%B3n,+San+Luis+Potos%C3%AD" target="_blank" rel="noopener" style="font-size:14px;line-height:20px;color:#F5F3EF;text-decoration:underline;text-decoration-color:#E4D1B0;text-underline-offset:4px">61 opiniones en Google</a>
+              </span>
+            </div>
+          </div>
+          <div style="overflow:hidden"><div data-giro="izq" style="display:flex;gap:12px;width:max-content;padding-left:16px;animation:carni-izq 70s linear infinite;animation-play-state:{{ giro }}">
+            <sc-for list="{{ fila1 }}" as="r" hint-placeholder-count="4">
+              <figure style="margin:0;width:280px;flex:0 0 280px;box-sizing:border-box;background:#151517;border:1px solid #3F3F46;border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:14px"><blockquote style="margin:0;font-family:Fraunces,serif;font-size:17px;line-height:25px;font-weight:420;text-wrap:pretty">«{{ r.t }}»</blockquote><figcaption style="display:flex;flex-direction:column;gap:2px;margin-top:auto"><span style="font-size:14px;line-height:18px;font-weight:600">{{ r.a }}</span><span style="font-size:13px;line-height:18px;color:#A8A29B;font-variant-numeric:tabular-nums">{{ r.o }} opiniones en Google</span></figcaption></figure>
+            </sc-for>
+          </div></div>
+          <div style="overflow:hidden"><div data-giro="der" style="display:flex;gap:12px;width:max-content;padding-left:16px;animation:carni-der 70s linear infinite;animation-play-state:{{ giro }}">
+            <sc-for list="{{ fila2 }}" as="r" hint-placeholder-count="4">
+              <figure style="margin:0;width:280px;flex:0 0 280px;box-sizing:border-box;background:#151517;border:1px solid #3F3F46;border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:14px"><blockquote style="margin:0;font-family:Fraunces,serif;font-size:17px;line-height:25px;font-weight:420;text-wrap:pretty">«{{ r.t }}»</blockquote><figcaption style="display:flex;flex-direction:column;gap:2px;margin-top:auto"><span style="font-size:14px;line-height:18px;font-weight:600">{{ r.a }}</span><span style="font-size:13px;line-height:18px;color:#A8A29B;font-variant-numeric:tabular-nums">{{ r.o }} opiniones en Google</span></figcaption></figure>
+            </sc-for>
+          </div></div>
+          <div style="padding:0 16px"><button onClick="{{ alternarGiro }}" style="height:44px;padding:0 18px;border-radius:999px;background:transparent;border:1px solid #3F3F46;color:#F5F3EF;font-family:Geist,system-ui,sans-serif;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:8px"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"></rect><rect x="14" y="5" width="4" height="14" rx="1"></rect></svg>{{ giroTexto }}</button></div>
+        </div>
+
+        <dc-import name="Pie" ancho="movil" hint-size="100%,700px"></dc-import>
+
+        <button aria-label="Abrir el asistente" style="position:absolute;right:16px;top:772px;width:56px;height:56px;border-radius:999px;background:#151517;border:1px solid #E4D1B0;color:#E4D1B0;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 0-3.2 6.4L20 19.5l-1-3.2A8 8 0 0 0 20 12Z"></path></svg></button>
+      </div>
+    </div>
+
+    <!-- ================= ESCRITORIO 1440 ================= -->
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div style="font-size:13px;line-height:18px;font-weight:600">Landing · escritorio 1440</div>
+      <div data-screen-label="Landing escritorio" style="width:1440px;background:#0B0B0C;border:1px solid #3F3F46;border-radius:12px;overflow:hidden;box-sizing:border-box;position:relative">
+        <dc-import name="Encabezado" ancho="escritorio" activo="Inicio" hint-size="100%,72px"></dc-import>
+
+        <!-- portada · a sangre, 765 px = 85 % de 900 -->
+        <div style="position:relative;height:765px;overflow:hidden;background:#0B0B0C">
+          <video autoplay="" muted="" loop="" playsinline="" src="uploads/video-portada-carne.mp4" poster="uploads/video-portada-carne-poster.jpg" aria-label="Video de la carnicería: el cuchillo sobre el corte y la parrilla" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 45%;display:block"></video><div style="position:absolute;inset:0;background:linear-gradient(to bottom, rgba(11,11,12,0) 40%, rgba(11,11,12,0.55) 65%, rgba(11,11,12,0.8) 100%)"></div>
+          <button aria-label="Pausar el video" style="position:absolute;right:24px;top:24px;width:48px;height:48px;border-radius:999px;background:rgba(11,11,12,0.6);border:1px solid #52525B;color:#F5F3EF;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"></rect><rect x="14" y="5" width="4" height="14" rx="1"></rect></svg></button>
+          <div style="position:absolute;left:48px;top:500px;width:1100px;display:flex;flex-direction:column;align-items:flex-start;gap:20px">
+            <h2 style="margin:0;font-family:Fraunces,serif;font-size:96px;line-height:90px;font-weight:480;letter-spacing:-0.03em;color:#F5F3EF;text-align:left"><span data-palabra="" style="display:inline-block;margin-right:0.22em;animation:palabra 420ms cubic-bezier(0.23,1,0.32,1) 0ms both">Cortes</span><span data-palabra="" style="display:inline-block;margin-right:0.22em;animation:palabra 420ms cubic-bezier(0.23,1,0.32,1) 50ms both">del</span><span data-palabra="" style="display:inline-block;margin-right:0.22em;animation:palabra 420ms cubic-bezier(0.23,1,0.32,1) 100ms both">día</span><span data-palabra="" style="display:inline-block;margin-right:0.22em;animation:palabra 420ms cubic-bezier(0.23,1,0.32,1) 150ms both">para</span><span data-palabra="" style="display:inline-block;margin-right:0.22em;animation:palabra 420ms cubic-bezier(0.23,1,0.32,1) 200ms both">tu</span><span data-palabra="" style="display:inline-block;margin-right:0.22em;animation:palabra 420ms cubic-bezier(0.23,1,0.32,1) 250ms both">asador</span></h2>
+            <a href="Catálogo y ficha.dc.html" style="height:52px;box-sizing:border-box;padding:0 32px;border-radius:999px;background:#DC2626;color:#FFFFFF;display:flex;align-items:center;font-size:16px;font-weight:600;text-decoration:none" style-hover="background:#C81E1E">Ver productos</a>
+          </div>
+        </div>
+        <div style="margin:40px 32px 0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid #3F3F46;border-bottom:1px solid #3F3F46">
+          <sc-for list="{{ datos }}" as="x" hint-placeholder-count="3">
+            <div style="padding:20px 24px;display:flex;flex-direction:column;gap:4px;border-left:{{ x.borde }}"><span style="font-size:14px;line-height:20px;color:#A8A29B">{{ x.k }}</span><span style="font-size:20px;line-height:26px;font-weight:600;font-variant-numeric:tabular-nums">{{ x.v }}</span></div>
+          </sc-for>
+        </div>
+
+        <!-- bento -->
+        <div style="padding:96px 32px 0;display:flex;flex-direction:column;gap:28px">
+          <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px">
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#E4D1B0">Categorías</span>
+              <h2 style="margin:0;font-family:Fraunces,serif;font-size:44px;line-height:50px;font-weight:460">Todo lo del mostrador</h2>
+            </div>
+            <a href="Catálogo y ficha.dc.html" style="height:44px;display:flex;align-items:center;gap:8px;font-size:15px;font-weight:600;color:#F5F3EF">Ver el catálogo completo<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E4D1B0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));grid-auto-rows:232px;gap:16px">
+            <sc-for list="{{ bentoD }}" as="t" hint-placeholder-count="11">
+              <a href="Catálogo y ficha.dc.html" style="grid-column:span {{ t.c }};grid-row:span {{ t.r }};display:flex;flex-direction:column;border:1px solid #3F3F46;border-radius:20px;overflow:hidden;background:#151517;color:#F5F3EF;text-decoration:none;min-height:0" style-hover="border-color:#E4D1B0">
+                <span style="flex:1 1 auto;min-height:0;background:#1C1C1F;display:block"><img src="{{ t.f }}" alt="" style="width:100%;height:100%;object-fit:cover;object-position:{{ t.p }};display:block"></span>
+                <sc-if value="{{ t.grande }}">
+                  <span style="flex:0 0 auto;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px"><span style="display:flex;flex-direction:column;gap:2px"><span style="font-family:Fraunces,serif;font-size:26px;line-height:32px;font-weight:460">{{ t.n }}</span><span style="font-size:14px;line-height:20px;color:#A8A29B">{{ t.d }}</span></span><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#E4D1B0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex:0 0 20px"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span>
+                </sc-if>
+                <sc-if value="{{ t.chico }}">
+                  <span style="flex:0 0 52px;padding:0 16px;display:flex;align-items:center;justify-content:space-between;gap:8px"><span style="font-size:16px;line-height:20px;font-weight:600">{{ t.n }}</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E4D1B0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex:0 0 18px"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span>
+                </sc-if>
+              </a>
+            </sc-for>
+          </div>
+        </div>
+
+        <!-- destacado -->
+        <div style="padding:120px 32px 0;display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:64px;align-items:center">
+          <div data-carrusel="D" style="display:flex;flex-direction:column;gap:8px">
+            <div style="position:relative">
+              <div ref="{{ refD }}" onScroll="{{ scrollD }}" role="region" aria-label="Cortes especiales, 8 fotos" tabindex="0" style="display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;border-radius:28px;height:600px;background:#1C1C1F">
+                <sc-for list="{{ cortes }}" as="c" hint-placeholder-count="8"><div style="flex:0 0 100%;scroll-snap-align:start;position:relative"><img src="{{ c.f }}" alt="{{ c.n }}" style="width:100%;height:100%;object-fit:cover;display:block"><span style="position:absolute;left:12px;bottom:12px;display:flex;align-items:center;gap:8px;height:32px;padding:0 12px;border-radius:999px;background:rgba(11,11,12,0.78);color:#F5F3EF;font-size:13px;font-weight:600">{{ c.n }} · {{ c.p }}</span></div></sc-for>
+              </div><button aria-label="Foto anterior" onClick="{{ prevD }}" style="position:absolute;left:16px;top:50%;margin-top:-24px;width:48px;height:48px;border-radius:999px;background:rgba(11,11,12,0.72);border:1px solid #52525B;color:#F5F3EF;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"></path></svg></button><button aria-label="Foto siguiente" onClick="{{ nextD }}" style="position:absolute;right:16px;top:50%;margin-top:-24px;width:48px;height:48px;border-radius:999px;background:rgba(11,11,12,0.72);border:1px solid #52525B;color:#F5F3EF;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"></path></svg></button>
+            </div>
+            <div style="display:flex;justify-content:center;gap:0">
+              <sc-for list="{{ dotsD }}" as="d" hint-placeholder-count="8"><button aria-label="{{ d.l }}" onClick="{{ d.go }}" style="width:28px;height:28px;padding:0;background:transparent;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer"><span style="width:{{ d.w }};height:8px;border-radius:999px;background:{{ d.bg }};transition:width 160ms cubic-bezier(0.23,1,0.32,1)"></span></button></sc-for>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#E4D1B0">De la vitrina</span>
+            <span style="font-size:13px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B">Cortes especiales · 20 en stock</span>
+            <h2 style="margin:0;font-family:Fraunces,serif;font-size:56px;line-height:60px;font-weight:460">Filete Mignon</h2>
+            <p style="margin:0;font-size:18px;line-height:28px;color:#A8A29B;max-width:44ch;text-wrap:pretty">La parte más suave del animal. Poca grasa, textura de mantequilla. La pieza de 1¼ pulgadas sale en unos 250 g.</p>
+            <div style="display:flex;align-items:baseline;gap:10px;font-variant-numeric:tabular-nums;padding-top:4px"><span style="font-size:36px;line-height:40px;font-weight:600">$689</span><span style="font-size:18px;color:#A8A29B">/ kg</span><span style="font-size:16px;color:#A8A29B;margin-left:12px">$312.53 / lb</span></div>
+            <div style="display:flex;gap:12px;padding-top:8px">
+              <button style="height:52px;padding:0 32px;border-radius:999px;background:#DC2626;border:none;color:#FFFFFF;font-family:Geist,system-ui,sans-serif;font-size:16px;font-weight:600;cursor:pointer" style-hover="background:#C81E1E">Agregar</button>
+              <button style="height:52px;padding:0 28px;border-radius:999px;background:transparent;border:1px solid #E4D1B0;color:#F5F3EF;font-family:Geist,system-ui,sans-serif;font-size:16px;font-weight:600;cursor:pointer">Ver la ficha</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- lo que se lleva la gente -->
+        <div style="padding:120px 32px 0;display:flex;flex-direction:column;gap:28px">
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#E4D1B0">Los más pedidos</span>
+            <h2 style="margin:0;font-family:Fraunces,serif;font-size:44px;line-height:50px;font-weight:460">Lo que se lleva la gente</h2>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px">
+            <sc-for list="{{ mas }}" as="p" hint-placeholder-count="4">
+              <dc-import name="Tarjeta" foto="{{ p.f }}" pos="{{ p.pos }}" cat="{{ p.cat }}" nombre="{{ p.n }}" desc="{{ p.d }}" precio="{{ p.precio }}" unidad="{{ p.u }}" stock="{{ p.s }}" hint-size="100%,620px"></dc-import>
+            </sc-for>
+          </div>
+        </div>
+
+        <!-- ofertas -->
+        <div style="padding:120px 32px 0;display:flex;flex-direction:column;gap:28px">
+          <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px">
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#E4D1B0">Esta semana</span>
+              <h2 style="margin:0;font-family:Fraunces,serif;font-size:44px;line-height:50px;font-weight:460">Ofertas</h2>
+              <span style="font-size:15px;line-height:22px;color:#A8A29B">Precio por paquete, no por kilo. Sujetos a existencia.</span>
+            </div>
+            <a href="Catálogo y ficha.dc.html" style="height:44px;display:flex;align-items:center;gap:8px;font-size:15px;font-weight:600;color:#F5F3EF">Ver todas las ofertas<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E4D1B0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px">
+            <sc-for list="{{ ofertas }}" as="p" hint-placeholder-count="4">
+              <dc-import name="Tarjeta" variante="oferta" foto="{{ p.f }}" pos="{{ p.pos }}" cat="Ofertas" nombre="{{ p.n }}" desc="{{ p.d }}" precio="{{ p.precio }}" unidad="{{ p.u }}" stock="{{ p.s }}" hint-size="100%,640px"></dc-import>
+            </sc-for>
+          </div>
+        </div>
+
+        <!-- preguntas -->
+        <div style="padding:120px 32px 0;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.6fr);gap:64px;align-items:start">
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#E4D1B0">Antes de pedir</span>
+            <h2 style="margin:0;font-family:Fraunces,serif;font-size:44px;line-height:50px;font-weight:460">Preguntas frecuentes</h2>
+            <p style="margin:0;font-size:16px;line-height:24px;color:#A8A29B;max-width:36ch;text-wrap:pretty">¿No está tu duda? Escríbele al carnicero, contesta en horario de tienda.</p>
+            <button style="align-self:flex-start;height:48px;padding:0 22px;border-radius:999px;background:transparent;border:1px solid #E4D1B0;color:#F5F3EF;font-family:Geist,system-ui,sans-serif;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:8px;margin-top:6px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 0-3.2 6.4L20 19.5l-1-3.2A8 8 0 0 0 20 12Z"></path></svg>Escribir por WhatsApp</button>
+          </div>
+          <div style="border-top:1px solid #3F3F46">
+            <sc-for list="{{ faq }}" as="q" hint-placeholder-count="5">
+              <div style="border-bottom:1px solid #3F3F46">
+                <button onClick="{{ q.alternar }}" aria-expanded="{{ q.abierta }}" style="width:100%;min-height:68px;padding:18px 0;background:transparent;border:none;color:#F5F3EF;font-family:Geist,system-ui,sans-serif;font-size:18px;line-height:26px;font-weight:600;text-align:left;display:flex;align-items:center;justify-content:space-between;gap:24px;cursor:pointer">{{ q.p }}<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#E4D1B0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex:0 0 22px;transform:{{ q.rot }};transition:transform 200ms"><path d="m6 9 6 6 6-6"></path></svg></button>
+                <sc-if value="{{ q.abierta }}"><div style="padding:0 64px 24px 0;display:flex;flex-direction:column;gap:10px;align-items:flex-start"><p style="margin:0;font-size:16px;line-height:26px;color:#A8A29B;max-width:64ch;text-wrap:pretty">{{ q.r }}</p><sc-if value="{{ q.tag }}"><span style="font-size:12px;line-height:16px;font-weight:600;color:#0B0B0C;background:#F59E0B;border-radius:999px;padding:4px 10px">{{ q.tag }}</span></sc-if></div></sc-if>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <!-- nosotros -->
+        <div style="padding:120px 32px 0;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:64px;align-items:center">
+          <div style="display:grid;grid-template-columns:1fr;border-radius:28px;background:#151517;border:1px solid #3F3F46;overflow:hidden">
+            <div style="display:flex;flex-direction:column;gap:6px;padding:36px 40px;"><span style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap"><span style="font-family:Fraunces,serif;font-size:72px;line-height:1;font-weight:460;letter-spacing:-0.02em;font-variant-numeric:tabular-nums;color:#F5F3EF">4.7</span><svg width="28" height="28" viewBox="0 0 24 24" fill="#F59E0B" aria-hidden="true"><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9Z"></path></svg><span style="font-size:18px;font-weight:600;color:#E4D1B0">de 5 en Google</span></span><span style="font-size:16px;line-height:22px;color:#A8A29B">61 opiniones de clientes</span></div><div style="display:flex;flex-direction:column;gap:6px;padding:36px 40px;border-top:1px solid #3F3F46;"><span style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap"><span style="font-family:Fraunces,serif;font-size:72px;line-height:1;font-weight:460;letter-spacing:-0.02em;font-variant-numeric:tabular-nums;color:#F5F3EF">53</span><span style="font-size:18px;font-weight:600;color:#E4D1B0">productos en el mostrador</span></span><span style="font-size:16px;line-height:22px;color:#A8A29B">en 9 categorías, cortados al momento</span></div><div style="display:flex;flex-direction:column;gap:6px;padding:36px 40px;border-top:1px solid #3F3F46;"><span style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap"><span style="font-family:Fraunces,serif;font-size:72px;line-height:1;font-weight:460;letter-spacing:-0.02em;font-variant-numeric:tabular-nums;color:#F5F3EF">8:00–17:00</span><span style="font-size:18px;font-weight:600;color:#E4D1B0">de lunes a sábado</span></span><span style="font-size:16px;line-height:22px;color:#A8A29B">domingos y festivos cerrado</span></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:18px">
+            <span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#E4D1B0">Sobre nosotros</span>
+            <h2 style="margin:0;font-family:Fraunces,serif;font-size:48px;line-height:54px;font-weight:460;text-wrap:balance">Carnicería de familia, pieza por pieza</h2>
+            <p style="margin:0;font-size:18px;line-height:29px;color:#A8A29B;max-width:48ch;text-wrap:pretty">Somos El Señor de La Misericordia, una carnicería familiar de la colonia Manuel J. Othón. Seleccionamos pieza por pieza, todos los días, y la cortamos como la pides.</p>
+            <p style="margin:0;font-size:18px;line-height:29px;color:#A8A29B;max-width:48ch;text-wrap:pretty">Quien vuelve, vuelve por la atención de los dueños, porque sabemos de dónde viene cada corte y por precios justos.</p>
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:24px;padding:24px 24px 24px 20px;border-radius:24px;background:#151517;border:1px solid #3F3F46;margin-top:12px">
+              <span style="display:flex;align-items:center;gap:16px"><span style="width:52px;height:52px;flex:0 0 52px;box-sizing:border-box;border-radius:999px;background:#1C1C1F;border:1px solid #3F3F46;display:flex;align-items:center;justify-content:center;color:#E4D1B0"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11Z"></path><circle cx="12" cy="10" r="2.5"></circle></svg></span><span style="display:flex;flex-direction:column;gap:2px"><span style="font-size:13px;line-height:18px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B">Ubicación</span><span style="font-size:18px;line-height:26px;font-weight:600">Agua Marina 110, Manuel J. Othón</span><span style="font-size:15px;line-height:22px;color:#A8A29B">78150 San Luis Potosí, S.L.P.</span></span></span>
+              <a href="https://www.google.com/maps/search/?api=1&amp;query=Agua+Marina+110,+Manuel+J.+Oth%C3%B3n,+San+Luis+Potos%C3%AD" target="_blank" rel="noopener" style="height:48px;box-sizing:border-box;border-radius:999px;border:1px solid #E4D1B0;color:#F5F3EF;display:flex;align-items:center;justify-content:center;gap:8px;padding:0 22px;font-size:15px;font-weight:600;text-decoration:none;font-variant-numeric:tabular-nums;flex:0 0 auto" style-hover="border-color:#F5F3EF">Cómo llegar</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- horario -->
+        <div style="padding:120px 32px 0">
+          <div style="display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1.1fr);align-items:center;gap:32px;padding:44px 48px;border-radius:28px;background:#151517;border:1px solid #3F3F46">
+            <span style="display:flex;align-items:center;gap:20px"><span style="width:60px;height:60px;flex:0 0 60px;box-sizing:border-box;border-radius:999px;background:#1C1C1F;border:1px solid #3F3F46;display:flex;align-items:center;justify-content:center;color:#E4D1B0"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3.2 2"></path></svg></span><h2 style="margin:0;font-family:Fraunces,serif;font-size:40px;line-height:46px;font-weight:460">Horarios y puntaje</h2></span>
+            <span style="display:flex;flex-direction:column;gap:6px;padding-left:32px;border-left:1px solid #3F3F46"><span style="font-size:16px;line-height:22px;color:#A8A29B">Lunes a sábado</span><span style="font-size:36px;line-height:42px;font-weight:600;font-variant-numeric:tabular-nums">8:00 – 17:00</span></span>
+            <span style="display:flex;flex-direction:column;gap:6px;padding-left:32px;border-left:1px solid #3F3F46"><span style="font-size:16px;line-height:22px;color:#A8A29B">Domingos y festivos</span><span style="font-size:36px;line-height:42px;font-weight:600;color:#A8A29B">Cerrado</span></span><span style="display:flex;flex-direction:column;gap:6px;padding-left:32px;border-left:1px solid #3F3F46"><span style="font-size:16px;line-height:22px;color:#A8A29B">Calificación · <span style="color:#E4D1B0">ejemplo · confirmar con el dueño</span></span><span style="display:flex;align-items:baseline;gap:10px"><span style="font-size:36px;line-height:42px;font-weight:600;font-variant-numeric:tabular-nums">4.7</span><span style="color:#F59E0B;font-size:20px;letter-spacing:1px" aria-label="4.7 de 5 estrellas">★★★★★</span></span><span style="font-size:15px;color:#A8A29B">61 opiniones en Google</span></span>
+          </div>
+        </div>
+
+        <!-- contacto directo -->
+        <div style="padding:120px 32px 120px;display:flex;flex-direction:column;gap:28px">
+          <h2 style="margin:0;font-family:Fraunces,serif;font-size:44px;line-height:50px;font-weight:460">Contacto y dirección</h2>
+          <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px">
+              <div style="display:flex;flex-direction:column;align-items:flex-start;gap:20px;padding:32px;border-radius:24px;background:#151517;border:1px solid #3F3F46">
+                <span style="width:56px;height:56px;flex:0 0 56px;box-sizing:border-box;border-radius:999px;background:#1C1C1F;border:1px solid #3F3F46;display:flex;align-items:center;justify-content:center;color:#E4D1B0"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16.4v2.8a1.9 1.9 0 0 1-2 1.9 18.7 18.7 0 0 1-8.2-2.9 18.4 18.4 0 0 1-5.7-5.7A18.7 18.7 0 0 1 2.2 4.2 1.9 1.9 0 0 1 4.1 2.1h2.8a1.9 1.9 0 0 1 1.9 1.6c.1.9.4 1.8.7 2.7a1.9 1.9 0 0 1-.4 2L7.9 9.6a15 15 0 0 0 5.7 5.7l1.2-1.2a1.9 1.9 0 0 1 2-.4c.9.3 1.8.6 2.7.7a1.9 1.9 0 0 1 1.6 2Z"></path></svg></span>
+                <span style="display:flex;flex-direction:column;gap:4px"><span style="font-family:Fraunces,serif;font-size:30px;line-height:36px;font-weight:460">Teléfono</span><span style="font-size:16px;line-height:22px;color:#A8A29B">Llama directamente</span></span>
+                <a href="tel:+524442715470" style="height:48px;box-sizing:border-box;border-radius:999px;border:1px solid #E4D1B0;color:#F5F3EF;display:flex;align-items:center;justify-content:center;gap:8px;padding:0 22px;font-size:15px;font-weight:600;text-decoration:none;font-variant-numeric:tabular-nums;align-self:stretch;margin-top:8px" style-hover="border-color:#F5F3EF">+52 444 271 5470</a>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:flex-start;gap:20px;padding:32px;border-radius:24px;background:#151517;border:1px solid #3F3F46">
+                <span style="width:56px;height:56px;flex:0 0 56px;box-sizing:border-box;border-radius:999px;background:#1C1C1F;border:1px solid #3F3F46;display:flex;align-items:center;justify-content:center;color:#E4D1B0"><svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"></path></svg></span>
+                <span style="display:flex;flex-direction:column;gap:4px"><span style="font-family:Fraunces,serif;font-size:30px;line-height:36px;font-weight:460">WhatsApp</span><span style="font-size:16px;line-height:22px;color:#A8A29B">Mensajes directos</span></span>
+                <a href="https://wa.me/524442715470" style="height:48px;box-sizing:border-box;border-radius:999px;background:#DC2626;color:#FFFFFF;display:flex;align-items:center;justify-content:center;gap:8px;padding:0 22px;font-size:15px;font-weight:600;text-decoration:none;align-self:stretch;margin-top:8px" style-hover="background:#C81E1E">Chatear</a>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:flex-start;gap:20px;padding:32px;border-radius:24px;background:#151517;border:1px solid #3F3F46">
+                <span style="width:56px;height:56px;flex:0 0 56px;box-sizing:border-box;border-radius:999px;background:#1C1C1F;border:1px solid #3F3F46;display:flex;align-items:center;justify-content:center;color:#E4D1B0"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="m3.5 7 8.5 6 8.5-6"></path></svg></span>
+                <span style="display:flex;flex-direction:column;gap:4px"><span style="font-family:Fraunces,serif;font-size:30px;line-height:36px;font-weight:460">Correo</span><span style="font-size:16px;line-height:22px;color:#A8A29B">Escríbenos</span></span>
+                <a href="mailto:contacto@carniceriasenmisericordia.com" style="height:48px;box-sizing:border-box;border-radius:999px;border:1px solid #E4D1B0;color:#F5F3EF;display:flex;align-items:center;justify-content:center;gap:8px;padding:0 22px;font-size:15px;font-weight:600;text-decoration:none;font-variant-numeric:tabular-nums;align-self:stretch;margin-top:8px" style-hover="border-color:#F5F3EF">Enviar correo</a>
+              </div>
+          </div>
+          <a href="https://www.facebook.com/profile.php?id=100054786668816" target="_blank" rel="noopener" style="min-height:72px;box-sizing:border-box;display:flex;align-items:center;gap:14px;padding:12px 24px 12px 12px;border-radius:20px;border:1px solid #3F3F46;color:#F5F3EF;text-decoration:none" style-hover="border-color:#E4D1B0"><span style="width:44px;height:44px;flex:0 0 44px;box-sizing:border-box;border-radius:999px;background:#1C1C1F;border:1px solid #3F3F46;display:flex;align-items:center;justify-content:center;color:#E4D1B0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3.5h-2.5A4 4 0 0 0 9.5 7.5V10H7v3.5h2.5v7h3.5v-7h2.6l.6-3.5H13V7.8c0-.6.4-.8 1-.8h2Z"></path></svg></span><span style="flex:1;display:flex;flex-direction:column;gap:2px"><span style="font-size:16px;line-height:22px;font-weight:600">Síguenos en Facebook</span><span style="font-size:14px;line-height:20px;color:#A8A29B">Ofertas y cortes del día</span></span><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#E4D1B0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex:0 0 20px"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+          <a href="https://www.instagram.com/carniceria.misericordia/" target="_blank" rel="noopener" style="min-height:72px;box-sizing:border-box;display:flex;align-items:center;gap:14px;padding:12px 24px 12px 12px;border-radius:20px;border:1px solid #3F3F46;color:#F5F3EF;text-decoration:none" style-hover="border-color:#E4D1B0"><span style="width:44px;height:44px;flex:0 0 44px;box-sizing:border-box;border-radius:999px;background:#1C1C1F;border:1px solid #3F3F46;display:flex;align-items:center;justify-content:center;color:#E4D1B0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="5"></rect><circle cx="12" cy="12" r="3.8"></circle><path d="M17.2 6.8h.01"></path></svg></span><span style="flex:1;display:flex;flex-direction:column;gap:2px"><span style="font-size:16px;line-height:22px;font-weight:600">Síguenos en Instagram</span><span style="font-size:14px;line-height:20px;color:#A8A29B">@carniceria.misericordia</span></span><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#E4D1B0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex:0 0 20px"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+          <a href="https://www.google.com/maps/search/?api=1&amp;query=Agua+Marina+110,+Manuel+J.+Oth%C3%B3n,+San+Luis+Potos%C3%AD" target="_blank" rel="noopener" style="display:flex;flex-direction:column;border-radius:20px;overflow:hidden;background:#151517;border:1px solid #3F3F46;color:#F5F3EF;text-decoration:none"><iframe title="Mapa: Agua Marina 110, Manuel J. Othón, San Luis Potosí" src="https://maps.google.com/maps?q=Agua%20Marina%20110%2C%20Manuel%20J.%20Oth%C3%B3n%2C%20San%20Luis%20Potos%C3%AD&amp;z=16&amp;output=embed" loading="lazy" style="width:100%;height:320px;border:0;display:block;pointer-events:none;filter:grayscale(0.4)"></iframe><span style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:16px 20px"><span style="display:flex;flex-direction:column;gap:2px"><span style="font-size:16px;font-weight:600">Agua Marina 110, Manuel J. Othón</span><span style="font-size:14px;color:#A8A29B">San Luis Potosí, S.L.P.</span></span><span style="font-size:15px;font-weight:600;color:#E4D1B0">Cómo llegar →</span></span></a>
+        </div>
+
+        <!-- comentarios -->
+        <div style="padding:120px 0 0;display:flex;flex-direction:column;gap:28px">
+          <div style="padding:0 32px;display:flex;align-items:flex-end;justify-content:space-between;gap:24px">
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#E4D1B0">ejemplo · en producción salen de Google o Facebook · falta backend</span>
+            <h2 style="margin:0;font-family:Fraunces,serif;font-size:44px;line-height:50px;font-weight:460">Comentarios</h2>
+              <div style="display:flex;align-items:center;gap:16px">
+                <span style="font-family:Fraunces,serif;font-size:64px;line-height:68px;font-weight:480;font-variant-numeric:tabular-nums">4.7</span>
+                <span style="display:flex;flex-direction:column;gap:6px">
+                  <span aria-label="4.7 de 5 estrellas" style="display:flex;gap:3px">
+                    <sc-for list="{{ estrellas }}" as="e" hint-placeholder-count="5"><span style="position:relative;width:22px;height:22px;display:block"><svg width="22" height="22" viewBox="0 0 24 24" style="position:absolute;inset:0"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z" fill="#3F3F46"></path></svg><span style="position:absolute;top:0;left:0;bottom:0;width:{{ e.w }};overflow:hidden"><svg width="22" height="22" viewBox="0 0 24 24"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z" fill="#F59E0B"></path></svg></span></span></sc-for>
+                  </span>
+                  <a href="https://www.google.com/maps/search/?api=1&amp;query=Agua+Marina+110,+Manuel+J.+Oth%C3%B3n,+San+Luis+Potos%C3%AD" target="_blank" rel="noopener" style="font-size:15px;line-height:20px;color:#F5F3EF;text-decoration:underline;text-decoration-color:#E4D1B0;text-underline-offset:4px">61 opiniones en Google · ver todas</a>
+                </span>
+              </div>
+            </div>
+            <button onClick="{{ alternarGiro }}" style="height:44px;padding:0 18px;border-radius:999px;background:transparent;border:1px solid #3F3F46;color:#F5F3EF;font-family:Geist,system-ui,sans-serif;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:8px"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"></rect><rect x="14" y="5" width="4" height="14" rx="1"></rect></svg>{{ giroTexto }}</button>
+          </div>
+          <div style="overflow:hidden"><div data-giro="izq" style="display:flex;gap:16px;width:max-content;padding-left:32px;animation:carni-izq 80s linear infinite;animation-play-state:{{ giro }}">
+            <sc-for list="{{ fila1 }}" as="r" hint-placeholder-count="4">
+              <figure style="margin:0;width:400px;flex:0 0 400px;box-sizing:border-box;background:#151517;border:1px solid #3F3F46;border-radius:20px;padding:24px;display:flex;flex-direction:column;gap:18px"><blockquote style="margin:0;font-family:Fraunces,serif;font-size:21px;line-height:30px;font-weight:420;text-wrap:pretty">«{{ r.t }}»</blockquote><figcaption style="display:flex;flex-direction:column;gap:2px;margin-top:auto"><span style="font-size:15px;line-height:20px;font-weight:600">{{ r.a }}</span><span style="font-size:14px;line-height:20px;color:#A8A29B;font-variant-numeric:tabular-nums">{{ r.o }} opiniones en Google</span></figcaption></figure>
+            </sc-for>
+          </div></div>
+          <div style="overflow:hidden"><div data-giro="der" style="display:flex;gap:16px;width:max-content;padding-left:32px;animation:carni-der 80s linear infinite;animation-play-state:{{ giro }}">
+            <sc-for list="{{ fila2 }}" as="r" hint-placeholder-count="4">
+              <figure style="margin:0;width:400px;flex:0 0 400px;box-sizing:border-box;background:#151517;border:1px solid #3F3F46;border-radius:20px;padding:24px;display:flex;flex-direction:column;gap:18px"><blockquote style="margin:0;font-family:Fraunces,serif;font-size:21px;line-height:30px;font-weight:420;text-wrap:pretty">«{{ r.t }}»</blockquote><figcaption style="display:flex;flex-direction:column;gap:2px;margin-top:auto"><span style="font-size:15px;line-height:20px;font-weight:600">{{ r.a }}</span><span style="font-size:14px;line-height:20px;color:#A8A29B;font-variant-numeric:tabular-nums">{{ r.o }} opiniones en Google</span></figcaption></figure>
+            </sc-for>
+          </div></div>
+        </div>
+
+        <dc-import name="Pie" ancho="escritorio" hint-size="100%,380px"></dc-import>
+
+        <span style="position:absolute;right:32px;top:836px;display:flex;align-items:center;gap:10px;height:48px;padding:0 18px;border-radius:999px;background:#151517;border:1px solid #E4D1B0;color:#F5F3EF;font-size:15px;font-weight:500"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E4D1B0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 0-3.2 6.4L20 19.5l-1-3.2A8 8 0 0 0 20 12Z"></path></svg>¿Te ayudo con el corte?</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="width:1862px;max-width:100%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 48px">
+    <sc-for list="{{ mejoras }}" as="m" hint-placeholder-count="12">
+      <div style="display:grid;grid-template-columns:140px minmax(0,1fr);gap:12px;padding:14px 0;border-bottom:1px solid #3F3F46;font-size:13px;line-height:19px"><span style="font-weight:600;color:#F5F3EF">{{ m.s }}</span><span style="display:flex;flex-direction:column;gap:4px;color:#A8A29B;text-wrap:pretty"><span><span style="color:#E4D1B0;font-weight:600">De lo nuestro · </span>{{ m.n }}</span><span><span style="color:#F5F3EF;font-weight:600">De lo mío · </span>{{ m.y }}</span><span><span style="color:#F5F3EF;font-weight:600">Mejora · </span>{{ m.m }}</span></span></div>
+    </sc-for>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:16px">
+    <h2 style="margin:0;font-family:Fraunces,serif;font-size:30px;line-height:36px;font-weight:440">Autorrevisión · landing</h2>
+    <div style="background:#151517;border:1px solid #3F3F46;border-radius:12px;overflow:hidden;width:1440px;max-width:100%">
+      <div style="display:grid;grid-template-columns:200px minmax(0,1fr) 100px minmax(0,1.2fr);font-size:12px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B;border-bottom:1px solid #3F3F46"><span style="padding:12px 16px">Criterio</span><span style="padding:12px 16px">Qué se midió</span><span style="padding:12px 16px">Estado</span><span style="padding:12px 16px">Corrección</span></div>
+      <sc-for list="{{ revision }}" as="c" hint-placeholder-count="6">
+        <div style="display:grid;grid-template-columns:200px minmax(0,1fr) 100px minmax(0,1.2fr);font-size:13px;line-height:18px;border-bottom:1px solid #3F3F46"><span style="padding:12px 16px">{{ c.c }}</span><span style="padding:12px 16px;color:#A8A29B">{{ c.m }}</span><span style="padding:12px 16px;color:#059669;font-weight:600">Pasa</span><span style="padding:12px 16px;color:#A8A29B">{{ c.x }}</span></div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div id="reporte-b2" data-screen-label="Reporte" style="width:1440px;max-width:100%;box-sizing:border-box;background:#151517;border:1px solid #3F3F46;border-radius:16px;padding:40px;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:48px">
+    <div style="display:flex;flex-direction:column;gap:20px">
+      <span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#E4D1B0">Reporte · landing</span>
+      <span style="font-family:Fraunces,serif;font-size:40px;line-height:46px;font-weight:480">1 de 1 pantalla cerrada, 11 secciones</span>
+      <span style="font-size:15px;line-height:24px;color:#A8A29B;text-wrap:pretty">07 Landing: portada con video, bento, destacado, lo que se lleva la gente, testimonios en dos filas, preguntas, ofertas, nosotros, horarios, contacto y pie. Tres correcciones en el primer intento, ninguna llegó al segundo.</span>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B">Notas</span>
+      <span style="font-size:15px;line-height:22px;text-wrap:pretty;border-bottom:1px solid #3F3F46;padding-bottom:12px">SIN RECURSOS: portada-carne.mp4 no llegó (el repo lo rechaza por peso). El &lt;video&gt; ya tiene autoplay, muted, loop y el póster portada-carne-poster.jpg; basta agregar el &lt;source&gt;.</span>
+      <span style="font-size:15px;line-height:22px;text-wrap:pretty;border-bottom:1px solid #3F3F46;padding-bottom:12px">Sobre nosotros se resolvió con tipografía y datos reales: 4.7 en Google, 53 productos, horario.</span>
+      <span style="font-size:15px;line-height:22px;text-wrap:pretty;border-bottom:1px solid #3F3F46;padding-bottom:12px">Confirmar con el dueño cómo se cobra el peso real y si se acepta pago en mostrador.</span>
+      <span style="font-size:15px;line-height:22px;text-wrap:pretty">Falta backend: pago con tarjeta, vigencia y precio anterior de las ofertas.</span>
+    </div>
+  </div>
+</section>
+
+<section id="contacto-variantes" data-screen-label="Contacto directo · variantes A y B" style="background:#0B0B0C;color:#F5F3EF;font-family:Geist,system-ui,sans-serif;padding:48px;display:flex;flex-direction:column;gap:24px;border-bottom:1px solid #3F3F46;width:max-content;min-width:100%;box-sizing:border-box">
+  <div style="display:flex;flex-direction:column;gap:10px;max-width:900px">
+    <span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#E4D1B0">1.3 · para que Eduardo elija</span>
+    <h2 style="margin:0;font-family:Fraunces,serif;font-size:36px;line-height:42px;font-weight:460">Contacto directo · variante A y variante B</h2>
+    <p style="margin:0;font-size:16px;line-height:25px;color:#A8A29B;text-wrap:pretty">A: glifos monocromos en beige, como hoy. B: el glifo de WhatsApp con su verde de marca (#25D366) solo en las tres tarjetas; Teléfono y Correo no tienen color de marca y se quedan igual. Facebook e Instagram van en sus filas, con sus enlaces reales, en las dos variantes.</p>
+  </div>
+  <div style="display:flex;gap:32px;align-items:flex-start">
+    <div style="display:flex;flex-direction:column;gap:8px"><div style="width:390px;background:#0B0B0C;border:1px solid #3F3F46;border-radius:12px;overflow:hidden;box-sizing:border-box"><!-- contacto directo -->
+        <div style="padding:56px 16px 56px;display:flex;flex-direction:column;gap:14px">
+          <h2 style="margin:0 0 6px;font-family:Fraunces,serif;font-size:30px;line-height:36px;font-weight:460">Contacto directo</h2>
+            <div style="display:flex;flex-direction:column;gap:16px;padding:20px;border-radius:20px;background:#151517;border:1px solid #3F3F46">
+              <span style="display:flex;align-items:center;gap:14px"><span style="width:48px;height:48px;flex:0 0 48px;box-sizing:border-box;border-radius:999px;background:#1C1C1F;border:1px solid #3F3F46;display:flex;align-items:center;justify-content:center;color:#E4D1B0"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16.4v2.8a1.9 1.9 0 0 1-2 1.9 18.7 18.7 0 0 1-8.2-2.9 18.4 18.4 0 0 1-5.7-5.7A18.7 18.7 0 0 1 2.2 4.2 1.9 1.9 0 0 1 4.1 2.1h2.8a1.9 1.9 0 0 1 1.9 1.6c.1.9.4 1.8.7 2.7a1.9 1.9 0 0 1-.4 2L7.9 9.6a15 15 0 0 0 5.7 5.7l1.2-1.2a1.9 1.9 0 0 1 2-.4c.9.3 1.8.6 2.7.7a1.9 1.9 0 0 1 1.6 2Z"></path></svg></span><span style="display:flex;flex-direction:column;gap:2px"><span style="font-family:Fraunces,serif;font-size:22px;line-height:26px;font-weight:460">Teléfono</span><span style="font-size:15px;line-height:20px;color:#A8A29B">Llama directamente</span></span></span>
+              <a href="tel:+524442715470" style="height:48px;box-sizing:border-box;border-radius:999px;border:1px solid #E4D1B0;color:#F5F3EF;display:flex;align-items:center;justify-content:center;gap:8px;padding:0 22px;font-size:15px;font-weight:600;text-decoration:none;font-variant-numeric:tabular-nums" style-hover="border-color:#F5F3EF">+52 444 271 5470</a>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:16px;padding:20px;border-radius:20px;background:#151517;border:1px solid #3F3F46">
+              <span style="display:flex;align-items:center;gap:14px"><span style="width:48px;height:48px;flex:0 0 48px;box-sizing:border-box;border-radius:999px;background:#1C1C1F;border:1px solid #3F3F46;display:flex;align-items:center;justify-content:center;color:#E4D1B0"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"></path></svg></span><span style="display:flex;flex-direction:column;gap:2px"><span style="font-family:Fraunces,serif;font-size:22px;line-height:26px;font-weight:460">WhatsApp</span><span style="font-size:15px;line-height:20px;color:#A8A29B">Mensajes directos</span></span></span>
+              <a href="https://wa.me/524442715470" style="height:48px;box-sizing:border-box;border-radius:999px;background:#DC2626;color:#FFFFFF;display:flex;align-items:center;justify-content:center;gap:8px;padding:0 22px;font-size:15px;font-weight:600;text-decoration:none" style-hover="background:#C81E1E">Chatear</a>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:16px;padding:20px;border-radius:20px;background:#151517;border:1px solid #3F3F46">
+              <span style="display:flex;align-items:center;gap:14px"><span style="width:48px;height:48px;flex:0 0 48px;box-sizing:border-box;border-radius:999px;background:#1C1C1F;border:1px solid #3F3F46;display:flex;align-items:center;justify-content:center;color:#E4D1B0"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="m3.5 7 8.5 6 8.5-6"></path></svg></span><span style="display:flex;flex-direction:column;gap:2px"><span style="font-family:Fraunces,serif;font-size:22px;line-height:26px;font-weight:460">Correo</span><span style="font-size:15px;line-height:20px;color:#A8A29B">Escríbenos</span></span></span>
+              <a href="mailto:contacto@carniceriasenmisericordia.com" style="height:48px;box-sizing:border-box;border-radius:999px;border:1px solid #E4D1B0;color:#F5F3EF;display:flex;align-items:center;justify-content:center;gap:8px;padding:0 22px;font-size:15px;font-weight:600;text-decoration:none;font-variant-numeric:tabular-nums" style-hover="border-color:#F5F3EF">Enviar correo</a>
+            </div>
+          <a href="https://www.facebook.com/profile.php?id=100054786668816" target="_blank" rel="noopener" style="min-height:64px;box-sizing:border-box;display:flex;align-items:center;gap:14px;padding:10px 16px 10px 10px;border-radius:20px;border:1px solid #3F3F46;color:#F5F3EF;text-decoration:none" style-hover="border-color:#E4D1B0"><span style="width:44px;height:44px;flex:0 0 44px;box-sizing:border-box;border-radius:999px;background:#1C1C1F;border:1px solid #3F3F46;display:flex;align-items:center;justify-content:center;color:#E4D1B0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3.5h-2.5A4 4 0 0 0 9.5 7.5V10H7v3.5h2.5v7h3.5v-7h2.6l.6-3.5H13V7.8c0-.6.4-.8 1-.8h2Z"></path></svg></span><span style="flex:1;display:flex;flex-direction:column;gap:2px"><span style="font-size:16px;line-height:22px;font-weight:600">Síguenos en Facebook</span><span style="font-size:14px;line-height:20px;color:#A8A29B">Ofertas y cortes del día</span></span><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#E4D1B0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex:0 0 20px"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+          <a href="https://www.instagram.com/carniceria.misericordia/" target="_blank" rel="noopener" style="min-height:64px;box-sizing:border-box;display:flex;align-items:center;gap:14px;padding:10px 16px 10px 10px;border-radius:20px;border:1px solid #3F3F46;color:#F5F3EF;text-decoration:none" style-hover="border-color:#E4D1B0"><span style="width:44px;height:44px;flex:0 0 44px;box-sizing:border-box;border-radius:999px;background:#1C1C1F;border:1px solid #3F3F46;display:flex;align-items:center;justify-content:center;color:#E4D1B0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="5"></rect><circle cx="12" cy="12" r="3.8"></circle><path d="M17.2 6.8h.01"></path></svg></span><span style="flex:1;display:flex;flex-direction:column;gap:2px"><span style="font-size:16px;line-height:22px;font-weight:600">Síguenos en Instagram</span><span style="font-size:14px;line-height:20px;color:#A8A29B">@carniceria.misericordia</span></span><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#E4D1B0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex:0 0 20px"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+        </div>
+
+        </div><div style="font-size:13px;line-height:18px;font-weight:600">A · monocromo · móvil 390</div></div>
+    <div style="display:flex;flex-direction:column;gap:8px"><div style="width:390px;background:#0B0B0C;border:1px solid #3F3F46;border-radius:12px;overflow:hidden;box-sizing:border-box"><!-- contacto directo -->
+        <div style="padding:56px 16px 56px;display:flex;flex-direction:column;gap:14px">
+          <h2 style="margin:0 0 6px;font-family:Fraunces,serif;font-size:30px;line-height:36px;font-weight:460">Contacto directo</h2>
+            <div style="display:flex;flex-direction:column;gap:16px;padding:20px;border-radius:20px;background:#151517;border:1px solid #3F3F46">
+              <span style="display:flex;align-items:center;gap:14px"><span style="width:48px;height:48px;flex:0 0 48px;box-sizing:border-box;border-radius:999px;background:#1C1C1F;border:1px solid #3F3F46;display:flex;align-items:center;justify-content:center;color:#E4D1B0"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16.4v2.8a1.9 1.9 0 0 1-2 1.9 18.7 18.7 0 0 1-8.2-2.9 18.4 18.4 0 0 1-5.7-5.7A18.7 18.7 0 0 1 2.2 4.2 1.9 1.9 0 0 1 4.1 2.1h2.8a1.9 1.9 0 0 1 1.9 1.6c.1.9.4 1.8.7 2.7a1.9 1.9 0 0 1-.4 2L7.9 9.6a15 15 0 0 0 5.7 5.7l1.2-1.2a1.9 1.9 0 0 1 2-.4c.9.3 1.8.6 2.7.7a1.9 1.9 0 0 1 1.6 2Z"></path></svg></span><span style="display:flex;flex-direction:column;gap:2px"><span style="font-family:Fraunces,serif;font-size:22px;line-height:26px;font-weight:460">Teléfono</span><span style="font-size:15px;line-height:20px;color:#A8A29B">Llama directamente</span></span></span>
+              <a href="tel:+524442715470" style="height:48px;box-sizing:border-box;border-radius:999px;border:1px solid #E4D1B0;color:#F5F3EF;display:flex;align-items:center;justify-content:center;gap:8px;padding:0 22px;font-size:15px;font-weight:600;text-decoration:none;font-variant-numeric:tabular-nums" style-hover="border-color:#F5F3EF">+52 444 271 5470</a>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:16px;padding:20px;border-radius:20px;background:#151517;border:1px solid #3F3F46">
+              <span style="display:flex;align-items:center;gap:14px"><span style="width:48px;height:48px;flex:0 0 48px;box-sizing:border-box;border-radius:999px;background:#25D366;border:1px solid #25D366;display:flex;align-items:center;justify-content:center;color:#FFFFFF"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"></path></svg></span><span style="display:flex;flex-direction:column;gap:2px"><span style="font-family:Fraunces,serif;font-size:22px;line-height:26px;font-weight:460">WhatsApp</span><span style="font-size:15px;line-height:20px;color:#A8A29B">Mensajes directos</span></span></span>
+              <a href="https://wa.me/524442715470" style="height:48px;box-sizing:border-box;border-radius:999px;background:#DC2626;color:#FFFFFF;display:flex;align-items:center;justify-content:center;gap:8px;padding:0 22px;font-size:15px;font-weight:600;text-decoration:none" style-hover="background:#C81E1E">Chatear</a>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:16px;padding:20px;border-radius:20px;background:#151517;border:1px solid #3F3F46">
+              <span style="display:flex;align-items:center;gap:14px"><span style="width:48px;height:48px;flex:0 0 48px;box-sizing:border-box;border-radius:999px;background:#1C1C1F;border:1px solid #3F3F46;display:flex;align-items:center;justify-content:center;color:#E4D1B0"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="m3.5 7 8.5 6 8.5-6"></path></svg></span><span style="display:flex;flex-direction:column;gap:2px"><span style="font-family:Fraunces,serif;font-size:22px;line-height:26px;font-weight:460">Correo</span><span style="font-size:15px;line-height:20px;color:#A8A29B">Escríbenos</span></span></span>
+              <a href="mailto:contacto@carniceriasenmisericordia.com" style="height:48px;box-sizing:border-box;border-radius:999px;border:1px solid #E4D1B0;color:#F5F3EF;display:flex;align-items:center;justify-content:center;gap:8px;padding:0 22px;font-size:15px;font-weight:600;text-decoration:none;font-variant-numeric:tabular-nums" style-hover="border-color:#F5F3EF">Enviar correo</a>
+            </div>
+          <a href="https://www.facebook.com/profile.php?id=100054786668816" target="_blank" rel="noopener" style="min-height:64px;box-sizing:border-box;display:flex;align-items:center;gap:14px;padding:10px 16px 10px 10px;border-radius:20px;border:1px solid #3F3F46;color:#F5F3EF;text-decoration:none" style-hover="border-color:#E4D1B0"><span style="width:44px;height:44px;flex:0 0 44px;box-sizing:border-box;border-radius:999px;background:#1C1C1F;border:1px solid #3F3F46;display:flex;align-items:center;justify-content:center;color:#E4D1B0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3.5h-2.5A4 4 0 0 0 9.5 7.5V10H7v3.5h2.5v7h3.5v-7h2.6l.6-3.5H13V7.8c0-.6.4-.8 1-.8h2Z"></path></svg></span><span style="flex:1;display:flex;flex-direction:column;gap:2px"><span style="font-size:16px;line-height:22px;font-weight:600">Síguenos en Facebook</span><span style="font-size:14px;line-height:20px;color:#A8A29B">Ofertas y cortes del día</span></span><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#E4D1B0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex:0 0 20px"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+          <a href="https://www.instagram.com/carniceria.misericordia/" target="_blank" rel="noopener" style="min-height:64px;box-sizing:border-box;display:flex;align-items:center;gap:14px;padding:10px 16px 10px 10px;border-radius:20px;border:1px solid #3F3F46;color:#F5F3EF;text-decoration:none" style-hover="border-color:#E4D1B0"><span style="width:44px;height:44px;flex:0 0 44px;box-sizing:border-box;border-radius:999px;background:#1C1C1F;border:1px solid #3F3F46;display:flex;align-items:center;justify-content:center;color:#E4D1B0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="5"></rect><circle cx="12" cy="12" r="3.8"></circle><path d="M17.2 6.8h.01"></path></svg></span><span style="flex:1;display:flex;flex-direction:column;gap:2px"><span style="font-size:16px;line-height:22px;font-weight:600">Síguenos en Instagram</span><span style="font-size:14px;line-height:20px;color:#A8A29B">@carniceria.misericordia</span></span><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#E4D1B0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex:0 0 20px"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+        </div>
+
+        </div><div style="font-size:13px;line-height:18px;font-weight:600">B · color de marca · móvil 390</div></div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:32px">
+    <div style="display:flex;flex-direction:column;gap:8px"><div style="width:1440px;background:#0B0B0C;border:1px solid #3F3F46;border-radius:12px;overflow:hidden;box-sizing:border-box"><!-- contacto directo -->
+        <div style="padding:120px 32px 120px;display:flex;flex-direction:column;gap:28px">
+          <h2 style="margin:0;font-family:Fraunces,serif;font-size:44px;line-height:50px;font-weight:460">Contacto directo</h2>
+          <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px">
+              <div style="display:flex;flex-direction:column;align-items:flex-start;gap:20px;padding:32px;border-radius:24px;background:#151517;border:1px solid #3F3F46">
+                <span style="width:56px;height:56px;flex:0 0 56px;box-sizing:border-box;border-radius:999px;background:#1C1C1F;border:1px solid #3F3F46;display:flex;align-items:center;justify-content:center;color:#E4D1B0"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16.4v2.8a1.9 1.9 0 0 1-2 1.9 18.7 18.7 0 0 1-8.2-2.9 18.4 18.4 0 0 1-5.7-5.7A18.7 18.7 0 0 1 2.2 4.2 1.9 1.9 0 0 1 4.1 2.1h2.8a1.9 1.9 0 0 1 1.9 1.6c.1.9.4 1.8.7 2.7a1.9 1.9 0 0 1-.4 2L7.9 9.6a15 15 0 0 0 5.7 5.7l1.2-1.2a1.9 1.9 0 0 1 2-.4c.9.3 1.8.6 2.7.7a1.9 1.9 0 0 1 1.6 2Z"></path></svg></span>
+                <span style="display:flex;flex-direction:column;gap:4px"><span style="font-family:Fraunces,serif;font-size:30px;line-height:36px;font-weight:460">Teléfono</span><span style="font-size:16px;line-height:22px;color:#A8A29B">Llama directamente</span></span>
+                <a href="tel:+524442715470" style="height:48px;box-sizing:border-box;border-radius:999px;border:1px solid #E4D1B0;color:#F5F3EF;display:flex;align-items:center;justify-content:center;gap:8px;padding:0 22px;font-size:15px;font-weight:600;text-decoration:none;font-variant-numeric:tabular-nums;align-self:stretch;margin-top:8px" style-hover="border-color:#F5F3EF">+52 444 271 5470</a>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:flex-start;gap:20px;padding:32px;border-radius:24px;background:#151517;border:1px solid #3F3F46">
+                <span style="width:56px;height:56px;flex:0 0 56px;box-sizing:border-box;border-radius:999px;background:#1C1C1F;border:1px solid #3F3F46;display:flex;align-items:center;justify-content:center;color:#E4D1B0"><svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"></path></svg></span>
+                <span style="display:flex;flex-direction:column;gap:4px"><span style="font-family:Fraunces,serif;font-size:30px;line-height:36px;font-weight:460">WhatsApp</span><span style="font-size:16px;line-height:22px;color:#A8A29B">Mensajes directos</span></span>
+                <a href="https://wa.me/524442715470" style="height:48px;box-sizing:border-box;border-radius:999px;background:#DC2626;color:#FFFFFF;display:flex;align-items:center;justify-content:center;gap:8px;padding:0 22px;font-size:15px;font-weight:600;text-decoration:none;align-self:stretch;margin-top:8px" style-hover="background:#C81E1E">Chatear</a>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:flex-start;gap:20px;padding:32px;border-radius:24px;background:#151517;border:1px solid #3F3F46">
+                <span style="width:56px;height:56px;flex:0 0 56px;box-sizing:border-box;border-radius:999px;background:#1C1C1F;border:1px solid #3F3F46;display:flex;align-items:center;justify-content:center;color:#E4D1B0"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="m3.5 7 8.5 6 8.5-6"></path></svg></span>
+                <span style="display:flex;flex-direction:column;gap:4px"><span style="font-family:Fraunces,serif;font-size:30px;line-height:36px;font-weight:460">Correo</span><span style="font-size:16px;line-height:22px;color:#A8A29B">Escríbenos</span></span>
+                <a href="mailto:contacto@carniceriasenmisericordia.com" style="height:48px;box-sizing:border-box;border-radius:999px;border:1px solid #E4D1B0;color:#F5F3EF;display:flex;align-items:center;justify-content:center;gap:8px;padding:0 22px;font-size:15px;font-weight:600;text-decoration:none;font-variant-numeric:tabular-nums;align-self:stretch;margin-top:8px" style-hover="border-color:#F5F3EF">Enviar correo</a>
+              </div>
+          </div>
+          <a href="https://www.facebook.com/profile.php?id=100054786668816" target="_blank" rel="noopener" style="min-height:72px;box-sizing:border-box;display:flex;align-items:center;gap:14px;padding:12px 24px 12px 12px;border-radius:20px;border:1px solid #3F3F46;color:#F5F3EF;text-decoration:none" style-hover="border-color:#E4D1B0"><span style="width:44px;height:44px;flex:0 0 44px;box-sizing:border-box;border-radius:999px;background:#1C1C1F;border:1px solid #3F3F46;display:flex;align-items:center;justify-content:center;color:#E4D1B0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3.5h-2.5A4 4 0 0 0 9.5 7.5V10H7v3.5h2.5v7h3.5v-7h2.6l.6-3.5H13V7.8c0-.6.4-.8 1-.8h2Z"></path></svg></span><span style="flex:1;display:flex;flex-direction:column;gap:2px"><span style="font-size:16px;line-height:22px;font-weight:600">Síguenos en Facebook</span><span style="font-size:14px;line-height:20px;color:#A8A29B">Ofertas y cortes del día</span></span><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#E4D1B0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex:0 0 20px"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+          <a href="https://www.instagram.com/carniceria.misericordia/" target="_blank" rel="noopener" style="min-height:72px;box-sizing:border-box;display:flex;align-items:center;gap:14px;padding:12px 24px 12px 12px;border-radius:20px;border:1px solid #3F3F46;color:#F5F3EF;text-decoration:none" style-hover="border-color:#E4D1B0"><span style="width:44px;height:44px;flex:0 0 44px;box-sizing:border-box;border-radius:999px;background:#1C1C1F;border:1px solid #3F3F46;display:flex;align-items:center;justify-content:center;color:#E4D1B0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="5"></rect><circle cx="12" cy="12" r="3.8"></circle><path d="M17.2 6.8h.01"></path></svg></span><span style="flex:1;display:flex;flex-direction:column;gap:2px"><span style="font-size:16px;line-height:22px;font-weight:600">Síguenos en Instagram</span><span style="font-size:14px;line-height:20px;color:#A8A29B">@carniceria.misericordia</span></span><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#E4D1B0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex:0 0 20px"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+        </div>
+
+        </div><div style="font-size:13px;line-height:18px;font-weight:600">A · monocromo · escritorio 1440</div></div>
+    <div style="display:flex;flex-direction:column;gap:8px"><div style="width:1440px;background:#0B0B0C;border:1px solid #3F3F46;border-radius:12px;overflow:hidden;box-sizing:border-box"><!-- contacto directo -->
+        <div style="padding:120px 32px 120px;display:flex;flex-direction:column;gap:28px">
+          <h2 style="margin:0;font-family:Fraunces,serif;font-size:44px;line-height:50px;font-weight:460">Contacto directo</h2>
+          <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px">
+              <div style="display:flex;flex-direction:column;align-items:flex-start;gap:20px;padding:32px;border-radius:24px;background:#151517;border:1px solid #3F3F46">
+                <span style="width:56px;height:56px;flex:0 0 56px;box-sizing:border-box;border-radius:999px;background:#1C1C1F;border:1px solid #3F3F46;display:flex;align-items:center;justify-content:center;color:#E4D1B0"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16.4v2.8a1.9 1.9 0 0 1-2 1.9 18.7 18.7 0 0 1-8.2-2.9 18.4 18.4 0 0 1-5.7-5.7A18.7 18.7 0 0 1 2.2 4.2 1.9 1.9 0 0 1 4.1 2.1h2.8a1.9 1.9 0 0 1 1.9 1.6c.1.9.4 1.8.7 2.7a1.9 1.9 0 0 1-.4 2L7.9 9.6a15 15 0 0 0 5.7 5.7l1.2-1.2a1.9 1.9 0 0 1 2-.4c.9.3 1.8.6 2.7.7a1.9 1.9 0 0 1 1.6 2Z"></path></svg></span>
+                <span style="display:flex;flex-direction:column;gap:4px"><span style="font-family:Fraunces,serif;font-size:30px;line-height:36px;font-weight:460">Teléfono</span><span style="font-size:16px;line-height:22px;color:#A8A29B">Llama directamente</span></span>
+                <a href="tel:+524442715470" style="height:48px;box-sizing:border-box;border-radius:999px;border:1px solid #E4D1B0;color:#F5F3EF;display:flex;align-items:center;justify-content:center;gap:8px;padding:0 22px;font-size:15px;font-weight:600;text-decoration:none;font-variant-numeric:tabular-nums;align-self:stretch;margin-top:8px" style-hover="border-color:#F5F3EF">+52 444 271 5470</a>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:flex-start;gap:20px;padding:32px;border-radius:24px;background:#151517;border:1px solid #3F3F46">
+                <span style="width:56px;height:56px;flex:0 0 56px;box-sizing:border-box;border-radius:999px;background:#25D366;border:1px solid #25D366;display:flex;align-items:center;justify-content:center;color:#FFFFFF"><svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"></path></svg></span>
+                <span style="display:flex;flex-direction:column;gap:4px"><span style="font-family:Fraunces,serif;font-size:30px;line-height:36px;font-weight:460">WhatsApp</span><span style="font-size:16px;line-height:22px;color:#A8A29B">Mensajes directos</span></span>
+                <a href="https://wa.me/524442715470" style="height:48px;box-sizing:border-box;border-radius:999px;background:#DC2626;color:#FFFFFF;display:flex;align-items:center;justify-content:center;gap:8px;padding:0 22px;font-size:15px;font-weight:600;text-decoration:none;align-self:stretch;margin-top:8px" style-hover="background:#C81E1E">Chatear</a>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:flex-start;gap:20px;padding:32px;border-radius:24px;background:#151517;border:1px solid #3F3F46">
+                <span style="width:56px;height:56px;flex:0 0 56px;box-sizing:border-box;border-radius:999px;background:#1C1C1F;border:1px solid #3F3F46;display:flex;align-items:center;justify-content:center;color:#E4D1B0"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="m3.5 7 8.5 6 8.5-6"></path></svg></span>
+                <span style="display:flex;flex-direction:column;gap:4px"><span style="font-family:Fraunces,serif;font-size:30px;line-height:36px;font-weight:460">Correo</span><span style="font-size:16px;line-height:22px;color:#A8A29B">Escríbenos</span></span>
+                <a href="mailto:contacto@carniceriasenmisericordia.com" style="height:48px;box-sizing:border-box;border-radius:999px;border:1px solid #E4D1B0;color:#F5F3EF;display:flex;align-items:center;justify-content:center;gap:8px;padding:0 22px;font-size:15px;font-weight:600;text-decoration:none;font-variant-numeric:tabular-nums;align-self:stretch;margin-top:8px" style-hover="border-color:#F5F3EF">Enviar correo</a>
+              </div>
+          </div>
+          <a href="https://www.facebook.com/profile.php?id=100054786668816" target="_blank" rel="noopener" style="min-height:72px;box-sizing:border-box;display:flex;align-items:center;gap:14px;padding:12px 24px 12px 12px;border-radius:20px;border:1px solid #3F3F46;color:#F5F3EF;text-decoration:none" style-hover="border-color:#E4D1B0"><span style="width:44px;height:44px;flex:0 0 44px;box-sizing:border-box;border-radius:999px;background:#1C1C1F;border:1px solid #3F3F46;display:flex;align-items:center;justify-content:center;color:#E4D1B0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3.5h-2.5A4 4 0 0 0 9.5 7.5V10H7v3.5h2.5v7h3.5v-7h2.6l.6-3.5H13V7.8c0-.6.4-.8 1-.8h2Z"></path></svg></span><span style="flex:1;display:flex;flex-direction:column;gap:2px"><span style="font-size:16px;line-height:22px;font-weight:600">Síguenos en Facebook</span><span style="font-size:14px;line-height:20px;color:#A8A29B">Ofertas y cortes del día</span></span><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#E4D1B0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex:0 0 20px"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+          <a href="https://www.instagram.com/carniceria.misericordia/" target="_blank" rel="noopener" style="min-height:72px;box-sizing:border-box;display:flex;align-items:center;gap:14px;padding:12px 24px 12px 12px;border-radius:20px;border:1px solid #3F3F46;color:#F5F3EF;text-decoration:none" style-hover="border-color:#E4D1B0"><span style="width:44px;height:44px;flex:0 0 44px;box-sizing:border-box;border-radius:999px;background:#1C1C1F;border:1px solid #3F3F46;display:flex;align-items:center;justify-content:center;color:#E4D1B0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="5"></rect><circle cx="12" cy="12" r="3.8"></circle><path d="M17.2 6.8h.01"></path></svg></span><span style="flex:1;display:flex;flex-direction:column;gap:2px"><span style="font-size:16px;line-height:22px;font-weight:600">Síguenos en Instagram</span><span style="font-size:14px;line-height:20px;color:#A8A29B">@carniceria.misericordia</span></span><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#E4D1B0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex:0 0 20px"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+        </div>
+
+        </div><div style="font-size:13px;line-height:18px;font-weight:600">B · color de marca · escritorio 1440</div></div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:4px;font-size:13px;line-height:19px;color:#A8A29B;max-width:1100px;text-wrap:pretty"><span><span style="color:#E4D1B0;font-weight:600">De lo nuestro · </span>las tres tarjetas Teléfono, WhatsApp y Correo, y el enlace a Facebook.</span><span><span style="color:#F5F3EF;font-weight:600">De lo mío · </span>la fila de Instagram con @carniceria.misericordia y los enlaces reales abiertos en otra pestaña.</span><span><span style="color:#F5F3EF;font-weight:600">Mejora · </span>en B el círculo verde (#25D366) contra la tarjeta #151517 da 9.0:1 y se reconoce a la primera; el glifo blanco sobre el verde es 1.98:1, el mismo del logo oficial, así que la palabra “WhatsApp” de al lado carga la lectura.</span></div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const IMG = 'public/img/products/';
+const RESENAS = [
+  { a: 'Sandra Rodriguez', o: 28, t: 'Tienen muy buena calidad de carne y muy serviciales, la verdad siempre tienen fila pero atienden súper rápido' },
+  { a: 'Oscar Alcocer', o: 378, t: 'Excelente proveedor. Excelente trato de sus dueños. Excelentes recomendaciones!' },
+  { a: 'Ramon Lopez Medel', o: 79, t: 'Pequeña carnicería atendida por la familia, encuentras carne fresca de puerco, pollo y res' },
+  { a: 'marco molina', o: 307, t: 'Excelente atención y precio. Se recomienda ampliamente.' },
+  { a: 'Rosy Reyna', o: 94, t: 'Excelente servicio y atención por parte del personal y sus propietarios' },
+  { a: 'claudia hernandez', o: 54, t: 'Buena carne, buena atención de sus dueños' },
+  { a: 'Armando Viramontes', o: 16, t: 'Buena carne, buen precio y buena atención' }
+];
+const FAQ = [
+  { p: '¿Cuál es el pedido mínimo?', r: 'Para entrega a domicilio, $150. Si pasas a recoger a la tienda no hay mínimo.' },
+  { p: '¿A qué zonas entregan?', r: 'A zonas participantes de San Luis Potosí. Cuando escribes tu dirección en el pedido te decimos si tu colonia está cubierta.' },
+  { p: '¿Puedo pedir por precio en vez de por peso?', r: 'Sí. En cada corte eliges por peso, por precio o por pieza, y el grosor que quieres.' },
+  { p: '¿Y si el peso no sale exacto?', r: 'El cuchillo no siempre cae en el gramo. Cortamos lo más cerca posible de lo que pediste y se cobra el peso real de la pieza.', tag: 'por confirmar con el dueño' },
+  { p: '¿Cómo pago?', r: 'Con tarjeta al confirmar el pedido. Si pasas a recoger, también en el mostrador.', tag: 'falta backend' }
+];
+const BENTO = [
+  { n: 'Carnes rojas', d: 'Bistec, diezmillo, molida y para caldo', f: 'res-alto.webp', p: '50% 50%', mc: 2, mr: 2, dc: 2, dr: 2 },
+  { n: 'Cortes especiales', d: 'Rib eye, tomahawk, arrachera', f: 'premium-alto.webp', p: '50% 45%', dc: 2 },
+  { n: 'Pollo', d: 'Pechuga, pierna y muslo, alas', f: 'pollo-alto.webp', p: '50% 50%', dr: 2 },
+  { n: 'Cerdo', f: 'cerdo-alto.webp', p: '50% 60%' },
+  { n: 'Preparadas', f: 'preparadas-alto.webp', p: '50% 50%' },
+  { n: 'Embutidos', f: 'embutidos-alto.webp', p: '50% 50%' },
+  { n: 'Ofertas', d: 'Paquetes para 4 a 10 personas', f: 'premium-detalle.webp', p: '50% 50%', dc: 2 },
+  { n: 'Merch', f: 'merch-alto.webp', p: '50% 40%' },
+  { n: 'Otros', f: 'otrosproductos.webp', p: '30% 30%' }
+];
+const CORTES = [['Filete Mignon','filet_mignon-alto.webp','$689 / kg'],['Rib Eye','rib-eye-alto.webp','$549 / kg'],['Tomahawk','tomahawk-alto.webp','$649 / kg'],['New York Strip','ney_york_strip.webp','$529 / kg'],['Porterhouse','porterhouse.webp','$579 / kg'],['Arrachera','skirt_steak.webp','$449 / kg'],['Flank Steak','flak_steak-alto.webp','$399 / kg'],['Top Sirloin','top_sirloin.webp','$389 / kg']].map(([n,f,p])=>({n,f:IMG+f,p}));
+class Component extends DCLogic {
+  state = { faq: 0, giro: true, carM: 0, carD: 0 };
+  refM = React.createRef(); refD = React.createRef();
+  car(k) {
+    const r = this['ref' + k], key = 'car' + k;
+    const go = i => { const el = r.current; if (el) el.scrollTo({ left: i * el.clientWidth, behavior: 'smooth' }); };
+    const cur = this.state[key];
+    return {
+      ['ref' + k]: r,
+      ['scroll' + k]: e => { const el = e.currentTarget, i = Math.round(el.scrollLeft / el.clientWidth); if (i !== this.state[key]) this.setState({ [key]: i }); },
+      ['prev' + k]: () => go(Math.max(0, cur - 1)), ['next' + k]: () => go(Math.min(CORTES.length - 1, cur + 1)),
+      ['dots' + k]: CORTES.map((c, i) => ({ l: 'Foto ' + (i + 1) + ' de 8: ' + c.n, go: () => go(i), w: i === cur ? '22px' : '8px', bg: i === cur ? '#F5F3EF' : '#52525B' }))
+    };
+  }
+  renderVals() {
+    const s = this.state;
+    const carV = { cortes: CORTES, ...this.car('M'), ...this.car('D') };
+    const f1 = RESENAS.slice(0, 3), f2 = RESENAS.slice(3, 6);
+    const hoy = 'Martes';
+    const dias = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'].map(d => {
+      const h = d === hoy, cerrado = d === 'Domingo';
+      return { d, h: cerrado ? 'Cerrado' : '8:00 – 17:00', hoy: h, c: h ? '#F5F3EF' : (cerrado ? '#A8A29B' : '#F5F3EF'), w: h ? 600 : 400 };
+    });
+    return {
+      ...carV,
+      datos: [
+        { k: 'Entrega a domicilio', v: 'Pedido mínimo $150', borde: 'none' },
+        { k: 'Recoger en tienda', v: 'Sin mínimo', borde: '1px solid #3F3F46' },
+        { k: 'Lunes a sábado', v: '8:00 a 17:00', borde: '1px solid #3F3F46' }
+      ],
+      bentoM: BENTO.map((t, i) => ({ ...t, f: IMG + t.f, c: t.mc ?? 1, r: t.mr ?? 1, grande: i === 0, chico: i !== 0 })),
+      bentoD: BENTO.map((t, i) => ({ ...t, f: IMG + t.f, c: t.dc ?? 1, r: t.dr ?? 1, grande: !!(t.dr || t.dc), chico: !(t.dr || t.dc) })),
+      mas: [
+        { f: IMG + 'flak_steak.webp', pos: '50% 50%', cat: 'Cortes especiales', n: 'Flank Steak', d: 'Fibra larga, para asar entero', precio: '$399', u: 'kg', s: '28 en stock' },
+        { f: IMG + 'top_sirloin.webp', pos: '40% 50%', cat: 'Cortes especiales', n: 'Top Sirloin', d: 'Entre precio y suavidad', precio: '$389', u: 'kg', s: '35 en stock' },
+        { f: IMG + 'res.webp', pos: '30% 50%', cat: 'Carnes rojas', n: 'Bistec de Res', d: 'Pulpa delgada, sartén o comal', precio: '$289', u: 'kg', s: '80 en stock' },
+        { f: IMG + 'res.webp', pos: '75% 60%', cat: 'Carnes rojas', n: 'Diezmillo', d: 'Jaspeado, aguanta cocción larga', precio: '$249', u: 'kg', s: '60 en stock' }
+      ],
+      ofertas: [
+        { f: IMG + 'premium.webp', pos: '50% 50%', n: 'Paquete Asador 4 a 6 Personas', d: 'Arrachera, chorizo argentino, cebolla cambray y carbón', precio: '$1,599', u: 'paquete', s: '12 en stock' },
+        { f: IMG + 'premium-alto.webp', pos: '50% 50%', n: 'Paquete Parrillada Familiar 8 a 10 Personas', d: 'Rib eye, costilla, pollo marinado y embutidos', precio: '$3,249', u: 'paquete', s: '8 en stock' },
+        { f: IMG + 'cerdo-alto.webp', pos: '50% 50%', n: 'Paquete Carnitas', d: 'Con tortillas, salsa y cebolla; se encarga un día antes', precio: '$389', u: 'paquete', s: '15 en stock' },
+        { f: IMG + 'bravette_steak.webp', pos: '50% 50%', n: 'Vacío en Oferta', d: 'Bavette de la semana, a precio de temporada', precio: '$379', u: 'kg', s: '20 en stock' }
+      ],
+      estrellas: [1, 1, 1, 1, 0.7].map(v => ({ w: Math.round(v * 100) + '%' })),
+      fila1: [...f1, ...f1], fila2: [...f2, ...f2],
+      giro: s.giro ? 'running' : 'paused',
+      giroTexto: s.giro ? 'Detener el giro' : 'Reanudar el giro',
+      alternarGiro: () => this.setState(v => ({ giro: !v.giro })),
+      faq: FAQ.map((q, i) => ({ ...q, tag: q.tag ?? null, abierta: i === s.faq, rot: i === s.faq ? 'rotate(180deg)' : 'none', alternar: () => this.setState(v => ({ faq: v.faq === i ? -1 : i })) })),
+      dias,
+      mejoras: [
+        { s: 'Encabezado y pie', n: 'hamburguesa a la izquierda, logo al centro, lupa y carrito a la derecha; pie de tres columnas con marca, Información y Contacto rápido.', y: 'logo tipográfico nítido en lugar de la foto del letrero, íconos de un solo trazo.', m: 'botones de 44 / 48 px, sin la fila de menú de texto y con el pie en dos tonos para separarlo del contenido.' },
+        { s: 'Portada', n: 'el video de la carne en la tabla y el sitio oscuro.', y: 'video a sangre (100 % × 83 % en 390, 85 % en 1440) sin caja negra, degradado 0 % → 55 % → 80 % y un solo botón.', m: 'titular Fraunces 56 / 96 px, −0.03em, 3 líneas en 390 y 2 en 1440, entre el 65 % y el 89 % del cuadro; entra palabra por palabra cada 50 ms (420 ms, cubic-bezier(0.23, 1, 0.32, 1)) y queda quieto con reduced-motion; contraste medido sobre portada-carne-cuadro-claro.jpg en la línea más alta: 7.98:1 en 1440 y 8.66:1 en 390. El video mide 1280 × 720: a sangre en 1440 retina se ve suave.' },
+        { s: 'Datos rápidos', n: 'mínimo de $150, recoger sin mínimo y el horario, que ya estaban en el sitio.', y: 'la franja de tres datos bajo la portada.', m: 'se ven antes del primer scroll y no enterrados en el pie o en el chat.' },
+        { s: 'Categorías', n: 'el bento con las 9 categorías del sitio y Carnes Rojas en grande primero.', y: 'el nombre sobre una franja sólida en vez de texto sobre la foto.', m: 'cuatro tamaños de pieza (2×2, 2×1, 1×2 y 1×1) en escritorio; en 390 sigue siendo bento de dos columnas, con una pieza 2×2 y ocho de 1×1 a 152 px parejas.' },
+        { s: 'Filete Mignon', n: 'el producto destacado con su botón a la ficha.', y: 'carrusel con las 8 fotos propias de Cortes Especiales, una a la vez, con puntos; flechas en 1440.', m: 'scroll-snap y dedo en 390, sin autoplay; los puntos también se tocan (28 px).' },
+        { s: 'Lo que se lleva', n: 'el título y los cuatro cortes más pedidos.', y: 'la Tarjeta única con libra y botón Agregar.', m: 'en 390 van dos por fila en vez de una tarjeta de pantalla completa por corte.' },
+        { s: 'Ofertas', n: 'la sección se llama “Ofertas”, como en el sitio.', y: 'la Tarjeta en su variante de oferta.', m: '“Precio por paquete, no por kilo” y sin contador regresivo.' },
+        { s: 'Preguntas', n: 'se quedan, con lo que antes solo sabía el chatbot.', y: 'acordeón con filas de 60 / 68 px.', m: 'mínimo, zonas, por peso o por precio, peso real y pago, a un toque.' },
+        { s: 'Sobre nosotros', n: 'Quiénes somos y Ubicación con “Cómo llegar”, juntos, como en el sitio.', y: 'sin foto: tres cifras reales en Fraunces 48 / 72 px (4.7 en Google, 53 productos, 8:00–17:00).', m: 'la dirección completa en una sola tarjeta con botón de 48 px, sin el título gris que casi no se leía.' },
+        { s: 'Horarios y puntaje', n: 'lunes a sábado de 8:00 a 17:00, domingos y festivos cerrado.', y: 'el horario y la calificación en la misma tarjeta: 4.7, cinco estrellas y 61 opiniones.', m: 'la calificación lleva “ejemplo · confirmar con el dueño”.' },
+        { s: 'Contacto y dirección', n: 'Teléfono, WhatsApp y Correo con su ícono, más Facebook e Instagram.', y: 'la dirección con mapa y “Cómo llegar”.', m: 'botones de 48 px; WhatsApp es la acción principal en rojo.' },
+        { s: 'Comentarios', n: 'las reseñas del sitio, 6 en dos filas.', y: 'nombre, estrellas y texto; rotuladas “ejemplo”.', m: 'justo antes del Pie; en producción salen de Google o Facebook (falta backend). Botón “Detener el giro”.' }
+      ],
+      revision: [
+        { c: 'Se lee en el teléfono', m: 'Cuerpo 15–16 px, H2 30 px, H1 40 px en 390', x: 'Sin cambios necesarios.' },
+        { c: 'Contraste', m: 'Titular #F5F3EF sobre #0B0B0C 18:1 · gris sobre tarjeta 7.2:1 · tinta sobre dorado 9.9:1 · blanco sobre rojo 4.8:1', x: 'Intento 1: el cuadro del video no se veía (etiqueta video sin fuente); ahora es imagen con el póster real.' },
+        { c: 'Botones de 44 px', m: 'CTAs 48 / 52, pausa 44 / 48, filas de pregunta 60 / 68, enlaces del pie 44', x: 'Sin cambios necesarios.' },
+        { c: 'Misma tarjeta y botones', m: 'Tarjeta importada en más pedidos y ofertas; solo rojo lleno y contorno beige', x: 'Sin cambios necesarios.' },
+        { c: 'Nada se sale ni se corta', m: 'Nombres largos de paquetes envuelven; chips y franjas del bento a dos líneas', x: 'Intento 1: la burbuja tapaba “Ver ofertas”; en 390 pasa a círculo de 56 px y los datos rápidos se apilan para dejarle el borde derecho libre. La barra de scroll de ofertas se ocultó.' },
+        { c: 'Mejor que lo viejo', m: 'Contra capturas 01, 06–10 y 36', x: 'Ver la línea de mejora de cada sección arriba.' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

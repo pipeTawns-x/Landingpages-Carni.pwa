@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..700&family=Geist:wght@400..700&display=swap" rel="stylesheet">
+<style>
+  body { margin:0; background:#0B0B0C; color:#F5F3EF; }
+  a { color:#DC2626; text-decoration:none; }
+  a:hover { color:#E4D1B0; }
+</style>
+</helmet>
+
+<section id="b5" data-screen-label="Compra" style="background:#0B0B0C;width:max-content;min-width:100%;box-sizing:border-box;padding:48px 48px 96px;font-family:Geist,system-ui,sans-serif;color:#F5F3EF;display:flex;flex-direction:column;gap:64px">
+
+  <div style="display:flex;flex-direction:column;gap:12px;max-width:960px">
+    <div style="font-size:12px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B">Carni · rediseño · compra</div>
+    <h1 style="margin:0;font-family:Fraunces,Georgia,serif;font-size:44px;line-height:50px;font-weight:480">17 Checkout · 18 Confirmación · 19 Estado del pedido</h1>
+    <p style="margin:0;font-size:16px;line-height:26px;color:#A8A29B;max-width:74ch;text-wrap:pretty">Mismo carrito en las tres pantallas: arrachera por peso, chorizo verde por precio y una gorra por pieza. Los campos son los de Inicio de sesión; los renglones del resumen, los del carrito de Componentes.</p>
+  </div>
+
+  <!-- ================= 17 CHECKOUT ================= -->
+  <div style="display:flex;flex-direction:column;gap:16px">
+    <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap">
+      <span style="font-size:12px;font-weight:600;letter-spacing:0.04em;color:#DC2626">17</span>
+      <h2 style="margin:0;font-family:Fraunces,serif;font-size:30px;line-height:36px;font-weight:440">Checkout</h2>
+      <span style="font-size:13px;line-height:18px;color:#A8A29B">a domicilio o recoger · aviso del mínimo · resumen · datos · dirección en ventana · código promocional · tarjeta</span>
+      <span style="font-size:12px;line-height:16px;font-weight:600;color:#0B0B0C;background:#F59E0B;border-radius:999px;padding:4px 10px">falta backend: pago con tarjeta</span>
+    </div>
+    <div style="display:flex;gap:32px;align-items:flex-start">
+
+      <div style="display:flex;flex-direction:column;gap:24px">
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div data-thumb="17" style="width:390px;background:#0B0B0C;border:1px solid #3F3F46;border-radius:12px;overflow:hidden;box-sizing:border-box;position:relative">
+            <div style="height:56px;display:flex;align-items:center;gap:4px;padding:0 6px;border-bottom:1px solid #3F3F46">
+              <button aria-label="Volver al carrito" style="width:44px;height:44px;border:none;background:transparent;color:#F5F3EF;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:999px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m15 5-7 7 7 7"></path></svg></button>
+              <span style="flex:1;font-family:Fraunces,serif;font-size:20px;line-height:24px;font-weight:460">Finalizar pedido</span>
+              <span style="font-size:13px;color:#A8A29B;padding-right:12px;font-variant-numeric:tabular-nums">Paso 2 de 3</span>
+            </div>
+            <div style="padding:16px 16px 136px;display:flex;flex-direction:column;gap:32px">
+              <a href="#resumen" style="min-height:72px;box-sizing:border-box;display:flex;align-items:center;gap:12px;padding:12px 12px 12px 14px;border-radius:18px;background:#151517;border:1px solid #3F3F46;color:#F5F3EF;text-decoration:none">
+                <span style="display:flex"><sc-for list="{{ items }}" as="i" hint-placeholder-count="3"><span style="width:40px;height:40px;margin-right:-10px;border-radius:12px;overflow:hidden;border:2px solid #151517;background:#1C1C1F"><img src="{{ i.f }}" alt="" style="width:100%;height:100%;object-fit:cover;display:block"></span></sc-for></span>
+                <span style="flex:1;display:flex;flex-direction:column;gap:2px;padding-left:18px"><span style="font-size:15px;font-weight:600">Tu pedido</span><span style="font-size:13px;color:#A8A29B">3 productos</span></span>
+                <span style="font-size:20px;font-weight:600;color:#E4D1B0;font-variant-numeric:tabular-nums">$524.50</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A8A29B" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"></path></svg>
+              </a>
+              <div style="display:flex;flex-direction:column;gap:14px"><div style="display:flex;align-items:baseline;gap:12px"><span style="font-family:Fraunces,serif;font-size:27px;line-height:1;font-weight:420;color:#E4D1B0;font-variant-numeric:tabular-nums">1</span><span style="font-size:17px;line-height:24px;font-weight:600">¿Cómo lo quieres recibir?</span></div>
+                  <sc-for list="{{ entregas }}" as="e" hint-placeholder-count="2">
+                    <span role="radio" aria-checked="{{ e.on }}" style="min-height:76px;box-sizing:border-box;display:flex;align-items:center;gap:14px;padding:14px 18px;border-radius:18px;background:#151517;border:{{ e.borde }}"><span style="width:22px;height:22px;flex:0 0 22px;box-sizing:border-box;border-radius:999px;border:{{ e.anillo }};display:flex;align-items:center;justify-content:center"><sc-if value="{{ e.on }}"><span style="width:10px;height:10px;border-radius:999px;background:#DC2626"></span></sc-if></span><span style="display:flex;flex-direction:column;gap:3px"><span style="font-size:17px;font-weight:600">{{ e.t }}</span><span style="font-size:14px;line-height:20px;color:#A8A29B;font-variant-numeric:tabular-nums">{{ e.s }}</span></span></span>
+                  </sc-for>
+                <span role="status" style="display:flex;gap:10px;align-items:center;font-size:14px;line-height:20px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:0 0 18px"><path d="M5 12.5 9.5 17 19 7.5"></path></svg>Tu pedido pasa el mínimo de $150 para entrega.</span>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:14px;border-top:1px solid #3F3F46;padding-top:28px"><div style="display:flex;align-items:baseline;gap:12px"><span style="font-family:Fraunces,serif;font-size:27px;line-height:1;font-weight:420;color:#E4D1B0;font-variant-numeric:tabular-nums">2</span><span style="font-size:17px;line-height:24px;font-weight:600">Tus datos</span></div>
+                <sc-for list="{{ datos }}" as="c" hint-placeholder-count="3">
+                  <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:14px;font-weight:600">{{ c.l }}</span><span style="display:flex;align-items:center;height:52px;box-sizing:border-box;border-radius:14px;background:#151517;border:1px solid #3F3F46;padding:0 16px;font-size:16px;font-variant-numeric:tabular-nums">{{ c.v }}</span></label>
+                </sc-for>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:14px;border-top:1px solid #3F3F46;padding-top:28px"><div style="display:flex;align-items:baseline;gap:12px"><span style="font-family:Fraunces,serif;font-size:27px;line-height:1;font-weight:420;color:#E4D1B0;font-variant-numeric:tabular-nums">3</span><span style="font-size:17px;line-height:24px;font-weight:600">Dirección de entrega</span></div>
+                <div style="display:flex;align-items:center;gap:14px;padding:14px 8px 14px 16px;border-radius:18px;background:#151517;border:1px solid #3F3F46"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#E4D1B0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex:0 0 22px"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11Z"></path><circle cx="12" cy="10" r="2.5"></circle></svg><span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><span style="font-size:16px;font-weight:600">Casa</span><span style="font-size:14px;line-height:20px;color:#A8A29B">Río Verde 214, Col. Jardín, 78270 San Luis Potosí</span></span><button style="height:44px;padding:0 16px;border-radius:999px;background:transparent;border:1px solid #E4D1B0;color:#F5F3EF;font-family:Geist,system-ui,sans-serif;font-size:14px;font-weight:600;cursor:pointer">Cambiar</button></div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:14px;border-top:1px solid #3F3F46;padding-top:28px"><div style="display:flex;align-items:baseline;gap:12px"><span style="font-family:Fraunces,serif;font-size:27px;line-height:1;font-weight:420;color:#E4D1B0;font-variant-numeric:tabular-nums">4</span><span style="font-size:17px;line-height:24px;font-weight:600">¿Cómo quieres pagar?</span></div>
+                  <div role="radiogroup" aria-label="Forma de pago" style="display:flex;flex-direction:column;gap:12px">
+                    <span role="radio" aria-checked="true" style="min-height:76px;box-sizing:border-box;display:flex;align-items:center;gap:14px;padding:14px 18px;border-radius:18px;background:#151517;border:2px solid #F5F3EF"><span style="width:22px;height:22px;flex:0 0 22px;box-sizing:border-box;border-radius:999px;border:2px solid #F5F3EF;display:flex;align-items:center;justify-content:center"><span style="width:10px;height:10px;border-radius:999px;background:#F5F3EF"></span></span><span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px"><span style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:17px;font-weight:600">Pagar al recoger o al recibir</span><span style="font-size:14px;line-height:20px;color:#A8A29B;text-wrap:pretty">Efectivo o tarjeta en el mostrador, o al repartidor cuando llegue. Se cobra el peso real.</span></span></span>
+                    <span role="radio" aria-checked="false" style="min-height:76px;box-sizing:border-box;display:flex;align-items:center;gap:14px;padding:14px 18px;border-radius:18px;background:#151517;border:1px solid #3F3F46"><span style="width:22px;height:22px;flex:0 0 22px;box-sizing:border-box;border-radius:999px;border:2px solid #52525B;display:flex;align-items:center;justify-content:center"></span><span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px"><span style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:17px;font-weight:600">Tarjeta en línea<span style="font-size:12px;line-height:16px;font-weight:600;color:#0B0B0C;background:#F59E0B;border-radius:999px;padding:3px 10px;white-space:nowrap">falta backend</span></span><span style="font-size:14px;line-height:20px;color:#A8A29B;text-wrap:pretty">Te llevamos a la página segura de la pasarela para pagar; aquí no se escriben datos de tarjeta.</span></span></span>
+                  </div>
+                </div>
+              <div id="resumen" style="display:flex;flex-direction:column;padding:20px;border-radius:24px;background:#151517;border:1px solid #3F3F46">
+                <span style="font-size:11px;line-height:16px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#A8A29B">Carnicería El Señor de La Misericordia</span>
+                <span style="display:flex;justify-content:space-between;align-items:baseline;padding:6px 0 4px"><span style="font-family:Fraunces,serif;font-size:28px;line-height:34px;font-weight:460">Tu pedido</span><span style="font-size:14px;color:#A8A29B">3 productos</span></span>
+                <sc-for list="{{ items }}" as="i" hint-placeholder-count="3">
+                  <div style="display:flex;gap:14px;align-items:center;padding:12px 0;border-bottom:1px solid #3F3F46"><span style="width:56px;height:56px;flex:0 0 56px;border-radius:14px;overflow:hidden;background:#1C1C1F"><img src="{{ i.f }}" alt="" style="width:100%;height:100%;object-fit:cover;display:block"></span><span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px"><span style="font-family:Fraunces,serif;font-size:18px;line-height:22px;font-weight:440">{{ i.n }}</span><span style="font-size:13px;line-height:18px;color:#A8A29B;font-variant-numeric:tabular-nums">{{ i.m }}</span></span><span style="font-size:16px;font-weight:600;font-variant-numeric:tabular-nums">{{ i.p }}</span></div>
+                </sc-for>
+                <details style="padding:4px 0;border-bottom:1px solid #3F3F46"><summary style="min-height:48px;display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;list-style:none;font-size:15px;font-weight:600"><span style="display:flex;flex-direction:column;gap:2px"><span>¿Tienes un código?</span><span style="font-size:13px;font-weight:400;color:#A8A29B">VECINOS50 aplicado · −$50.00</span></span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E4D1B0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"></path></svg></summary><div style="display:flex;gap:8px;padding:4px 0 12px"><span style="flex:1;display:flex;align-items:center;height:52px;box-sizing:border-box;border-radius:14px;background:#0B0B0C;border:1px solid #3F3F46;padding:0 16px;font-size:15px;color:#A8A29B">Escribe tu código</span><button style="height:52px;padding:0 20px;border-radius:999px;background:transparent;border:1px solid #E4D1B0;color:#F5F3EF;font-family:Geist,system-ui,sans-serif;font-size:15px;font-weight:600;cursor:pointer">Aplicar</button></div></details>
+                <div style="display:flex;flex-direction:column;gap:10px;font-size:15px;font-variant-numeric:tabular-nums">
+                  <sc-for list="{{ totales }}" as="t" hint-placeholder-count="3"><span style="display:flex;justify-content:space-between;color:#A8A29B">{{ t.k }}<span style="color:#F5F3EF">{{ t.v }}</span></span></sc-for>
+                </div>
+                <div style="margin-top:16px;padding-top:16px;border-top:1px dashed #52525B;display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:12px;letter-spacing:0.14em;text-transform:uppercase;color:#A8A29B">Total</span><span style="font-size:34px;line-height:38px;font-weight:600;color:#E4D1B0;font-variant-numeric:tabular-nums">$524.50</span></div>
+                <span style="font-size:13px;line-height:19px;color:#A8A29B;padding-top:8px;text-wrap:pretty">El total definitivo se calcula con el precio del día y el peso real de cada corte.</span>
+              </div>
+            </div>
+            <div style="position:absolute;left:0;right:0;bottom:0;box-sizing:border-box;background:#151517;border-top:1px solid #3F3F46;padding:12px 16px 20px;display:flex;flex-direction:column;gap:8px">
+              <span style="display:flex;justify-content:space-between;align-items:baseline;font-variant-numeric:tabular-nums"><span style="font-size:15px;color:#A8A29B">Total · sin costo de envío</span><span style="font-size:24px;font-weight:600;color:#E4D1B0">$524.50</span></span>
+              <button style="height:52px;border-radius:999px;background:#DC2626;border:none;color:#FFFFFF;font-family:Geist,system-ui,sans-serif;font-size:16px;font-weight:600;cursor:pointer;font-variant-numeric:tabular-nums">Confirmar pedido · $524.50</button>
+            </div>
+          </div>
+          <div style="font-size:13px;line-height:18px;font-weight:600">Checkout · a domicilio · móvil 390</div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="width:390px;background:#0B0B0C;border:1px solid #3F3F46;border-radius:12px;box-sizing:border-box;padding:20px 16px;display:flex;flex-direction:column;gap:12px">
+            <span style="font-size:17px;font-weight:600">¿Cómo lo quieres recibir?</span>
+            <sc-for list="{{ entregas2 }}" as="e" hint-placeholder-count="2">
+              <span role="radio" aria-checked="{{ e.on }}" style="min-height:64px;box-sizing:border-box;display:flex;align-items:center;gap:14px;padding:12px 16px;border-radius:16px;background:#151517;border:{{ e.borde }}"><span style="width:22px;height:22px;flex:0 0 22px;box-sizing:border-box;border-radius:999px;border:{{ e.anillo }};display:flex;align-items:center;justify-content:center"><sc-if value="{{ e.on }}"><span style="width:10px;height:10px;border-radius:999px;background:#DC2626"></span></sc-if></span><span style="display:flex;flex-direction:column;gap:2px"><span style="font-size:16px;font-weight:600">{{ e.t }}</span><span style="font-size:14px;color:#A8A29B;font-variant-numeric:tabular-nums">{{ e.s }}</span></span></span>
+            </sc-for>
+            <div style="display:flex;flex-direction:column;gap:6px;padding:14px 16px;border-radius:16px;border:1px solid #3F3F46">
+              <span style="font-size:15px;font-weight:600">Pasas a recoger a</span>
+              <span style="font-size:14px;line-height:20px;color:#A8A29B">Agua Marina 110, Manuel J. Othón · lunes a sábado, 8:00 a 17:00</span>
+              <span style="font-size:14px;line-height:20px">Recoger en tienda no tiene mínimo. Te avisamos por WhatsApp cuando esté listo.</span>
+            </div>
+          </div>
+          <div style="font-size:13px;line-height:18px;font-weight:600">Checkout · recoger en tienda · móvil 390</div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="width:390px;background:#0B0B0C;border:1px solid #3F3F46;border-radius:12px;box-sizing:border-box;padding:20px 16px;display:flex;flex-direction:column;gap:20px">
+            <sc-for list="{{ promos }}" as="c" hint-placeholder-count="3">
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B">{{ c.estado }}</span>
+                <div style="display:flex;gap:8px"><span style="flex:1;display:flex;align-items:center;gap:10px;height:52px;box-sizing:border-box;border-radius:14px;background:#151517;border:1px solid {{ c.bd }};padding:0 16px;font-size:15px;letter-spacing:0.04em;color:{{ c.fg }}">{{ c.v }}</span><button style="height:52px;padding:0 18px;border-radius:999px;background:transparent;border:1px solid #E4D1B0;color:#F5F3EF;font-family:Geist,system-ui,sans-serif;font-size:15px;font-weight:600;cursor:pointer">{{ c.b }}</button></div>
+                <sc-if value="{{ c.msg }}"><span style="display:flex;gap:8px;align-items:flex-start;font-size:14px;line-height:20px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="{{ c.ic }}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:0 0 18px;margin-top:1px"><path d="{{ c.path }}"></path></svg>{{ c.msg }}</span></sc-if>
+              </div>
+            </sc-for>
+          </div>
+          <div style="font-size:13px;line-height:18px;font-weight:600">Código promocional · vacío, aplicado, no válido · móvil 390</div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:24px">
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="width:1440px;background:#0B0B0C;border:1px solid #3F3F46;border-radius:12px;overflow:hidden;box-sizing:border-box">
+            <div style="position:relative;height:72px;display:flex;align-items:center;justify-content:space-between;padding:0 32px;border-bottom:1px solid #3F3F46">
+              <span style="display:flex;flex-direction:column;gap:6px;line-height:1"><span style="font-size:20px;font-weight:600;letter-spacing:0.18em">CARNICERÍA</span><span style="font-size:10px;font-weight:500;letter-spacing:0.14em;color:#E4D1B0">EL SEÑOR DE LA MISERICORDIA</span></span>
+              <span style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%)"><span style="display:flex;align-items:center;gap:28px;font-size:14px"><span style="min-height:44px;display:flex;align-items:center;gap:8px;color:#A8A29B;font-weight:400;">Carrito</span><span style="width:24px;height:1px;background:#3F3F46"></span><span style="min-height:44px;display:flex;align-items:center;gap:8px;color:#F5F3EF;font-weight:600;box-shadow:inset 0 -2px 0 #DC2626">Entrega y pago</span><span style="width:24px;height:1px;background:#3F3F46"></span><span style="min-height:44px;display:flex;align-items:center;gap:8px;color:#A8A29B;font-weight:400;">Confirmación</span></span></span>
+              <a href="Componentes.dc.html" style="min-height:44px;display:flex;align-items:center;gap:6px;font-size:15px;color:#F5F3EF"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m15 5-7 7 7 7"></path></svg>Volver al carrito</a>
+            </div>
+            <div style="padding:56px 48px 112px;display:grid;grid-template-columns:minmax(0,1fr) 480px;gap:80px;align-items:start;max-width:1320px;margin:0 auto;box-sizing:border-box">
+              <div style="display:flex;flex-direction:column;gap:44px">
+                <div style="display:flex;flex-direction:column;gap:10px"><span style="font-size:11px;line-height:16px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#A8A29B">Carnicería El Señor de La Misericordia</span><h2 style="margin:0;font-family:Fraunces,serif;font-size:60px;line-height:64px;font-weight:460;letter-spacing:-0.01em">Finalizar pedido</h2><span style="font-size:17px;line-height:26px;color:#A8A29B">Cuatro pasos. Pagas al recoger o al recibir, o con tarjeta en la pasarela.</span></div>
+                <div style="display:flex;flex-direction:column;gap:16px"><div style="display:flex;align-items:baseline;gap:12px"><span style="font-family:Fraunces,serif;font-size:30px;line-height:1;font-weight:420;color:#E4D1B0;font-variant-numeric:tabular-nums">1</span><span style="font-size:20px;line-height:24px;font-weight:600">¿Cómo lo quieres recibir?</span></div>
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px"><sc-for list="{{ entregas }}" as="e" hint-placeholder-count="2">
+                    <span role="radio" aria-checked="{{ e.on }}" style="min-height:76px;box-sizing:border-box;display:flex;align-items:center;gap:14px;padding:14px 18px;border-radius:18px;background:#151517;border:{{ e.borde }}"><span style="width:22px;height:22px;flex:0 0 22px;box-sizing:border-box;border-radius:999px;border:{{ e.anillo }};display:flex;align-items:center;justify-content:center"><sc-if value="{{ e.on }}"><span style="width:10px;height:10px;border-radius:999px;background:#DC2626"></span></sc-if></span><span style="display:flex;flex-direction:column;gap:3px"><span style="font-size:17px;font-weight:600">{{ e.t }}</span><span style="font-size:14px;line-height:20px;color:#A8A29B;font-variant-numeric:tabular-nums">{{ e.s }}</span></span></span>
+                  </sc-for></div>
+                  <span role="status" style="display:flex;gap:10px;align-items:center;font-size:14px;line-height:20px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:0 0 18px"><path d="M5 12.5 9.5 17 19 7.5"></path></svg>Tu pedido pasa el mínimo de $150 para entrega. Recoger en tienda no tiene mínimo.</span>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:16px;border-top:1px solid #3F3F46;padding-top:40px"><div style="display:flex;align-items:baseline;gap:12px"><span style="font-family:Fraunces,serif;font-size:30px;line-height:1;font-weight:420;color:#E4D1B0;font-variant-numeric:tabular-nums">2</span><span style="font-size:20px;line-height:24px;font-weight:600">Tus datos</span></div>
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px"><label style="display:flex;flex-direction:column;gap:6px;min-width:0"><span style="font-size:14px;font-weight:600">Nombre</span><span style="display:flex;align-items:center;height:52px;box-sizing:border-box;border-radius:14px;background:#151517;border:1px solid #3F3F46;padding:0 16px;font-size:16px;font-variant-numeric:tabular-nums;overflow:hidden;white-space:nowrap">Eduardo Torres</span></label><label style="display:flex;flex-direction:column;gap:6px;min-width:0"><span style="font-size:14px;font-weight:600">Teléfono con WhatsApp</span><span style="display:flex;align-items:center;height:52px;box-sizing:border-box;border-radius:14px;background:#151517;border:1px solid #3F3F46;padding:0 16px;font-size:16px;font-variant-numeric:tabular-nums;overflow:hidden;white-space:nowrap">444 123 4567</span></label><label style="display:flex;flex-direction:column;gap:6px;min-width:0;grid-column:1 / -1"><span style="font-size:14px;font-weight:600">Correo electrónico</span><span style="display:flex;align-items:center;height:52px;box-sizing:border-box;border-radius:14px;background:#151517;border:1px solid #3F3F46;padding:0 16px;font-size:16px;font-variant-numeric:tabular-nums;overflow:hidden;white-space:nowrap">eduardo@gmail.com</span></label></div>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:16px;border-top:1px solid #3F3F46;padding-top:40px"><div style="display:flex;align-items:baseline;gap:12px"><span style="font-family:Fraunces,serif;font-size:30px;line-height:1;font-weight:420;color:#E4D1B0;font-variant-numeric:tabular-nums">3</span><span style="font-size:20px;line-height:24px;font-weight:600">Dirección de entrega</span></div>
+                  <div style="display:flex;align-items:center;gap:14px;padding:18px 14px 18px 20px;border-radius:18px;background:#151517;border:1px solid #3F3F46"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#E4D1B0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex:0 0 22px"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11Z"></path><circle cx="12" cy="10" r="2.5"></circle></svg><span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><span style="font-size:16px;font-weight:600">Casa</span><span style="font-size:14px;line-height:20px;color:#A8A29B">Río Verde 214, Col. Jardín, 78270 San Luis Potosí</span></span><button style="height:44px;padding:0 16px;border-radius:999px;background:transparent;border:1px solid #E4D1B0;color:#F5F3EF;font-family:Geist,system-ui,sans-serif;font-size:14px;font-weight:600;cursor:pointer">Cambiar</button></div>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:16px;border-top:1px solid #3F3F46;padding-top:40px"><div style="display:flex;align-items:baseline;gap:12px"><span style="font-family:Fraunces,serif;font-size:30px;line-height:1;font-weight:420;color:#E4D1B0;font-variant-numeric:tabular-nums">4</span><span style="font-size:20px;line-height:24px;font-weight:600">¿Cómo quieres pagar?</span></div>
+                  <div role="radiogroup" aria-label="Forma de pago" style="display:flex;flex-direction:column;gap:12px">
+                    <span role="radio" aria-checked="true" style="min-height:76px;box-sizing:border-box;display:flex;align-items:center;gap:14px;padding:14px 18px;border-radius:18px;background:#151517;border:2px solid #F5F3EF"><span style="width:22px;height:22px;flex:0 0 22px;box-sizing:border-box;border-radius:999px;border:2px solid #F5F3EF;display:flex;align-items:center;justify-content:center"><span style="width:10px;height:10px;border-radius:999px;background:#F5F3EF"></span></span><span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px"><span style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:17px;font-weight:600">Pagar al recoger o al recibir</span><span style="font-size:14px;line-height:20px;color:#A8A29B;text-wrap:pretty">Efectivo o tarjeta en el mostrador, o al repartidor cuando llegue. Se cobra el peso real.</span></span></span>
+                    <span role="radio" aria-checked="false" style="min-height:76px;box-sizing:border-box;display:flex;align-items:center;gap:14px;padding:14px 18px;border-radius:18px;background:#151517;border:1px solid #3F3F46"><span style="width:22px;height:22px;flex:0 0 22px;box-sizing:border-box;border-radius:999px;border:2px solid #52525B;display:flex;align-items:center;justify-content:center"></span><span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px"><span style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:17px;font-weight:600">Tarjeta en línea<span style="font-size:12px;line-height:16px;font-weight:600;color:#0B0B0C;background:#F59E0B;border-radius:999px;padding:3px 10px;white-space:nowrap">falta backend</span></span><span style="font-size:14px;line-height:20px;color:#A8A29B;text-wrap:pretty">Te llevamos a la página segura de la pasarela para pagar; aquí no se escriben datos de tarjeta.</span></span></span>
+                  </div>
+                </div>
+              </div>
+              <div style="position:sticky;top:24px;display:flex;flex-direction:column;padding:32px;border-radius:28px;background:#151517;border:1px solid #3F3F46">
+                <span style="font-size:11px;line-height:16px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#A8A29B">Carnicería El Señor de La Misericordia</span>
+                <span style="display:flex;justify-content:space-between;align-items:baseline;padding:8px 0 6px"><span style="font-family:Fraunces,serif;font-size:36px;line-height:42px;font-weight:460">Tu pedido</span><span style="font-size:14px;color:#A8A29B">3 productos</span></span>
+                <sc-for list="{{ items }}" as="i" hint-placeholder-count="3">
+                  <div style="display:flex;gap:14px;align-items:center;padding:12px 0;border-bottom:1px solid #3F3F46"><span style="width:64px;height:64px;flex:0 0 64px;border-radius:14px;overflow:hidden;background:#1C1C1F"><img src="{{ i.f }}" alt="" style="width:100%;height:100%;object-fit:cover;display:block"></span><span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px"><span style="font-family:Fraunces,serif;font-size:18px;line-height:22px;font-weight:440">{{ i.n }}</span><span style="font-size:13px;line-height:18px;color:#A8A29B;font-variant-numeric:tabular-nums">{{ i.m }}</span></span><span style="font-size:16px;font-weight:600;font-variant-numeric:tabular-nums">{{ i.p }}</span></div>
+                </sc-for>
+                <details style="padding:6px 0;border-bottom:1px solid #3F3F46"><summary style="min-height:48px;display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;list-style:none;font-size:15px;font-weight:600">¿Tienes un código?<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E4D1B0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"></path></svg></summary><div style="display:flex;gap:8px;padding:4px 0 12px"><span style="flex:1;display:flex;align-items:center;height:52px;box-sizing:border-box;border-radius:14px;background:#0B0B0C;border:1px solid #3F3F46;padding:0 16px;font-size:15px;color:#A8A29B">Escribe tu código</span><button style="height:52px;padding:0 20px;border-radius:999px;background:transparent;border:1px solid #E4D1B0;color:#F5F3EF;font-family:Geist,system-ui,sans-serif;font-size:15px;font-weight:600;cursor:pointer">Aplicar</button></div></details>
+                <div style="display:flex;flex-direction:column;gap:10px;font-size:15px;font-variant-numeric:tabular-nums">
+                  <sc-for list="{{ totalesD }}" as="t" hint-placeholder-count="2"><span style="display:flex;justify-content:space-between;color:#A8A29B">{{ t.k }}<span style="color:#F5F3EF">{{ t.v }}</span></span></sc-for>
+                </div>
+                <div style="margin-top:18px;padding-top:18px;border-top:1px dashed #52525B;display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:12px;letter-spacing:0.14em;text-transform:uppercase;color:#A8A29B">Total</span><span style="font-size:44px;line-height:48px;font-weight:600;color:#E4D1B0;font-variant-numeric:tabular-nums">$574.50</span></div>
+                <button style="margin-top:20px;height:52px;border-radius:999px;background:#DC2626;border:none;color:#FFFFFF;font-family:Geist,system-ui,sans-serif;font-size:16px;font-weight:600;cursor:pointer;font-variant-numeric:tabular-nums" style-hover="background:#C81E1E">Confirmar pedido · $574.50</button>
+                <span style="font-size:13px;line-height:19px;color:#A8A29B;padding-top:12px;text-wrap:pretty">El total definitivo se calcula con el precio del día y el peso real de cada corte: si la arrachera sale en 510 g, el cargo se ajusta a eso.</span>
+              </div>
+            </div>
+          </div>
+          <div style="font-size:13px;line-height:18px;font-weight:600">Checkout · a domicilio · escritorio 1440 · tarjeta y código con error</div>
+        </div>
+
+        <div style="display:flex;gap:24px;align-items:flex-start">
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="width:390px;height:844px;background:#0B0B0C;border:1px solid #3F3F46;border-radius:12px;overflow:hidden;box-sizing:border-box;position:relative">
+              <div style="padding:72px 16px;display:flex;flex-direction:column;gap:16px;opacity:1"><span style="font-family:Fraunces,serif;font-size:32px;line-height:38px;font-weight:480">Finalizar pedido</span></div>
+              <div style="position:absolute;inset:0;background:rgba(11,11,12,0.72)"></div>
+              <div role="dialog" aria-label="Dirección de entrega" style="position:absolute;left:0;right:0;bottom:0;height:720px;box-sizing:border-box;background:#1C1C1F;border:1px solid #3F3F46;border-bottom:none;border-radius:28px 28px 0 0;display:flex;flex-direction:column">
+                <div style="display:flex;justify-content:center;padding-top:8px"><span style="width:40px;height:4px;border-radius:999px;background:#3F3F46"></span></div>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px 14px 20px;border-bottom:1px solid #3F3F46"><span style="font-family:Fraunces,serif;font-size:24px;line-height:30px;font-weight:460">Dirección de entrega</span><button aria-label="Cerrar" style="width:44px;height:44px;border:1px solid #3F3F46;background:#151517;color:#F5F3EF;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:999px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg></button></div>
+                <div style="flex:1;overflow:hidden;padding:16px;display:flex;flex-direction:column;gap:14px">
+                  <span role="radio" aria-checked="false" style="min-height:60px;box-sizing:border-box;display:flex;align-items:center;gap:14px;padding:10px 16px;border-radius:16px;background:#151517;border:1px solid #3F3F46"><span style="width:22px;height:22px;box-sizing:border-box;border-radius:999px;border:2px solid #52525B"></span><span style="display:flex;flex-direction:column;gap:2px"><span style="font-size:15px;font-weight:600">Casa</span><span style="font-size:14px;color:#A8A29B">Río Verde 214, Col. Jardín</span></span></span>
+                  <span role="radio" aria-checked="true" style="min-height:60px;box-sizing:border-box;display:flex;align-items:center;gap:14px;padding:10px 16px;border-radius:16px;background:#151517;border:2px solid #DC2626"><span style="width:22px;height:22px;box-sizing:border-box;border-radius:999px;border:2px solid #DC2626;display:flex;align-items:center;justify-content:center"><span style="width:10px;height:10px;border-radius:999px;background:#DC2626"></span></span><span style="font-size:15px;font-weight:600">Otra dirección</span></span>
+                  <sc-for list="{{ direccion }}" as="c" hint-placeholder-count="3">
+                    <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:14px;font-weight:600">{{ c.l }}</span><span style="display:flex;align-items:center;height:52px;box-sizing:border-box;border-radius:14px;background:#151517;border:1px solid {{ c.bd }};outline:{{ c.ol }};outline-offset:2px;padding:0 16px;font-size:16px;color:{{ c.fg }}">{{ c.v }}</span></label>
+                  </sc-for>
+                  <span role="status" style="display:flex;gap:10px;align-items:center;font-size:14px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 9.5 17 19 7.5"></path></svg>Sí entregamos en Tequisquiapan.</span>
+                </div>
+                <div style="border-top:1px solid #3F3F46;padding:12px 16px 24px"><button style="width:100%;height:52px;border-radius:999px;background:#DC2626;border:none;color:#FFFFFF;font-family:Geist,system-ui,sans-serif;font-size:16px;font-weight:600;cursor:pointer">Usar esta dirección</button></div>
+              </div>
+            </div>
+            <div style="font-size:13px;line-height:18px;font-weight:600">Dirección en ventana emergente · móvil 390 · hoja desde abajo</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="width:1026px;height:844px;background:#0B0B0C;border:1px solid #3F3F46;border-radius:12px;overflow:hidden;box-sizing:border-box;position:relative">
+              <div style="padding:112px 72px;font-family:Fraunces,serif;font-size:48px;font-weight:480">Finalizar pedido</div>
+              <div style="position:absolute;inset:0;background:rgba(11,11,12,0.72)"></div>
+              <div role="dialog" aria-label="Dirección de entrega" style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:560px;box-sizing:border-box;background:#1C1C1F;border:1px solid #3F3F46;border-radius:24px;display:flex;flex-direction:column">
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 16px 16px 28px;border-bottom:1px solid #3F3F46"><span style="font-family:Fraunces,serif;font-size:26px;line-height:32px;font-weight:460">Dirección de entrega</span><button aria-label="Cerrar" style="width:44px;height:44px;border:1px solid #3F3F46;background:#151517;color:#F5F3EF;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:999px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg></button></div>
+                <div style="padding:24px 28px;display:grid;grid-template-columns:1fr 160px;gap:16px">
+                  <sc-for list="{{ direccionD }}" as="c" hint-placeholder-count="4">
+                    <label style="display:flex;flex-direction:column;gap:6px;grid-column:{{ c.span }}"><span style="font-size:14px;font-weight:600">{{ c.l }}</span><span style="display:flex;align-items:center;height:52px;box-sizing:border-box;border-radius:14px;background:#151517;border:1px solid {{ c.bd }};outline:{{ c.ol }};outline-offset:2px;padding:0 16px;font-size:16px;color:{{ c.fg }}">{{ c.v }}</span></label>
+                  </sc-for>
+                  <span role="alert" style="grid-column:1 / -1;display:flex;gap:8px;align-items:flex-start;font-size:14px;line-height:20px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2" stroke-linecap="round" style="flex:0 0 18px;margin-top:1px"><circle cx="12" cy="12" r="9"></circle><path d="M12 7.5v5.5M12 16.5h.01"></path></svg><span>Todavía no llegamos a Villa de Pozos. <a href="Compra.dc.html" style="color:#F5F3EF;font-weight:600;text-decoration:underline;text-decoration-color:#E4D1B0;text-underline-offset:4px">Cambiar a recoger en tienda</a></span></span>
+                </div>
+                <div style="border-top:1px solid #3F3F46;padding:16px 28px 24px;display:flex;justify-content:flex-end;gap:12px"><button style="height:48px;padding:0 22px;border-radius:999px;background:transparent;border:1px solid #E4D1B0;color:#F5F3EF;font-family:Geist,system-ui,sans-serif;font-size:15px;font-weight:600;cursor:pointer">Cancelar</button><button style="height:48px;padding:0 22px;border-radius:999px;background:#DC2626;border:none;color:#FFFFFF;font-family:Geist,system-ui,sans-serif;font-size:15px;font-weight:600;cursor:pointer">Usar esta dirección</button></div>
+              </div>
+            </div>
+            <div style="font-size:13px;line-height:18px;font-weight:600">Dirección en ventana emergente · escritorio 1440 (recorte) · colonia fuera de zona</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:4px;font-size:13px;line-height:19px;color:#A8A29B;max-width:1100px;text-wrap:pretty"><span><span style="color:#E4D1B0;font-weight:600">De lo nuestro · </span>la hoja “Tu pedido” de Carrito.tsx: la marca arriba, el conteo de productos, las mismas líneas del cajón, el total grande en crema y la nota de que el total final lo calcula el servidor con el precio del día.</span><span><span style="color:#F5F3EF;font-weight:600">De lo mío · </span>entrega como primera decisión, el mínimo confirmado en verde, la dirección en ventana, el código promocional con sus tres estados y la tarjeta.</span><span><span style="color:#F5F3EF;font-weight:600">Mejora · </span>pago al recoger o al recibir como primera opción y la tarjeta en segundo lugar por pasarela alojada, sin campos de tarjeta dibujados (falta backend); “¿Tienes un código?” plegado en una fila de 48 px; mínimo de $150 solo a domicilio, recoger sin mínimo; la frase del peso real junto al total; título de 60 px y pasos numerados con aire de 40 px.</span></div>
+  </div>
+
+  <!-- ================= 17 CHECKOUT CON PAQUETE ================= -->
+  <div id="s17-paquete" style="display:flex;flex-direction:column;gap:16px">
+    <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap">
+      <span style="font-size:12px;font-weight:600;letter-spacing:0.04em;color:#DC2626">17</span>
+      <h2 style="margin:0;font-family:Fraunces,serif;font-size:30px;line-height:36px;font-weight:440">Finalizar pedido · con paquete</h2>
+      <span style="font-size:13px;line-height:18px;color:#A8A29B">anticipo del 50 % según el Catálogo 2024 de la tienda</span>
+    </div>
+    <div style="display:flex;gap:32px;align-items:flex-start">
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="width:390px;background:#0B0B0C;border:1px solid #3F3F46;border-radius:12px;overflow:hidden;box-sizing:border-box">
+          <div style="height:56px;display:flex;align-items:center;gap:4px;padding:0 6px;border-bottom:1px solid #3F3F46"><a href="Componentes.dc.html" aria-label="Volver al carrito" style="width:44px;height:44px;color:#F5F3EF;display:flex;align-items:center;justify-content:center;border-radius:999px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m15 5-7 7 7 7"></path></svg></a><span style="flex:1;font-family:Fraunces,serif;font-size:20px;line-height:24px;font-weight:460">Finalizar pedido</span><span style="font-size:13px;color:#A8A29B;padding-right:12px">Paso 2 de 3</span></div>
+          <div style="padding:16px 16px 32px"><div style="display:flex;flex-direction:column;padding:20px;border-radius:24px;background:#151517;border:1px solid #3F3F46">
+  <span style="display:flex;justify-content:space-between;align-items:baseline;padding-bottom:6px"><span style="font-family:Fraunces,serif;font-size:28px;line-height:1.15;font-weight:460">Tu pedido</span><span style="font-size:14px;color:#A8A29B">2 productos</span></span>
+  <div style="display:flex;gap:14px;align-items:center;padding:12px 0;border-bottom:1px solid #3F3F46"><span style="width:56px;height:56px;flex:0 0 56px;border-radius:14px;overflow:hidden;background:#1C1C1F"><img src="public/img/products/premium.webp" alt="" style="width:100%;height:100%;object-fit:cover;display:block"></span><span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px"><span style="font-family:Fraunces,serif;font-size:18px;line-height:22px;font-weight:440">Paquete Asador 4 a 6 Personas</span><span style="font-size:13px;line-height:18px;color:#A8A29B;font-variant-numeric:tabular-nums">1 paquete</span></span><span style="font-size:16px;font-weight:600;font-variant-numeric:tabular-nums">$1,599.00</span></div>
+  <div style="display:flex;gap:14px;align-items:center;padding:12px 0;border-bottom:1px solid #3F3F46"><span style="width:56px;height:56px;flex:0 0 56px;border-radius:14px;overflow:hidden;background:#1C1C1F"><img src="public/img/products/preparadas.webp" alt="" style="width:100%;height:100%;object-fit:cover;display:block"></span><span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px"><span style="font-family:Fraunces,serif;font-size:18px;line-height:22px;font-weight:440">Chorizo Verde</span><span style="font-size:13px;line-height:18px;color:#A8A29B;font-variant-numeric:tabular-nums">Por peso · 500 g</span></span><span style="font-size:16px;font-weight:600;font-variant-numeric:tabular-nums">$74.50</span></div>
+  <div style="display:flex;justify-content:space-between;padding:14px 0 0;font-size:15px;color:#A8A29B;font-variant-numeric:tabular-nums">Subtotal<span style="color:#F5F3EF">$1,673.50</span></div>
+  <div style="display:flex;flex-direction:column;gap:10px;margin-top:16px;padding:16px;border-radius:18px;background:#0B0B0C;border:1px solid #E4D1B0">
+    <span style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><span style="font-size:16px;font-weight:600">Anticipo del 50 %</span><span style="font-size:12px;line-height:16px;font-weight:600;color:#E4D1B0;border:1px solid #E4D1B0;border-radius:999px;padding:3px 10px;white-space:nowrap">confirmar con el dueño</span></span>
+    <span style="font-size:14px;line-height:20px;color:#A8A29B;text-wrap:pretty">Todo paquete requiere un 50 % de anticipo. Se cobra al confirmar, con la pasarela de pago de la tienda.</span>
+    <span style="display:flex;justify-content:space-between;align-items:baseline;font-variant-numeric:tabular-nums"><span style="display:flex;align-items:center;gap:8px;font-size:15px">Ahora, con la pasarela <span style="font-size:12px;line-height:16px;font-weight:600;color:#0B0B0C;background:#F59E0B;border-radius:999px;padding:3px 10px;white-space:nowrap">falta backend</span></span><span style="font-size:22px;font-weight:600;color:#E4D1B0">$799.50</span></span>
+    <span style="display:flex;justify-content:space-between;align-items:baseline;border-top:1px dashed #52525B;padding-top:10px;font-variant-numeric:tabular-nums"><span style="font-size:15px">Al recoger o al recibir</span><span style="font-size:18px;font-weight:600">$874.00</span></span>
+    <span style="font-size:13px;line-height:19px;color:#A8A29B;text-wrap:pretty">“Pagar al recoger o al recibir” cubre solo el resto: el 50 % del paquete y el Chorizo Verde. Los precios pueden modificarse según la alta demanda.</span>
+  </div>
+  <button style="margin-top:18px;height:52px;border-radius:999px;background:#DC2626;border:none;color:#FFFFFF;font-family:Geist,system-ui,sans-serif;font-size:16px;font-weight:600;cursor:pointer;font-variant-numeric:tabular-nums">Pagar anticipo de $799.50</button>
+  <span style="font-size:13px;line-height:19px;color:#A8A29B;padding-top:10px;text-wrap:pretty">El chorizo se cobra por su peso real; si sale en 520 g, el resto sube $2.98.</span>
+</div></div>
+        </div>
+        <div style="font-size:13px;line-height:18px;font-weight:600">Finalizar pedido · con paquete · móvil 390</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="width:1440px;background:#0B0B0C;border:1px solid #3F3F46;border-radius:12px;overflow:hidden;box-sizing:border-box">
+          <div style="height:72px;display:flex;align-items:center;justify-content:space-between;padding:0 32px;border-bottom:1px solid #3F3F46"><span style="display:flex;flex-direction:column;gap:6px;line-height:1"><span style="font-size:20px;font-weight:560;letter-spacing:0.22em">CARNICERÍA</span><span style="font-size:10px;font-weight:500;letter-spacing:0.16em;color:#E4D1B0">EL SEÑOR DE LA MISERICORDIA</span></span><a href="Componentes.dc.html" style="min-height:44px;display:flex;align-items:center;font-size:15px;color:#F5F3EF">Volver al carrito</a></div>
+          <div style="padding:56px 48px 96px;display:grid;grid-template-columns:minmax(0,1fr) 520px;gap:80px;align-items:start;max-width:1320px;margin:0 auto;box-sizing:border-box">
+            <div style="display:flex;flex-direction:column;gap:18px">
+              <h3 style="margin:0;font-family:Fraunces,serif;font-size:52px;line-height:58px;font-weight:460">Tu pedido lleva un paquete</h3>
+              <p style="margin:0;font-size:18px;line-height:28px;color:#A8A29B;max-width:52ch;text-wrap:pretty">La tienda aparta el paquete con la mitad de su precio. El resto, y lo demás que pediste, se paga como siempre: al recoger en tienda o al recibir en casa.</p>
+              <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;padding-top:12px;font-variant-numeric:tabular-nums">
+                <div style="display:flex;flex-direction:column;gap:6px;padding:20px;border-radius:18px;background:#151517;border:1px solid #3F3F46"><span style="font-size:14px;color:#A8A29B">Paquete</span><span style="font-size:24px;font-weight:600">$1,599.00</span></div>
+                <div style="display:flex;flex-direction:column;gap:6px;padding:20px;border-radius:18px;background:#151517;border:1px solid #E4D1B0"><span style="font-size:14px;color:#A8A29B">Anticipo del 50 %</span><span style="font-size:24px;font-weight:600;color:#E4D1B0">$799.50</span></div>
+                <div style="display:flex;flex-direction:column;gap:6px;padding:20px;border-radius:18px;background:#151517;border:1px solid #3F3F46"><span style="font-size:14px;color:#A8A29B">Resto al recoger o recibir</span><span style="font-size:24px;font-weight:600">$874.00</span></div>
+              </div>
+              <span style="display:flex;gap:8px;flex-wrap:wrap;padding-top:6px"><span style="font-size:12px;line-height:16px;font-weight:600;color:#E4D1B0;border:1px solid #E4D1B0;border-radius:999px;padding:3px 10px;white-space:nowrap">confirmar con el dueño</span><span style="font-size:12px;line-height:16px;font-weight:600;color:#0B0B0C;background:#F59E0B;border-radius:999px;padding:3px 10px;white-space:nowrap">falta backend</span></span>
+              <span style="font-size:14px;line-height:21px;color:#A8A29B;max-width:60ch;text-wrap:pretty">Por confirmar con el dueño: si el anticipo se cobra al pedir o al confirmar por WhatsApp, y si se devuelve cuando la tienda cancela.</span>
+            </div>
+            <div style="display:flex;flex-direction:column;padding:32px;border-radius:28px;background:#151517;border:1px solid #3F3F46">
+  <span style="display:flex;justify-content:space-between;align-items:baseline;padding-bottom:6px"><span style="font-family:Fraunces,serif;font-size:36px;line-height:1.15;font-weight:460">Tu pedido</span><span style="font-size:14px;color:#A8A29B">2 productos</span></span>
+  <div style="display:flex;gap:14px;align-items:center;padding:12px 0;border-bottom:1px solid #3F3F46"><span style="width:64px;height:64px;flex:0 0 64px;border-radius:14px;overflow:hidden;background:#1C1C1F"><img src="public/img/products/premium.webp" alt="" style="width:100%;height:100%;object-fit:cover;display:block"></span><span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px"><span style="font-family:Fraunces,serif;font-size:18px;line-height:22px;font-weight:440">Paquete Asador 4 a 6 Personas</span><span style="font-size:13px;line-height:18px;color:#A8A29B;font-variant-numeric:tabular-nums">1 paquete</span></span><span style="font-size:16px;font-weight:600;font-variant-numeric:tabular-nums">$1,599.00</span></div>
+  <div style="display:flex;gap:14px;align-items:center;padding:12px 0;border-bottom:1px solid #3F3F46"><span style="width:64px;height:64px;flex:0 0 64px;border-radius:14px;overflow:hidden;background:#1C1C1F"><img src="public/img/products/preparadas.webp" alt="" style="width:100%;height:100%;object-fit:cover;display:block"></span><span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px"><span style="font-family:Fraunces,serif;font-size:18px;line-height:22px;font-weight:440">Chorizo Verde</span><span style="font-size:13px;line-height:18px;color:#A8A29B;font-variant-numeric:tabular-nums">Por peso · 500 g</span></span><span style="font-size:16px;font-weight:600;font-variant-numeric:tabular-nums">$74.50</span></div>
+  <div style="display:flex;justify-content:space-between;padding:14px 0 0;font-size:15px;color:#A8A29B;font-variant-numeric:tabular-nums">Subtotal<span style="color:#F5F3EF">$1,673.50</span></div>
+  <div style="display:flex;flex-direction:column;gap:10px;margin-top:16px;padding:16px;border-radius:18px;background:#0B0B0C;border:1px solid #E4D1B0">
+    <span style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><span style="font-size:16px;font-weight:600">Anticipo del 50 %</span><span style="font-size:12px;line-height:16px;font-weight:600;color:#E4D1B0;border:1px solid #E4D1B0;border-radius:999px;padding:3px 10px;white-space:nowrap">confirmar con el dueño</span></span>
+    <span style="font-size:14px;line-height:20px;color:#A8A29B;text-wrap:pretty">Todo paquete requiere un 50 % de anticipo. Se cobra al confirmar, con la pasarela de pago de la tienda.</span>
+    <span style="display:flex;justify-content:space-between;align-items:baseline;font-variant-numeric:tabular-nums"><span style="display:flex;align-items:center;gap:8px;font-size:15px">Ahora, con la pasarela <span style="font-size:12px;line-height:16px;font-weight:600;color:#0B0B0C;background:#F59E0B;border-radius:999px;padding:3px 10px;white-space:nowrap">falta backend</span></span><span style="font-size:22px;font-weight:600;color:#E4D1B0">$799.50</span></span>
+    <span style="display:flex;justify-content:space-between;align-items:baseline;border-top:1px dashed #52525B;padding-top:10px;font-variant-numeric:tabular-nums"><span style="font-size:15px">Al recoger o al recibir</span><span style="font-size:18px;font-weight:600">$874.00</span></span>
+    <span style="font-size:13px;line-height:19px;color:#A8A29B;text-wrap:pretty">“Pagar al recoger o al recibir” cubre solo el resto: el 50 % del paquete y el Chorizo Verde. Los precios pueden modificarse según la alta demanda.</span>
+  </div>
+  <button style="margin-top:18px;height:52px;border-radius:999px;background:#DC2626;border:none;color:#FFFFFF;font-family:Geist,system-ui,sans-serif;font-size:16px;font-weight:600;cursor:pointer;font-variant-numeric:tabular-nums">Pagar anticipo de $799.50</button>
+  <span style="font-size:13px;line-height:19px;color:#A8A29B;padding-top:10px;text-wrap:pretty">El chorizo se cobra por su peso real; si sale en 520 g, el resto sube $2.98.</span>
+</div>
+          </div>
+        </div>
+        <div style="font-size:13px;line-height:18px;font-weight:600">Finalizar pedido · con paquete · escritorio 1440</div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:4px;font-size:13px;line-height:19px;color:#A8A29B;max-width:1100px;text-wrap:pretty"><span><span style="color:#E4D1B0;font-weight:600">De lo nuestro · </span>la regla del Catálogo 2024 de la tienda: “Todo paquete se requiere un 50% de anticipo”.</span><span><span style="color:#F5F3EF;font-weight:600">De lo mío · </span>un recuadro beige “Anticipo del 50 %” dentro del ticket, con lo que se paga ahora y lo que se paga al recoger o al recibir.</span><span><span style="color:#F5F3EF;font-weight:600">Mejora · </span>el cliente ve las dos cifras antes de pagar ($799.50 y $874.00); el botón dice exactamente cuánto cobra; todo marcado “confirmar con el dueño” y la pasarela “falta backend”.</span></div>
+  </div>
+
+  <!-- ================= 18 CONFIRMACIÓN ================= -->
+  <div style="display:flex;flex-direction:column;gap:16px">
+    <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap">
+      <span style="font-size:12px;font-weight:600;letter-spacing:0.04em;color:#DC2626">18</span>
+      <h2 style="margin:0;font-family:Fraunces,serif;font-size:30px;line-height:36px;font-weight:440">Confirmación con número de pedido</h2>
+      <span style="font-size:12px;line-height:16px;font-weight:600;color:#0B0B0C;background:#F59E0B;border-radius:999px;padding:4px 10px">falta backend: número de pedido legible</span>
+    </div>
+    <div style="display:flex;gap:32px;align-items:flex-start">
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="width:390px;min-height:844px;background:#0B0B0C;border:1px solid #3F3F46;border-radius:12px;overflow:hidden;box-sizing:border-box;display:flex;flex-direction:column">
+          <dc-import name="Encabezado" ancho="movil" cuenta="{{ 0 }}" hint-size="100%,56px"></dc-import>
+          <div style="padding:32px 16px;display:flex;flex-direction:column;gap:24px;flex:1">
+            <span style="width:64px;height:64px;border-radius:999px;border:1px solid #059669;background:#151517;display:flex;align-items:center;justify-content:center"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 9.5 17 19 7.5"></path></svg></span>
+            <div style="display:flex;flex-direction:column;gap:10px"><h3 style="margin:0;font-family:Fraunces,serif;font-size:34px;line-height:40px;font-weight:480">Recibimos tu pedido</h3><p style="margin:0;font-size:16px;line-height:24px;color:#A8A29B;text-wrap:pretty">Te escribimos por WhatsApp en cuanto el carnicero lo confirme.</p></div>
+            <div style="display:flex;flex-direction:column;gap:4px;padding:20px;border-radius:20px;background:#151517;border:1px solid #3F3F46"><span style="font-size:13px;color:#A8A29B">Número de pedido</span><span style="font-size:40px;line-height:44px;font-weight:600;font-variant-numeric:tabular-nums;letter-spacing:0.02em">1042</span><span style="font-size:14px;color:#A8A29B">Díselo al carnicero si llamas o pasas a la tienda.</span></div>
+            <div style="display:flex;flex-direction:column;border-top:1px solid #3F3F46">
+              <sc-for list="{{ resumen }}" as="r" hint-placeholder-count="4"><span style="display:flex;justify-content:space-between;gap:16px;padding:12px 0;border-bottom:1px solid #3F3F46;font-size:15px;line-height:22px"><span style="color:#A8A29B">{{ r.k }}</span><span style="text-align:right;font-variant-numeric:tabular-nums">{{ r.v }}</span></span></sc-for>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:10px;margin-top:auto">
+              <button style="height:52px;border-radius:999px;background:#DC2626;border:none;color:#FFFFFF;font-family:Geist,system-ui,sans-serif;font-size:16px;font-weight:600;cursor:pointer">Ver el estado del pedido</button>
+              <button style="height:52px;border-radius:999px;background:transparent;border:1px solid #E4D1B0;color:#F5F3EF;font-family:Geist,system-ui,sans-serif;font-size:16px;font-weight:600;cursor:pointer">Seguir comprando</button>
+            </div>
+          </div>
+        </div>
+        <div style="font-size:13px;line-height:18px;font-weight:600">Confirmación · móvil 390</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="width:1440px;height:900px;background:#0B0B0C;border:1px solid #3F3F46;border-radius:12px;overflow:hidden;box-sizing:border-box;display:flex;flex-direction:column">
+          <dc-import name="Encabezado" ancho="escritorio" activo="ninguno" cuenta="{{ 0 }}" hint-size="100%,72px"></dc-import>
+          <div style="flex:1;display:grid;grid-template-columns:minmax(0,1fr) 440px;gap:64px;align-items:center;max-width:1120px;width:100%;margin:0 auto;padding:0 32px;box-sizing:border-box">
+            <div style="display:flex;flex-direction:column;gap:24px">
+              <span style="width:72px;height:72px;border-radius:999px;border:1px solid #059669;background:#151517;display:flex;align-items:center;justify-content:center"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 9.5 17 19 7.5"></path></svg></span>
+              <h3 style="margin:0;font-family:Fraunces,serif;font-size:60px;line-height:64px;font-weight:480">Recibimos tu pedido</h3>
+              <p style="margin:0;font-size:18px;line-height:28px;color:#A8A29B;max-width:44ch;text-wrap:pretty">Te escribimos por WhatsApp en cuanto el carnicero lo confirme. Mientras, puedes seguir su estado aquí.</p>
+              <div style="display:flex;gap:12px"><button style="height:52px;padding:0 28px;border-radius:999px;background:#DC2626;border:none;color:#FFFFFF;font-family:Geist,system-ui,sans-serif;font-size:16px;font-weight:600;cursor:pointer" style-hover="background:#C81E1E">Ver el estado del pedido</button><button style="height:52px;padding:0 28px;border-radius:999px;background:transparent;border:1px solid #E4D1B0;color:#F5F3EF;font-family:Geist,system-ui,sans-serif;font-size:16px;font-weight:600;cursor:pointer">Seguir comprando</button></div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:16px;padding:28px;border-radius:24px;background:#151517;border:1px solid #3F3F46">
+              <span style="font-size:14px;color:#A8A29B">Número de pedido</span>
+              <span style="font-size:64px;line-height:64px;font-weight:600;font-variant-numeric:tabular-nums">1042</span>
+              <span style="font-size:14px;color:#A8A29B">Díselo al carnicero si llamas o pasas a la tienda.</span>
+              <div style="display:flex;flex-direction:column;border-top:1px solid #3F3F46">
+                <sc-for list="{{ resumen }}" as="r" hint-placeholder-count="4"><span style="display:flex;justify-content:space-between;gap:16px;padding:12px 0;border-bottom:1px solid #3F3F46;font-size:15px;line-height:22px"><span style="color:#A8A29B">{{ r.k }}</span><span style="text-align:right;font-variant-numeric:tabular-nums">{{ r.v }}</span></span></sc-for>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="font-size:13px;line-height:18px;font-weight:600">Confirmación · escritorio 1440</div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:4px;font-size:13px;line-height:19px;color:#A8A29B;max-width:1100px;text-wrap:pretty"><span><span style="color:#E4D1B0;font-weight:600">De lo nuestro · </span>el mensaje de “pedido recibido” y la vuelta al catálogo.</span><span><span style="color:#F5F3EF;font-weight:600">De lo mío · </span>número corto y grande (1042) y para qué sirve.</span><span><span style="color:#F5F3EF;font-weight:600">Mejora · </span>el verde aparece una sola vez: en el sello de “recibido”.</span></div>
+  </div>
+
+  <!-- ================= 19 ESTADO ================= -->
+  <div style="display:flex;flex-direction:column;gap:16px">
+    <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap">
+      <span style="font-size:12px;font-weight:600;letter-spacing:0.04em;color:#DC2626">19</span>
+      <h2 style="margin:0;font-family:Fraunces,serif;font-size:30px;line-height:36px;font-weight:440">Estado del pedido</h2>
+      <span style="font-size:13px;line-height:18px;color:#A8A29B">Pendiente → Confirmado → Preparando → Listo → Entregado · Cancelado fuera del flujo</span>
+    </div>
+    <div style="display:flex;gap:32px;align-items:flex-start">
+      <div style="display:flex;flex-direction:column;gap:24px">
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="width:390px;background:#0B0B0C;border:1px solid #3F3F46;border-radius:12px;overflow:hidden;box-sizing:border-box">
+            <dc-import name="Encabezado" ancho="movil" cuenta="{{ 0 }}" hint-size="100%,56px"></dc-import>
+            <div style="padding:24px 16px 32px;display:flex;flex-direction:column;gap:24px">
+              <div style="display:flex;flex-direction:column;gap:6px"><span style="font-size:13px;color:#A8A29B;font-variant-numeric:tabular-nums">Pedido 1042 · hoy, 12:04</span><h3 style="margin:0;font-family:Fraunces,serif;font-size:34px;line-height:40px;font-weight:480">Lo estamos preparando</h3><span style="font-size:15px;line-height:22px;color:#A8A29B">A domicilio · Río Verde 214, Col. Jardín</span></div>
+              <ol style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column">
+                <sc-for list="{{ pasos }}" as="s" hint-placeholder-count="5">
+                  <li style="display:grid;grid-template-columns:28px minmax(0,1fr);gap:14px">
+                    <span style="display:flex;flex-direction:column;align-items:center"><span style="width:28px;height:28px;box-sizing:border-box;border-radius:999px;background:{{ s.bg }};border:2px solid {{ s.bd }};display:flex;align-items:center;justify-content:center;color:{{ s.ic }}"><sc-if value="{{ s.hecho }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 9.5 17 19 7.5"></path></svg></sc-if><sc-if value="{{ s.ahora }}"><span style="width:10px;height:10px;border-radius:999px;background:#FFFFFF"></span></sc-if></span><sc-if value="{{ s.linea }}"><span style="width:2px;flex:1;min-height:28px;background:{{ s.lc }}"></span></sc-if></span>
+                    <span style="display:flex;flex-direction:column;gap:2px;padding-bottom:20px"><span style="display:flex;justify-content:space-between;gap:8px"><span style="font-size:16px;font-weight:{{ s.w }};color:{{ s.fg }}">{{ s.t }}</span><span style="font-size:14px;color:#A8A29B;font-variant-numeric:tabular-nums">{{ s.h }}</span></span><sc-if value="{{ s.d }}"><span style="font-size:14px;line-height:20px;color:#A8A29B;text-wrap:pretty">{{ s.d }}</span></sc-if></span>
+                  </li>
+                </sc-for>
+              </ol>
+              <div style="display:flex;flex-direction:column;gap:10px;padding:16px;border-radius:20px;background:#151517;border:1px solid #3F3F46">
+                <sc-for list="{{ items }}" as="i" hint-placeholder-count="3"><div style="display:flex;gap:12px;align-items:center"><span style="width:48px;height:48px;flex:0 0 48px;border-radius:12px;overflow:hidden;background:#1C1C1F"><img src="{{ i.f }}" alt="" style="width:100%;height:100%;object-fit:cover;display:block"></span><span style="flex:1;display:flex;flex-direction:column"><span style="font-size:15px;font-weight:600">{{ i.n }}</span><span style="font-size:13px;color:#A8A29B;font-variant-numeric:tabular-nums">{{ i.m }}</span></span><span style="font-size:15px;font-variant-numeric:tabular-nums">{{ i.p }}</span></div></sc-for>
+                <span style="display:flex;justify-content:space-between;border-top:1px solid #3F3F46;padding-top:10px;font-size:16px;font-weight:600;font-variant-numeric:tabular-nums">Total<span>$524.50</span></span>
+              </div>
+              <button style="height:52px;border-radius:999px;background:transparent;border:1px solid #E4D1B0;color:#F5F3EF;font-family:Geist,system-ui,sans-serif;font-size:16px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 0-3.2 6.4L20 19.5l-1-3.2A8 8 0 0 0 20 12Z"></path></svg>Escribir a la carnicería</button>
+            </div>
+          </div>
+          <div style="font-size:13px;line-height:18px;font-weight:600">Estado · preparando · móvil 390</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="width:390px;background:#0B0B0C;border:1px solid #3F3F46;border-radius:12px;box-sizing:border-box;padding:24px 16px;display:flex;flex-direction:column;gap:18px">
+            <span style="align-self:flex-start;display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 12px;border-radius:999px;border:1px solid #3F3F46;background:#1C1C1F;color:#A8A29B;font-size:13px;font-weight:600"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M7 7l10 10M17 7 7 17"></path></svg>Cancelado</span>
+            <div style="display:flex;flex-direction:column;gap:8px"><span style="font-size:13px;color:#A8A29B;font-variant-numeric:tabular-nums">Pedido 1039 · ayer, 16:40</span><h3 style="margin:0;font-family:Fraunces,serif;font-size:30px;line-height:36px;font-weight:480">Este pedido se canceló</h3><p style="margin:0;font-size:15px;line-height:23px;color:#A8A29B;text-wrap:pretty">Lo cancelaste antes de que el carnicero lo preparara. El reembolso vuelve a tu tarjeta.</p></div>
+            <button style="height:52px;border-radius:999px;background:#DC2626;border:none;color:#FFFFFF;font-family:Geist,system-ui,sans-serif;font-size:16px;font-weight:600;cursor:pointer">Volver a pedir lo mismo</button>
+            <button style="height:52px;border-radius:999px;background:transparent;border:1px solid #E4D1B0;color:#F5F3EF;font-family:Geist,system-ui,sans-serif;font-size:16px;font-weight:600;cursor:pointer">Escribir a la carnicería</button>
+          </div>
+          <div style="font-size:13px;line-height:18px;font-weight:600">Estado · cancelado, aparte del flujo · móvil 390</div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:24px">
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="width:1440px;background:#0B0B0C;border:1px solid #3F3F46;border-radius:12px;overflow:hidden;box-sizing:border-box">
+            <dc-import name="Encabezado" ancho="escritorio" activo="ninguno" cuenta="{{ 0 }}" hint-size="100%,72px"></dc-import>
+            <div style="padding:48px 32px 96px;max-width:1200px;margin:0 auto;box-sizing:border-box;display:flex;flex-direction:column;gap:40px">
+              <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:24px"><div style="display:flex;flex-direction:column;gap:8px"><span style="font-size:14px;color:#A8A29B;font-variant-numeric:tabular-nums">Pedido 1042 · hoy, 12:04 · a domicilio</span><h3 style="margin:0;font-family:Fraunces,serif;font-size:52px;line-height:58px;font-weight:480">Lo estamos preparando</h3></div><button style="height:48px;padding:0 22px;border-radius:999px;background:transparent;border:1px solid #E4D1B0;color:#F5F3EF;font-family:Geist,system-ui,sans-serif;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:8px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 0-3.2 6.4L20 19.5l-1-3.2A8 8 0 0 0 20 12Z"></path></svg>Escribir a la carnicería</button></div>
+              <ol style="margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(5,minmax(0,1fr))">
+                <sc-for list="{{ pasos }}" as="s" hint-placeholder-count="5">
+                  <li style="display:flex;flex-direction:column;gap:12px">
+                    <span style="display:flex;align-items:center"><span style="width:32px;height:32px;flex:0 0 32px;box-sizing:border-box;border-radius:999px;background:{{ s.bg }};border:2px solid {{ s.bd }};display:flex;align-items:center;justify-content:center;color:{{ s.ic }}"><sc-if value="{{ s.hecho }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 9.5 17 19 7.5"></path></svg></sc-if><sc-if value="{{ s.ahora }}"><span style="width:12px;height:12px;border-radius:999px;background:#FFFFFF"></span></sc-if></span><sc-if value="{{ s.linea }}"><span style="height:2px;flex:1;background:{{ s.lc }};margin:0 12px"></span></sc-if></span>
+                    <span style="display:flex;flex-direction:column;gap:4px;padding-right:24px"><span style="font-size:17px;font-weight:{{ s.w }};color:{{ s.fg }}">{{ s.t }}</span><span style="font-size:14px;color:#A8A29B;font-variant-numeric:tabular-nums">{{ s.h }}</span><sc-if value="{{ s.d }}"><span style="font-size:14px;line-height:20px;color:#A8A29B;text-wrap:pretty">{{ s.d }}</span></sc-if></span>
+                  </li>
+                </sc-for>
+              </ol>
+              <div style="display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:24px">
+                <div style="display:flex;flex-direction:column;gap:12px;padding:24px;border-radius:20px;background:#151517;border:1px solid #3F3F46">
+                  <span style="font-size:17px;font-weight:600">Lo que pediste</span>
+                  <sc-for list="{{ items }}" as="i" hint-placeholder-count="3"><div style="display:flex;gap:14px;align-items:center"><span style="width:56px;height:56px;flex:0 0 56px;border-radius:12px;overflow:hidden;background:#1C1C1F"><img src="{{ i.f }}" alt="" style="width:100%;height:100%;object-fit:cover;display:block"></span><span style="flex:1;display:flex;flex-direction:column"><span style="font-family:Fraunces,serif;font-size:17px;font-weight:440">{{ i.n }}</span><span style="font-size:13px;color:#A8A29B;font-variant-numeric:tabular-nums">{{ i.m }}</span></span><span style="font-size:16px;font-variant-numeric:tabular-nums">{{ i.p }}</span></div></sc-for>
+                </div>
+                <div style="display:flex;flex-direction:column;padding:8px 24px;border-radius:20px;background:#151517;border:1px solid #3F3F46">
+                  <sc-for list="{{ resumen }}" as="r" hint-placeholder-count="4"><span style="display:flex;justify-content:space-between;gap:16px;padding:14px 0;border-bottom:1px solid #3F3F46;font-size:15px;line-height:22px"><span style="color:#A8A29B">{{ r.k }}</span><span style="text-align:right;font-variant-numeric:tabular-nums">{{ r.v }}</span></span></sc-for>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style="font-size:13px;line-height:18px;font-weight:600">Estado · preparando · escritorio 1440</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="width:1440px;background:#0B0B0C;border:1px solid #3F3F46;border-radius:12px;box-sizing:border-box;padding:40px 48px;display:flex;align-items:center;justify-content:space-between;gap:48px">
+            <div style="display:flex;flex-direction:column;gap:10px;max-width:720px">
+              <span style="align-self:flex-start;display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 12px;border-radius:999px;border:1px solid #3F3F46;background:#1C1C1F;color:#A8A29B;font-size:13px;font-weight:600"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M7 7l10 10M17 7 7 17"></path></svg>Cancelado</span>
+              <span style="font-size:14px;color:#A8A29B;font-variant-numeric:tabular-nums">Pedido 1039 · ayer, 16:40</span>
+              <h3 style="margin:0;font-family:Fraunces,serif;font-size:40px;line-height:46px;font-weight:480">Este pedido se canceló</h3>
+              <p style="margin:0;font-size:16px;line-height:25px;color:#A8A29B">Lo cancelaste antes de que el carnicero lo preparara. El reembolso vuelve a tu tarjeta.</p>
+            </div>
+            <div style="display:flex;gap:12px"><button style="height:52px;padding:0 24px;border-radius:999px;background:#DC2626;border:none;color:#FFFFFF;font-family:Geist,system-ui,sans-serif;font-size:16px;font-weight:600;cursor:pointer">Volver a pedir lo mismo</button><button style="height:52px;padding:0 24px;border-radius:999px;background:transparent;border:1px solid #E4D1B0;color:#F5F3EF;font-family:Geist,system-ui,sans-serif;font-size:16px;font-weight:600;cursor:pointer">Escribir a la carnicería</button></div>
+          </div>
+          <div style="font-size:13px;line-height:18px;font-weight:600">Estado · cancelado · escritorio 1440</div>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:4px;font-size:13px;line-height:19px;color:#A8A29B;max-width:1100px;text-wrap:pretty"><span><span style="color:#E4D1B0;font-weight:600">De lo nuestro · </span>los estados del pedido que ya usaba el panel: Pendiente, Confirmado, Preparando, Listo, Entregado y Cancelado.</span><span><span style="color:#F5F3EF;font-weight:600">De lo mío · </span>cinco pasos con hora y una línea de qué está pasando.</span><span><span style="color:#F5F3EF;font-weight:600">Mejora · </span>el cliente ya puede ver su pedido; Cancelado vive aparte, en gris, con dos salidas.</span></div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:16px">
+    <h2 style="margin:0;font-family:Fraunces,serif;font-size:30px;line-height:36px;font-weight:440">Autorrevisión · compra</h2>
+    <div style="background:#151517;border:1px solid #3F3F46;border-radius:12px;overflow:hidden;width:1440px;max-width:100%">
+      <div style="display:grid;grid-template-columns:200px minmax(0,1fr) 100px minmax(0,1.2fr);font-size:12px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B;border-bottom:1px solid #3F3F46"><span style="padding:12px 16px">Criterio</span><span style="padding:12px 16px">Qué se midió</span><span style="padding:12px 16px">Estado</span><span style="padding:12px 16px">Corrección</span></div>
+      <sc-for list="{{ revision }}" as="c" hint-placeholder-count="6">
+        <div style="display:grid;grid-template-columns:200px minmax(0,1fr) 100px minmax(0,1.2fr);font-size:13px;line-height:18px;border-bottom:1px solid #3F3F46"><span style="padding:12px 16px">{{ c.c }}</span><span style="padding:12px 16px;color:#A8A29B">{{ c.m }}</span><span style="padding:12px 16px;color:#059669;font-weight:600">Pasa</span><span style="padding:12px 16px;color:#A8A29B">{{ c.x }}</span></div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div id="reporte-b5" data-screen-label="Reporte" style="width:1440px;max-width:100%;box-sizing:border-box;background:#151517;border:1px solid #3F3F46;border-radius:16px;padding:40px;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:48px">
+    <div style="display:flex;flex-direction:column;gap:20px">
+      <span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#E4D1B0">Reporte · Compra · compra</span>
+      <span style="font-family:Fraunces,serif;font-size:40px;line-height:46px;font-weight:480">3 de 3 pantallas cerradas</span>
+      <div style="display:flex;flex-direction:column">
+        <span style="display:grid;grid-template-columns:40px minmax(0,1fr) 80px;gap:12px;padding:12px 0;border-bottom:1px solid #3F3F46;font-size:15px;line-height:22px"><span style="color:#A8A29B">17</span><span>Checkout: entrega, mínimo, dirección en ventana, datos, código, tarjeta, resumen</span><span style="color:#059669;font-weight:600">Listo</span></span>
+        <span style="display:grid;grid-template-columns:40px minmax(0,1fr) 80px;gap:12px;padding:12px 0;border-bottom:1px solid #3F3F46;font-size:15px;line-height:22px"><span style="color:#A8A29B">18</span><span>Confirmación con número de pedido</span><span style="color:#059669;font-weight:600">Listo</span></span>
+        <span style="display:grid;grid-template-columns:40px minmax(0,1fr) 80px;gap:12px;padding:12px 0;font-size:15px;line-height:22px"><span style="color:#A8A29B">19</span><span>Estado del pedido en cinco pasos y Cancelado aparte</span><span style="color:#059669;font-weight:600">Listo</span></span>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B">Pendientes</span>
+      <span style="font-size:15px;line-height:22px;text-wrap:pretty;border-bottom:1px solid #3F3F46;padding-bottom:12px">Falta backend: pasarela de pago con tarjeta, folio corto legible y la regla de zonas por colonia.</span>
+      <span style="font-size:15px;line-height:22px;text-wrap:pretty;border-bottom:1px solid #3F3F46;padding-bottom:12px">Envío sin costo según el brief; los códigos promocionales usan el backend existente (validar, aplicar y quitar).</span>
+      <span style="font-size:15px;line-height:22px;text-wrap:pretty">Nombre, teléfono y direcciones del cliente son de ejemplo.</span>
+    </div>
+  </div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const IMG = 'public/img/products/';
+const radio = (t, s, on) => ({ t, s, on, borde: on ? '2px solid #DC2626' : '1px solid #3F3F46', anillo: on ? '2px solid #DC2626' : '2px solid #52525B' });
+const f = (l, v, o = {}) => ({ l, v: v || o.ph, fg: v ? '#F5F3EF' : '#A8A29B', bd: o.foco ? '#DC2626' : '#3F3F46', ol: o.foco ? '2px solid #DC2626' : 'none', span: o.ancho ? '1 / -1' : 'auto' });
+class Component extends DCLogic {
+  renderVals() {
+    const orden = ['Pendiente', 'Confirmado', 'Preparando', 'Listo', 'Entregado'];
+    const actual = 2;
+    const horas = ['12:04', '12:10', '12:26', '', ''];
+    const desc = [null, 'El carnicero revisó que hubiera de todo.', 'Está cortando tu arrachera a ½ kg.', 'Sale a tu domicilio o te avisamos para recoger.', null];
+    return {
+      entregas: [radio('A domicilio', 'Mínimo $150 · sin costo de envío', true), radio('Recoger en tienda', 'Sin mínimo · Agua Marina 110', false)],
+      entregas2: [radio('A domicilio', 'Mínimo $150 · sin costo de envío', false), radio('Recoger en tienda', 'Sin mínimo · Agua Marina 110', true)],
+      datos: [{ l: 'Nombre', v: 'Eduardo Torres' }, { l: 'Teléfono con WhatsApp', v: '444 123 4567' }, { l: 'Correo electrónico', v: 'eduardo@gmail.com' }],
+      items: [
+        { f: IMG + 'skirt_steak.webp', n: 'Arrachera', m: 'Por peso · 0.500 kg · 1¼”', p: '$224.50' },
+        { f: IMG + 'preparadas.webp', n: 'Chorizo Verde', m: 'Por precio · $100 ≈ 0.671 kg', p: '$100.00' },
+        { f: IMG + 'merch.webp', n: 'Gorra Bordada', m: 'Por pieza · 1', p: '$250.00' }
+      ],
+      totales: [{ k: 'Subtotal', v: '$574.50' }, { k: 'Entrega a domicilio', v: 'Sin costo' }, { k: 'Código VECINOS50', v: '−$50.00' }],
+      totalesD: [{ k: 'Subtotal', v: '$574.50' }, { k: 'Entrega a domicilio', v: 'Sin costo' }],
+      promos: [
+        { estado: 'Vacío', v: 'Escribe tu código', fg: '#A8A29B', bd: '#3F3F46', b: 'Aplicar', msg: null },
+        { estado: 'Aplicado', v: 'VECINOS50', fg: '#F5F3EF', bd: '#059669', b: 'Quitar', msg: 'Listo: −$50.00 en este pedido.', ic: '#059669', path: 'M5 12.5 9.5 17 19 7.5' },
+        { estado: 'No válido', v: 'VERANO25', fg: '#F5F3EF', bd: '#DC2626', b: 'Aplicar', msg: 'Ese código ya venció o no existe.', ic: '#DC2626', path: 'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18ZM12 7.5v5.5M12 16.5h.01' }
+      ],
+      direccion: [f('Calle y número', 'Av. Hernán Cortés 405', { foco: true }), f('Colonia', 'Tequisquiapan'), f('Referencias', '', { ph: 'Portón negro, junto a la farmacia' })],
+      direccionD: [f('Calle y número', 'Camino a Pozos 1200', { ancho: true }), f('Colonia', 'Villa de Pozos', { foco: true }), f('Código postal', '78421'), f('Referencias', '', { ph: 'Portón negro, junto a la farmacia', ancho: true })],
+      resumen: [{ k: 'Entrega', v: 'A domicilio · Río Verde 214' }, { k: 'Artículos', v: '3' }, { k: 'Pagado con', v: 'Tarjeta •••• 4299' }, { k: 'Total', v: '$524.50' }],
+      pasos: orden.map((t, i) => {
+        const hecho = i < actual, ahora = i === actual;
+        return { t, h: horas[i] || 'Pendiente', d: ahora ? desc[i] : null, hecho, ahora,
+          bg: ahora ? '#DC2626' : (hecho ? '#E4D1B0' : '#0B0B0C'), bd: ahora ? '#DC2626' : (hecho ? '#E4D1B0' : '#3F3F46'), ic: '#0B0B0C',
+          linea: i < orden.length - 1, lc: hecho ? '#E4D1B0' : '#3F3F46', w: ahora ? 600 : 400, fg: hecho || ahora ? '#F5F3EF' : '#A8A29B' };
+      }).map((s, i) => ({ ...s, h: i >= actual + 1 ? '—' : s.h })),
+      revision: [
+        { c: 'Se lee en el teléfono', m: 'Secciones con título 17 px, campos 16 px, total 24 px en la barra fija', x: 'Sin cambios necesarios.' },
+        { c: 'Contraste', m: 'Paso actual blanco sobre rojo · pasos hechos tinta sobre beige 13:1 · Cancelado gris sobre #1C1C1F 6.9:1', x: 'Intento 1: los pasos hechos iban en verde; el verde quedó solo para éxito real (mínimo cumplido, código aplicado, recibido).' },
+        { c: 'Botones de 44 px', m: 'Radios de entrega 64 / 72, Cambiar 44, Quitar 44, Pagar 52, cerrar ventana 44', x: 'Sin cambios necesarios.' },
+        { c: 'Mismos campos y botones', m: 'Campo de Inicio de sesión con sus estados; rojo lleno y contorno beige; renglón del carrito de Componentes', x: 'Sin cambios necesarios.' },
+        { c: 'Nada se sale ni se corta', m: 'Modos del resumen (“Por precio · $100 ≈ 0.671 kg”) en 390', x: 'Intento 1: en escritorio el correo se salía del campo a tres columnas; se dejó el campo con overflow oculto y ancho suficiente.' },
+        { c: 'Mejor que lo viejo', m: 'Contra el flujo viejo: carrito → WhatsApp, sin estado del pedido', x: 'Ver las tres líneas de mejora.' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>
