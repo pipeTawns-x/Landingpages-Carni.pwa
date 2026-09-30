@@ -1,170 +1,291 @@
-export type VarianteTarjeta = 'normal' | 'agotado' | 'oferta' | 'chica';
-export type UnidadTarjeta = 'kg' | 'pieza' | 'paquete';
+import type { ComponentType } from 'react';
+import type { ProductoVista } from '@src/data/catalogo';
+import { formatearPrecio } from '@src/lib/formatearPrecio';
+import { assetUrl } from './assetUrl';
+import { ICONO_POR_CATEGORIA, IconoOtros, IconoSiguiente } from './iconos';
+import { unidadDe, type Presentacion } from './presentacionProducto';
+
+export type VarianteTarjeta = 'normal' | 'oferta' | 'chica';
 
 export interface TarjetaProps {
+  producto: ProductoVista;
+  /** La calcula quien pinta la lista, con `elegirPresentacion` sobre la lista visible. */
+  presentacion: Presentacion;
+  /** "Agotado" no es una variante: se deriva de `!producto.disponible`. */
   variante?: VarianteTarjeta;
-  unidad?: UnidadTarjeta;
-  foto: string;
-  posicion?: string;
-  categoria: string;
-  nombre: string;
-  descripcion?: string;
-  /** Precio como string ya formateado, p.ej. "$289". */
-  precio: string;
-  /** Precio anterior, si aplica — tacha el actual y agrega "Antes $X / u". */
-  antes?: string;
-  /** Sobreescribe la línea secundaria de precio (si no, se calcula sola). */
-  segunda?: string;
-  /** Texto de la insignia (p. ej. "28 en stock"). Se ignora si `variante === 'agotado'`. */
-  stock?: string;
-  /**
-   * A dónde manda el botón "Agregar".
-   *
-   * No es un despacho a Redux: la ficha del producto (src/pages/ProductoDetalle.tsx)
-   * es donde vive la configuración real de peso/precio/pieza, y desde ahí sale
-   * el único `agregarProducto` que existe en el código — el propio
-   * ProductCard.tsx de la tienda tampoco agrega directo, enlaza a la ficha.
-   * Esta tarjeta hace lo mismo: `enlace` es la ficha real cuando el producto
-   * tiene id confirmado, o el catálogo filtrado por categoría cuando no.
-   */
-  enlace: string;
-  /** Solo para la variante "chica": mostrar el botón "+" redondo. */
-  conBoton?: boolean;
+  /** Por defecto, la ficha del producto en las páginas viejas. */
+  enlace?: string;
+  /** True en la primera fila: la imagen carga de inmediato y con prioridad. */
+  prioridad?: boolean;
+}
+
+type IconoCategoria = ComponentType<{ className?: string; tamano?: number }>;
+
+function iconoDe(slug: string): IconoCategoria {
+  return ICONO_POR_CATEGORIA[slug] ?? IconoOtros;
 }
 
 /**
- * Tarjeta de producto — componente compartido de Componentes en el diseño
- * (Tarjeta.dc.html), usada tal cual en "Lo que se lleva la gente" y en
- * "Ofertas".
+ * Precio por kilo tal como viene de la base: sin centavos si es entero y con
+ * ellos si no, para no redondear nunca un precio real.
+ */
+export function precioPorKg(valor: number): string {
+  return formatearPrecio(valor, Number.isInteger(valor) ? 'tarjeta' : 'ticket');
+}
+
+/** Precio por libra de su columna, con centavos. Nunca se calcula desde el kilo. */
+export function precioPorLb(valor: number): string {
+  return formatearPrecio(valor, 'ticket');
+}
+
+/** La ficha del producto: donde se elige peso o pieza y se agrega de verdad. */
+export function enlaceDeFicha(id: number): string {
+  return `products.html#/producto/${id}`;
+}
+
+/**
+ * React 18 no conoce `fetchPriority` y avisa en consola; el atributo en
+ * minúsculas sí llega al navegador tal cual.
+ */
+const PRIORIDAD_ALTA: Record<string, string> = { fetchpriority: 'high' };
+
+const BOTON_AGREGAR =
+  'inline-flex h-11 w-full touch-manipulation items-center justify-center rounded-pill bg-red text-ui font-medium text-white transition-[background-color,scale] duration-150 ease-out-strong hover:bg-red-hover active:scale-[0.97] motion-reduce:transition-none';
+
+function IconoMas(): JSX.Element {
+  return (
+    <svg
+      width={20}
+      height={20}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.8}
+      strokeLinecap="round"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <path d="M12 5v14M5 12h14" />
+    </svg>
+  );
+}
+
+/**
+ * La tarjeta de producto: la única pieza con borde y fondo del sitio, junto con
+ * las celdas del mostrador. Se usa igual en la landing, el catálogo y el asistente.
  *
- * La regla de precio por libra es la del diseño, literal:
- * libra = precio-por-kg × 0.4536, "Sin precio por libra" en piezas,
- * "Precio por paquete, no por kilo" en paquetes.
+ * "Agregar" lleva a la ficha, que es donde se configura el peso o la pieza y de
+ * donde sale el único alta real en el pedido. Esta tarjeta no agrega por su
+ * cuenta ni inventa cantidades: muestra lo que la base dice.
  */
 export function Tarjeta({
+  producto,
+  presentacion,
   variante = 'normal',
-  unidad = 'kg',
-  foto,
-  posicion = '50% 50%',
-  categoria,
-  nombre,
-  descripcion,
-  precio,
-  antes,
-  segunda,
-  stock,
   enlace,
-  conBoton = true
+  prioridad = false
 }: TarjetaProps): JSX.Element {
-  const agotado = variante === 'agotado';
-  const esOferta = variante === 'oferta';
-  const chica = variante === 'chica';
+  const { id, nombre, precioKg, precioLb, foto, categoria } = producto;
+  const href = enlace ?? enlaceDeFicha(id);
+  const agotado = !producto.disponible;
+  const unidad = unidadDe(nombre);
+  const Icono = iconoDe(categoria.slug);
+  /** Sin foto propia o con presentación tipográfica no hay imagen: va el ícono. */
+  const srcFoto = presentacion !== 'tipografica' && foto ? assetUrl(foto) : null;
 
-  const numero = parseFloat(precio.replace(/[^0-9.]/g, '')) || 0;
-  const porLibra = `$${(numero * 0.4536).toFixed(2)} / lb`;
-  const lineaSecundaria =
-    segunda ??
-    (antes
-      ? `Antes ${antes} / ${unidad}`
-      : unidad === 'kg'
-        ? porLibra
-        : unidad === 'pieza'
-          ? 'Sin precio por libra'
-          : 'Precio por paquete, no por kilo');
-
-  const colorTexto = agotado ? 'text-text-muted' : 'text-text';
-  const etiquetaAgregar = `Agregar ${nombre}`;
-
-  if (chica) {
+  if (variante === 'chica') {
     return (
-      <div className="box-border flex h-full items-center gap-3 rounded-card border border-border bg-surface-1 p-3 font-sans text-text [container-type:inline-size]">
-        <div className="h-12 w-12 shrink-0 overflow-hidden rounded-xl bg-surface-2">
-          <img src={foto} alt={nombre} className="h-full w-full object-cover" style={{ objectPosition: posicion }} />
+      <article
+        data-tarjeta
+        data-producto-id={id}
+        data-presentacion={presentacion}
+        className="flex items-center gap-3 rounded-card border border-border bg-surface-1 p-2"
+      >
+        <div className="relative size-12 shrink-0 overflow-hidden rounded-control bg-surface-2">
+          {srcFoto ? (
+            <img
+              src={srcFoto}
+              alt=""
+              width={96}
+              height={96}
+              loading="lazy"
+              decoding="async"
+              className={`size-full object-cover ${agotado ? 'saturate-60' : ''}`}
+            />
+          ) : (
+            <span aria-hidden="true" className="grid size-full place-items-center text-sand">
+              <Icono tamano={24} />
+            </span>
+          )}
         </div>
-        <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-          <span className="text-xs font-medium uppercase tracking-[0.04em] text-sand">{categoria}</span>
-          <span className={`font-display text-base font-[440] leading-5 text-balance ${colorTexto}`}>{nombre}</span>
-          <span className={`text-[15px] font-semibold leading-5 tabular-nums ${colorTexto}`}>
-            {precio} <span className="text-[13px] font-normal text-text-muted">/ {unidad}</span>
-          </span>
+
+        <div className="min-w-0 flex-1">
+          <h3 className="line-clamp-1 font-sans text-ui font-medium">{nombre}</h3>
+          <p className="text-meta text-text-muted tabular-nums">
+            <span data-precio-kg={precioKg}>{precioPorKg(precioKg)}</span> / {unidad}
+          </p>
         </div>
-        {conBoton ? (
+
+        {agotado ? (
+          <span className="shrink-0 px-2 text-meta text-red-text">Agotado</span>
+        ) : (
           <a
-            href={enlace}
-            aria-label={etiquetaAgregar}
-            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-pill bg-red text-xl text-white no-underline hover:bg-red-hover"
+            href={href}
+            aria-label={`Agregar ${nombre}`}
+            className="grid size-11 shrink-0 touch-manipulation place-items-center rounded-full bg-red text-white transition-[background-color,scale] duration-150 ease-out-strong hover:bg-red-hover active:scale-95 motion-reduce:transition-none"
           >
-            +
+            <IconoMas />
           </a>
-        ) : null}
-      </div>
+        )}
+      </article>
     );
   }
 
   return (
-    <article className="relative flex h-full flex-col overflow-hidden rounded-card border border-border bg-surface-1 font-sans text-text transition-[transform,border-color] duration-150 [container-type:inline-size] hover:-translate-y-0.5 hover:border-red/30">
-      <div className="relative aspect-[4/5] shrink-0 overflow-hidden bg-surface-2">
-        <img
-          src={foto}
-          alt={nombre}
-          className="h-full w-full object-cover"
-          style={{ objectPosition: posicion, filter: agotado ? 'saturate(0.6)' : undefined }}
-          loading="lazy"
-        />
-        {!agotado && stock ? (
-          <span className="absolute left-2 top-2 rounded-pill border border-border bg-surface-2 px-2.5 py-1 text-xs font-medium tabular-nums text-text lg:left-3 lg:top-3">
-            {stock}
+    <article
+      data-tarjeta
+      data-producto-id={id}
+      data-presentacion={presentacion}
+      className="relative flex h-full flex-col overflow-hidden rounded-card border border-border bg-surface-1 transition-[translate,border-color] duration-150 ease-out-strong hover:-translate-y-0.5 hover:border-red/30 motion-reduce:transition-none motion-reduce:hover:translate-y-0"
+    >
+      {/* La cabeza crece si la fila es más alta que ella: todas las tarjetas de una fila miden lo mismo. */}
+      <div className="relative aspect-[4/5] shrink-0 grow overflow-hidden bg-surface-2">
+        {srcFoto ? (
+          <img
+            src={srcFoto}
+            alt={nombre}
+            width={400}
+            height={500}
+            loading={prioridad ? 'eager' : 'lazy'}
+            {...(prioridad ? PRIORIDAD_ALTA : {})}
+            decoding="async"
+            className={`absolute inset-0 size-full object-cover ${agotado ? 'saturate-60' : ''}`}
+          />
+        ) : (
+          <div aria-hidden="true" className="absolute inset-0 grid place-items-center text-sand">
+            <Icono tamano={48} />
+          </div>
+        )}
+
+        {presentacion === 'ilustrativa' ? (
+          <span className="absolute bottom-2 left-2 rounded-control bg-surface-2/90 px-2 py-1 text-meta text-text">
+            Foto ilustrativa
           </span>
         ) : null}
-        {agotado ? (
-          <span className="absolute left-2 top-2 rounded-pill border border-border bg-surface-2 px-2.5 py-1 text-xs font-medium tabular-nums text-text-muted lg:left-3 lg:top-3">
-            Sin stock
+
+        {variante === 'oferta' ? (
+          <span className="absolute top-2 right-2 rounded-control bg-gold px-2 py-1 text-meta font-medium text-bg">
+            Oferta
           </span>
         ) : null}
       </div>
-      {esOferta ? (
-        <span className="absolute right-0 top-0 rounded-bl-xl bg-gold px-3 py-1.5 text-xs font-semibold text-bg">
-          Oferta
-        </span>
-      ) : null}
-      <div className="flex flex-1 flex-col gap-2 p-4">
-        <span className="text-xs font-medium uppercase tracking-[0.04em] text-sand">{categoria}</span>
-        <span
-          className={`font-display text-[clamp(18px,calc(14px+2.6cqi),22px)] font-[440] leading-[1.25] text-balance ${colorTexto}`}
-        >
-          {nombre}
-        </span>
-        {descripcion ? <span className="text-[13px] leading-[18px] text-text-muted">{descripcion}</span> : null}
-        <div className="mt-auto flex flex-col gap-0.5 pt-1">
-          <div className={`flex flex-wrap items-baseline gap-1.5 tabular-nums ${colorTexto}`}>
-            <span className="text-[clamp(18px,calc(13px+3cqi),22px)] font-semibold leading-[1.2]">{precio}</span>
-            <span className="text-[clamp(14px,calc(11px+1.6cqi),16px)] leading-5 text-text-muted">/ {unidad}</span>
-          </div>
-          <span
-            className="text-[clamp(13px,calc(10px+1.6cqi),15px)] leading-5 tabular-nums text-text-muted"
-            style={{ textDecoration: antes ? 'line-through' : 'none' }}
-          >
-            {lineaSecundaria}
-          </span>
+
+      <div className="flex flex-col p-3 lg:p-4">
+        <p className="text-meta text-sand">{categoria.nombre}</p>
+        <h3 className="mt-1 font-display text-titulo">{nombre}</h3>
+
+        <p className="mt-2 text-ui font-semibold tabular-nums">
+          <span data-precio-kg={precioKg}>{precioPorKg(precioKg)}</span>{' '}
+          <span className="font-normal text-text-muted">/ {unidad}</span>
+        </p>
+        {unidad === 'kg' && precioLb !== null ? (
+          <p className="text-meta text-text-muted tabular-nums">{precioPorLb(precioLb)} / lb</p>
+        ) : null}
+
+        <div className="mt-3">
+          {agotado ? (
+            <button
+              type="button"
+              disabled
+              className="h-11 w-full cursor-not-allowed rounded-pill bg-surface-2 text-ui font-medium text-red-text"
+            >
+              Agotado
+            </button>
+          ) : (
+            <a href={href} aria-label={`Agregar ${nombre}`} className={BOTON_AGREGAR}>
+              Agregar
+            </a>
+          )}
         </div>
-        {!agotado ? (
-          <a
-            href={enlace}
-            aria-label={etiquetaAgregar}
-            className="mt-1 flex h-11 w-full items-center justify-center rounded-pill bg-red text-center text-[15px] font-semibold leading-5 text-white no-underline transition-colors hover:bg-red-hover active:scale-[0.98]"
-          >
-            Agregar
-          </a>
-        ) : (
-          <button
-            disabled
-            type="button"
-            className="mt-1 h-11 w-full cursor-not-allowed rounded-pill border border-border bg-surface-2 text-[15px] font-semibold leading-5 text-text-muted"
-          >
-            Sin stock
-          </button>
-        )}
       </div>
     </article>
+  );
+}
+
+/* ---------------------------------------------------------------- mostrador */
+
+export interface CeldaBentoProps {
+  nombre: string;
+  descripcion: string;
+  /** `catalogo.html#categoria=<slug>` */
+  href: string;
+  slug: string;
+  /** Foto de la celda; sin ella, la celda es tipográfica con el ícono de la categoría. */
+  foto?: string;
+  posicion?: string;
+  /** La celda grande del mostrador: ocupa todo el ancho en móvil y 2×2 en escritorio. */
+  grande?: boolean;
+}
+
+/**
+ * Una celda del mostrador de categorías. Vive junto a la Tarjeta porque es la
+ * otra pieza del sitio con borde y fondo: todo lo demás va en filas con hairline.
+ *
+ * Sin degradados encima de la foto: el nombre va debajo, sobre el fondo de la
+ * celda, así se lee igual con cualquier foto.
+ */
+export function CeldaBento({
+  nombre,
+  descripcion,
+  href,
+  slug,
+  foto,
+  posicion,
+  grande = false
+}: CeldaBentoProps): JSX.Element {
+  const Icono = iconoDe(slug);
+
+  return (
+    <a
+      href={href}
+      data-celda={slug}
+      className={`group flex h-full flex-col overflow-hidden rounded-card border border-border bg-surface-1 transition-[border-color] duration-150 ease-out-strong hover:border-sand/50 ${
+        grande ? 'col-span-2 lg:col-span-2 lg:row-span-2' : ''
+      }`}
+    >
+      <div
+        className={`relative overflow-hidden bg-surface-2 ${
+          grande ? 'aspect-video lg:aspect-auto lg:min-h-0 lg:flex-1' : 'aspect-[4/3]'
+        }`}
+      >
+        {foto ? (
+          <img
+            src={assetUrl(foto)}
+            alt=""
+            width={640}
+            height={480}
+            loading="lazy"
+            decoding="async"
+            style={{ objectPosition: posicion }}
+            className="absolute inset-0 size-full object-cover"
+          />
+        ) : (
+          <span aria-hidden="true" className="absolute inset-0 grid place-items-center text-sand">
+            <Icono tamano={48} />
+          </span>
+        )}
+      </div>
+
+      <div className="flex items-start justify-between gap-3 p-3 lg:p-4">
+        <div className="min-w-0">
+          <h3 className="font-display text-titulo">{nombre}</h3>
+          <p className="mt-1 text-meta text-text-muted">{descripcion}</p>
+        </div>
+        <IconoSiguiente
+          tamano={18}
+          className="mt-1 shrink-0 text-text-muted transition-colors duration-150 ease-out-strong group-hover:text-sand"
+        />
+      </div>
+    </a>
   );
 }

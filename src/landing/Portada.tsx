@@ -1,103 +1,187 @@
 import { useEffect, useRef, useState } from 'react';
 import { assetUrl } from '@src/ui/assetUrl';
-import { IconoPausa, IconoPlay } from '@src/ui/iconos';
-import { rutaCategoria } from './datos';
+import { IconoPausa, IconoReproducir } from '@src/ui/iconos';
+import { CONTENEDOR } from './datos';
+
+type ConexionLimitada = Navigator & {
+  connection?: { saveData?: boolean; effectiveType?: string };
+};
 
 /**
- * El hero: video real (no el `<img>` de marcador que traía el canvas — el
- * diseño anotaba que faltaba el .mp4, pero el .mp4 y el .webm ya existen en
- * public/img/Videos/, junto con el póster).
+ * ¿Hay que quedarse solo con el póster?
  *
- * Es el único <h1> de la página: el diseño usa <h2> ahí porque el propio
- * canvas se queda con el <h1>, pero en el documento real el titular del hero
- * es el título de la página.
+ * Sí con movimiento reducido, con ahorro de datos o con una conexión 2G. Es un
+ * extra: la protección real para todos es que el video no se descarga hasta
+ * reproducirse, pesa unos 300 KB en móvil y tiene su botón de pausa.
+ */
+function soloPoster(): boolean {
+  if (typeof window === 'undefined') {
+    return true;
+  }
+  const reducir = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const conexion = (navigator as ConexionLimitada).connection;
+  const lenta = !!conexion && (conexion.saveData === true || /(^|-)2g$/.test(conexion.effectiveType ?? ''));
+  return reducir || lenta;
+}
+
+const TITULAR = 'Cortes frescos, del mostrador a tu mesa';
+const ENTRADILLA = 'Carnicería familiar en San Luis Potosí. Elige tus cortes y te los preparamos.';
+
+/**
+ * La portada: el video de fondo, el titular y una sola acción.
+ *
+ * En móvil es una caja 16:9 (unos 220 px a 390) que crece si el texto pide más
+ * alto; la entradilla baja fuera de la caja para que no la infle. En escritorio
+ * ocupa el 85 % de la pantalla a sangre.
+ *
+ * El encabezado nace transparente sobre el video y se vuelve sólido cuando
+ * `#fin-portada` (el centinela de 1 px al pie de la caja) sube bajo él; eso lo
+ * resuelve `Encabezado`, aquí solo se coloca el centinela.
+ *
+ * El video:
+ *   - `preload="none"`: no baja nada hasta reproducirse.
+ *   - Empieza después del evento `load` y de un momento de inactividad, y solo
+ *     mientras al menos el 25 % de la caja está a la vista.
+ *   - Con movimiento reducido o ahorro de datos se queda en el póster y el botón
+ *     ofrece reproducirlo.
+ *   - Una pausa del visitante se respeta: el observador no la deshace.
  */
 export function Portada(): JSX.Element {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [enPausa, setEnPausa] = useState(false);
-
-  const [reducirMovimiento] = useState(
-    () => typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
-  );
+  const video = useRef<HTMLVideoElement>(null);
+  const caja = useRef<HTMLDivElement>(null);
+  const pausaDelVisitante = useRef(false);
+  const [posterSolo] = useState(soloPoster);
+  const [reproduciendo, setReproduciendo] = useState(false);
 
   useEffect(() => {
-    if (reducirMovimiento) {
-      videoRef.current?.pause();
-      setEnPausa(true);
+    const v = video.current;
+    const c = caja.current;
+    if (!v || !c || posterSolo) {
+      return;
     }
-  }, [reducirMovimiento]);
 
-  function alternarVideo(): void {
-    const video = videoRef.current;
-    if (!video) return;
-    if (video.paused) {
-      void video.play();
-      setEnPausa(false);
+    // React no siempre escribe el atributo `muted`, y sin él el autoplay se bloquea.
+    v.muted = true;
+    v.defaultMuted = true;
+
+    let observador: IntersectionObserver | undefined;
+    let cancelarEspera: () => void = () => undefined;
+    let cancelado = false;
+
+    const arrancar = (): void => {
+      if (cancelado) {
+        return;
+      }
+      observador = new IntersectionObserver(
+        ([entrada]) => {
+          if (entrada.isIntersecting && !pausaDelVisitante.current) {
+            // Un autoplay bloqueado no es un error: queda el póster y el botón dice "Reproducir".
+            void v.play().catch(() => undefined);
+          } else {
+            v.pause();
+          }
+        },
+        { threshold: 0.25 }
+      );
+      observador.observe(c);
+    };
+
+    // Después de `load`, y cuando el navegador esté libre: el video nunca compite con la primera pintura.
+    const cuandoLibre = (): void => {
+      if (typeof window.requestIdleCallback === 'function') {
+        const id = window.requestIdleCallback(arrancar);
+        cancelarEspera = () => window.cancelIdleCallback(id);
+      } else {
+        const id = window.setTimeout(arrancar, 200);
+        cancelarEspera = () => window.clearTimeout(id);
+      }
+    };
+
+    if (document.readyState === 'complete') {
+      cuandoLibre();
     } else {
-      video.pause();
-      setEnPausa(true);
+      window.addEventListener('load', cuandoLibre, { once: true });
     }
-  }
+
+    return () => {
+      cancelado = true;
+      window.removeEventListener('load', cuandoLibre);
+      cancelarEspera();
+      observador?.disconnect();
+    };
+  }, [posterSolo]);
+
+  const alternar = (): void => {
+    const v = video.current;
+    if (!v) {
+      return;
+    }
+    if (v.paused) {
+      pausaDelVisitante.current = false;
+      void v.play().catch(() => undefined);
+    } else {
+      pausaDelVisitante.current = true;
+      v.pause();
+    }
+  };
 
   return (
-    <section className="relative">
-      <div className="px-3 pt-3 lg:px-8 lg:pt-6">
-        <div className="relative h-[320px] overflow-hidden rounded-[24px] bg-surface-2 lg:h-[640px] lg:rounded-[28px]">
+    <section id="portada" className="relative">
+      <div
+        ref={caja}
+        className="relative isolate grid aspect-video content-end pt-[calc(3.5rem+env(safe-area-inset-top)+0.5rem)] pb-4 text-text lg:aspect-auto lg:h-[min(85svh,800px)] lg:min-h-[560px] lg:pt-[72px] lg:pb-16"
+      >
+        {/* Medios: el recorte vive aquí y no en la caja con proporción, para que el texto pueda empujar su alto. */}
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 -z-10 overflow-hidden rounded-b-sheet bg-surface-2 lg:rounded-none"
+        >
           <video
-            ref={videoRef}
-            className="h-full w-full object-cover"
+            ref={video}
+            className="size-full object-cover"
             style={{ objectPosition: '74% 40%' }}
-            autoPlay={!reducirMovimiento}
             muted
             loop
             playsInline
-            preload="metadata"
-            poster={assetUrl('/img/Videos/VideoCarniwebP01-poster.jpg')}
-            aria-hidden="true"
+            preload="none"
+            disablePictureInPicture
             tabIndex={-1}
+            aria-hidden="true"
+            poster={assetUrl('/img/Videos/portada-carne-poster.webp')}
+            onPlay={() => setReproduciendo(true)}
+            onPause={() => setReproduciendo(false)}
           >
-            <source src={assetUrl('/img/Videos/VideoCarniwebP01.webm')} type="video/webm" />
-            <source src={assetUrl('/img/Videos/VideoCarniwebP01.mp4')} type="video/mp4" />
+            <source media="(min-width: 1024px)" src={assetUrl('/img/Videos/portada-carne-720.mp4')} type="video/mp4" />
+            <source src={assetUrl('/img/Videos/portada-carne-360.mp4')} type="video/mp4" />
           </video>
+          <div className="absolute inset-0 bg-linear-to-t from-black/75 via-black/35 to-black/10" />
+        </div>
 
-          <button
-            type="button"
-            onClick={alternarVideo}
-            aria-label={enPausa ? 'Reanudar el video' : 'Pausar el video'}
-            className="absolute bottom-3 right-3 flex h-11 w-11 items-center justify-center rounded-pill border border-border bg-bg text-text lg:bottom-6 lg:right-6 lg:h-12 lg:w-12"
+        <div className={`${CONTENEDOR} flex flex-col items-start gap-3 lg:gap-5`}>
+          <h1 className="text-portada lg:max-w-[22ch]">{TITULAR}</h1>
+          <p className="hidden max-w-[46ch] text-lead text-text lg:block">{ENTRADILLA}</p>
+          <a
+            href="catalogo.html"
+            className="inline-flex h-11 touch-manipulation items-center rounded-pill bg-red px-6 text-ui font-medium text-white transition-[background-color,scale] duration-150 ease-out-strong hover:bg-red-hover active:scale-[0.97] motion-reduce:transition-none lg:h-12 lg:px-8"
           >
-            {enPausa ? <IconoPlay /> : <IconoPausa />}
-          </button>
+            Ver productos
+          </a>
         </div>
 
-        {/* En móvil, px-1 más el px-3 del contenedor da 16 px: el mismo margen que el resto de la página.
-            En escritorio el bloque muerde la esquina inferior izquierda del video, al ras de su borde. */}
-        <div className="flex flex-col gap-3.5 px-1 pb-2 pt-6 lg:absolute lg:bottom-0 lg:left-8 lg:w-[680px] lg:rounded-tr-[28px] lg:bg-bg lg:pb-0 lg:pl-0 lg:pr-12 lg:pt-10">
-          <span className="text-xs font-medium uppercase tracking-[0.04em] text-sand lg:text-[13px]">
-            Carnicería familiar · San Luis Potosí
-          </span>
-          <h1 className="m-0 text-balance font-display text-[40px] font-[480] leading-[44px] tracking-[-0.01em] lg:text-[68px] lg:leading-[72px] lg:tracking-[-0.015em]">
-            Cortes del día, listos para el asador
-          </h1>
-          <p className="m-0 max-w-[46ch] text-pretty text-base leading-6 text-text-muted lg:text-lg lg:leading-7">
-            Pide en línea y recoge en el mostrador, o te lo llevamos a domicilio desde $150.
-          </p>
-          <div className="flex flex-col gap-2 pt-1.5 lg:flex-row lg:pt-1">
-            <a
-              href="products.html"
-              className="flex h-12 items-center justify-center rounded-pill bg-red px-7 text-center text-[15px] font-semibold text-white no-underline hover:bg-red-hover lg:h-[52px] lg:text-base"
-            >
-              Ver productos
-            </a>
-            <a
-              href={rutaCategoria('ofertas')}
-              className="flex h-12 items-center justify-center rounded-pill border border-sand px-7 text-center text-[15px] font-semibold text-text no-underline lg:h-[52px] lg:text-base"
-            >
-              Ver ofertas
-            </a>
-          </div>
-        </div>
+        <button
+          type="button"
+          onClick={alternar}
+          aria-label={reproduciendo ? 'Pausar el video' : 'Reproducir el video'}
+          className="absolute right-3 bottom-3 grid size-11 touch-manipulation place-items-center rounded-full border border-border-control bg-bg/70 text-text transition-[background-color,scale] duration-150 ease-out-strong hover:bg-bg active:scale-95 motion-reduce:transition-none lg:right-6 lg:bottom-6"
+        >
+          {reproduciendo ? <IconoPausa tamano={20} /> : <IconoReproducir tamano={20} />}
+        </button>
       </div>
+
+      {/* Centinela: el encabezado pasa a sólido cuando esto sube bajo él. */}
+      <div id="fin-portada" aria-hidden="true" className="h-px" />
+
+      <p className={`${CONTENEDOR} pt-5 text-lead text-text-muted lg:hidden`}>{ENTRADILLA}</p>
     </section>
   );
 }

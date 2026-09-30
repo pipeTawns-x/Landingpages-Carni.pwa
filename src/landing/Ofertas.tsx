@@ -1,63 +1,46 @@
-import { assetUrl } from '@src/ui/assetUrl';
-import { formatearPrecio } from '@src/lib/formatearPrecio';
+import type { ProductoVista } from '@src/data/catalogo';
+import { elegirPresentacion } from '@src/ui/presentacionProducto';
 import { Tarjeta } from '@src/ui/Tarjeta';
-import { IconoFlecha } from '@src/ui/iconos';
-import { OFERTAS, rutaCategoria } from './datos';
-import { buscarProductoPorNombre, useCatalogoVivo } from './useCatalogoVivo';
+import { CONTENEDOR, IDS_OFERTAS, seleccionar } from './datos';
+
+export interface OfertasProps {
+  productos: readonly ProductoVista[];
+}
 
 /**
- * "Ofertas". En 390px es un riel horizontal con scroll-snap (intencional,
- * como el de reseñas: no cuenta como scroll horizontal de página). En
- * escritorio es una rejilla de 4 columnas.
+ * "Ofertas": tres Tarjetas de oferta.
+ *
+ * Móvil: un riel con deslizamiento por imanes y tarjetas al 80 % para que se
+ * asome la siguiente. Escritorio: una cuadrícula asimétrica de 1,4 / 1 / 1, que
+ * no se parece a la de Populares. Cada tarjeta mide lo suyo y se alinea arriba:
+ * estirar las angostas hasta igualar a la ancha las llenaría de fondo vacío.
+ *
+ * La nota es la única de la landing sobre el peso y el anticipo.
  */
-export function Ofertas(): JSX.Element {
-  const catalogo = useCatalogoVivo();
+export function Ofertas({ productos }: OfertasProps): JSX.Element {
+  const elegidos = seleccionar(productos, IDS_OFERTAS);
+  const presentacion = elegirPresentacion(elegidos);
 
   return (
-    <section className="pt-14 lg:pt-[120px]">
-      <div className="flex flex-col gap-2 px-4 lg:flex-row lg:items-end lg:justify-between lg:gap-6 lg:px-8">
-        <div className="flex flex-col gap-2 lg:gap-2.5">
-          <span className="text-xs font-medium uppercase tracking-[0.04em] text-sand">Esta semana</span>
-          <h2 className="m-0 font-display text-[30px] font-[460] leading-9 lg:text-[44px] lg:leading-[50px]">
-            Ofertas
-          </h2>
-          <span className="text-sm text-text-muted lg:text-[15px]">
-            Precio por paquete, no por kilo. Sujetos a existencia.
-          </span>
-        </div>
-        <a
-          href={rutaCategoria('ofertas')}
-          className="hidden h-11 items-center gap-2 text-[15px] font-semibold text-text no-underline lg:flex"
-        >
-          Ver todas las ofertas
-          <IconoFlecha size={18} className="shrink-0 text-sand" />
-        </a>
-      </div>
+    <section id="ofertas" className="pb-16 lg:pb-24">
+      <div className={CONTENEDOR}>
+        <h2 className="text-seccion">Ofertas</h2>
 
-      <div className="mt-5 flex gap-3 overflow-x-auto px-4 pb-1 [scroll-snap-type:x_mandatory] [scrollbar-width:none] lg:mt-7 lg:grid lg:grid-cols-4 lg:gap-6 lg:overflow-visible lg:px-8 lg:pb-0 [&::-webkit-scrollbar]:hidden">
-        {OFERTAS.map((producto) => {
-          const real = buscarProductoPorNombre(catalogo, producto.nombre);
-          const enlace = real ? `products.html#/producto/${real.id}` : producto.enlace;
-          const precio = real ? formatearPrecio(real.price_per_kg) : producto.precio;
-          const stock = real ? `${real.stock} en stock` : producto.stock;
-
-          return (
-            <div key={producto.nombre} className="w-[240px] shrink-0 [scroll-snap-align:start] lg:w-auto">
+        <div className="-mx-5 mt-8 flex snap-x snap-mandatory gap-3 overflow-x-auto overscroll-x-contain scroll-px-5 px-5 pb-1 [scrollbar-width:none] lg:mx-0 lg:mt-12 lg:grid lg:grid-cols-[1.4fr_1fr_1fr] lg:items-start lg:gap-6 lg:overflow-visible lg:px-0 lg:pb-0 [&::-webkit-scrollbar]:hidden">
+          {elegidos.map((producto) => (
+            <div key={producto.id} className="w-[80%] shrink-0 snap-start lg:w-auto">
               <Tarjeta
+                producto={producto}
                 variante="oferta"
-                foto={assetUrl(producto.foto)}
-                posicion={producto.posicion}
-                categoria={producto.categoria}
-                nombre={producto.nombre}
-                descripcion={producto.descripcion}
-                precio={precio}
-                unidad={producto.unidad}
-                stock={stock}
-                enlace={enlace}
+                presentacion={presentacion.get(producto.id) ?? 'tipografica'}
               />
             </div>
-          );
-        })}
+          ))}
+        </div>
+
+        <p className="mt-6 max-w-[60ch] text-meta text-text-muted">
+          Todo paquete requiere un 50 % de anticipo. Precios de referencia; el peso final puede variar.
+        </p>
       </div>
     </section>
   );
