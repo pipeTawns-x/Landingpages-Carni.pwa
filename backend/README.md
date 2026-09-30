@@ -95,6 +95,13 @@ Behaviour worth knowing before touching it:
 | Forms | `inventory/forms.py` (`ProductForm`, `CutSpecForm`) |
 | Search and protection | `Q` filter in `product_list`; `login_required` on the five views, `LOGIN_URL` in `config/settings.py` |
 
+### EBAC practice M14 — Django Models & Admin
+
+The assigned practice (500 bulk-created products, fixture, admin) lives in the
+course-only app `ecommerce/`: see [`ecommerce/README.md`](ecommerce/README.md).
+Its adaptation to the store is the paginated product list and the test suite
+described in "Tests".
+
 ## Tests
 
 ```bash
