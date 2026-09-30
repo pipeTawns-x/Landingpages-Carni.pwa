@@ -18,6 +18,11 @@ from django.db.models import CheckConstraint, F, Q
 KG_TO_LB_PRICE_FACTOR = Decimal("0.4536")
 
 
+def price_per_lb_for(price_per_kg: Decimal) -> Decimal:
+    """Convert a price per kg to a price per lb, rounded half up to cents."""
+    return (price_per_kg * KG_TO_LB_PRICE_FACTOR).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+
+
 class Category(models.Model):
     """Product category. Owned by Supabase; Django only reads/writes rows."""
 
@@ -100,9 +105,7 @@ class Product(models.Model):
 
     def save(self, *args: object, **kwargs: object) -> None:
         """Keep price_per_lb consistent with price_per_kg on every save."""
-        self.price_per_lb = (self.price_per_kg * KG_TO_LB_PRICE_FACTOR).quantize(
-            Decimal("0.01"), rounding=ROUND_HALF_UP
-        )
+        self.price_per_lb = price_per_lb_for(self.price_per_kg)
         super().save(*args, **kwargs)
 
 

@@ -1,0 +1,101 @@
+[
+{
+    "model": "inventory.category",
+    "pk": 1,
+    "fields": {
+        "name": "Carnes Rojas",
+        "slug": "carnes-rojas",
+        "image_url": "/img/products/res.webp",
+        "is_active": true,
+        "order": 1
+    }
+},
+{
+    "model": "inventory.category",
+    "pk": 2,
+    "fields": {
+        "name": "Cortes Especiales",
+        "slug": "cortes-especiales",
+        "image_url": "/img/products/premium.webp",
+        "is_active": true,
+        "order": 2
+    }
+},
+{
+    "model": "inventory.category",
+    "pk": 3,
+    "fields": {
+        "name": "Cerdo",
+        "slug": "cerdo",
+        "image_url": "/img/products/cerdo.webp",
+        "is_active": true,
+        "order": 3
+    }
+},
+{
+    "model": "inventory.category",
+    "pk": 4,
+    "fields": {
+        "name": "Pollo",
+        "slug": "pollo",
+        "image_url": "/img/products/pollo.webp",
+        "is_active": true,
+        "order": 4
+    }
+},
+{
+    "model": "inventory.category",
+    "pk": 5,
+    "fields": {
+        "name": "Embutidos",
+        "slug": "embutidos",
+        "image_url": "/img/products/embutidos.webp",
+        "is_active": true,
+        "order": 5
+    }
+},
+{
+    "model": "inventory.category",
+    "pk": 6,
+    "fields": {
+        "name": "Preparadas",
+        "slug": "preparadas",
+        "image_url": "/img/products/preparadas.webp",
+        "is_active": true,
+        "order": 6
+    }
+},
+{
+    "model": "inventory.category",
+    "pk": 7,
+    "fields": {
+        "name": "Ofertas",
+        "slug": "ofertas",
+        "image_url": "/img/products/premium.webp",
+        "is_active": true,
+        "order": 7
+    }
+},
+{
+    "model": "inventory.category",
+    "pk": 8,
+    "fields": {
+        "name": "Merch",
+        "slug": "merch",
+        "image_url": "/img/products/merch.webp",
+        "is_active": true,
+        "order": 8
+    }
+},
+{
+    "model": "inventory.category",
+    "pk": 9,
+    "fields": {
+        "name": "Otros",
+        "slug": "otros",
+        "image_url": "/img/products/otrosproductos.webp",
+        "is_active": true,
+        "order": 9
+    }
+}
+]

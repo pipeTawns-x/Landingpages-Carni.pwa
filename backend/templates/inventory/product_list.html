@@ -68,6 +68,22 @@
         </tbody>
       </table>
     </div>
+
+    {# {% querystring %} copies the current query string, so q and category survive a page change. #}
+    <nav class="card" aria-label="Paginación de productos">
+      <p>Mostrando {{ page_obj.start_index }}–{{ page_obj.end_index }} de {{ page_obj.paginator.count }} productos</p>
+      <div class="actions">
+        {% if page_obj.has_previous %}
+          <a href="{% querystring page=1 %}" class="btn btn-secondary">&laquo; Primera</a>
+          <a href="{% querystring page=page_obj.previous_page_number %}" class="btn btn-secondary">&lsaquo; Anterior</a>
+        {% endif %}
+        <span aria-current="page">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+          <a href="{% querystring page=page_obj.next_page_number %}" class="btn btn-secondary">Siguiente &rsaquo;</a>
+          <a href="{% querystring page=page_obj.paginator.num_pages %}" class="btn btn-secondary">Última &raquo;</a>
+        {% endif %}
+      </div>
+    </nav>
   {% else %}
     <div class="empty-state">
       <p>No se encontraron productos con esos filtros.</p>

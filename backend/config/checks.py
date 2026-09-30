@@ -17,8 +17,14 @@ def check_django_schema_exists(app_configs=None, **kwargs):
     must never create its tables in the ``public`` schema, which belongs to
     Supabase. If the schema is gone, ``migrate`` would silently create Django
     tables in the wrong place, so this check stops that before it happens.
+
+    Only Postgres has schemas in this sense, so any other database (the
+    SQLite one the tests use) has nothing to verify.
     """
     errors = []
+    if connection.vendor != "postgresql":
+        return errors
+
     try:
         with connection.cursor() as cursor:
             cursor.execute("SELECT 1 FROM information_schema.schemata WHERE schema_name = 'django'")
