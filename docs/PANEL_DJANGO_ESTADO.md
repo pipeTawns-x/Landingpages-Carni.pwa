@@ -14,8 +14,8 @@ Se actualiza en cada slice. Se retoma en la primera que no esté HECHA.
 | B6 | Tokens y Tailwind | ESPERA | | S1 (tokens.css del rediseño) |
 | B7 | `panel/base.html` desde `dashboar.html` | ESPERA | | S2 |
 | B10–B13 | Productos en el panel | ESPERA | | S3 |
-| B14 | Rutas `/panel/productos/` | PENDIENTE | | B10–B13 |
-| B15 | Reemplazar el `base.html` claro de la M13 | PENDIENTE | | B14 |
+| B14 | Rutas `/panel/productos/` | HECHO (se adelantó a B10–B13) | `6dc3429e` | — |
+| B15 | Reemplazar el `base.html` claro de la M13 | PENDIENTE | | B7 y B10–B13 (el HTML rediseñado) |
 | B3 | Historial de cambios (opcional) | PENDIENTE | | — |
 | B5 | Entrega M14 | PENDIENTE | | B10 |
 | B17 | M15 Django Templates | PENDIENTE | | Fase 2 |
@@ -41,3 +41,4 @@ Se actualiza en cada slice. Se retoma en la primera que no esté HECHA.
   - `Referrer-Policy` queda en `same-origin` y no en `no-referrer` (que pedía el encargo): en Chrome, `no-referrer` hace que el navegador mande `Origin: null` en todos los POST, también los del propio Django, y el CSRF de Django los rechaza; se rompían la salida, los formularios y el admin. Contrato corregido.
   - Sin CSP de Django todavía: el contrato no la pide (el CSP de §5b es el de Netlify) y la define `panel/base.html` (B7).
   - S4 queda listo del lado del backend (`/panel/sesion/` y `/panel/salir/`). Para probarlo contra Supabase hace falta aplicar la migración `4e5d6137` y agregar las variables a `backend/.env`.
+  - B14 hecho (`6dc3429e`): las cinco vistas de `inventory` viven bajo `/panel/productos/` con los mismos nombres (`inventory:list`, `detail`, `create`, `update` y `delete`), y `/inventario/` ya no existe ni redirige. Pasaron de `login_required` a `panel_admin_required`: solo entra un admin del traspaso, con el rol leído en cada petición; el login del admin de Django ya no abre los productos, y `LOGIN_URL` se quitó porque nada lo usa. B14 se adelantó a B10–B13 porque las rutas no dependen del HTML rediseñado: siguen las plantillas claras de la M13 hasta B15. La prueba de rutas protegidas ahora recorre el URLconf raíz y cubre los productos. Pasan 239 pruebas, ruff limpio.
