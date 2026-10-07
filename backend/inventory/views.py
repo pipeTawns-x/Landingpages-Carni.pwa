@@ -167,9 +167,9 @@ def product_update(request, product_id):
             product = product_form.save()
             spec_instance = spec_form.save(commit=False)
             # Keep the table clean: only store a spec that already exists or
-            # that the user actually filled in.
-            spec_has_data = any(spec_form.cleaned_data.get(name) for name in spec_form.fields)
-            if spec_instance.pk or spec_has_data:
+            # that the user actually filled in. A zero counts as filled in,
+            # the same criterion product_create uses.
+            if spec_instance.pk or _spec_form_has_data(spec_form):
                 spec_instance.product = product
                 spec_instance.save()
             messages.success(request, f'Producto "{product.name}" actualizado correctamente.')

@@ -9,10 +9,12 @@ from decimal import Decimal
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.db import connection
 from django.test import SimpleTestCase, TestCase
+from django.test.utils import CaptureQueriesContext
 from django.urls import reverse
 
-from inventory.models import Category, Product, price_per_lb_for
+from inventory.models import Category, CutSpec, Product, price_per_lb_for
 
 
 class PricePerLbForTests(SimpleTestCase):
@@ -46,6 +48,82 @@ class ProductSaveTests(TestCase):
 
         product.refresh_from_db()
         self.assertEqual(product.price_per_lb, Decimal("249.03"))
+
+
+class ProductUpdateSpecTests(TestCase):
+    """The cut spec that the edit page creates, or deliberately leaves alone."""
+
+    fixtures = ["categories.json"]
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.staff = get_user_model().objects.create_user("staff")
+        cls.product = Product.objects.create(
+            category=Category.objects.first(),
+            name="Rib Eye",
+            price_per_kg=Decimal("549.00"),
+            stock=12,
+        )
+
+    def setUp(self):
+        self.url = reverse("inventory:update", args=[self.product.pk])
+        self.detail_url = reverse("inventory:detail", args=[self.product.pk])
+        self.client.force_login(self.staff)
+
+    def post_data(self, **spec_fields):
+        """Return POST data that keeps the product as it is, plus the given spec fields.
+
+        The price and the minimum quantity stay the same on purpose: a change
+        in either one would stop at the confirmation page instead of saving.
+        """
+        return {
+            "name": self.product.name,
+            "category": self.product.category_id,
+            "price_per_kg": str(self.product.price_per_kg),
+            "min_quantity_kg": "0",
+            "stock": str(self.product.stock),
+            "is_active": "on",
+            **spec_fields,
+        }
+
+    def test_a_spec_with_a_single_zero_value_is_saved(self):
+        # Decimal("0") is falsy, so an any(values) check took a spec made of
+        # zeros for an empty one and silently skipped it.
+        response = self.client.post(self.url, self.post_data(avg_piece_weight_kg="0"))
+
+        self.assertRedirects(response, self.detail_url)
+        spec = CutSpec.objects.get(product=self.product)
+        self.assertEqual(spec.avg_piece_weight_kg, Decimal("0"))
+
+    def test_a_spec_where_every_number_is_zero_is_saved(self):
+        spec_fields = {
+            "avg_piece_weight_kg": "0",
+            "thickness_min_in": "0",
+            "thickness_max_in": "0",
+            "thickness_default_in": "0",
+        }
+
+        response = self.client.post(self.url, self.post_data(**spec_fields))
+
+        self.assertRedirects(response, self.detail_url)
+        spec = CutSpec.objects.get(product=self.product)
+        self.assertEqual(spec.thickness_max_in, Decimal("0"))
+
+    def test_an_untouched_empty_spec_form_does_not_create_a_spec(self):
+        response = self.client.post(self.url, self.post_data())
+
+        self.assertRedirects(response, self.detail_url)
+        self.assertFalse(CutSpec.objects.exists())
+
+    def test_opening_the_edit_page_writes_nothing(self):
+        with CaptureQueriesContext(connection) as queries:
+            response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(CutSpec.objects.exists())
+        statements = [query["sql"].lstrip().upper() for query in queries.captured_queries]
+        writes = [sql for sql in statements if sql.startswith(("INSERT", "UPDATE", "DELETE"))]
+        self.assertEqual(writes, [])
 
 
 class ProductListPaginationTests(TestCase):
