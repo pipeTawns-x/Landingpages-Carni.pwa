@@ -75,13 +75,13 @@ El frente migra el sitio actual a React + Tailwind v4 **dentro de las mismas pá
 
 ## 8 · Estado del frente de backend (corregido el 2026-10-07, verificado en `origin/practicas-ebac`)
 
-**Corrección:** la versión anterior de esta sección decía que la M14 no existía. Era falso: yo había leído la rama local, que va atrasada, sin hacer `git fetch origin`. Se lee siempre con `git -C ~/Desktop/Carni-mvp fetch origin` y `git show origin/practicas-ebac:<ruta>`.
+**Segunda corrección (2026-10-07):** "entregada" era inexacto; ver M14 abajo. **Primera corrección:** la versión anterior de esta sección decía que la M14 no existía. Era falso: yo había leído la rama local, que va atrasada, sin hacer `git fetch origin`. Se lee siempre con `git -C ~/Desktop/Carni-mvp fetch origin` y `git show origin/practicas-ebac:<ruta>`.
 
 - **M13** (CRUD de inventario en Django): entregada el 2026-09-21 (`24725c6d`, PR #10 a #12).
-- **M14** (modelos y admin con 500 productos): **existe y está entregada** el 2026-09-30.
+- **M14** (modelos y admin con 500 productos): **el código existe** (2026-09-30), pero **la entrega al LMS está PENDIENTE (B5)**. `PANEL_DJANGO_ESTADO.md` dice: "La M14 no se manda al LMS hasta B5", que espera el panel rediseñado de este frente (F1 a F3).
   - `2e222757`: `backend/ecommerce/` con `models.py`, `admin.py`, la migración `0001_initial.py`, el comando `create_test_products.py` y `fixtures/products/500Products.json`.
   - `4ed789e4`: paginación del listado de `inventory` y pruebas sobre SQLite.
-  - `6954d2ff`: documento de entrega, capturas y mensaje para el LMS.
+  - `6954d2ff`: documento de entrega, capturas y mensaje para el LMS (preparado, no enviado).
   - El README de `backend/` indica que `POSTGRES_*` debe apuntar a la instancia **local** de Supabase (puerto 54322).
 - **Documentos del panel servido por Django** (decisión de Eduardo del 2026-10-06), todos en `origin/practicas-ebac:docs/`: `CONTRATO_PANEL_DJANGO.md`, `DECISION_PANEL_DJANGO_2026-10-06.md`, `PANEL_DJANGO_ESTADO.md` y `LOOP_REDISENO_TOTAL.md`. **Este traspaso queda superado donde choque con ellos**, sobre todo en el panel: ya no es un shell React aparte, el HTML lo sirve Django.
 - Pregunta abierta para Eduardo: dónde se alojará Django y cuándo pasa el backend a `main`.
