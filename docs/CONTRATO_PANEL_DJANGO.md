@@ -90,9 +90,12 @@ Los datos de ejemplo son los reales: 53 productos y 9 categorías.
 
 ## 5b. Seguridad del traspaso (revisión obligatoria antes de F4/B8)
 
-- El `access_token` viaja solo en el cuerpo de un POST y por HTTPS (en local, `http://localhost`). Nunca en la URL ni en la consola.
-- La página que hace el traspaso manda `Referrer-Policy: no-referrer`. Django valida el origen con `PANEL_ALLOWED_ORIGINS`.
-- Django verifica la firma contra las llaves de Supabase (JWKS) o contra el secreto (HS256 en local), la vigencia y que `profiles.role` sea `admin`.
+- El `access_token` viaja solo en el cuerpo de un POST y por HTTPS (en local, `http://localhost`). Nunca en la URL ni en la consola. Un token en la URL se rechaza.
+- La página de la tienda que hace el traspaso NO puede mandar `Referrer-Policy: no-referrer` (ni `same-origin`): con esas políticas el navegador manda `Origin: null` en un POST de formulario a otro origen (comprobado en Chrome el 2026-10-07), y Django rechazaría todo traspaso legítimo. Debe mandar `strict-origin`, que solo deja salir el origen y no la ruta.
+- Django exige que la cabecera `Origin` sea una de `PANEL_ALLOWED_ORIGINS`. Sin cabecera, o con `null`, rechaza. Sus propias respuestas mandan `Referrer-Policy: no-referrer`.
+- Django verifica la firma contra las llaves de Supabase (JWKS, `SUPABASE_JWKS_URL`) o contra el secreto (HS256 en local, `SUPABASE_JWT_SECRET`): usa una sola, según la configuración, y el token no elige cuál. Verifica además la vigencia (`exp`), `aud = authenticated`, el emisor (`<SUPABASE_URL>/auth/v1`), que el token no sea más viejo que `PANEL_TOKEN_MAX_AGE_SECONDS` desde su `iat`, y que `profiles.role` sea `admin`.
+- Por eso la tienda entrega un token recién emitido: si el admin ya llevaba tiempo firmado, llama `supabase.auth.refreshSession()` antes de enviarlo.
+- `/panel/sesion/` no lleva el token CSRF de Django (el formulario vive en otro origen y no puede leerlo). Lo compensan el origen permitido y el token. Responde 302 a `/panel/` si todo sale bien, 403 siempre igual si algo falla (el motivo queda en el log del servidor, nunca el token) y 405 si no es POST.
 - Django no escribe el token en logs.
 - El host de Django entra en `form-action` del CSP de Netlify.
 - Agregar `VITE_PANEL_URL` exige sumarla a la lista permitida de la compuerta G6 de `gates.sh` en el mismo commit.
@@ -101,11 +104,12 @@ Los datos de ejemplo son los reales: 53 productos y 9 categorías.
 
 | Lado | Variable | Para qué |
 |---|---|---|
-| Django (`backend/.env`, documentado en comentarios) | `SUPABASE_URL` | proyecto de Supabase |
-| Django | `SUPABASE_JWT_SECRET` | solo si el proyecto firma los tokens con HS256 |
-| Django | `STORE_ORIGIN` | origen de la tienda |
-| Django | `PANEL_ALLOWED_ORIGINS` | orígenes desde los que se acepta el traspaso |
-| Django | `PANEL_TOKEN_MAX_AGE_SECONDS` | vida máxima del token en el traspaso |
+| Django (`backend/.env`, documentado en comentarios) | `SUPABASE_URL` | proyecto de Supabase; de aquí sale el emisor `<SUPABASE_URL>/auth/v1` |
+| Django | `SUPABASE_JWKS_URL` | producción: dónde publica el proyecto sus llaves (`<SUPABASE_URL>/auth/v1/.well-known/jwks.json`); si está, se usa en lugar del secreto |
+| Django | `SUPABASE_JWT_SECRET` | local: secreto HS256 (`JWT_SECRET` de `supabase status -o env`); solo cuenta si no hay `SUPABASE_JWKS_URL`. Tiene que haber uno de los dos |
+| Django | `STORE_ORIGIN` | origen de la tienda; a su `/accessweb.html` manda Django a quien no ha iniciado sesión |
+| Django | `PANEL_ALLOWED_ORIGINS` | orígenes desde los que se acepta el traspaso, separados por comas |
+| Django | `PANEL_TOKEN_MAX_AGE_SECONDS` | edad máxima del token en el traspaso, contada desde su `iat` (300 en local) |
 | Tienda | `VITE_PANEL_URL` | sin ella, la tienda se comporta como hoy |
 
 En local: Django en `localhost:8000`, la tienda en `localhost:3002` y Supabase en `127.0.0.1:54321` / `54322`.
@@ -124,3 +128,7 @@ En local: Django en `localhost:8000`, la tienda en `localhost:3002` y Supabase e
   - la seguridad del traspaso;
   - G6 para `VITE_PANEL_URL`.
   - El diseño son 16 pantallas `.dc.html` (`docs/design/claude-design-1.1/`).
+- 2026-10-07 (B8): corregido §5b y completado §6 al implementar el traspaso.
+  - La página de la tienda que hace el traspaso no puede mandar `Referrer-Policy: no-referrer`: el navegador manda `Origin: null` y Django rechaza el traspaso. Tiene que mandar `strict-origin`. Cambia lo que decía la versión anterior; avisado al agente de rediseño antes de S4.
+  - Se agrega `SUPABASE_JWKS_URL`. `SUPABASE_JWT_SECRET` pasa a ser solo para local.
+  - Se documentan la edad máxima del token (la tienda debe entregar uno recién emitido), el 302/403/405 de `/panel/sesion/` y que esa ruta va sin token CSRF.
