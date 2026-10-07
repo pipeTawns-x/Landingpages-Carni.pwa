@@ -74,9 +74,12 @@ Behaviour worth knowing before touching it:
 - Changing a price or a minimum quantity shows a before/after confirmation
   before saving.
 - Deleting a product that appears in orders deactivates it instead, because
-  `order_items.product_id` is `ON DELETE RESTRICT`. When a delete does go
-  through, the panel reports how many favorite lists lost the product
-  (`favorites.product_id` cascades).
+  `order_items.product_id` is `ON DELETE RESTRICT`. An order that arrives
+  between the count and the delete is handled the same way: the delete runs in
+  a savepoint, and when the database refuses it the product is deactivated
+  instead of failing with a server error. When a delete does go through, the
+  panel reports how many favorite lists lost the product (`favorites.product_id`
+  cascades).
 - The Django admin (`inventory/admin.py`) applies the same rules through the
   services. `price_per_lb` is shown read-only. A product whose price or minimum
   quantity changes is not saved until the "Confirmar cambio de precio o

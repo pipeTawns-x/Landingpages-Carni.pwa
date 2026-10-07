@@ -8,6 +8,7 @@ Se actualiza en cada slice. Se retoma en la primera que no esté HECHA.
 | B1 | Bug: ficha con todos los valores en cero | HECHO | `8e750cc2` | — |
 | B2 | `inventory/services.py` + mirrors `OrderItem` y `Favorite` | HECHO | `7aa61146` | — |
 | B4 | Django Admin con las reglas del panel | HECHO | `df9428b6` | — |
+| R | Carrera al borrar: un pedido nuevo desactiva el producto en vez de dar un 500 | HECHO | `61f891c7` | — |
 | B8 | Traspaso Supabase → Django | PENDIENTE | | Docker/Supabase prendidos para el gate SQL |
 | B9 | Salida, permisos y endurecimiento | PENDIENTE | | B8 |
 | B6 | Tokens y Tailwind | ESPERA | | S1 (tokens.css del rediseño) |
@@ -15,8 +16,8 @@ Se actualiza en cada slice. Se retoma en la primera que no esté HECHA.
 | B10–B13 | Productos en el panel | ESPERA | | S3 |
 | B14 | Rutas `/panel/productos/` | PENDIENTE | | B10–B13 |
 | B15 | Reemplazar el `base.html` claro de la M13 | PENDIENTE | | B14 |
-| B3 | Historial de cambios (opcional) | PENDIENTE | | B2 |
-| B5 | Entrega M14 | PENDIENTE | | B10, B4 |
+| B3 | Historial de cambios (opcional) | PENDIENTE | | — |
+| B5 | Entrega M14 | PENDIENTE | | B10 |
 | B17 | M15 Django Templates | PENDIENTE | | Fase 2 |
 
 ## Bitácora
@@ -32,3 +33,4 @@ Se actualiza en cada slice. Se retoma en la primera que no esté HECHA.
   - B1 hecho (`8e750cc2`): `product_update` guarda la ficha aunque todos sus valores sean cero, igual que `product_create`. Pasan 42 pruebas.
   - B2 hecho (`7aa61146`): `inventory/services.py` concentra la confirmación de precio, borrar o desactivar y cuándo se guarda la ficha; los mirrors `OrderItem` y `Favorite` (solo lectura, sin DDL: la migración `0002` es solo estado) reemplazan el SQL crudo. Pasan 81 pruebas.
   - B4 hecho (`df9428b6`): `ProductAdmin` aplica las reglas del panel con los servicios: `price_per_lb` solo lectura, casilla "Confirmar cambio de precio o cantidad mínima" que `ProductAdminForm` exige al cambiar el precio por kg o la cantidad mínima (no en productos nuevos), y `delete_model` y `delete_queryset` borran o desactivan y avisan cuáles se desactivaron. Django sigue mostrando su mensaje de eliminado y registra un borrado para esos productos, porque ambos salen del admin y no de esos dos métodos. Pasan 98 pruebas.
+  - R hecho (`61f891c7`): `delete_or_deactivate` borra dentro de un savepoint. Si un pedido llega entre el conteo y el borrado y la base lo rechaza (`ON DELETE RESTRICT`), el producto se desactiva y el resultado lo dice, en vez de un `IntegrityError` (500). Pasan 102 pruebas.
