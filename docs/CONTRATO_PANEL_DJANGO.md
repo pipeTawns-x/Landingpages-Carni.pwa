@@ -145,3 +145,7 @@ En local: Django en `localhost:8000`, la tienda en `localhost:3002` y Supabase e
   - `/inventario/` desapareció sin redirección: la página vieja pasó a ser la nueva.
   - Las cinco vistas exigen un admin del traspaso (`panel_admin_required`) en lugar de cualquier usuario de Django. `panel:inicio` sigue llevando a `inventory:list`.
   - Siguen las plantillas claras de la M13 hasta B15, que las reemplaza con el HTML rediseñado.
+- 2026-10-07 (S1 → B6): Django compila su propia hoja de Tailwind v4 (`backend/static/panel/panel.css`) a partir de una copia idéntica de `src/styles/tokens.css`. El sha256 de esa copia es `6847e086…5cd05`, el de `pruebas` en `3e471379`.
+  - Las fuentes son las mismas de la tienda, autoalojadas en `backend/static/panel/fonts/`: Geist Variable (`wght`) y Fraunces Variable (`opsz` y `wght`), versión 5.3.0.
+  - El backend queda acoplado a tres cosas del rediseño: `tokens.css`, la versión de `tailwindcss` y la de las dos fuentes en `package-lock.json`. Si el rediseño cambia cualquiera de ellas, lo anuncia en Engram (`frontend/entrega/tokens`). Mientras tanto, `backend/scripts/build_panel_css.sh --check` falla hasta que el backend corra `--sync-tokens` o mueva la versión fijada.
+  - Cada slice del backend que cambie clases en `backend/templates/` reconstruye y commitea `panel.css`.
