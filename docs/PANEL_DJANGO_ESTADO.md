@@ -21,4 +21,8 @@ Se actualiza en cada slice. Se retoma en la primera que no esté HECHA.
 
 ## Bitácora
 
-- 2026-10-06: plan aprobado por Eduardo. Diseño 1.1 traído desde pruebas@115490ea (`f4a21027`). El PR #13 (base técnica de la M14) sigue abierto; la M14 no se manda al LMS hasta B5.
+- 2026-10-06: plan aprobado por Eduardo. Diseño 1.1 traído desde pruebas@115490ea (`f4a21027`). La M14 no se manda al LMS hasta B5.
+- 2026-10-06:
+  - Todo lo de las ramas extra (`entrega-m14-django-models-admin` y `panel-django`) pasó directo a `practicas-ebac` (`6b720395`), y esas ramas se borraron. La M14 literal (`backend/ecommerce/`, `4ed789e4` y `2e222757`) ya está en `practicas-ebac`.
+  - El contrato y el loop se corrigieron con la revisión del agente de rediseño.
+  - B1 quedó empezado sin commitear en el worktree: pruebas y el arreglo en `inventory/views.py`. Se revisa y commitea cuando Eduardo dé la orden de seguir.

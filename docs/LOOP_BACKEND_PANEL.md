@@ -1,6 +1,9 @@
 # LOOP-BACKEND-PANEL · agente de backend (Django + Supabase) · rama practicas-ebac
 
-Se trabaja en ramas de tema desde `practicas-ebac`; cada fase sale en un PR y Eduardo lo mergea. La coordinación con el rediseño está en `docs/CONTRATO_PANEL_DJANGO.md`.
+Se trabaja en el worktree de la sesión y se sube directo a `practicas-ebac`.
+- Solo existen tres ramas: `practicas-ebac`, `pruebas` y `main`.
+- No se crean ramas ni PR sin que Eduardo lo pida.
+- La coordinación con el rediseño está en `docs/CONTRATO_PANEL_DJANGO.md`.
 
 ## 1. Propósito y alcance
 
@@ -13,10 +16,12 @@ Se trabaja en ramas de tema desde `practicas-ebac`; cada fase sale en un PR y Ed
   - migraciones aplicadas sin el OK de Eduardo;
   - entregas con capturas que no muestren el proyecto rediseñado.
 
-## 2. Contexto a leer primero
+## 2. Contexto a leer primero (memoria primero, después verificar)
 
 1. `docs/DECISION_PANEL_DJANGO_2026-10-06.md` y `docs/CONTRATO_PANEL_DJANGO.md`.
-2. Engram `carni-mvp`, también `Landingpages-Carni.pwa` porque está partido: `panel-django/*`, `frontend/entrega/*` y `revision/frontend-a-backend/*`.
+2. Engram: busca con palabras del título, nunca con la clave literal, porque `mem_search` no encuentra por `topic_key`. Revisa los dos proyectos, `carni-mvp` y `Landingpages-Carni.pwa`.
+   - Para una clave exacta: `sqlite3 -readonly ~/.engram/engram.db "SELECT id, project, title FROM observations WHERE topic_key LIKE 'panel-django/%';"`
+   - Lo que recuerdes de memoria lo compruebas en el repo y lo reportas así: "recordaba X; verifiqué Y".
 3. `docs/PANEL_DJANGO_ESTADO.md`, que dice dónde retomar.
 4. El diseño: `docs/design/claude-design-1.1/` (Inventario Django 28–33; Productos 22–24).
 

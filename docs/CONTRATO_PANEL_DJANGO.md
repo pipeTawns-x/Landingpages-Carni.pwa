@@ -59,7 +59,10 @@ Los datos de ejemplo son los reales: 53 productos y 9 categorías.
 
 ## 4. Puntos de sincronización
 
-La sincronización se hace solo con commits empujados, que el otro lee con `git show <rama>:<ruta>`. Nunca hay checkout ni stash en el árbol del otro.
+- La sincronización se hace solo con commits empujados.
+- Antes de leer, actualiza la copia remota con `git -C ~/Desktop/Carni-mvp fetch origin`. Después lee con `git -C ~/Desktop/Carni-mvp show origin/practicas-ebac:<ruta>` (o `origin/pruebas:<ruta>`).
+- La rama local del checkout principal puede ir atrasada; usa siempre `origin/...`.
+- Nunca hay checkout ni stash en el árbol del otro.
 
 | Punto | Quién entrega a quién | Qué entrega | Qué desbloquea |
 |---|---|---|---|
@@ -82,6 +85,17 @@ La sincronización se hace solo con commits empujados, que el otro lee con `git 
 
 - El orquestador lee los dos lados y deja su retroalimentación en `revision/*`.
 - Engram está partido en `carni-mvp` y `Landingpages-Carni.pwa`: busca en los dos hasta que Eduardo lo unifique.
+- `mem_search` NO encuentra por `topic_key` (las barras y los guiones rompen la búsqueda). Busca con palabras del título, por ejemplo "contrato panel Django" o "Admin panel served by Django". Para una clave exacta: `sqlite3 -readonly ~/.engram/engram.db "SELECT id, project, title FROM observations WHERE topic_key LIKE 'panel-django/%';"`
+- Regla para los dos: primero la memoria (Engram y graphify), después comprobar en el repo. Se reporta "recordaba X; verifiqué Y", nunca "no existe" sin haber buscado en los dos lugares.
+
+## 5b. Seguridad del traspaso (revisión obligatoria antes de F4/B8)
+
+- El `access_token` viaja solo en el cuerpo de un POST y por HTTPS (en local, `http://localhost`). Nunca en la URL ni en la consola.
+- La página que hace el traspaso manda `Referrer-Policy: no-referrer`. Django valida el origen con `PANEL_ALLOWED_ORIGINS`.
+- Django verifica la firma contra las llaves de Supabase (JWKS) o contra el secreto (HS256 en local), la vigencia y que `profiles.role` sea `admin`.
+- Django no escribe el token en logs.
+- El host de Django entra en `form-action` del CSP de Netlify.
+- Agregar `VITE_PANEL_URL` exige sumarla a la lista permitida de la compuerta G6 de `gates.sh` en el mismo commit.
 
 ## 6. Configuración
 
@@ -104,3 +118,9 @@ En local: Django en `localhost:8000`, la tienda en `localhost:3002` y Supabase e
 ## Changelog
 
 - 2026-10-06: versión inicial (backend).
+- 2026-10-06: corregida tras la revisión del agente de rediseño. Los documentos ya están en `origin/practicas-ebac` (antes vivían en una rama extra, eliminada). Se agregan:
+  - cómo buscar en Engram;
+  - la lectura desde `origin/...`;
+  - la seguridad del traspaso;
+  - G6 para `VITE_PANEL_URL`.
+  - El diseño son 16 pantallas `.dc.html` (`docs/design/claude-design-1.1/`).
