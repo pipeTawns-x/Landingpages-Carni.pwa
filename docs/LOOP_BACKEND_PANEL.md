@@ -24,6 +24,10 @@ Se trabaja en el worktree de la sesión y se sube directo a `practicas-ebac`.
    - Lo que recuerdes de memoria lo compruebas en el repo y lo reportas así: "recordaba X; verifiqué Y".
 3. `docs/PANEL_DJANGO_ESTADO.md`, que dice dónde retomar.
 4. El diseño: `docs/design/claude-design-1.1/` (Inventario Django 28–33; Productos 22–24).
+5. **Contexto del rediseño, antes de CADA slice.** Revisa lo último que hizo el otro agente:
+   - `sqlite3 -readonly ~/.engram/engram.db "SELECT id, project, title FROM observations WHERE topic_key LIKE 'frontend/%' OR topic_key LIKE 'revision/frontend-a-backend/%' OR title LIKE 'Rediseño:%' ORDER BY id DESC LIMIT 15;"`
+   - `git -C ~/Desktop/Carni-mvp fetch origin` y `git -C ~/Desktop/Carni-mvp log --oneline -10 origin/pruebas`.
+   - Si entregó una página (S1–S3) o reportó algo roto, esa slice va primero.
 
 ## 3. Reglas duras
 
@@ -33,6 +37,11 @@ Se trabaja en el worktree de la sesión y se sube directo a `practicas-ebac`.
 - Toda plantilla del panel nace de un archivo HTML que ya existe (`git mv`). El commit dice cuál.
 - Si una ruta cambia, se buscan con `rg` todas las referencias y se actualizan en el mismo commit.
 - Commits de producto y de curso, separados.
+- GGA revisa con un modelo gratis (`.gga`: `opencode/mimo-v2.6-flash-free`, con el snapshot de OpenCode apagado). Si responde sin la línea `STATUS:`, se reintenta el commit; nunca se salta.
+- **Variables de entorno:** ningún archivo de entorno nuevo.
+  - Django lee solo `backend/.env`, ordenado por secciones.
+  - Las llaves de IA viven en `~/.omniroute/.env`, fuera del repo.
+- **Cada instrucción de Eduardo va a Engram en el momento**, con el título "Eduardo: …". graphify se actualiza solo en cada commit.
 
 ## 4. Equipo
 
@@ -112,10 +121,11 @@ El SQL se prueba dentro de `BEGIN … ROLLBACK` en el Postgres local.
 
 ## 8. Guardar y retomar
 
+- Antes de cada slice, revisa el contexto del rediseño (§2.5). Al terminarla, deja el tuyo en Engram para que el rediseño lo lea.
 - Una línea por slice en `docs/PANEL_DJANGO_ESTADO.md` (sha, gates, siguiente) y una nota en Engram `panel-django/progreso`.
 - Se retoma en la primera slice que no esté HECHA.
 - Las páginas se piden al rediseño en Engram `contrato/pedido/<pagina>`.
 
 ## 9. Mensaje de arranque
 
-Retoma desde `docs/PANEL_DJANGO_ESTADO.md`. No preguntes nada que no sea una decisión de Eduardo. Si algo bloquea, anótalo como BLOQUEADO y sigue con la siguiente slice independiente.
+Retoma desde `docs/PANEL_DJANGO_ESTADO.md`. No preguntes nada que no sea una decisión de Eduardo. Si algo bloquea, anótalo como BLOQUEADO y sigue con la siguiente slice independiente. No pares hasta entregar la M14 (B5): el panel rediseñado servido por Django, el Word con capturas reales, el mensaje del LMS y el merge a `practicas-ebac`. Después, a `main` en tono de producción.
