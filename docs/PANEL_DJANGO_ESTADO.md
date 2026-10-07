@@ -5,7 +5,7 @@ Se actualiza en cada slice. Se retoma en la primera que no esté HECHA.
 | Slice | Qué | Estado | Sha | Espera |
 |---|---|---|---|---|
 | B0 | Decisión, contrato, loop y estado | HECHO | (este commit) | — |
-| B1 | Bug: ficha con todos los valores en cero | PENDIENTE | | — |
+| B1 | Bug: ficha con todos los valores en cero | HECHO | `8e750cc2` | — |
 | B2 | `inventory/services.py` + mirrors `OrderItem` y `Favorite` | PENDIENTE | | — |
 | B4 | Django Admin con las reglas del panel | PENDIENTE | | B2 |
 | B8 | Traspaso Supabase → Django | PENDIENTE | | Docker/Supabase prendidos para el gate SQL |
@@ -26,3 +26,7 @@ Se actualiza en cada slice. Se retoma en la primera que no esté HECHA.
   - Todo lo de las ramas extra (`entrega-m14-django-models-admin` y `panel-django`) pasó directo a `practicas-ebac` (`6b720395`), y esas ramas se borraron. La M14 literal (`backend/ecommerce/`, `4ed789e4` y `2e222757`) ya está en `practicas-ebac`.
   - El contrato y el loop se corrigieron con la revisión del agente de rediseño.
   - B1 quedó empezado sin commitear en el worktree: pruebas y el arreglo en `inventory/views.py`. Se revisa y commitea cuando Eduardo dé la orden de seguir.
+- 2026-10-07:
+  - GGA revisa gratis: Gemini Flash-Lite con el revisor `gga-reviewer` y el snapshot de OpenCode apagado (`e77de1f3`, `7b513e8e`).
+  - Los dos loops leen el contexto del otro agente en Engram antes de cada paso (`1869c669`, `541ddfeb`).
+  - B1 hecho (`8e750cc2`): `product_update` guarda la ficha aunque todos sus valores sean cero, igual que `product_create`. Pasan 42 pruebas.
