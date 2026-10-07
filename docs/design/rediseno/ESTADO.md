@@ -166,3 +166,25 @@ Escribe "retoma" en el chat de Claude Code del frente de diseño. El orquestador
   - **DISCREPANCIA 2 (menor, de mapa):** `js/modules/chatbot.js:146-147` lee `env.VITE_SUPABASE_URL` y `env.VITE_SUPABASE_KEY` por su cuenta: es un **cuarto** lector de las variables de Supabase y `MAPA.md` §2a solo registra tres. Muere en el paso 6.
   - **DISCREPANCIA 3 (menor, de mapa):** las referencias a rutas paralelas son **33 en 15 archivos**, no 5: además de `src/ui/Carcasa.tsx` y `vite.config.js` están `Pie`, `MenuHoja`, `CarritoHoja`, `Encabezado`, `Tarjeta`, `Portada`, `Mostrador`, `Populares`, `src/styles/tailwind.css` y el test de `Tarjeta`. `MAPA.md` §3.5 las enumera una por una, pero sin el recuento.
 - 2026-09-30 · OpenCode · **Rebanada 0 HECHO** · `gates.sh` gana el bloque anti-duplicado D1–D7 (codifica `MAPA.md` §5.1 y `LOOP-OPENCODE.md` §7) y la sonda HTTP ahora cubre también las cuatro páginas de producción, que antes no comprobaba. `--rapido` corre D1+D2+D3+D7; la corrida completa suma D4 (referencias colgantes: avisa si crecen de 33), D5 (una sola tarjeta, un solo cargador, un solo cliente de Supabase, un solo `assetUrl`, una sola superposición) y D6 (ninguna superposición sin X). Línea base en verde parcial: 5 fallas, todas conocidas y documentadas en el propio script — G2/G6 (los comentarios de `src/ui/assetUrl.ts`, deuda de U1) y D5 b/c/d (los tres duplicados vivos que mueren en 2.1, 2.1 y 6). `ts:check` ✓, 60/60 pruebas ✓, `build` ✓. Rebanada 1.1 (Lupa sobre `Hoja`) es la siguiente.
+
+---
+
+## Etapa 2 · LOOP-REDISENO-TOTAL (2026-10-07)
+
+Fuente de verdad: `origin/practicas-ebac:docs/LOOP_REDISENO_TOTAL.md` y `docs/CONTRATO_PANEL_DJANGO.md`. **Superado por el contrato:** `MAPA.md` §4.2–4.5, la decisión 12 de este archivo y `06-plano.md` §5.4 (panel en React aparte): el panel lo sirve Django y mi trabajo es el HTML rediseñado en el lugar. `LOOP-OPENCODE.md` M4 y M6 también quedan superados para el panel; `--no-verify` ya no se usa (GGA revisa gratis con OpenCode).
+
+| Paso | Qué | Estado | Sha |
+|---|---|---|---|
+| F0 | Enmienda de `AGENTS.md`, `.gga` gratis, corrección del traspaso (M14: código existe, entrega al LMS pendiente en B5) | HECHO | `1bfb1d8f`, `4d4abf3f`, `d778b84d` |
+| F1 | `tokens.css` exportable (S1); hash del CSS de la tienda intacto (`tailwind-B8PZhvSI.css`); `DESIGN.md` conciliado | HECHO | `3e471379`, `7991d6af`, DESIGN.md |
+| F2 | `dashboar.html` rediseñado en el lugar (S2) | PENDIENTE ← siguiente | |
+| F3 | `admin-products.html` y kit de Productos (S3, prioridad M14) | PENDIENTE | |
+| F4 a F10 | Tienda, perfil, islas, resto del panel, PWA, auditoría | PENDIENTE | |
+
+**Trabajo sin commit heredado (OpenCode, verificado verde: tipos OK y 64 pruebas):** `jest.config.js`, `src/components/Lupa/*`, `src/components/__tests__/*`, `src/data/supabase.ts`, `src/entry/products.tsx`, `src/redux/slices/busquedaSlice.ts`, `src/ui/{Carcasa,Encabezado,Hoja}.tsx`, `src/ui/Hoja.css`, `src/ui/LupaHoja.tsx` y sus pruebas. Se commitea por componente cuando se toque la Lupa o la Hoja (F4); mientras tanto no se pierde nada. También quedan sin commit `docs/design/loop-final.md` y `loop-v3.md` (ajenos).
+
+**COBERTURA** (pantalla de Claude Design → archivo → estado). Todas PENDIENTE hasta tener sha y captura a 390 y 1440, excepto Componentes/tokens, parcial por F1.
+Componentes · Encabezado · Pie · Tarjeta · Cierre · Landing (`index.html`) · Catálogo y ficha y Compra (`products.html`) · Inicio de sesión del cliente (`accessweb.html`) · Perfil del cliente (nuevo) · AdminNav y Panel administrativo (`dashboar.html`) · Productos, clientes y ajustes e Inventario Django (`admin-products.html`, `admin-customers.html`) · BuildAds y ProductAds.
+
+**Excepciones frente a Claude Design a anotar:** la landing y el encabezado ya tienen el efecto de video que Eduardo pidió conservar (`rgba(0,0,0,.92)` en hover o foco, sin desenfoque).
+- 2026-10-07 · F0 y F1 HECHOS. 5 h ~33 % · semanal ~42 % · contexto del chat 83 % (conviene una sesión nueva con el prompt de la etapa 2 para F2 y F3).
