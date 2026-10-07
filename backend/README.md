@@ -63,9 +63,11 @@ uv run python manage.py runserver
 uv run python manage.py test
 uv run ruff check .
 uv run ruff format .
+scripts/build_panel_css.sh --check   # the panel stylesheet is up to date (needs Docker)
 ```
 
-`manage.py test` runs on an in-memory SQLite database (see "Tests" below).
+`manage.py test` runs on an in-memory SQLite database (see "Tests" below). The
+panel stylesheet is built by a script, not by `manage.py`: see "Panel stylesheet".
 
 ## Inventory panel
 
@@ -225,6 +227,122 @@ Behaviour worth knowing before touching it:
   `PANEL_ALLOWED_ORIGINS=http://localhost:3002` and
   `PANEL_TOKEN_MAX_AGE_SECONDS=300`.
 
+## Panel stylesheet (Tailwind v4)
+
+The panel is styled with Tailwind v4 from the same design tokens as the store.
+Django has no Node, so one script compiles the stylesheet inside Docker and the
+result is committed.
+
+| Path | What it is |
+| --- | --- |
+| `assets/tokens.css` | Byte-identical copy of `src/styles/tokens.css` on `pruebas` (contract S1): the one `@theme` that the store and the panel share. Never edited here. |
+| `assets/panel.css` | The Tailwind entry: imports Tailwind and the tokens, scans `templates/` for classes and declares the `@font-face` rules. Sources only. |
+| `static/panel/panel.css` | The compiled, minified output. Built by the script, committed, and served by `staticfiles` as `panel/panel.css`. |
+| `static/panel/fonts/` | The self-hosted woff2 files, each with its SIL OFL license next to it. |
+| `scripts/build_panel_css.sh` | Drift check, build and `--check`. |
+
+`STATICFILES_DIRS` is `[BASE_DIR / "static"]`. `assets/` is left out on purpose,
+so `collectstatic` and `runserver` never publish the sources. No template links
+the stylesheet yet: `panel/base.html` (B7) will, with
+`{% static 'panel/panel.css' %}`.
+
+### Build and check
+
+Run it from any directory, with Docker running and access to the npm registry
+(the CLI is installed on every run; nothing runs `npm` on the host):
+
+```bash
+backend/scripts/build_panel_css.sh                  # drift check, then build
+backend/scripts/build_panel_css.sh --check          # fail when the committed CSS is stale
+backend/scripts/build_panel_css.sh --sync-tokens    # take tokens.css from origin/pruebas, then build
+```
+
+Every run starts with `git fetch origin pruebas` (skip it with
+`PANEL_CSS_NO_FETCH=1` when offline) and a drift check. It fails when:
+
+- the sha256 of `assets/tokens.css` differs from `src/styles/tokens.css` on
+  `origin/pruebas`;
+- the Tailwind version pinned at the top of the script, or one of the two font
+  versions, differs from what `package-lock.json` locks on `origin/pruebas`: the
+  panel has to compile with the store's Tailwind and ship the store's font files.
+
+Then it compiles into a temp directory. A plain run copies the result over
+`static/panel/panel.css`; `--check` changes nothing and fails when the committed
+file is not what the sources build. The output is byte-identical across runs and
+between `linux/arm64` and `linux/amd64`, so the check also holds on other
+machines and CI. The CLI's own dependencies are not locked, but the two that
+decide the output (`@tailwindcss/oxide` and `lightningcss`) are pinned by
+Tailwind itself.
+
+The Docker command it runs, so a failure can be reproduced by hand:
+
+```bash
+docker compose -f .devcontainer/docker-compose.yml run --rm -T \
+  --user "$(id -u):$(id -g)" \
+  -e HOME=/tmp -e npm_config_cache=/tmp/.npm -e npm_config_update_notifier=false \
+  -v "$OUT_DIR:/out" --workdir /tmp \
+  app sh -euc "$CONTAINER_SCRIPT" sh 4.3.3
+```
+
+`$OUT_DIR` is an empty temp directory that receives `panel.css`, and
+`$CONTAINER_SCRIPT` is the script's own text (the heredoc at the top of
+`build_panel_css.sh`). Inside the container it copies `backend/` (without
+`.venv`, `.env` and the caches) to `/tmp`, installs `tailwindcss@4.3.3` and
+`@tailwindcss/cli@4.3.3` there with install scripts off, and compiles
+`assets/panel.css` with `--minify`. The copy exists because the CLI looks for
+`tailwindcss` from the folder of the CSS file it compiles, and the repo has no
+`node_modules`. The first run builds the `.devcontainer` image if it is missing.
+
+### When the redesign changes the tokens
+
+`src/styles/tokens.css` belongs to the redesign. The backend never edits its
+copy; it resyncs it:
+
+1. `backend/scripts/build_panel_css.sh --sync-tokens` fetches `origin/pruebas`,
+   copies the file byte for byte and rebuilds.
+2. `uv run python manage.py test panel.test_stylesheet` (from `backend/`).
+3. Commit `assets/tokens.css` and `static/panel/panel.css` together.
+
+Until that is done, every run of the script reports the drift and `--check`
+fails. The same applies to a Tailwind or font version the store bumps: the
+script says which pin moved.
+
+### Fonts
+
+| Family | Package | Files |
+| --- | --- | --- |
+| `Geist Variable` (`wght` axis) | `@fontsource-variable/geist` 5.3.0 | `static/panel/fonts/geist/geist-latin-wght-normal.woff2` and `LICENSE` |
+| `Fraunces Variable` (`opsz` and `wght` axes) | `@fontsource-variable/fraunces` 5.3.0, `opsz.css` | `static/panel/fonts/fraunces/fraunces-latin-opsz-normal.woff2` and `LICENSE` |
+
+They are the packages, versions and axes that `src/styles/fuentes.ts` imports in
+the store. The woff2 files and the licenses come from the npm tarballs
+(`npm pack @fontsource-variable/<name>@<version>`, run in the same Docker
+service), after checking each tarball's sha512 against the `integrity` that the
+store's `package-lock.json` records. The `@font-face` blocks in
+`assets/panel.css` are Fontsource's own, with `font-display: swap` and the
+`unicode-range` of the `latin` subset, and only their `url()` changed. That
+subset covers Spanish; a character outside it falls back to the system font. To
+add a subset (for example `latin-ext`) or to refresh the files after the script
+reports a font drift, copy the file and the new `@font-face` block from the same
+package version and rebuild.
+
+### Things to know
+
+- `assets/panel.css` imports the tokens with `theme(static)`, so the build emits
+  every token as a custom property on `:root`, not only the ones a utility uses.
+  A template can read `var(--color-sand)` from its own CSS.
+- Tailwind only scans `templates/`. A class that lives anywhere else (a form
+  widget's `attrs`, a message tag in Python, a template inside an app) is not
+  seen; add an `@source` line to `assets/panel.css` for it.
+- The `url()` paths in `assets/panel.css` are relative to the compiled file
+  (`static/panel/`), not to the source.
+- Do not edit `static/panel/panel.css` by hand: `--check` fails and the next
+  build overwrites it.
+- The M13 templates define their own `--color-*` custom properties in an inline
+  `<style>`, with names that collide with the tokens. Do not link `panel.css`
+  from them; `panel/base.html` replaces them (B15). Meanwhile Tailwind also emits
+  a few utilities for plain words it finds in them (`block`, `table`, `border`).
+
 ## Tests
 
 ```bash
@@ -257,6 +375,14 @@ with raw SQL, the way Supabase does. It starts from the fixture
 `inventory/fixtures/categories.json`, the 9 real categories dumped with
 `dumpdata inventory.Category`. The `config.E001` system check only runs against
 Postgres; other databases have no `django` schema to verify.
+
+`panel/test_stylesheet.py` covers the static files of the panel: the finders
+serve the stylesheet, both woff2 files and their licenses, and do not serve the
+Tailwind sources in `assets/`; the compiled CSS declares every custom property of
+`assets/tokens.css` (and the same colours and font stacks), both `@font-face`
+families with `font-display: swap`, no `@import` and no remote URL, and every
+`url()` in it is a file the finders serve. It needs no Docker. Whether the CSS is
+up to date with its sources is `build_panel_css.sh --check`, not a test.
 
 ## Warning
 

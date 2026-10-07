@@ -155,6 +155,11 @@ USE_TZ = True
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
+# The compiled stylesheet of the panel and its fonts live in backend/static/panel/.
+# backend/assets/ (the Tailwind sources) is deliberately not listed: collectstatic
+# and runserver would publish it. See "Panel stylesheet" in backend/README.md.
+STATICFILES_DIRS = [BASE_DIR / "static"]
+
 
 # Panel session handoff (Supabase -> Django)
 # See docs/CONTRATO_PANEL_DJANGO.md, sections 5b and 6.
