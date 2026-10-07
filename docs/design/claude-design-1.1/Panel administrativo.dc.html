@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..700&family=Geist:wght@400..700&display=swap" rel="stylesheet">
+<style>
+  body { margin:0; background:#0B0B0C; color:#F5F3EF; }
+  a { color:#DC2626; text-decoration:none; }
+  a:hover { color:#E4D1B0; }
+</style>
+</helmet>
+
+<section id="b6a" data-screen-label="Panel administrativo" style="background:#0B0B0C;width:max-content;min-width:100%;box-sizing:border-box;padding:48px 48px 96px;font-family:Geist,system-ui,sans-serif;color:#F5F3EF;display:flex;flex-direction:column;gap:64px">
+
+  <div style="display:flex;flex-direction:column;gap:12px;max-width:960px">
+    <div style="font-size:12px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B">Carni · rediseño · panel administrativo</div>
+    <h1 style="margin:0;font-family:Fraunces,Georgia,serif;font-size:44px;line-height:50px;font-weight:480">20 Inicio · 21 Pedidos en tablero</h1>
+    <p style="margin:0;font-size:16px;line-height:26px;color:#A8A29B;max-width:74ch;text-wrap:pretty">Oscuro de punta a punta, sin una sola tabla blanca y sin franjas decorativas: cada bloque carga un dato. Navegación en el componente AdminNav: lateral en 1440, barra arriba y pestañas abajo en 390. Clientes y cifras son de ejemplo.</p>
+  </div>
+
+  <!-- ================= 20 INICIO ================= -->
+  <div style="display:flex;flex-direction:column;gap:16px">
+    <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap">
+      <span style="font-size:12px;font-weight:600;letter-spacing:0.04em;color:#DC2626">20</span>
+      <h2 style="margin:0;font-family:Fraunces,serif;font-size:30px;line-height:36px;font-weight:440">Inicio del panel</h2>
+      <span style="font-size:13px;line-height:18px;color:#A8A29B">ventas, pedidos, ticket promedio y stock bajo con cifra, variación y periodo · gráfica · últimos pedidos</span>
+    </div>
+    <div style="display:flex;gap:32px;align-items:flex-start">
+
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="width:390px;background:#0B0B0C;border:1px solid #3F3F46;border-radius:12px;overflow:hidden;box-sizing:border-box">
+          <dc-import name="AdminNav" ancho="movil-arriba" activo="Inicio" titulo="Hoy en la tienda" hint-size="100%,56px"></dc-import>
+          <div style="padding:16px 16px 28px;display:flex;flex-direction:column;gap:20px">
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <span style="font-size:14px;color:#A8A29B">Martes 22 de septiembre · abierto hasta las 17:00</span>
+              <div role="radiogroup" style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;padding:4px;border-radius:999px;background:#151517;border:1px solid #3F3F46">
+                <sc-for list="{{ periodos }}" as="o" hint-placeholder-count="3"><span style="height:44px;display:flex;align-items:center;justify-content:center;border-radius:999px;background:{{ o.bg }};color:{{ o.fg }};font-size:15px;font-weight:{{ o.w }}">{{ o.t }}</span></sc-for>
+              </div>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px">
+              <sc-for list="{{ kpis }}" as="k" hint-placeholder-count="4">
+                <div style="display:flex;flex-direction:column;gap:6px;padding:14px;border-radius:16px;background:#151517;border:1px solid #3F3F46">
+                  <span style="font-size:13px;line-height:18px;color:#A8A29B">{{ k.l }}</span>
+                  <span style="font-size:26px;line-height:30px;font-weight:600;font-variant-numeric:tabular-nums">{{ k.v }}</span>
+                  <span style="display:flex;align-items:center;gap:4px;font-size:13px;line-height:18px;color:{{ k.c }};font-variant-numeric:tabular-nums"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="{{ k.flecha }}"></path></svg>{{ k.d }}</span>
+                  <span style="font-size:12px;line-height:16px;color:#A8A29B">{{ k.p }}</span>
+                  <span style="display:flex;flex-direction:column;gap:2px;padding-top:4px"><svg viewBox="0 0 100 32" preserveAspectRatio="none" aria-label="{{ k.sparkLabel }}" style="width:100%;height:28px;display:block;overflow:visible"><polyline points="{{ k.pts }}" fill="none" stroke="#E4D1B0" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"></polyline></svg><span style="display:flex;justify-content:space-between;font-size:12px;line-height:16px;color:#A8A29B"><span>hace 7 días</span><span>hoy</span></span></span>
+                </div>
+              </sc-for>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px;padding:16px;border-radius:16px;background:#151517;border:1px solid #3F3F46">
+              <span style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:15px;font-weight:600">Ventas por día</span><span style="font-size:13px;color:#A8A29B">últimos 14 días</span></span>
+              <div style="height:140px;display:grid;grid-template-columns:repeat(14,minmax(0,1fr));gap:4px;align-items:end">
+                <sc-for list="{{ barras }}" as="b" hint-placeholder-count="14"><span style="display:block;height:{{ b.h }};border-radius:4px 4px 2px 2px;background:{{ b.c }}"></span></sc-for>
+              </div>
+              <div style="display:grid;grid-template-columns:repeat(14,minmax(0,1fr));gap:4px;font-size:11px;color:#A8A29B;text-align:center"><sc-for list="{{ barras }}" as="b" hint-placeholder-count="14"><span style="color:{{ b.lc }}">{{ b.d }}</span></sc-for></div>
+              <span style="font-size:13px;line-height:18px;color:#A8A29B;font-variant-numeric:tabular-nums">Hoy, en rojo: $8,420 · el mejor día fue el sábado 19 con $12,960</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:4px">
+              <span style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:17px;font-weight:600">Últimos pedidos</span><a href="Panel administrativo.dc.html" style="min-height:44px;display:flex;align-items:center;font-size:14px;font-weight:600;color:#F5F3EF;text-decoration:underline;text-decoration-color:#E4D1B0;text-underline-offset:4px">Ver tablero</a></span>
+              <sc-for list="{{ ultimos }}" as="o" hint-placeholder-count="5">
+                <div style="display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;padding:12px 0;border-bottom:1px solid #3F3F46">
+                  <span style="font-size:15px;font-weight:600">{{ o.cliente }}</span>
+                  <span style="font-size:15px;font-weight:600;font-variant-numeric:tabular-nums;text-align:right">{{ o.total }}</span>
+                  <span style="font-size:13px;color:#A8A29B;font-variant-numeric:tabular-nums">{{ o.folio }} · {{ o.hora }} · {{ o.modo }}</span>
+                  <span style="justify-self:end;display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 10px;border-radius:999px;background:#1C1C1F;border:1px solid #3F3F46;font-size:12px;font-weight:600"><span style="width:8px;height:8px;border-radius:999px;background:{{ o.dot }}"></span>{{ o.estado }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+          <dc-import name="AdminNav" ancho="movil-abajo" activo="Inicio" hint-size="100%,72px"></dc-import>
+        </div>
+        <div style="font-size:13px;line-height:18px;font-weight:600">Inicio · móvil 390</div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="width:1440px;height:1080px;background:#0B0B0C;border:1px solid #3F3F46;border-radius:12px;overflow:hidden;box-sizing:border-box;display:grid;grid-template-columns:248px minmax(0,1fr)">
+          <dc-import name="AdminNav" ancho="escritorio" activo="Inicio" hint-size="248px,100%"></dc-import>
+          <div style="display:flex;flex-direction:column;min-width:0">
+            <div style="height:72px;flex:0 0 72px;display:flex;align-items:center;justify-content:space-between;gap:24px;padding:0 32px;border-bottom:1px solid #3F3F46">
+              <span style="display:flex;align-items:baseline;gap:14px"><span style="font-family:Fraunces,serif;font-size:28px;line-height:32px;font-weight:460">Hoy en la tienda</span><span style="font-size:14px;color:#A8A29B">Martes 22 de septiembre · abierto hasta las 17:00</span></span>
+              <div role="radiogroup" style="width:360px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;padding:4px;border-radius:999px;background:#151517;border:1px solid #3F3F46">
+                <sc-for list="{{ periodos }}" as="o" hint-placeholder-count="3"><span style="height:40px;display:flex;align-items:center;justify-content:center;border-radius:999px;background:{{ o.bg }};color:{{ o.fg }};font-size:14px;font-weight:{{ o.w }}">{{ o.t }}</span></sc-for>
+              </div>
+            </div>
+            <div style="padding:28px 32px;display:flex;flex-direction:column;gap:20px">
+              <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px">
+                <sc-for list="{{ kpis }}" as="k" hint-placeholder-count="4">
+                  <div style="display:flex;flex-direction:column;gap:8px;padding:20px;border-radius:16px;background:#151517;border:1px solid #3F3F46">
+                    <span style="font-size:14px;color:#A8A29B">{{ k.l }}</span>
+                    <span style="font-size:36px;line-height:40px;font-weight:600;font-variant-numeric:tabular-nums">{{ k.v }}</span>
+                    <span style="display:flex;align-items:center;gap:6px;font-size:14px;color:{{ k.c }};font-variant-numeric:tabular-nums"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="{{ k.flecha }}"></path></svg>{{ k.d }} <span style="color:#A8A29B">· {{ k.p }}</span></span>
+                    <span style="display:flex;flex-direction:column;gap:2px;padding-top:4px"><svg viewBox="0 0 100 32" preserveAspectRatio="none" aria-label="{{ k.sparkLabel }}" style="width:100%;height:36px;display:block;overflow:visible"><polyline points="{{ k.pts }}" fill="none" stroke="#E4D1B0" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"></polyline></svg><span style="display:flex;justify-content:space-between;font-size:12px;line-height:16px;color:#A8A29B"><span>hace 7 días</span><span>hoy</span></span></span>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:16px">
+                <div style="display:flex;flex-direction:column;gap:14px;padding:20px 24px;border-radius:16px;background:#151517;border:1px solid #3F3F46">
+                  <span style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:16px;font-weight:600">Ventas por día</span><span style="font-size:14px;color:#A8A29B">últimos 14 días · hoy en rojo</span></span>
+                  <div style="display:grid;grid-template-columns:56px minmax(0,1fr);gap:12px">
+                    <div style="height:220px;display:flex;flex-direction:column;justify-content:space-between;font-size:12px;color:#A8A29B;text-align:right;font-variant-numeric:tabular-nums"><span>$15k</span><span>$10k</span><span>$5k</span><span>$0</span></div>
+                    <div style="height:220px;display:grid;grid-template-columns:repeat(14,minmax(0,1fr));gap:10px;align-items:end;border-bottom:1px solid #3F3F46">
+                      <sc-for list="{{ barras }}" as="b" hint-placeholder-count="14"><span style="display:block;height:{{ b.h }};border-radius:6px 6px 2px 2px;background:{{ b.c }}"></span></sc-for>
+                    </div>
+                  </div>
+                  <div style="display:grid;grid-template-columns:56px minmax(0,1fr);gap:12px"><span></span><div style="display:grid;grid-template-columns:repeat(14,minmax(0,1fr));gap:10px;font-size:12px;text-align:center;font-variant-numeric:tabular-nums"><sc-for list="{{ barras }}" as="b" hint-placeholder-count="14"><span style="color:{{ b.lc }}">{{ b.dd }}</span></sc-for></div></div>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:6px;padding:20px 24px;border-radius:16px;background:#151517;border:1px solid #3F3F46">
+                  <span style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:16px;font-weight:600">Stock bajo</span><a href="Productos, clientes y ajustes.dc.html" style="min-height:44px;display:flex;align-items:center;font-size:14px;font-weight:600;color:#F5F3EF;text-decoration:underline;text-decoration-color:#E4D1B0;text-underline-offset:4px">Ver productos</a></span>
+                  <sc-for list="{{ bajo }}" as="s" hint-placeholder-count="5"><span style="display:flex;justify-content:space-between;gap:12px;min-height:44px;align-items:center;border-bottom:1px solid #3F3F46;font-size:15px"><span>{{ s.n }}</span><span style="font-variant-numeric:tabular-nums;color:{{ s.c }};font-weight:600">{{ s.q }}</span></span></sc-for>
+                </div>
+              </div>
+              <div style="display:flex;flex-direction:column;padding:8px 24px 12px;border-radius:16px;background:#151517;border:1px solid #3F3F46">
+                <span style="display:flex;justify-content:space-between;align-items:center;min-height:52px"><span style="font-size:16px;font-weight:600">Últimos pedidos</span><a href="Panel administrativo.dc.html" style="min-height:44px;display:flex;align-items:center;font-size:14px;font-weight:600;color:#F5F3EF;text-decoration:underline;text-decoration-color:#E4D1B0;text-underline-offset:4px">Ver tablero</a></span>
+                <div style="display:grid;grid-template-columns:90px minmax(0,1.4fr) 110px minmax(0,1fr) 120px 150px;gap:16px;padding:10px 0;border-bottom:1px solid #3F3F46;font-size:12px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B"><span>Folio</span><span>Cliente</span><span>Hora</span><span>Entrega</span><span style="text-align:right">Total</span><span>Estado</span></div>
+                <sc-for list="{{ ultimos }}" as="o" hint-placeholder-count="5">
+                  <div style="display:grid;grid-template-columns:90px minmax(0,1.4fr) 110px minmax(0,1fr) 120px 150px;gap:16px;min-height:52px;align-items:center;border-bottom:1px solid #3F3F46;font-size:15px;font-variant-numeric:tabular-nums"><span style="color:#A8A29B">{{ o.folio }}</span><span style="font-weight:600">{{ o.cliente }}</span><span style="color:#A8A29B">{{ o.hora }}</span><span style="color:#A8A29B">{{ o.modo }}</span><span style="text-align:right;font-weight:600">{{ o.total }}</span><span><span style="display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 10px;border-radius:999px;background:#1C1C1F;border:1px solid #3F3F46;font-size:13px;font-weight:600"><span style="width:8px;height:8px;border-radius:999px;background:{{ o.dot }}"></span>{{ o.estado }}</span></span></div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="font-size:13px;line-height:18px;font-weight:600">Inicio · escritorio 1440</div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:4px;font-size:13px;line-height:19px;color:#A8A29B;max-width:1100px;text-wrap:pretty"><span><span style="color:#E4D1B0;font-weight:600">De lo nuestro · </span>el dashboard con navegación lateral, tarjetas de ventas y pedidos, gráficas y últimos pedidos.</span><span><span style="color:#F5F3EF;font-weight:600">De lo mío · </span>cada tarjeta con cifra, variación y contra qué se compara; hoy en rojo en la gráfica.</span><span><span style="color:#F5F3EF;font-weight:600">Mejora · </span>sin tabla blanca ni franjas de color sin datos, y la navegación lateral ya incluye BuildAds y ProductAds.</span></div>
+  </div>
+
+  <!-- ================= 21 KANBAN ================= -->
+  <div style="display:flex;flex-direction:column;gap:16px">
+    <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap">
+      <span style="font-size:12px;font-weight:600;letter-spacing:0.04em;color:#DC2626">21</span>
+      <h2 style="margin:0;font-family:Fraunces,serif;font-size:30px;line-height:36px;font-weight:440">Pedidos en tablero</h2>
+      <span style="font-size:13px;line-height:18px;color:#A8A29B">cinco columnas y Cancelado fuera del flujo · en 1440 se arrastra · en 390 pilas deslizables con botón Avanzar</span>
+    </div>
+    <div style="display:flex;gap:32px;align-items:flex-start">
+
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="width:390px;height:844px;background:#0B0B0C;border:1px solid #3F3F46;border-radius:12px;overflow:hidden;box-sizing:border-box;display:flex;flex-direction:column">
+          <dc-import name="AdminNav" ancho="movil-arriba" activo="Pedidos" titulo="Pedidos" hint-size="100%,56px"></dc-import>
+          <div style="flex:0 0 auto;padding:12px 0 8px;overflow:hidden">
+            <div style="display:flex;gap:8px;padding:0 16px;width:max-content">
+              <sc-for list="{{ columnas }}" as="c" hint-placeholder-count="5"><span style="min-height:44px;display:inline-flex;align-items:center;gap:8px;padding:0 14px;border-radius:999px;background:{{ c.bg }};border:1px solid {{ c.bd }};color:{{ c.fg }};font-size:15px;font-weight:{{ c.w }};white-space:nowrap">{{ c.t }}<span style="font-variant-numeric:tabular-nums;opacity:0.9">{{ c.n }}</span></span></sc-for>
+            </div>
+          </div>
+          <div style="flex:1;min-height:0;overflow:hidden;display:flex;gap:12px;padding:8px 16px 0">
+            <div style="flex:0 0 334px;display:flex;flex-direction:column;gap:10px">
+              <span style="display:flex;justify-content:space-between;align-items:center;font-size:13px;color:#A8A29B"><span>Pendiente · 3 · el más antiguo arriba</span><span style="display:flex;gap:4px"><span style="width:16px;height:4px;border-radius:999px;background:#DC2626"></span><sc-for list="{{ puntos }}" as="x" hint-placeholder-count="4"><span style="width:6px;height:4px;border-radius:999px;background:#3F3F46"></span></sc-for></span></span>
+              <sc-for list="{{ pendientes }}" as="o" hint-placeholder-count="3">
+                <div style="display:flex;flex-direction:column;gap:8px;padding:14px;border-radius:16px;background:#151517;border:1px solid {{ o.borde }}">
+                  <span style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:13px;color:#A8A29B;font-variant-numeric:tabular-nums">{{ o.folio }} · {{ o.modo }}</span><span style="display:inline-flex;align-items:center;gap:4px;height:24px;padding:0 8px;border-radius:999px;border:1px solid {{ o.tbd }};color:{{ o.tfg }};font-size:12px;font-weight:600;font-variant-numeric:tabular-nums"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8"></circle><path d="M12 8v4l2.5 2"></path></svg>{{ o.espera }}</span></span>
+                  <span style="display:flex;justify-content:space-between;align-items:baseline;gap:12px"><span style="font-size:16px;font-weight:600">{{ o.cliente }}</span><span style="font-size:16px;font-weight:600;font-variant-numeric:tabular-nums">{{ o.total }}</span></span>
+                  <span style="font-size:13px;line-height:18px;color:#A8A29B;text-wrap:pretty">{{ o.items }}</span>
+                  <span style="display:flex;gap:8px;padding-top:2px"><button style="flex:1;height:44px;border-radius:999px;background:#DC2626;border:none;color:#FFFFFF;font-family:Geist,system-ui,sans-serif;font-size:15px;font-weight:600;cursor:pointer">Avanzar a Confirmado</button><button aria-label="Más acciones del pedido" style="width:44px;height:44px;flex:0 0 44px;border-radius:999px;background:transparent;border:1px solid #3F3F46;color:#F5F3EF;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12h.01M12 12h.01M19 12h.01"></path></svg></button></span>
+                </div>
+              </sc-for>
+            </div>
+            <div style="flex:0 0 334px;display:flex;flex-direction:column;gap:10px;opacity:0.9">
+              <span style="font-size:13px;color:#A8A29B">Confirmado · 2</span>
+              <div style="height:180px;border-radius:16px;background:#151517;border:1px solid #3F3F46"></div>
+            </div>
+          </div>
+          <dc-import name="AdminNav" ancho="movil-abajo" activo="Pedidos" hint-size="100%,72px"></dc-import>
+        </div>
+        <div style="font-size:13px;line-height:18px;font-weight:600">Pedidos · móvil 390 · pila Pendiente, la siguiente asoma a la derecha</div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="width:1440px;height:1000px;background:#0B0B0C;border:1px solid #3F3F46;border-radius:12px;overflow:hidden;box-sizing:border-box;display:grid;grid-template-columns:248px minmax(0,1fr)">
+          <dc-import name="AdminNav" ancho="escritorio" activo="Pedidos" hint-size="248px,100%"></dc-import>
+          <div style="display:flex;flex-direction:column;min-width:0">
+            <div style="height:72px;flex:0 0 72px;display:flex;align-items:center;justify-content:space-between;gap:24px;padding:0 32px;border-bottom:1px solid #3F3F46">
+              <span style="display:flex;align-items:baseline;gap:14px"><span style="font-family:Fraunces,serif;font-size:28px;line-height:32px;font-weight:460">Pedidos</span><span style="font-size:14px;color:#A8A29B">hoy · 17 activos · arrastra una tarjeta para cambiar su estado</span></span>
+              <span style="display:flex;gap:8px"><span style="min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;background:#DC2626;border:1px solid #DC2626;color:#FFFFFF;font-size:14px;font-weight:600">Todos</span><span style="min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;background:#151517;border:1px solid #3F3F46;color:#F5F3EF;font-size:14px">A domicilio</span><span style="min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;background:#151517;border:1px solid #3F3F46;color:#F5F3EF;font-size:14px">Recoger</span></span>
+            </div>
+            <div style="flex:1;min-height:0;padding:20px 24px 0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px">
+              <sc-for list="{{ tablero }}" as="col" hint-placeholder-count="5">
+                <div style="display:flex;flex-direction:column;gap:10px;min-width:0;padding:12px;border-radius:16px;background:#151517;border:1px solid #3F3F46">
+                  <span style="display:flex;justify-content:space-between;align-items:center;padding:0 4px"><span style="display:flex;align-items:center;gap:8px;font-size:15px;font-weight:600"><span style="width:8px;height:8px;border-radius:999px;background:{{ col.dot }}"></span>{{ col.t }}</span><span style="font-size:14px;color:#A8A29B;font-variant-numeric:tabular-nums">{{ col.n }}</span></span>
+                  <sc-for list="{{ col.cards }}" as="o" hint-placeholder-count="2">
+                    <div style="display:flex;flex-direction:column;gap:6px;padding:12px;border-radius:14px;background:#1C1C1F;border:1px solid {{ o.borde }};transform:{{ o.tf }};cursor:grab">
+                      <span style="display:flex;justify-content:space-between;align-items:center"><span style="display:flex;align-items:center;gap:6px;font-size:13px;color:#A8A29B;font-variant-numeric:tabular-nums"><svg width="12" height="12" viewBox="0 0 24 24" fill="#A8A29B"><circle cx="9" cy="6" r="1.5"></circle><circle cx="15" cy="6" r="1.5"></circle><circle cx="9" cy="12" r="1.5"></circle><circle cx="15" cy="12" r="1.5"></circle><circle cx="9" cy="18" r="1.5"></circle><circle cx="15" cy="18" r="1.5"></circle></svg>{{ o.folio }}</span><span style="display:flex;align-items:center;gap:4px"><span style="display:inline-flex;align-items:center;gap:4px;height:22px;padding:0 8px;border-radius:999px;border:1px solid {{ o.tbd }};color:{{ o.tfg }};font-size:12px;font-weight:600;font-variant-numeric:tabular-nums">{{ o.espera }}</span><button aria-label="Más acciones del pedido {{ o.folio }}" style="width:44px;height:44px;margin:-12px -10px -12px -6px;border:none;background:transparent;color:#A8A29B;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:999px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12h.01M12 12h.01M19 12h.01"></path></svg></button></span></span>
+                      <span style="font-size:15px;line-height:20px;font-weight:600">{{ o.cliente }}</span>
+                      <span style="font-size:13px;line-height:18px;color:#A8A29B;text-wrap:pretty">{{ o.items }}</span>
+                      <span style="display:flex;justify-content:space-between;align-items:center;padding-top:2px"><span style="font-size:13px;color:#A8A29B">{{ o.modo }}</span><span style="font-size:15px;font-weight:600;font-variant-numeric:tabular-nums">{{ o.total }}</span></span>
+                    </div>
+                  </sc-for>
+                  <sc-if value="{{ col.hueco }}"><div style="height:64px;border-radius:14px;border:1px dashed #DC2626;display:flex;align-items:center;justify-content:center;font-size:13px;color:#F5F3EF">Suelta aquí</div></sc-if>
+                  <sc-if value="{{ col.mas }}"><span style="min-height:44px;display:flex;align-items:center;justify-content:center;font-size:14px;color:#A8A29B">{{ col.mas }}</span></sc-if>
+                </div>
+              </sc-for>
+            </div>
+            <div style="margin:16px 24px 24px;display:flex;align-items:center;gap:16px;min-height:56px;padding:0 20px;border-radius:16px;border:1px solid #3F3F46;background:#0B0B0C">
+              <span style="display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 10px;border-radius:999px;background:#1C1C1F;border:1px solid #3F3F46;color:#A8A29B;font-size:13px;font-weight:600"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M7 7l10 10M17 7 7 17"></path></svg>Cancelados · 1 esta semana</span>
+              <span style="flex:1;font-size:14px;color:#A8A29B;font-variant-numeric:tabular-nums">1039 · Karla Méndez · $412.00 · cancelado por la clienta ayer, 16:40</span>
+              <span style="font-size:13px;color:#A8A29B">Fuera del flujo: se cancela desde el botón “…” de la tarjeta, no arrastrando</span>
+            </div>
+          </div>
+        </div>
+        <div style="font-size:13px;line-height:18px;font-weight:600">Pedidos · escritorio 1440 · arrastrando 1043 de Confirmado a Preparando</div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:4px;font-size:13px;line-height:19px;color:#A8A29B;max-width:1100px;text-wrap:pretty"><span><span style="color:#E4D1B0;font-weight:600">De lo nuestro · </span>admin-orders con sus pedidos y estados.</span><span><span style="color:#F5F3EF;font-weight:600">De lo mío · </span>el tablero con las cinco columnas, arrastrar en escritorio y “Avanzar” en 390.</span><span><span style="color:#F5F3EF;font-weight:600">Mejora · </span>cada tarjeta dice folio, cliente, artículos, total, modo y cuánto lleva esperando, en orden de llegada.</span></div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:16px">
+    <h2 style="margin:0;font-family:Fraunces,serif;font-size:30px;line-height:36px;font-weight:440">Autorrevisión · inicio y pedidos</h2>
+    <div style="background:#151517;border:1px solid #3F3F46;border-radius:12px;overflow:hidden;width:1440px;max-width:100%">
+      <div style="display:grid;grid-template-columns:200px minmax(0,1fr) 100px minmax(0,1.2fr);font-size:12px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B;border-bottom:1px solid #3F3F46"><span style="padding:12px 16px">Criterio</span><span style="padding:12px 16px">Qué se midió</span><span style="padding:12px 16px">Estado</span><span style="padding:12px 16px">Corrección</span></div>
+      <sc-for list="{{ revision }}" as="c" hint-placeholder-count="6">
+        <div style="display:grid;grid-template-columns:200px minmax(0,1fr) 100px minmax(0,1.2fr);font-size:13px;line-height:18px;border-bottom:1px solid #3F3F46"><span style="padding:12px 16px">{{ c.c }}</span><span style="padding:12px 16px;color:#A8A29B">{{ c.m }}</span><span style="padding:12px 16px;color:#059669;font-weight:600">Pasa</span><span style="padding:12px 16px;color:#A8A29B">{{ c.x }}</span></div>
+      </sc-for>
+    </div>
+  </div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const EST = { Pendiente: '#A8A29B', Confirmado: '#E4D1B0', Preparando: '#DC2626', Listo: '#F5F3EF', Entregado: '#059669' };
+const card = (folio, cliente, items, total, modo, min, o = {}) => ({
+  folio, cliente, items, total, modo, espera: min + ' min',
+  tbd: min > 15 ? '#E4D1B0' : '#3F3F46', tfg: min > 15 ? '#E4D1B0' : '#A8A29B',
+  borde: o.arrastre ? '#DC2626' : (min > 15 && o.col === 'Pendiente' ? '#E4D1B0' : '#3F3F46'),
+  tf: o.arrastre ? 'translate(-18px,-6px) rotate(-1.5deg)' : 'none'
+});
+class Component extends DCLogic {
+  renderVals() {
+    const dias = ['M', 'M', 'J', 'V', 'S', 'D', 'L', 'M', 'M', 'J', 'V', 'S', 'D', 'L', 'M'].slice(1);
+    const nums = ['9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22'];
+    const v = [6.1, 5.4, 7.2, 9.8, 12.1, 3.2, 5.9, 7.5, 6.8, 7.9, 10.4, 12.96, 3.9, 8.42];
+    const col = (t, n, cards, o = {}) => ({ t, n, cards, dot: EST[t], hueco: !!o.hueco, mas: o.mas ?? null });
+    return {
+      periodos: ['Hoy', '7 días', '30 días'].map((t, i) => ({ t, bg: i === 0 ? '#DC2626' : 'transparent', fg: i === 0 ? '#FFFFFF' : '#A8A29B', w: i === 0 ? 600 : 400 })),
+      kpis: [
+        { l: 'Ventas', s7: [7.5, 6.8, 7.9, 10.4, 12.96, 3.9, 8.42], v: '$8,420', d: '12 %', p: 'vs. martes pasado', c: '#059669', flecha: 'M12 19V5M6 11l6-6 6 6' },
+        { l: 'Pedidos', s7: [18, 21, 16, 25, 27, 20, 23], v: '23', d: '3 más', p: 'vs. martes pasado', c: '#059669', flecha: 'M12 19V5M6 11l6-6 6 6' },
+        { l: 'Ticket promedio', s7: [339, 352, 362, 356, 355, 375, 366], v: '$366', d: '4 %', p: 'vs. martes pasado', c: '#E4D1B0', flecha: 'M12 5v14M6 13l6 6 6-6' },
+        { l: 'Stock bajo', s7: [2, 2, 3, 3, 4, 4, 5], v: '5', d: 'Tomahawk: quedan 3', p: 'menos de 5 en existencia', c: '#E4D1B0', flecha: 'M12 9v4M12 16.5h.01M10.3 4.2 2.8 17.5A2 2 0 0 0 4.5 20.5h15a2 2 0 0 0 1.7-3L13.7 4.2a2 2 0 0 0-3.4 0Z' }
+      ].map(x => { const mn = Math.min(...x.s7), mx = Math.max(...x.s7); return { ...x, sparkLabel: x.l + ', últimos 7 días', pts: x.s7.map((y, i) => (i * 100 / 6).toFixed(1) + ',' + (30 - (y - mn) / ((mx - mn) || 1) * 28).toFixed(1)).join(' ') }; }),
+      barras: v.map((x, i) => ({ h: Math.round(x / 15 * 100) + '%', c: i === 13 ? '#DC2626' : '#3F3F46', d: dias[i] ?? '', dd: nums[i], lc: i === 13 ? '#F5F3EF' : '#A8A29B' })),
+      bajo: [{ n: 'Tomahawk', q: '3 piezas' }, { n: 'Paquete Parrillada Familiar', q: '2' }, { n: 'Filete Mignon', q: '4 kg' }, { n: 'Hielera Rígida', q: '4' }, { n: 'Vacío en Oferta', q: '4 kg' }].map(s => ({ ...s, c: '#E4D1B0' })),
+      ultimos: [
+        { folio: '1047', cliente: 'Lucía Hernández', hora: '12:41', modo: 'A domicilio', total: '$449.40', estado: 'Pendiente' },
+        { folio: '1046', cliente: 'Jorge Martínez', hora: '12:35', modo: 'Recoger', total: '$912.00', estado: 'Pendiente' },
+        { folio: '1044', cliente: 'Carlos Pérez', hora: '12:22', modo: 'Recoger', total: '$386.50', estado: 'Confirmado' },
+        { folio: '1042', cliente: 'Eduardo Torres', hora: '12:04', modo: 'A domicilio', total: '$524.50', estado: 'Preparando' },
+        { folio: '1036', cliente: 'Patricia Ruiz', hora: '10:15', modo: 'A domicilio', total: '$1,034.00', estado: 'Entregado' }
+      ].map(o => ({ ...o, dot: EST[o.estado] })),
+      columnas: [['Pendiente', 3], ['Confirmado', 2], ['Preparando', 2], ['Listo', 1], ['Entregado', 9]].map(([t, n], i) => ({ t, n, bg: i === 0 ? '#DC2626' : '#151517', bd: i === 0 ? '#DC2626' : '#3F3F46', fg: i === 0 ? '#FFFFFF' : '#F5F3EF', w: i === 0 ? 600 : 400 })),
+      puntos: [1, 2, 3, 4],
+      pendientes: [
+        card('1045', 'Ana Rodríguez', 'Paquete Asador 4 a 6 Personas', '$1,599.00', 'A domicilio', 18, { col: 'Pendiente' }),
+        card('1046', 'Jorge Martínez', 'Costilla de Cerdo 1.5 kg, Chorizo Rojo ½ kg, Tortillas y 2 más', '$912.00', 'Recoger', 9, { col: 'Pendiente' }),
+        card('1047', 'Lucía Hernández', 'Rib Eye 0.600 kg · 1¼”, Carbón de Mezquite', '$449.40', 'A domicilio', 3, { col: 'Pendiente' })
+      ],
+      tablero: [
+        col('Pendiente', 3, [card('1045', 'Ana Rodríguez', 'Paquete Asador 4 a 6 Personas', '$1,599.00', 'A domicilio', 18, { col: 'Pendiente' }), card('1046', 'Jorge Martínez', 'Costilla de Cerdo 1.5 kg y 3 más', '$912.00', 'Recoger', 9), card('1047', 'Lucía Hernández', 'Rib Eye 0.600 kg, Carbón', '$449.40', 'A domicilio', 3)]),
+        col('Confirmado', 2, [card('1044', 'Carlos Pérez', 'Bistec de Res 1 kg, Longaniza ½ kg', '$386.50', 'Recoger', 22)]),
+        col('Preparando', 2, [card('1043', 'Sofía Ramírez', 'Pierna y Muslo 2 kg, Alas Adobadas', '$278.00', 'A domicilio', 25, { arrastre: true }), card('1042', 'Eduardo Torres', 'Arrachera ½ kg, Chorizo Verde $100, Gorra', '$524.50', 'A domicilio', 31), card('1041', 'Daniela Flores', 'Tomahawk 1 pieza y 4 más', '$1,204.00', 'Recoger', 38)], { hueco: true }),
+        col('Listo', 1, [card('1040', 'Roberto Sánchez', 'Molida Especial 1 kg, Jamón ½ kg', '$318.00', 'Recoger', 44)]),
+        col('Entregado', 9, [card('1037', 'Mónica Vega', 'Chuleta de Cerdo 1 kg', '$169.00', 'A domicilio', 0), card('1036', 'Patricia Ruiz', 'Parrillada Familiar', '$1,034.00', 'A domicilio', 0)], { mas: '7 más de hoy' })
+      ].map(c => ({ ...c, cards: c.cards.map(k => c.t === 'Entregado' ? { ...k, espera: 'entregado', tbd: '#059669', tfg: '#F5F3EF' } : k) })),
+      revision: [
+        { c: 'Se lee en el teléfono', m: 'Cifras 26 px, nombres 16 px, artículos 13 px en 390', x: 'Sin cambios necesarios.' },
+        { c: 'Contraste', m: 'Variación verde #059669 sobre #151517 5.1:1 · beige 12.4:1 · barra de hoy roja contra barras #3F3F46', x: 'Intento 1: la baja del ticket iba en rojo; el rojo es de acciones, pasó a beige con flecha hacia abajo.' },
+        { c: 'Botones de 44 px', m: 'Avanzar 44, más acciones 44, pestañas de estado 44, pestañas inferiores 56', x: 'Sin cambios necesarios.' },
+        { c: 'Mismos botones y chips', m: 'Segmentado de Catálogo y ficha para el periodo; chips de Componentes para filtros y estados', x: 'Sin cambios necesarios.' },
+        { c: 'Nada se sale ni se corta', m: 'Artículos largos envuelven en dos líneas; columnas de 214 px en 1440', x: 'Intento 1: “Costilla de Cerdo 1.5 kg, Chorizo Rojo ½ kg, Tortillas y 2 más” se cortaba en escritorio; allá se resume a “y 3 más”.' },
+        { c: 'Mejor que lo viejo', m: 'Contra capturas 26–29 y 33', x: 'Ver las dos líneas de mejora.' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

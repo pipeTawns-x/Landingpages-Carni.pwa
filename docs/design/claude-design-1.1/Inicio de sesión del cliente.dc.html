@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..700&family=Geist:wght@400..700&display=swap" rel="stylesheet">
+<style>
+  body { margin:0; background:#0B0B0C; color:#F5F3EF; }
+  a { color:#DC2626; text-decoration:none; }
+  a:hover { color:#E4D1B0; }
+</style>
+</helmet>
+
+<section id="b4" data-screen-label="Inicio de sesión del cliente" style="background:#0B0B0C;width:max-content;min-width:100%;box-sizing:border-box;padding:48px 48px 96px;font-family:Geist,system-ui,sans-serif;color:#F5F3EF;display:flex;flex-direction:column;gap:64px">
+
+  <div style="display:flex;flex-direction:column;gap:12px;max-width:960px">
+    <div style="font-size:12px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B">Carni · rediseño · inicio de sesión del cliente</div>
+    <h1 style="margin:0;font-family:Fraunces,Georgia,serif;font-size:44px;line-height:50px;font-weight:480">10–16 — Ingresar, registrarse, recuperar y sin conexión</h1>
+    <p style="margin:0;font-size:16px;line-height:26px;color:#A8A29B;max-width:74ch;text-wrap:pretty">Un solo campo para todo el sitio: fondo #151517 de un tono, borde #3F3F46, foco rojo con anillo de 2 px, error con borde rojo y mensaje debajo en tinta clara con ícono rojo (el rojo en texto chico no llega a 4.5:1, el ícono sí se ve), y verde solo cuando algo salió bien.</p>
+  </div>
+
+  <sc-for list="{{ pantallas }}" as="p" hint-placeholder-count="8">
+    <div data-screen-label="{{ p.id }} {{ p.nombre }}" style="display:flex;flex-direction:column;gap:16px">
+      <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap">
+        <span style="font-size:12px;font-weight:600;letter-spacing:0.04em;color:#DC2626">{{ p.id }}</span>
+        <h2 style="margin:0;font-family:Fraunces,serif;font-size:30px;line-height:36px;font-weight:440">{{ p.nombre }}</h2>
+        <sc-if value="{{ p.backend }}"><span style="font-size:12px;line-height:16px;font-weight:600;color:#0B0B0C;background:#F59E0B;border-radius:999px;padding:4px 10px">falta backend</span></sc-if>
+      </div>
+      <div style="display:flex;gap:32px;align-items:flex-start">
+
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="width:390px;min-height:844px;background:#0B0B0C;border:1px solid #3F3F46;border-radius:12px;overflow:hidden;box-sizing:border-box;display:flex;flex-direction:column">
+            <div style="height:56px;flex:0 0 56px;display:flex;align-items:center;justify-content:space-between;padding:0 6px">
+              <button aria-label="Volver" style="width:44px;height:44px;border:none;background:transparent;color:#F5F3EF;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:999px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m15 5-7 7 7 7"></path></svg></button>
+              <span style="display:flex;flex-direction:column;align-items:center;gap:4px;line-height:1"><span style="font-size:17px;font-weight:600;letter-spacing:0.16em;padding-left:0.16em">CARNICERÍA</span><span style="display:flex;align-items:center;gap:6px;font-size:8.5px;font-weight:500;letter-spacing:0.12em;color:#E4D1B0;white-space:nowrap"><span style="width:12px;height:1px;background:#E4D1B0"></span>EL SEÑOR DE LA MISERICORDIA<span style="width:12px;height:1px;background:#E4D1B0"></span></span></span>
+              <span style="width:44px"></span>
+            </div>
+            <sc-if value="{{ p.slider }}">
+              <div style="padding:4px 16px 0;display:flex;flex-direction:column;gap:16px">
+                <div style="position:relative;height:232px;border-radius:24px;background:#DC2626;overflow:hidden">
+                  <div style="position:absolute;left:20px;top:22px;width:172px;display:flex;flex-direction:column;gap:8px;color:#FFFFFF">
+                    <h3 style="margin:0;font-family:Fraunces,serif;font-size:28px;line-height:32px;font-weight:480;text-wrap:balance">{{ p.titulo }}</h3>
+                    <p style="margin:0;font-size:15px;line-height:21px;text-wrap:pretty">{{ p.textoCorto }}</p>
+                  </div>
+                  <span style="position:absolute;right:12px;bottom:0;width:140px;height:196px;border-radius:999px 999px 0 0;overflow:hidden;background:#F2DCC4">
+                    <img src="public/img/recursos_web/carnicero-ingresar.webp" alt="Ilustración del carnicero saludando" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:52% 14%;opacity:{{ p.opIng }};transition:opacity 400ms ease">
+                    <img src="public/img/recursos_web/carnicero-registro.webp" alt="Ilustración del carnicero con los brazos abiertos" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 26%;opacity:{{ p.opReg }};transition:opacity 400ms ease">
+                  </span>
+                </div>
+                <div role="tablist" aria-label="Ingresar o registrarse" style="position:relative;height:52px;box-sizing:border-box;border-radius:999px;background:#151517;border:1px solid #3F3F46;padding:4px;display:grid;grid-template-columns:1fr 1fr">
+                  <span style="position:absolute;top:4px;bottom:4px;left:4px;width:calc(50% - 4px);border-radius:999px;background:#DC2626;transform:translateX({{ p.segX }});transition:transform 350ms cubic-bezier(.6,0,.2,1)"></span>
+                  <button role="tab" aria-selected="{{ p.esIng }}" onClick="{{ p.aIngresar }}" style="position:relative;min-height:44px;border:none;background:transparent;color:{{ p.fgIng }};font-family:Geist,system-ui,sans-serif;font-size:15px;font-weight:600;cursor:pointer;border-radius:999px">Ingresar</button>
+                  <button role="tab" aria-selected="{{ p.esReg }}" onClick="{{ p.aRegistro }}" style="position:relative;min-height:44px;border:none;background:transparent;color:{{ p.fgReg }};font-family:Geist,system-ui,sans-serif;font-size:15px;font-weight:600;cursor:pointer;border-radius:999px">Registrarse</button>
+                </div>
+              </div>
+            </sc-if>
+            <div style="flex:1 1 auto;padding:16px 16px 32px;display:flex;flex-direction:column;gap:24px">
+              <sc-if value="{{ p.paso }}">
+                <div style="display:flex;flex-direction:column;gap:8px"><span style="font-size:13px;color:#A8A29B;font-variant-numeric:tabular-nums">{{ p.pasoTexto }}</span><div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px"><sc-for list="{{ p.barras }}" as="b" hint-placeholder-count="4"><span style="height:4px;border-radius:999px;background:{{ b.c }}"></span></sc-for></div></div>
+              </sc-if>
+              <sc-if value="{{ p.icono }}"><span style="width:64px;height:64px;border-radius:999px;border:1px solid {{ p.iconoBorde }};background:#151517;display:flex;align-items:center;justify-content:center;color:{{ p.iconoColor }}"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="{{ p.iconoPath }}"></path></svg></span></sc-if>
+              <sc-if value="{{ p.tituloEnForm }}"><div style="display:flex;flex-direction:column;gap:10px">
+                <h3 style="margin:0;font-family:Fraunces,serif;font-size:32px;line-height:38px;font-weight:480;text-wrap:balance">{{ p.titulo }}</h3>
+                <p style="margin:0;font-size:16px;line-height:24px;color:#A8A29B;text-wrap:pretty">{{ p.texto }}</p>
+              </div></sc-if>
+              <sc-for list="{{ p.secciones }}" as="s" hint-placeholder-count="1">
+                <div style="display:flex;flex-direction:column;gap:16px;padding:{{ s.pad }};border-radius:20px;border:{{ s.borde }};background:{{ s.fondo }}">
+                  <sc-if value="{{ s.titulo }}"><span style="display:flex;align-items:center;justify-content:space-between;gap:12px"><span style="font-size:17px;font-weight:600">{{ s.titulo }}</span><sc-if value="{{ s.chip }}"><span style="font-size:12px;font-weight:600;color:#E4D1B0;border:1px solid #E4D1B0;border-radius:999px;padding:3px 10px">{{ s.chip }}</span></sc-if></span></sc-if>
+                  <sc-if value="{{ s.nota }}"><span style="font-size:14px;line-height:20px;color:#A8A29B;margin-top:-8px;text-wrap:pretty">{{ s.nota }}</span></sc-if>
+                  <sc-for list="{{ s.campos }}" as="c" hint-placeholder-count="2">
+                    <div style="display:flex;flex-direction:column;gap:6px">
+                      <span style="font-size:14px;line-height:20px;font-weight:600">{{ c.l }}</span>
+                      <span style="display:flex;align-items:center;gap:8px;height:52px;box-sizing:border-box;border-radius:14px;background:#151517;border:1px solid {{ c.bd }};outline:{{ c.ol }};outline-offset:2px;padding:0 6px 0 16px;font-size:16px;color:{{ c.fg }};font-variant-numeric:tabular-nums"><span style="flex:1;min-width:0;letter-spacing:{{ c.ls }}">{{ c.v }}</span><sc-if value="{{ c.cursor }}"><span style="width:1px;height:22px;background:#DC2626;margin-left:-8px;margin-right:auto"></span></sc-if><sc-if value="{{ c.ok }}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:10px"><path d="M5 12.5 9.5 17 19 7.5"></path></svg></sc-if><sc-if value="{{ c.ojo }}"><button aria-label="Mostrar la contraseña" style="width:44px;height:44px;flex:0 0 44px;border:none;background:transparent;color:#A8A29B;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:999px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 12s3.5-6.5 9.5-6.5 9.5 6.5 9.5 6.5-3.5 6.5-9.5 6.5S2.5 12 2.5 12Z"></path><circle cx="12" cy="12" r="2.8"></circle></svg></button></sc-if></span>
+                      <sc-if value="{{ c.error }}"><span role="alert" style="display:flex;gap:8px;align-items:flex-start;font-size:14px;line-height:20px;color:#F5F3EF"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2" stroke-linecap="round" style="flex:0 0 18px;margin-top:1px"><circle cx="12" cy="12" r="9"></circle><path d="M12 7.5v5.5M12 16.5h.01"></path></svg>{{ c.error }}</span></sc-if>
+                      <sc-if value="{{ c.bien }}"><span style="display:flex;gap:8px;align-items:center;font-size:14px;line-height:20px;color:#F5F3EF"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 9.5 17 19 7.5"></path></svg>{{ c.bien }}</span></sc-if>
+                      <sc-if value="{{ c.ayuda }}"><span style="font-size:13px;line-height:18px;color:#A8A29B">{{ c.ayuda }}</span></sc-if>
+                      <sc-if value="{{ c.medidor }}">
+                        <div style="display:flex;flex-direction:column;gap:8px;padding-top:4px">
+                          <div style="display:flex;align-items:center;gap:10px"><div style="flex:1;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px"><sc-for list="{{ c.medidor.barras }}" as="b" hint-placeholder-count="4"><span style="height:6px;border-radius:999px;background:{{ b.c }}"></span></sc-for></div><span style="font-size:14px;font-weight:600;color:#F5F3EF">{{ c.medidor.etiqueta }}</span></div>
+                          <sc-for list="{{ c.medidor.reglas }}" as="r" hint-placeholder-count="3"><span style="display:flex;align-items:center;gap:8px;font-size:14px;line-height:20px;color:{{ r.fg }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="{{ r.ic }}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="{{ r.path }}"></path></svg>{{ r.t }}</span></sc-for>
+                        </div>
+                      </sc-if>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-for>
+              <sc-if value="{{ p.codigo }}">
+                <div style="display:flex;flex-direction:column;gap:12px">
+                  <span style="font-size:14px;font-weight:600">Código de 6 dígitos</span>
+                  <div style="display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px">
+                    <sc-for list="{{ p.codigo }}" as="d" hint-placeholder-count="6"><span style="height:60px;box-sizing:border-box;border-radius:14px;background:#151517;border:1px solid {{ d.bd }};outline:{{ d.ol }};outline-offset:2px;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:600;font-variant-numeric:tabular-nums">{{ d.v }}</span></sc-for>
+                  </div>
+                  <span style="font-size:14px;line-height:20px;color:#A8A29B">¿No te llegó? <a href="Inicio de sesión del cliente.dc.html" style="color:#F5F3EF;font-weight:600;text-decoration:underline;text-decoration-color:#E4D1B0;text-underline-offset:4px">Reenviar código</a></span>
+                </div>
+              </sc-if>
+              <div style="display:flex;flex-direction:column;gap:10px;margin-top:auto">
+                <sc-if value="{{ p.recordar }}"><div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap"><label style="min-height:44px;display:flex;align-items:center;gap:10px;font-size:15px;color:#F5F3EF;cursor:pointer"><span style="width:22px;height:22px;box-sizing:border-box;border-radius:6px;background:#DC2626;display:flex;align-items:center;justify-content:center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 9.5 17 19 7.5"></path></svg></span>Recordarme</label><a href="Inicio de sesión del cliente.dc.html" style="min-height:44px;display:flex;align-items:center;font-size:15px;font-weight:600;color:#F5F3EF;text-decoration:underline;text-decoration-color:#E4D1B0;text-underline-offset:4px">¿Olvidaste tu contraseña?</a></div></sc-if>
+                <sc-if value="{{ p.enlaceArriba }}"><a href="Inicio de sesión del cliente.dc.html" style="align-self:flex-end;min-height:44px;display:flex;align-items:center;font-size:15px;font-weight:600;color:#F5F3EF;text-decoration:underline;text-decoration-color:#E4D1B0;text-underline-offset:4px">{{ p.enlaceArriba }}</a></sc-if>
+                <button style="height:52px;border-radius:999px;background:#DC2626;border:none;color:#FFFFFF;font-family:Geist,system-ui,sans-serif;font-size:16px;font-weight:600;cursor:pointer">{{ p.boton }}</button>
+                <sc-if value="{{ p.boton2 }}"><button style="height:52px;border-radius:999px;background:transparent;border:1px solid #E4D1B0;color:#F5F3EF;font-family:Geist,system-ui,sans-serif;font-size:16px;font-weight:600;cursor:pointer">{{ p.boton2 }}</button></sc-if>
+                <sc-if value="{{ p.enlaceAbajo }}"><a href="Inicio de sesión del cliente.dc.html" style="align-self:center;min-height:44px;display:flex;align-items:center;font-size:15px;color:#A8A29B;text-decoration:underline;text-decoration-color:#3F3F46;text-underline-offset:4px">{{ p.enlaceAbajo }}</a></sc-if>
+              </div>
+              <sc-if value="{{ p.cache }}">
+                <div style="display:flex;flex-direction:column;gap:10px;border-top:1px solid #3F3F46;padding-top:20px">
+                  <span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B">Guardado en este teléfono</span>
+                  <sc-for list="{{ p.cache }}" as="k" hint-placeholder-count="2"><dc-import name="Tarjeta" variante="chica" boton="{{ false }}" foto="{{ k.f }}" cat="{{ k.cat }}" nombre="{{ k.n }}" precio="{{ k.precio }}" unidad="kg" hint-size="100%,88px"></dc-import></sc-for>
+                </div>
+              </sc-if>
+            </div>
+          </div>
+          <div style="font-size:13px;line-height:18px;font-weight:600">{{ p.nombre }} · móvil 390</div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="position:relative;width:1440px;height:{{ p.altoD }};background:#0B0B0C;border:1px solid #3F3F46;border-radius:12px;overflow:hidden;box-sizing:border-box">
+            <div style="position:absolute;top:24px;bottom:24px;left:24px;width:calc(50% - 36px);z-index:1;transform:translateX({{ p.panelX }});transition:transform 700ms cubic-bezier(.7,0,.2,1)">
+              <sc-if value="{{ p.panelColor }}">
+                <div style="position:relative;height:100%;border-radius:28px;background:#DC2626;overflow:hidden">
+                  <sc-for list="{{ p.capas }}" as="c" hint-placeholder-count="1">
+                    <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:flex-start;gap:16px;padding:64px 56px 0;box-sizing:border-box;color:#FFFFFF;opacity:{{ c.op }};visibility:{{ c.vis }};transition:opacity 320ms ease {{ c.delay }}, visibility 0ms linear {{ c.visDelay }}">
+                      <h3 style="margin:0;font-family:Fraunces,serif;font-size:46px;line-height:52px;font-weight:480;text-wrap:balance;max-width:14ch">{{ c.t }}</h3>
+                      <p style="margin:0;font-size:18px;line-height:28px;max-width:36ch;text-wrap:pretty">{{ c.d }}</p>
+                      <button onClick="{{ c.accion }}" style="margin-top:12px;height:52px;padding:0 30px;border-radius:999px;background:transparent;border:1.5px solid #FFFFFF;color:#FFFFFF;font-family:Geist,system-ui,sans-serif;font-size:16px;font-weight:600;cursor:pointer" style-hover="background:#FFFFFF;color:#DC2626">{{ c.b }}</button>
+                      <span style="margin-top:auto;align-self:center;width:100%;max-width:520px;height:62%;max-height:640px;border-radius:999px 999px 0 0;overflow:hidden;background:#F2DCC4;display:block"><img src="{{ c.img }}" alt="{{ c.alt }}" style="width:100%;height:100%;object-fit:cover;object-position:{{ c.pos }};display:block"></span>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-if>
+              <sc-if value="{{ p.panelFoto }}">
+              <div style="position:relative;height:100%;border-radius:28px;overflow:hidden;background:#1C1C1F">
+                <img src="{{ p.foto }}" alt="" style="width:100%;height:100%;object-fit:cover;display:block">
+                <div style="position:absolute;left:0;bottom:0;max-width:480px;box-sizing:border-box;background:#0B0B0C;border-top-right-radius:28px;padding:28px 36px 4px 4px;display:flex;flex-direction:column;gap:10px">
+                  <span style="font-family:Fraunces,serif;font-size:26px;line-height:34px;font-weight:420;text-wrap:pretty">«{{ p.cita }}»</span>
+                  <span style="font-size:14px;color:#A8A29B">{{ p.autor }} · reseña en Google</span>
+                </div>
+              </div>
+              </sc-if>
+            </div>
+            <div style="position:absolute;top:0;bottom:0;left:50%;width:50%;box-sizing:border-box;display:flex;flex-direction:column;padding:24px 48px 40px;transform:translateX({{ p.formX }});transition:transform 700ms cubic-bezier(.7,0,.2,1)">
+              <div style="height:56px;display:flex;align-items:center;justify-content:space-between">
+                <span style="display:flex;flex-direction:column;align-items:flex-start;gap:6px;line-height:1"><span style="font-size:20px;font-weight:600;letter-spacing:0.18em">CARNICERÍA</span><span style="display:flex;align-items:center;gap:8px;font-size:10px;font-weight:500;letter-spacing:0.14em;color:#E4D1B0;white-space:nowrap">EL SEÑOR DE LA MISERICORDIA<span style="width:20px;height:1px;background:#E4D1B0"></span></span></span>
+                <a href="Landing.dc.html" style="min-height:44px;display:flex;align-items:center;gap:6px;font-size:15px;color:#F5F3EF"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m15 5-7 7 7 7"></path></svg>Volver a la tienda</a>
+              </div>
+              <div style="flex:1;display:flex;align-items:center;justify-content:center">
+                <div style="width:440px;display:flex;flex-direction:column;gap:24px">
+                  <sc-if value="{{ p.paso }}">
+                    <div style="display:flex;flex-direction:column;gap:8px"><span style="font-size:13px;color:#A8A29B;font-variant-numeric:tabular-nums">{{ p.pasoTexto }}</span><div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px"><sc-for list="{{ p.barras }}" as="b" hint-placeholder-count="4"><span style="height:4px;border-radius:999px;background:{{ b.c }}"></span></sc-for></div></div>
+                  </sc-if>
+                  <sc-if value="{{ p.icono }}"><span style="width:72px;height:72px;border-radius:999px;border:1px solid {{ p.iconoBorde }};background:#151517;display:flex;align-items:center;justify-content:center;color:{{ p.iconoColor }}"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="{{ p.iconoPath }}"></path></svg></span></sc-if>
+                  <div style="display:flex;flex-direction:column;gap:10px">
+                    <h3 style="margin:0;font-family:Fraunces,serif;font-size:44px;line-height:50px;font-weight:480;text-wrap:balance">{{ p.titulo }}</h3>
+                    <p style="margin:0;font-size:17px;line-height:26px;color:#A8A29B;text-wrap:pretty">{{ p.texto }}</p>
+                  </div>
+                  <sc-for list="{{ p.secciones }}" as="s" hint-placeholder-count="1">
+                    <div style="display:flex;flex-direction:column;gap:16px;padding:{{ s.pad }};border-radius:20px;border:{{ s.borde }};background:{{ s.fondo }}">
+                      <sc-if value="{{ s.titulo }}"><span style="display:flex;align-items:center;justify-content:space-between;gap:12px"><span style="font-size:17px;font-weight:600">{{ s.titulo }}</span><sc-if value="{{ s.chip }}"><span style="font-size:12px;font-weight:600;color:#E4D1B0;border:1px solid #E4D1B0;border-radius:999px;padding:3px 10px">{{ s.chip }}</span></sc-if></span></sc-if>
+                      <sc-if value="{{ s.nota }}"><span style="font-size:14px;line-height:20px;color:#A8A29B;margin-top:-8px;text-wrap:pretty">{{ s.nota }}</span></sc-if>
+                      <div style="display:grid;grid-template-columns:{{ s.colsD }};gap:16px">
+                        <sc-for list="{{ s.campos }}" as="c" hint-placeholder-count="2">
+                          <div style="display:flex;flex-direction:column;gap:6px;grid-column:{{ c.spanD }}">
+                            <span style="font-size:14px;line-height:20px;font-weight:600">{{ c.l }}</span>
+                            <span style="display:flex;align-items:center;gap:8px;height:52px;box-sizing:border-box;border-radius:14px;background:#151517;border:1px solid {{ c.bd }};outline:{{ c.ol }};outline-offset:2px;padding:0 6px 0 16px;font-size:16px;color:{{ c.fg }};font-variant-numeric:tabular-nums"><span style="flex:1;min-width:0;letter-spacing:{{ c.ls }}">{{ c.v }}</span><sc-if value="{{ c.cursor }}"><span style="width:1px;height:22px;background:#DC2626;margin-left:-8px;margin-right:auto"></span></sc-if><sc-if value="{{ c.ok }}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:10px"><path d="M5 12.5 9.5 17 19 7.5"></path></svg></sc-if><sc-if value="{{ c.ojo }}"><button aria-label="Mostrar la contraseña" style="width:44px;height:44px;flex:0 0 44px;border:none;background:transparent;color:#A8A29B;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:999px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 12s3.5-6.5 9.5-6.5 9.5 6.5 9.5 6.5-3.5 6.5-9.5 6.5S2.5 12 2.5 12Z"></path><circle cx="12" cy="12" r="2.8"></circle></svg></button></sc-if></span>
+                            <sc-if value="{{ c.error }}"><span role="alert" style="display:flex;gap:8px;align-items:flex-start;font-size:14px;line-height:20px;color:#F5F3EF"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2" stroke-linecap="round" style="flex:0 0 18px;margin-top:1px"><circle cx="12" cy="12" r="9"></circle><path d="M12 7.5v5.5M12 16.5h.01"></path></svg>{{ c.error }}</span></sc-if>
+                            <sc-if value="{{ c.bien }}"><span style="display:flex;gap:8px;align-items:center;font-size:14px;line-height:20px;color:#F5F3EF"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 9.5 17 19 7.5"></path></svg>{{ c.bien }}</span></sc-if>
+                            <sc-if value="{{ c.ayuda }}"><span style="font-size:13px;line-height:18px;color:#A8A29B">{{ c.ayuda }}</span></sc-if>
+                            <sc-if value="{{ c.medidor }}">
+                              <div style="display:flex;flex-direction:column;gap:8px;padding-top:4px">
+                                <div style="display:flex;align-items:center;gap:10px"><div style="flex:1;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px"><sc-for list="{{ c.medidor.barras }}" as="b" hint-placeholder-count="4"><span style="height:6px;border-radius:999px;background:{{ b.c }}"></span></sc-for></div><span style="font-size:14px;font-weight:600">{{ c.medidor.etiqueta }}</span></div>
+                                <sc-for list="{{ c.medidor.reglas }}" as="r" hint-placeholder-count="3"><span style="display:flex;align-items:center;gap:8px;font-size:14px;line-height:20px;color:{{ r.fg }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="{{ r.ic }}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="{{ r.path }}"></path></svg>{{ r.t }}</span></sc-for>
+                              </div>
+                            </sc-if>
+                          </div>
+                        </sc-for>
+                      </div>
+                    </div>
+                  </sc-for>
+                  <sc-if value="{{ p.codigo }}">
+                    <div style="display:flex;flex-direction:column;gap:12px">
+                      <span style="font-size:14px;font-weight:600">Código de 6 dígitos</span>
+                      <div style="display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px">
+                        <sc-for list="{{ p.codigo }}" as="d" hint-placeholder-count="6"><span style="height:64px;box-sizing:border-box;border-radius:14px;background:#151517;border:1px solid {{ d.bd }};outline:{{ d.ol }};outline-offset:2px;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:600;font-variant-numeric:tabular-nums">{{ d.v }}</span></sc-for>
+                      </div>
+                      <span style="font-size:14px;line-height:20px;color:#A8A29B">¿No te llegó? <a href="Inicio de sesión del cliente.dc.html" style="color:#F5F3EF;font-weight:600;text-decoration:underline;text-decoration-color:#E4D1B0;text-underline-offset:4px">Reenviar código</a></span>
+                    </div>
+                  </sc-if>
+                  <div style="display:flex;flex-direction:column;gap:10px">
+                    <sc-if value="{{ p.recordar }}"><div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap"><label style="min-height:44px;display:flex;align-items:center;gap:10px;font-size:15px;color:#F5F3EF;cursor:pointer"><span style="width:22px;height:22px;box-sizing:border-box;border-radius:6px;background:#DC2626;display:flex;align-items:center;justify-content:center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 9.5 17 19 7.5"></path></svg></span>Recordarme</label><a href="Inicio de sesión del cliente.dc.html" style="min-height:44px;display:flex;align-items:center;font-size:15px;font-weight:600;color:#F5F3EF;text-decoration:underline;text-decoration-color:#E4D1B0;text-underline-offset:4px">¿Olvidaste tu contraseña?</a></div></sc-if>
+                <sc-if value="{{ p.enlaceArriba }}"><a href="Inicio de sesión del cliente.dc.html" style="align-self:flex-end;min-height:44px;display:flex;align-items:center;font-size:15px;font-weight:600;color:#F5F3EF;text-decoration:underline;text-decoration-color:#E4D1B0;text-underline-offset:4px">{{ p.enlaceArriba }}</a></sc-if>
+                    <button style="height:52px;border-radius:999px;background:#DC2626;border:none;color:#FFFFFF;font-family:Geist,system-ui,sans-serif;font-size:16px;font-weight:600;cursor:pointer" style-hover="background:#C81E1E">{{ p.boton }}</button>
+                    <sc-if value="{{ p.boton2 }}"><button style="height:52px;border-radius:999px;background:transparent;border:1px solid #E4D1B0;color:#F5F3EF;font-family:Geist,system-ui,sans-serif;font-size:16px;font-weight:600;cursor:pointer">{{ p.boton2 }}</button></sc-if>
+                    <sc-if value="{{ p.enlaceAbajo }}"><a href="Inicio de sesión del cliente.dc.html" style="align-self:center;min-height:44px;display:flex;align-items:center;font-size:15px;color:#A8A29B;text-decoration:underline;text-decoration-color:#3F3F46;text-underline-offset:4px">{{ p.enlaceAbajo }}</a></sc-if>
+                  </div>
+                  <sc-if value="{{ p.cache }}">
+                    <div style="display:flex;flex-direction:column;gap:10px;border-top:1px solid #3F3F46;padding-top:20px">
+                      <span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B">Guardado en este equipo</span>
+                      <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px"><sc-for list="{{ p.cache }}" as="k" hint-placeholder-count="2"><dc-import name="Tarjeta" variante="chica" boton="{{ false }}" foto="{{ k.f }}" cat="{{ k.cat }}" nombre="{{ k.n }}" precio="{{ k.precio }}" unidad="kg" hint-size="100%,88px"></dc-import></sc-for></div>
+                    </div>
+                  </sc-if>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style="font-size:13px;line-height:18px;font-weight:600">{{ p.nombre }} · escritorio 1440</div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:4px;font-size:13px;line-height:19px;color:#A8A29B;max-width:1100px;text-wrap:pretty"><span><span style="color:#E4D1B0;font-weight:600">De lo nuestro · </span>{{ p.n }}</span><span><span style="color:#F5F3EF;font-weight:600">De lo mío · </span>{{ p.y }}</span><span><span style="color:#F5F3EF;font-weight:600">Mejora · </span>{{ p.m }}</span></div>
+    </div>
+  </sc-for>
+
+  <div style="display:flex;flex-direction:column;gap:16px">
+    <h2 style="margin:0;font-family:Fraunces,serif;font-size:30px;line-height:36px;font-weight:440">Autorrevisión · acceso</h2>
+    <div style="background:#151517;border:1px solid #3F3F46;border-radius:12px;overflow:hidden;width:1440px;max-width:100%">
+      <div style="display:grid;grid-template-columns:200px minmax(0,1fr) 100px minmax(0,1.2fr);font-size:12px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B;border-bottom:1px solid #3F3F46"><span style="padding:12px 16px">Criterio</span><span style="padding:12px 16px">Qué se midió</span><span style="padding:12px 16px">Estado</span><span style="padding:12px 16px">Corrección</span></div>
+      <sc-for list="{{ revision }}" as="c" hint-placeholder-count="6">
+        <div style="display:grid;grid-template-columns:200px minmax(0,1fr) 100px minmax(0,1.2fr);font-size:13px;line-height:18px;border-bottom:1px solid #3F3F46"><span style="padding:12px 16px">{{ c.c }}</span><span style="padding:12px 16px;color:#A8A29B">{{ c.m }}</span><span style="padding:12px 16px;color:#059669;font-weight:600">Pasa</span><span style="padding:12px 16px;color:#A8A29B">{{ c.x }}</span></div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div id="reporte-b4" data-screen-label="Reporte" style="width:1440px;max-width:100%;box-sizing:border-box;background:#151517;border:1px solid #3F3F46;border-radius:16px;padding:40px;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:48px">
+    <div style="display:flex;flex-direction:column;gap:20px">
+      <span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#E4D1B0">Reporte · inicio de sesión del cliente</span>
+      <span style="font-family:Fraunces,serif;font-size:40px;line-height:46px;font-weight:480">7 de 7 pantallas cerradas, más la de “listo”</span>
+      <div style="display:flex;flex-direction:column">
+        <sc-for list="{{ pantallas }}" as="p" hint-placeholder-count="8"><span style="display:grid;grid-template-columns:40px minmax(0,1fr) 80px;gap:12px;padding:12px 0;border-bottom:1px solid #3F3F46;font-size:15px;line-height:22px"><span style="color:#A8A29B;font-variant-numeric:tabular-nums">{{ p.id }}</span><span>{{ p.nombre }}</span><span style="color:#059669;font-weight:600">Listo</span></span></sc-for>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B">Pendientes</span>
+      <span style="font-size:15px;line-height:22px;text-wrap:pretty;border-bottom:1px solid #3F3F46;padding-bottom:12px">Falta backend: el envío del código de 6 dígitos (hoy Supabase manda un enlace mágico, no un código) y su vencimiento.</span>
+      <span style="font-size:15px;line-height:22px;text-wrap:pretty;border-bottom:1px solid #3F3F46;padding-bottom:12px">Sin conexión necesita que el service worker guarde el carrito y los últimos productos vistos.</span>
+      <span style="font-size:15px;line-height:22px;text-wrap:pretty">Las ilustraciones del carnicero salen de carniLogin.png y carniRegistro.png del repo, recortadas sin el marco negro ni la marca de agua y pasadas a WebP (78 y 120 KB). Si se quiere al personaje suelto sobre el rojo, falta una versión con fondo transparente.</span>
+    </div>
+  </div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const IMG = 'public/img/products/';
+const OK = 'M5 12.5 9.5 17 19 7.5', NO = 'M12 12h.01';
+const campo = (l, v, o = {}) => {
+  const vacio = !v;
+  const estado = o.estado ?? 'normal';
+  return {
+    l, v: vacio ? (o.ph ?? '') : v, fg: vacio ? '#A8A29B' : '#F5F3EF',
+    bd: estado === 'error' || estado === 'foco' ? '#DC2626' : '#3F3F46',
+    ol: estado === 'foco' ? '2px solid #DC2626' : 'none',
+    cursor: estado === 'foco' && !vacio, ok: !!o.ok, ojo: !!o.ojo,
+    ls: o.puntos ? '0.18em' : 'normal',
+    error: o.error ?? null, bien: o.bien ?? null, ayuda: o.ayuda ?? null, medidor: o.medidor ?? null,
+    spanD: o.ancho ? '1 / -1' : 'auto'
+  };
+};
+const sec = (campos, o = {}) => ({ campos, titulo: o.titulo ?? null, chip: o.chip ?? null, nota: o.nota ?? null, pad: o.caja ? '20px' : '0', borde: o.caja ? '1px solid #3F3F46' : 'none', fondo: o.caja ? '#0B0B0C' : 'transparent', colsD: o.colsD ?? '1fr' });
+const paso = n => ({ paso: true, pasoTexto: 'Paso ' + n + ' de 4', barras: [1, 2, 3, 4].map(i => ({ c: i <= n ? '#DC2626' : '#3F3F46' })) });
+const icono = (path, verde) => ({ icono: true, iconoPath: path, iconoColor: verde ? '#059669' : '#E4D1B0', iconoBorde: verde ? '#059669' : '#3F3F46' });
+const medidor = {
+  etiqueta: 'Fuerte',
+  barras: [1, 2, 3, 4].map(i => ({ c: i <= 3 ? '#059669' : '#3F3F46' })),
+  reglas: [
+    { t: 'Al menos 8 caracteres', ok: true }, { t: 'Un número', ok: true }, { t: 'Una mayúscula', ok: true }, { t: 'Un símbolo, para llegar a “muy fuerte”', ok: false }
+  ].map(r => ({ t: r.t, fg: r.ok ? '#F5F3EF' : '#A8A29B', ic: r.ok ? '#059669' : '#A8A29B', path: r.ok ? OK : 'M8 12h8' }))
+};
+const ING = 'public/img/recursos_web/carnicero-ingresar.webp', REG = 'public/img/recursos_web/carnicero-registro.webp';
+const base = { slider: false, tituloEnForm: true, recordar: false, textoCorto: '', panelColor: true, panelFoto: false, panelX: '0px', formX: '0%', capas: [{ t: '¿Ya te acordaste?', d: 'Vuelve a ingresar con tu correo y tu contraseña.', b: 'Volver a ingresar', img: ING, alt: 'Ilustración del carnicero saludando', pos: '50% 16%', op: 1, vis: 'visible', delay: '0ms', visDelay: '0ms', accion: null }], paso: false, pasoTexto: '', barras: [], icono: false, iconoPath: '', iconoColor: '', iconoBorde: '', secciones: [], codigo: null, enlaceArriba: null, boton2: null, enlaceAbajo: null, cache: null, backend: false, altoD: '900px' };
+const P = [
+  { ...base, id: '10', nombre: 'Ingresar', foto: IMG + 'premium-alto.webp', cita: 'Buena carne, buen precio y buena atención', autor: 'Armando Viramontes',
+    titulo: 'Qué gusto verte', texto: 'Ingresa para ver tus pedidos, tus direcciones y tus favoritos.',
+    secciones: [sec([campo('Correo electrónico', 'eduardo@gmail.com', { ok: true }), campo('Contraseña', '••••••••', { estado: 'error', ojo: true, puntos: true, error: 'La contraseña no coincide con este correo. Revisa mayúsculas o recupérala.' })])],
+    recordar: true, boton: 'Ingresar', textoCorto: 'Ingresa para ver tus pedidos, direcciones y favoritos.', altoD: '1180px',
+    n: 'el panel de color con el carnicero que saluda, “¿Primera vez por aquí?” con su botón, la transición deslizante hacia el registro y el “Recuérdame”.', y: 'la composición en dos mitades, el campo de un solo tono con foco rojo y el error explicado debajo.', m: 'la ilustración sin marco negro ni marca de agua, recortada en un arco que nace del borde del panel; en 390 vuelve el panel con un selector Ingresar / Registrarse que se desliza; “Contraseña” y “Correo electrónico” con tilde. Toca “Crear una cuenta” para ver el cruce.' },
+  { ...base, id: '11', nombre: 'Registrarse', foto: IMG + 'res-alto.webp', cita: 'Excelente trato de sus dueños. Excelentes recomendaciones!', autor: 'Oscar Alcocer', altoD: '1180px',
+    titulo: 'Crea tu cuenta', texto: 'Tres datos para empezar. Lo de la entrega puedes llenarlo ahora o en tu primer pedido.',
+    secciones: [
+      sec([campo('Nombre completo', 'Eduardo Torres', { ancho: true }), campo('Correo electrónico', 'eduardo@gmail', { estado: 'foco', ancho: true, error: 'Al correo le falta el final, por ejemplo “.com”.' }), campo('Contraseña', '••••••••••', { ojo: true, puntos: true, ancho: true, medidor })], { titulo: 'Tu cuenta', colsD: '1fr' }),
+      sec([campo('Teléfono con WhatsApp', '', { ph: '444 000 0000', ancho: true, ayuda: 'Te avisamos por aquí cuando tu pedido esté listo.' }), campo('Calle y número', '', { ph: 'Agua Marina 110', ancho: true }), campo('Colonia', '', { ph: 'Manuel J. Othón' }), campo('Código postal', '', { ph: '78150' })], { titulo: 'Para tus entregas', chip: 'Opcional', caja: true, colsD: '1fr 160px' })
+    ],
+    boton: 'Crear cuenta', textoCorto: 'Tres datos para empezar; la entrega puede esperar.',
+    n: 'el panel que cruza al otro lado con “¿Ya compras con nosotros?” y el carnicero de brazos abiertos; los datos de entrega como opción aparte.', y: 'los tres datos esenciales arriba y la entrega en su caja “Opcional”, con medidor de fuerza.', m: 'panel y formulario se cruzan en 700 ms en escritorio y el selector se desliza en 390; el error de correo dice qué falta. Toca “Ingresar” en el panel para volver.' },
+  { ...base, ...paso(1), id: '12', nombre: 'Recuperar · pedir correo', foto: IMG + 'tomahawk-alto.webp', cita: 'Excelente atención y precio. Se recomienda ampliamente.', autor: 'marco molina',
+    titulo: '¿Olvidaste tu contraseña?', texto: 'Escribe el correo de tu cuenta y te mandamos un código de 6 dígitos.',
+    secciones: [sec([campo('Correo electrónico', 'eduardo@gmail.com', { estado: 'foco' })])],
+    boton: 'Enviar código', enlaceAbajo: 'Volver a ingresar', backend: true,
+    n: 'el mismo panel de color del acceso, para no cambiar de escenario a mitad del flujo.', y: 'recuperar en cuatro pasos con barra de progreso roja.', m: 'un solo campo por paso y, desde el panel, salida para volver a ingresar.' },
+  { ...base, ...paso(2), ...icono('M3.5 6.5h17v11h-17zM3.5 7l8.5 6 8.5-6'), id: '13', nombre: 'Recuperar · revisa tu correo', foto: IMG + 'filet_mignon-alto.webp', cita: 'Buena carne, buena atención de sus dueños', autor: 'claudia hernandez',
+    titulo: 'Revisa tu correo', texto: 'Te mandamos un código a e•••••o@gmail.com. Si no lo ves, busca en la carpeta de spam.',
+    boton: 'Escribir el código', enlaceAbajo: 'Usar otro correo', backend: true,
+    n: 'el panel de color con el carnicero.', y: 'el correo enmascarado para confirmar a dónde se mandó.', m: 'se corrige el correo sin volver al inicio.' },
+  { ...base, ...paso(3), id: '14', nombre: 'Recuperar · escribir el código', foto: IMG + 'porterhouse.webp', cita: 'Pequeña carnicería atendida por la familia, encuentras carne fresca de puerco, pollo y res', autor: 'Ramon Lopez Medel',
+    titulo: 'Escribe el código', texto: 'Son los 6 dígitos del correo. Puedes pegarlos completos. Nota: falta configurar la plantilla del correo en Supabase.',
+    codigo: ['4', '8', '1', '0', '6', ''].map((v, i) => ({ v, bd: i === 5 ? '#DC2626' : '#3F3F46', ol: i === 5 ? '2px solid #DC2626' : 'none' })),
+    boton: 'Verificar', backend: true,
+    n: 'el panel de color con el carnicero.', y: 'seis casillas de 60 / 64 px y reenvío sin contador regresivo.', m: 'se puede pegar el código completo y el foco avanza solo a la siguiente casilla.' },
+  { ...base, ...paso(4), id: '15', nombre: 'Recuperar · nueva contraseña', foto: IMG + 'premium.webp', cita: 'Excelente servicio y atención por parte del personal y sus propietarios', autor: 'Rosy Reyna', altoD: '980px',
+    titulo: 'Tu nueva contraseña', texto: 'Que no sea la misma de antes.',
+    secciones: [sec([campo('Nueva contraseña', '••••••••••', { ojo: true, puntos: true, medidor }), campo('Repite la contraseña', '••••••••••', { ok: true, puntos: true, bien: 'Coinciden' })])],
+    boton: 'Guardar contraseña', backend: true,
+    n: 'el panel de color con el carnicero.', y: 'medidor de cuatro tramos y confirmación “Coinciden”.', m: 'cada regla se marca en verde al cumplirse, sin adivinar qué falta.' },
+  { ...base, ...icono(OK, true), id: '15b', nombre: 'Recuperar · listo', foto: IMG + 'res.webp', cita: 'Tienen muy buena calidad de carne y muy serviciales', autor: 'Sandra Rodriguez',
+    titulo: 'Tu contraseña quedó guardada', texto: 'Ya puedes ingresar con ella. Cerramos la sesión en tus otros dispositivos por seguridad.',
+    boton: 'Ingresar', backend: true,
+    n: 'el panel de color con el carnicero.', y: 'cierre con el único verde de éxito del flujo.', m: 'un solo botón para seguir y aviso de que se cerraron las otras sesiones.' },
+  { ...base, ...icono('M3 3l18 18M8.5 16.5a5 5 0 0 1 7 0M5 13a10 10 0 0 1 5-2.7M12 20h.01M16.7 11.3A10 10 0 0 1 19 13M2 9.5a15 15 0 0 1 4.5-2.8M11 5.1A15 15 0 0 1 22 9.5'), id: '16', nombre: 'Sin conexión', panelColor: false, panelFoto: true, foto: IMG + 'cerdo-alto.webp', cita: 'Buena carne, buen precio y buena atención', autor: 'Armando Viramontes', altoD: '960px',
+    titulo: 'Te quedaste sin señal', texto: 'Tu carrito sigue guardado en este teléfono. En cuanto vuelva la conexión, seguimos donde ibas.',
+    boton: 'Reintentar', boton2: 'Llamar a la carnicería', enlaceAbajo: 'Lunes a sábado, 8:00 a 17:00 · 444 271 5470',
+    cache: [
+      { f: IMG + 'flak_steak.webp', cat: 'Cortes especiales', n: 'Flank Steak', precio: '$399' },
+      { f: IMG + 'res.webp', cat: 'Carnes rojas', n: 'Bistec de Res', precio: '$289' }
+    ],
+    n: 'offline.html y el teléfono de la tienda a la vista; aquí se queda la foto con reseña porque no es parte del acceso.', y: 'el aviso de que el carrito sigue guardado y lo último visto con la Tarjeta chica.', m: 'en vez de la página de error del navegador, deja llamar sin datos y reintentar.' }
+];
+class Component extends DCLogic {
+  state = { m10: 'ingresar', m11: 'registro' };
+  deslizante(p, clave) {
+    const modo = this.state[clave];
+    const ing = modo === 'ingresar';
+    const src = ing ? P[0] : P[1];
+    const ir = v => () => this.setState({ [clave]: v });
+    return {
+      ...src, id: p.id, nombre: p.nombre, n: p.n, y: p.y, m: p.m, altoD: '1180px',
+      slider: true, tituloEnForm: false, boton2: null, enlaceAbajo: null,
+      panelX: ing ? '0px' : 'calc(100% + 24px)', formX: ing ? '0%' : '-100%',
+      segX: ing ? '0%' : '100%', esIng: ing, esReg: !ing, fgIng: ing ? '#FFFFFF' : '#A8A29B', fgReg: ing ? '#A8A29B' : '#FFFFFF',
+      opIng: ing ? 1 : 0, opReg: ing ? 0 : 1, aIngresar: ir('ingresar'), aRegistro: ir('registro'),
+      capas: [
+        { t: '¿Primera vez por aquí?', d: 'Crea tu cuenta en minutos y deja listo tu acceso para pedir sin filas ni vueltas.', b: 'Crear una cuenta', img: ING, alt: 'Ilustración del carnicero saludando con un corte en la tabla', pos: '50% 16%', accion: ir('registro'), op: ing ? 1 : 0, vis: ing ? 'visible' : 'hidden', delay: ing ? '380ms' : '0ms', visDelay: ing ? '0ms' : '320ms' },
+        { t: '¿Ya compras con nosotros?', d: 'Ingresa, revisa tus favoritos y vuelve a pedir tus cortes de siempre en segundos.', b: 'Ingresar', img: REG, alt: 'Ilustración del carnicero con los brazos abiertos', pos: '50% 24%', accion: ir('ingresar'), op: ing ? 0 : 1, vis: ing ? 'hidden' : 'visible', delay: ing ? '0ms' : '380ms', visDelay: ing ? '320ms' : '0ms' }
+      ]
+    };
+  }
+  renderVals() {
+    return {
+      pantallas: P.map(p => p.id === '10' ? this.deslizante(p, 'm10') : (p.id === '11' ? this.deslizante(p, 'm11') : p)),
+      revision: [
+        { c: 'Se lee en el teléfono', m: 'Títulos 32 px, cuerpo 16 px, etiquetas 14 px en 390', x: 'Sin cambios necesarios.' },
+        { c: 'Contraste', m: 'Mensaje de error #F5F3EF sobre #0B0B0C 18:1 con ícono rojo; marcador de posición #A8A29B sobre #151517 7.2:1', x: 'Intento 1: el error iba en rojo #DC2626 a 14 px (4.1:1, no pasa); pasó a tinta clara con ícono rojo.' },
+        { c: 'Botones de 44 px', m: 'Principal 52, mostrar contraseña 44, volver 44, enlaces con 44 de alto, casillas del código 60 / 64', x: 'Sin cambios necesarios.' },
+        { c: 'Mismos campos y botones', m: 'Un solo campo con cuatro estados (normal, foco, error, bien); rojo lleno y contorno beige', x: 'Sin cambios necesarios.' },
+        { c: 'Nada se sale ni se corta', m: 'Mensajes de error de dos líneas, “Recuperar · escribir el código” en el título', x: 'Intento 1: en escritorio el registro no cabía en 900 px; su lámina sube a 1180.' },
+        { c: 'Mejor que lo viejo', m: 'Contra capturas 05, 23, 24, 25 y 39', x: 'Ver la línea de mejora de cada pantalla.' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

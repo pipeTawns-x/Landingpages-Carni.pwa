@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..700&family=Geist:wght@400..700&display=swap" rel="stylesheet">
+<style>
+  body { margin:0; background:#0B0B0C; color:#F5F3EF; }
+  a { color:#F5F3EF; text-decoration:underline; text-decoration-color:#E4D1B0; text-underline-offset:4px; }
+  a:hover { color:#E4D1B0; }
+</style>
+</helmet>
+
+<section id="b8" data-screen-label="Perfil del cliente" style="background:#0B0B0C;width:max-content;min-width:100%;box-sizing:border-box;padding:48px 48px 96px;font-family:Geist,system-ui,sans-serif;color:#F5F3EF;display:flex;flex-direction:column;gap:64px">
+
+  <div style="display:flex;flex-direction:column;gap:12px;max-width:980px">
+    <div style="font-size:12px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B">Carni · rediseño · perfil del cliente</div>
+    <h1 style="margin:0;font-family:Fraunces,Georgia,serif;font-size:44px;line-height:50px;font-weight:480">34–41, 46 y 47 — Mi cuenta, una sola web con menú lateral</h1>
+    <p style="margin:0;font-size:16px;line-height:26px;color:#A8A29B;max-width:76ch;text-wrap:pretty">En 1440 el menú es una columna fija a la izquierda; en 390 se vuelve un riel de chips bajo el encabezado, con la sección activa en rojo. Cada sección trae su estado vacío al lado. El recetario toma la estructura editorial de Sweetgreen, sin sus efectos: foto, origen, tiempo, y los cortes que se venden aquí.</p>
+  </div>
+
+  <sc-for list="{{ pantallas }}" as="p" hint-placeholder-count="10">
+    <div id="s{{ p.id }}" data-screen-label="{{ p.id }} {{ p.nombre }}" style="display:flex;flex-direction:column;gap:16px;scroll-margin-top:24px">
+      <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap">
+        <span style="font-size:12px;font-weight:600;letter-spacing:0.04em;color:#DC2626">{{ p.id }}</span>
+        <h2 style="margin:0;font-family:Fraunces,serif;font-size:30px;line-height:36px;font-weight:440">{{ p.nombre }}</h2>
+        <sc-if value="{{ p.backend }}"><span style="font-size:12px;line-height:16px;font-weight:600;color:#0B0B0C;background:#F59E0B;border-radius:999px;padding:4px 10px">falta backend</span></sc-if>
+      </div>
+      <div style="display:flex;gap:32px;align-items:flex-start">
+        <sc-for list="{{ p.marcos }}" as="m" hint-placeholder-count="2">
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="width:{{ m.w }};min-height:{{ m.h }};background:#0B0B0C;border:1px solid #3F3F46;border-radius:12px;overflow:hidden;box-sizing:border-box;display:flex;flex-direction:column">
+              <sc-if value="{{ m.mo }}"><dc-import name="Encabezado" ancho="movil" hint-size="100%,56px"></dc-import></sc-if>
+              <sc-if value="{{ m.d }}"><dc-import name="Encabezado" ancho="escritorio" activo="ninguno" hint-size="100%,72px"></dc-import></sc-if>
+              <div style="flex:1;display:flex;flex-direction:{{ m.dir }}">
+                <sc-if value="{{ m.d }}">
+                  <nav style="width:268px;flex:0 0 268px;box-sizing:border-box;border-right:1px solid #3F3F46;padding:28px 16px;display:flex;flex-direction:column;gap:2px">
+                    <span style="display:flex;align-items:center;gap:12px;padding:0 12px 20px"><span style="width:44px;height:44px;border-radius:999px;background:#E4D1B0;color:#0B0B0C;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:600">ET</span><span style="display:flex;flex-direction:column"><span style="font-size:15px;font-weight:600">Eduardo Torres</span><span style="display:flex;align-items:center;gap:6px;font-size:12px;color:#A8A29B">Nivel <span style="font-weight:600;color:#0B0B0C;background:#F59E0B;border-radius:999px;padding:1px 8px">Asador</span></span></span></span>
+                    <sc-for list="{{ p.menu }}" as="i" hint-placeholder-count="8">
+                      <a href="{{ i.href }}" aria-current="{{ i.cur }}" style="min-height:44px;display:flex;align-items:center;gap:10px;padding:0 12px;border-radius:12px;background:{{ i.bg }};color:{{ i.fg }};font-size:15px;font-weight:{{ i.w }};text-decoration:none"><span style="width:3px;height:20px;border-radius:999px;background:{{ i.barra }}"></span>{{ i.t }}</a>
+                    </sc-for>
+                  </nav>
+                </sc-if>
+                <sc-if value="{{ m.mo }}">
+                  <div style="border-bottom:1px solid #3F3F46;padding:10px 0;overflow:hidden"><div style="display:flex;gap:8px;padding-left:16px;width:max-content">
+                    <sc-for list="{{ p.rail }}" as="i" hint-placeholder-count="8"><span style="min-height:44px;display:inline-flex;align-items:center;padding:0 14px;border-radius:999px;background:{{ i.cb }};border:1px solid {{ i.cbd }};color:{{ i.cf }};font-size:15px;font-weight:{{ i.w }};white-space:nowrap">{{ i.t }}</span></sc-for>
+                  </div></div>
+                </sc-if>
+
+                <div style="flex:1;min-width:0;box-sizing:border-box;padding:{{ m.pad }};display:flex;flex-direction:column;gap:20px">
+                  <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap">
+                    <div style="display:flex;flex-direction:column;gap:6px"><h3 style="margin:0;font-family:Fraunces,serif;font-size:{{ m.h3 }};line-height:1.15;font-weight:480;text-wrap:balance">{{ p.titulo }}</h3><sc-if value="{{ p.bajada }}"><span style="font-size:15px;line-height:22px;color:#A8A29B;text-wrap:pretty;font-variant-numeric:tabular-nums">{{ p.bajada }}</span></sc-if></div>
+                    <sc-if value="{{ p.accion }}"><button style="height:48px;padding:0 20px;border-radius:999px;background:#DC2626;border:none;color:#FFFFFF;font-family:Geist,system-ui,sans-serif;font-size:15px;font-weight:600;cursor:pointer">{{ p.accion }}</button></sc-if>
+                  </div>
+
+                  <sc-if value="{{ p.pedidos }}">
+                    <div style="display:flex;flex-direction:column;gap:12px">
+                      <sc-for list="{{ p.pedidos }}" as="o" hint-placeholder-count="3">
+                        <div style="display:flex;flex-direction:column;gap:12px;padding:16px;border-radius:16px;background:#151517;border:1px solid #3F3F46">
+                          <span style="display:flex;justify-content:space-between;gap:12px;align-items:center"><span style="display:flex;flex-direction:column;gap:2px"><span style="font-size:16px;font-weight:600;font-variant-numeric:tabular-nums">Pedido {{ o.folio }}</span><span style="font-size:13px;color:#A8A29B">{{ o.fecha }} · {{ o.modo }}</span></span><span style="display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 10px;border-radius:999px;background:#1C1C1F;border:1px solid #3F3F46;font-size:13px;font-weight:600"><span style="width:8px;height:8px;border-radius:999px;background:{{ o.dot }}"></span>{{ o.estado }}</span></span>
+                          <span style="display:flex;gap:6px"><sc-for list="{{ o.fotos }}" as="f" hint-placeholder-count="3"><span style="width:48px;height:48px;border-radius:10px;overflow:hidden;background:#1C1C1F"><img src="{{ f }}" alt="" style="width:100%;height:100%;object-fit:cover;display:block"></span></sc-for><span style="flex:1;display:flex;flex-direction:column;justify-content:center;padding-left:6px;font-size:13px;line-height:18px;color:#A8A29B;text-wrap:pretty">{{ o.items }}</span></span>
+                          <span style="display:flex;justify-content:space-between;align-items:center;gap:12px;border-top:1px solid #3F3F46;padding-top:12px"><span style="font-size:16px;font-weight:600;font-variant-numeric:tabular-nums">{{ o.total }}</span><span style="display:flex;gap:8px"><button style="height:44px;padding:0 16px;border-radius:999px;background:transparent;border:1px solid #E4D1B0;color:#F5F3EF;font-family:Geist,system-ui,sans-serif;font-size:14px;font-weight:600;cursor:pointer">{{ o.b2 }}</button><button style="height:44px;padding:0 16px;border-radius:999px;background:#DC2626;border:none;color:#FFFFFF;font-family:Geist,system-ui,sans-serif;font-size:14px;font-weight:600;cursor:pointer">Pedir de nuevo</button></span></span>
+                        </div>
+                      </sc-for>
+                    </div>
+                  </sc-if>
+
+                  <sc-if value="{{ p.direcciones }}">
+                    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px">
+                      <sc-for list="{{ p.direcciones }}" as="a" hint-placeholder-count="2">
+                        <div style="display:flex;flex-direction:column;gap:10px;padding:16px;border-radius:16px;background:#151517;border:1px solid {{ a.bd }}">
+                          <span style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:16px;font-weight:600">{{ a.n }}</span><sc-if value="{{ a.pred }}"><span style="font-size:12px;font-weight:600;color:#E4D1B0;border:1px solid #E4D1B0;border-radius:999px;padding:3px 10px">Predeterminada</span></sc-if></span>
+                          <span style="font-size:15px;line-height:22px;color:#A8A29B">{{ a.d }}</span>
+                          <span style="display:flex;align-items:center;gap:8px;font-size:14px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="{{ a.ic }}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="{{ a.path }}"></path></svg>{{ a.zona }}</span>
+                          <span style="display:flex;gap:16px;border-top:1px solid #3F3F46;padding-top:6px;font-size:14px"><a href="Perfil del cliente.dc.html" style="min-height:44px;display:flex;align-items:center">Editar</a><a href="Perfil del cliente.dc.html" style="min-height:44px;display:flex;align-items:center;color:#A8A29B;text-decoration-color:#3F3F46">Quitar</a></span>
+                        </div>
+                      </sc-for>
+                    </div>
+                  </sc-if>
+
+                  <sc-if value="{{ p.favoritos }}">
+                    <div style="display:grid;grid-template-columns:repeat({{ m.colsT }},minmax(0,1fr));gap:{{ m.gap }}">
+                      <sc-for list="{{ p.favoritos }}" as="t" hint-placeholder-count="4"><dc-import name="Tarjeta" variante="{{ t.v }}" foto="{{ t.f }}" cat="{{ t.cat }}" nombre="{{ t.n }}" desc="{{ t.d }}" precio="{{ t.precio }}" unidad="{{ t.u }}" hint-size="100%,440px"></dc-import></sc-for>
+                    </div>
+                  </sc-if>
+
+                  <sc-if value="{{ p.recetas }}">
+                    <sc-if value="{{ p.pestanas }}"><div role="tablist" aria-label="Recetario" style="display:flex;gap:4px;border-bottom:1px solid #3F3F46"><sc-for list="{{ p.pestanas }}" as="c" hint-placeholder-count="2"><a href="{{ c.href }}" role="tab" aria-selected="{{ c.sel }}" style="min-height:48px;display:flex;align-items:center;gap:8px;padding:0 14px;font-size:15px;font-weight:{{ c.w }};color:{{ c.fg }};text-decoration:none;box-shadow:inset 0 -2px 0 {{ c.barra }}">{{ c.n }}<span style="font-size:13px;color:#A8A29B;font-variant-numeric:tabular-nums">{{ c.cuenta }}</span></a></sc-for></div></sc-if>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap"><sc-for list="{{ p.origenes }}" as="c" hint-placeholder-count="4"><span style="min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;background:{{ c.bg }};border:1px solid {{ c.bd }};color:{{ c.fg }};font-size:15px;font-weight:{{ c.w }}">{{ c.n }}</span></sc-for></div>
+                    <div style="display:grid;grid-template-columns:repeat({{ m.colsR }},minmax(0,1fr));gap:{{ m.gap }}">
+                      <sc-for list="{{ p.recetas }}" as="r" hint-placeholder-count="6">
+                        <article style="display:flex;flex-direction:column;border-radius:16px;overflow:hidden;background:#151517;border:1px solid #3F3F46">
+                          <span style="position:relative;aspect-ratio:4/3;background:#1C1C1F;display:block"><img src="{{ r.f }}" alt="" style="width:100%;height:100%;object-fit:cover;object-position:{{ r.pos }};display:block"><button aria-label="{{ r.guardarLabel }}" style="position:absolute;top:8px;right:8px;width:44px;height:44px;border-radius:999px;background:#0B0B0C;border:1px solid #3F3F46;color:{{ r.cor }};display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="18" height="18" viewBox="0 0 24 24" fill="{{ r.relleno }}" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h12v16l-6-4-6 4Z"></path></svg></button></span>
+                          <span style="padding:14px;display:flex;flex-direction:column;gap:6px"><span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#E4D1B0">{{ r.o }}</span><span style="font-family:Fraunces,serif;font-size:19px;line-height:24px;font-weight:440;text-wrap:balance">{{ r.n }}</span><span style="font-size:13px;line-height:18px;color:#A8A29B;font-variant-numeric:tabular-nums">{{ r.meta }}</span><span style="font-size:13px;line-height:18px;color:#F5F3EF;text-wrap:pretty">Lleva: {{ r.cortes }}</span></span>
+                        </article>
+                      </sc-for>
+                    </div>
+                  </sc-if>
+
+                  <sc-if value="{{ p.receta }}">
+                    <div style="display:grid;grid-template-columns:{{ m.colsRec }};gap:28px;align-items:start">
+                      <div style="display:flex;flex-direction:column;gap:16px">
+                        <div style="border-radius:24px;overflow:hidden;background:#1C1C1F;aspect-ratio:{{ m.ar }}"><img src="public/img/products/flak_steak-alto.webp" alt="Vacío a la parrilla" style="width:100%;height:100%;object-fit:cover;display:block"></div>
+                        <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid #3F3F46;border-bottom:1px solid #3F3F46"><sc-for list="{{ p.recMeta }}" as="x" hint-placeholder-count="3"><span style="display:flex;flex-direction:column;gap:2px;padding:12px 0"><span style="font-size:13px;color:#A8A29B">{{ x.k }}</span><span style="font-size:16px;font-weight:600;font-variant-numeric:tabular-nums">{{ x.v }}</span></span></sc-for></div>
+                        <ol style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:14px">
+                          <sc-for list="{{ p.pasos }}" as="s" hint-placeholder-count="4"><li style="display:grid;grid-template-columns:32px minmax(0,1fr);gap:12px;font-size:15px;line-height:24px"><span style="width:32px;height:32px;border-radius:999px;border:1px solid #3F3F46;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;font-variant-numeric:tabular-nums">{{ s.n }}</span><span style="text-wrap:pretty">{{ s.t }}</span></li></sc-for>
+                        </ol>
+                      </div>
+                      <div style="display:flex;flex-direction:column;gap:12px;padding:20px;border-radius:20px;background:#151517;border:1px solid #3F3F46">
+                        <span style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:17px;font-weight:600">Ingredientes para 4</span><span style="font-size:13px;color:#A8A29B">en rojo, lo que vendemos</span></span>
+                        <sc-for list="{{ p.ingredientes }}" as="g" hint-placeholder-count="6">
+                          <span style="display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:44px;border-bottom:1px solid #3F3F46;font-size:15px"><span style="display:flex;align-items:center;gap:10px"><span style="width:8px;height:8px;border-radius:999px;background:{{ g.dot }}"></span><span style="font-weight:{{ g.w }}">{{ g.n }}</span></span><span style="font-size:14px;color:#A8A29B;font-variant-numeric:tabular-nums;text-align:right">{{ g.q }}</span></span>
+                        </sc-for>
+                        <span style="display:flex;justify-content:space-between;align-items:baseline;padding-top:4px;font-variant-numeric:tabular-nums"><span style="font-size:14px;color:#A8A29B">3 productos de la tienda</span><span style="font-size:22px;font-weight:600">$845.70</span></span>
+                        <button style="height:52px;border-radius:999px;background:#DC2626;border:none;color:#FFFFFF;font-family:Geist,system-ui,sans-serif;font-size:16px;font-weight:600;cursor:pointer">Agregar los cortes al pedido</button>
+                        <button style="height:48px;border-radius:999px;background:transparent;border:1px solid #E4D1B0;color:#F5F3EF;font-family:Geist,system-ui,sans-serif;font-size:15px;font-weight:600;cursor:pointer">Guardar receta</button>
+                      </div>
+                    </div>
+                  </sc-if>
+
+                  <sc-if value="{{ p.salud }}">
+                    <div style="display:grid;grid-template-columns:repeat({{ m.colsS }},minmax(0,1fr));gap:12px">
+                      <sc-for list="{{ p.salud }}" as="w" hint-placeholder-count="2">
+                        <div style="display:flex;flex-direction:column;gap:14px;padding:20px;border-radius:20px;background:#151517;border:1px solid #3F3F46">
+                          <span style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:16px;font-weight:600">{{ w.t }}</span><span style="font-size:13px;color:#A8A29B">{{ w.p }}</span></span>
+                          <span style="display:flex;align-items:baseline;gap:8px;font-variant-numeric:tabular-nums"><span style="font-size:40px;line-height:44px;font-weight:600">{{ w.v }}</span><span style="font-size:15px;color:#A8A29B">{{ w.u }}</span></span>
+                          <div style="height:10px;border-radius:999px;background:#1C1C1F;border:1px solid #3F3F46;overflow:hidden"><div style="width:{{ w.pct }};height:100%;background:#E4D1B0"></div></div>
+                          <span style="font-size:13px;line-height:18px;color:#A8A29B;font-variant-numeric:tabular-nums">{{ w.meta }}</span>
+                          <div style="display:flex;flex-direction:column;border-top:1px solid #3F3F46">
+                            <sc-for list="{{ w.filas }}" as="x" hint-placeholder-count="3"><span style="display:flex;justify-content:space-between;gap:12px;min-height:40px;align-items:center;border-bottom:1px solid #3F3F46;font-size:14px;font-variant-numeric:tabular-nums"><span>{{ x.n }}</span><span style="color:#A8A29B">{{ x.v }}</span></span></sc-for>
+                          </div>
+                        </div>
+                      </sc-for>
+                    </div>
+                    <span style="font-size:13px;line-height:18px;color:#A8A29B;text-wrap:pretty">Estimado a partir de tus pedidos del mes y tablas de referencia por 100 g de carne cruda. Es orientativo, no un consejo médico.</span>
+                  </sc-if>
+
+                  <sc-if value="{{ p.niveles }}">
+                    <div style="display:flex;flex-direction:column;gap:10px;padding:20px;border-radius:20px;background:#151517;border:1px solid #3F3F46">
+                      <span style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap"><span style="font-size:16px;font-weight:600">Te faltan 8 pedidos o $5,760 para Parrillero</span><span style="font-size:14px;color:#A8A29B;font-variant-numeric:tabular-nums">12 de 20 pedidos</span></span>
+                      <div style="height:10px;border-radius:999px;background:#1C1C1F;border:1px solid #3F3F46;overflow:hidden"><div style="width:60%;height:100%;background:#DC2626"></div></div>
+                    </div>
+                    <div style="display:grid;grid-template-columns:repeat({{ m.colsN }},minmax(0,1fr));gap:12px">
+                      <sc-for list="{{ p.niveles }}" as="n" hint-placeholder-count="3">
+                        <div style="display:flex;flex-direction:column;gap:12px;padding:20px;border-radius:20px;background:#151517;border:{{ n.bd }}">
+                          <span style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:13px;font-weight:600;color:#0B0B0C;background:#F59E0B;border-radius:999px;padding:3px 12px">{{ n.n }}</span><sc-if value="{{ n.tuyo }}"><span style="font-size:13px;font-weight:600;color:#F5F3EF">Tu nivel</span></sc-if></span>
+                          <span style="font-family:Fraunces,serif;font-size:32px;line-height:36px;font-weight:480;font-variant-numeric:tabular-nums">{{ n.desc }}</span>
+                          <span style="font-size:14px;color:#A8A29B">{{ n.regla }}</span>
+                          <sc-for list="{{ n.da }}" as="x" hint-placeholder-count="3"><span style="display:flex;gap:8px;font-size:14px;line-height:20px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E4D1B0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:0 0 16px;margin-top:2px"><path d="M5 12.5 9.5 17 19 7.5"></path></svg>{{ x }}</span></sc-for>
+                        </div>
+                      </sc-for>
+                    </div>
+                  </sc-if>
+
+                  <sc-if value="{{ p.datos }}">
+                    <form style="display:flex;flex-direction:column;gap:12px;max-width:560px">
+                      <sc-for list="{{ p.datos }}" as="c" hint-placeholder-count="4">
+                        <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:14px;font-weight:600">{{ c.l }}</span><span style="display:flex;align-items:center;gap:8px;height:52px;box-sizing:border-box;border-radius:14px;background:#151517;border:1px solid #3F3F46;padding:0 6px 0 16px;font-size:16px;font-variant-numeric:tabular-nums"><span style="flex:1;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">{{ c.v }}</span><sc-if value="{{ c.b }}"><button type="button" style="height:44px;padding:0 14px;border-radius:999px;background:transparent;border:1px solid #E4D1B0;color:#F5F3EF;font-family:Geist,system-ui,sans-serif;font-size:14px;font-weight:600;cursor:pointer">{{ c.b }}</button></sc-if></span></label>
+                      </sc-for>
+                      <button type="submit" style="margin-top:4px;height:52px;border-radius:999px;background:#DC2626;border:none;color:#FFFFFF;font-family:Geist,system-ui,sans-serif;font-size:16px;font-weight:600;cursor:pointer">Guardar cambios</button>
+                      <a href="Inicio de sesión del cliente.dc.html" style="height:48px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;gap:8px;border-radius:999px;border:1px solid #3F3F46;color:#F5F3EF;font-size:15px;font-weight:600;text-decoration:none"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l-5-5 5-5M5 12h11"></path></svg>Cerrar sesión</a>
+                    </form>
+                  </sc-if>
+
+                  <sc-if value="{{ p.afiliado }}">
+                    <div style="display:grid;grid-template-columns:{{ m.colsA }};gap:16px;align-items:start">
+                      <div style="display:flex;flex-direction:column;gap:14px;padding:20px;border-radius:20px;background:#151517;border:1px solid #3F3F46">
+                        <span style="font-size:14px;font-weight:600">Tu enlace</span>
+                        <span style="display:flex;gap:8px"><span style="flex:1;min-width:0;display:flex;align-items:center;height:52px;box-sizing:border-box;border-radius:14px;background:#0B0B0C;border:1px solid #3F3F46;padding:0 14px;font-size:15px;overflow:hidden;white-space:nowrap">carni.mx/i/eduardo-t</span><button style="height:52px;padding:0 18px;border-radius:999px;background:#DC2626;border:none;color:#FFFFFF;font-family:Geist,system-ui,sans-serif;font-size:15px;font-weight:600;cursor:pointer">Copiar</button></span>
+                        <span style="font-size:14px;line-height:20px;color:#A8A29B;text-wrap:pretty">Quien llega con tu enlace recibe $50 en su primer pedido; tú recibes $50 de saldo cuando lo recoge o se lo entregan. <span style="color:#E4D1B0;font-weight:600">Cifras por confirmar con el dueño.</span></span>
+                        <span style="font-size:14px;font-weight:600;padding-top:4px">Compartir</span>
+                        <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px">
+                          <a href="https://wa.me/?text=Te%20invito%20a%20la%20Carnicer%C3%ADa%20El%20Se%C3%B1or%20de%20La%20Misericordia%3A%20carni.mx%2Fi%2Feduardo-t" target="_blank" rel="noopener" style="min-height:72px;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;border-radius:16px;border:1px solid #3F3F46;color:#F5F3EF;font-size:13px;font-weight:600;text-decoration:none"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"></path></svg>WhatsApp</a>
+                          <a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fcarni.mx%2Fi%2Feduardo-t" target="_blank" rel="noopener" style="min-height:72px;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;border-radius:16px;border:1px solid #3F3F46;color:#F5F3EF;font-size:13px;font-weight:600;text-decoration:none"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3.5h-2.5A4 4 0 0 0 9.5 7.5V10H7v3.5h2.5v7h3.5v-7h2.6l.6-3.5H13V7.8c0-.6.4-.8 1-.8h2Z"></path></svg>Facebook</a>
+                          <button aria-label="Más opciones: abre el menú de compartir del teléfono" style="min-height:72px;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;border-radius:16px;border:1px solid #3F3F46;background:transparent;color:#F5F3EF;font-family:Geist,system-ui,sans-serif;font-size:13px;font-weight:600;cursor:pointer"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3.5M7.5 8 12 3.5 16.5 8M5 12v7a1.5 1.5 0 0 0 1.5 1.5h11A1.5 1.5 0 0 0 19 19v-7"></path></svg>Más opciones</button>
+                        </div>
+                        <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid #3F3F46;padding-top:12px"><sc-for list="{{ p.afCifras }}" as="x" hint-placeholder-count="3"><span style="display:flex;flex-direction:column;gap:2px"><span style="font-size:22px;font-weight:600;font-variant-numeric:tabular-nums">{{ x.v }}</span><span style="font-size:13px;color:#A8A29B">{{ x.k }}</span></span></sc-for></div>
+                      </div>
+                      <div style="display:flex;flex-direction:column;align-items:center;gap:12px;padding:20px;border-radius:20px;background:#151517;border:1px solid #3F3F46">
+                        <div style="width:200px;height:200px;box-sizing:border-box;border-radius:16px;background:#F5F3EF;border:12px solid #F5F3EF;display:flex;align-items:center;justify-content:center"><span style="width:100%;height:100%;border:2px dashed #3F3F46;border-radius:6px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:13px;line-height:18px;color:#3F3F46;padding:12px;box-sizing:border-box">Código QR de carni.mx/i/eduardo-t</span></div>
+                        <span style="font-size:14px;color:#A8A29B;text-align:center">Para que lo escaneen en el mostrador</span>
+                        <button style="height:44px;padding:0 18px;border-radius:999px;background:transparent;border:1px solid #3F3F46;color:#F5F3EF;font-family:Geist,system-ui,sans-serif;font-size:14px;font-weight:600;cursor:pointer">Descargar imagen</button>
+                      </div>
+                    </div>
+                  </sc-if>
+                </div>
+              </div>
+            </div>
+            <div style="font-size:13px;line-height:18px;font-weight:600">{{ p.nombre }} · {{ m.nombre }}</div>
+          </div>
+        </sc-for>
+
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="width:390px;box-sizing:border-box;background:#0B0B0C;border:1px solid #3F3F46;border-radius:12px;padding:32px 20px;display:flex;flex-direction:column;align-items:flex-start;gap:14px">
+            <span style="width:56px;height:56px;border-radius:999px;border:1px solid #3F3F46;background:#151517;display:flex;align-items:center;justify-content:center;color:#E4D1B0"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="{{ p.vacioIcono }}"></path></svg></span>
+            <span style="font-family:Fraunces,serif;font-size:24px;line-height:30px;font-weight:460;text-wrap:balance">{{ p.vacioT }}</span>
+            <span style="font-size:15px;line-height:23px;color:#A8A29B;text-wrap:pretty">{{ p.vacioD }}</span>
+            <button style="height:48px;padding:0 20px;border-radius:999px;background:#DC2626;border:none;color:#FFFFFF;font-family:Geist,system-ui,sans-serif;font-size:15px;font-weight:600;cursor:pointer">{{ p.vacioB }}</button>
+          </div>
+          <div style="font-size:13px;line-height:18px;font-weight:600">{{ p.nombre }} · estado vacío · móvil 390</div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:4px;font-size:13px;line-height:19px;color:#A8A29B;max-width:1100px;text-wrap:pretty"><span><span style="color:#E4D1B0;font-weight:600">De lo nuestro · </span>{{ p.n }}</span><span><span style="color:#F5F3EF;font-weight:600">De lo mío · </span>{{ p.y }}</span><span><span style="color:#F5F3EF;font-weight:600">Mejora · </span>{{ p.m }}</span></div>
+    </div>
+  </sc-for>
+
+  <div style="display:flex;flex-direction:column;gap:16px">
+    <h2 style="margin:0;font-family:Fraunces,serif;font-size:30px;line-height:36px;font-weight:440">Autorrevisión · perfil</h2>
+    <div style="background:#151517;border:1px solid #3F3F46;border-radius:12px;overflow:hidden;width:1440px;max-width:100%">
+      <div style="display:grid;grid-template-columns:200px minmax(0,1fr) 100px minmax(0,1.2fr);font-size:12px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B;border-bottom:1px solid #3F3F46"><span style="padding:12px 16px">Criterio</span><span style="padding:12px 16px">Qué se midió</span><span style="padding:12px 16px">Estado</span><span style="padding:12px 16px">Corrección</span></div>
+      <sc-for list="{{ revision }}" as="c" hint-placeholder-count="6">
+        <div style="display:grid;grid-template-columns:200px minmax(0,1fr) 100px minmax(0,1.2fr);font-size:13px;line-height:18px;border-bottom:1px solid #3F3F46"><span style="padding:12px 16px">{{ c.c }}</span><span style="padding:12px 16px;color:#A8A29B">{{ c.m }}</span><span style="padding:12px 16px;color:#059669;font-weight:600">Pasa</span><span style="padding:12px 16px;color:#A8A29B">{{ c.x }}</span></div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div id="reporte-b8" data-screen-label="Reporte" style="width:1440px;max-width:100%;box-sizing:border-box;background:#151517;border:1px solid #3F3F46;border-radius:16px;padding:40px;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:48px">
+    <div style="display:flex;flex-direction:column;gap:20px">
+      <span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#E4D1B0">Reporte · perfil del cliente</span>
+      <span style="font-family:Fraunces,serif;font-size:40px;line-height:46px;font-weight:480">10 de 10 pantallas cerradas, cada una con su vacío</span>
+      <div style="display:flex;flex-direction:column">
+        <sc-for list="{{ pantallas }}" as="p" hint-placeholder-count="8"><span style="display:grid;grid-template-columns:40px minmax(0,1fr) 80px;gap:12px;padding:12px 0;border-bottom:1px solid #3F3F46;font-size:15px;line-height:22px"><span style="color:#A8A29B">{{ p.id }}</span><span>{{ p.nombre }}</span><span style="color:#059669;font-weight:600">Listo</span></span></sc-for>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B">Pendientes</span>
+      <span style="font-size:15px;line-height:22px;text-wrap:pretty;border-bottom:1px solid #3F3F46;padding-bottom:12px">Falta backend: recetario, recetas guardadas, calorías y proteína, niveles y afiliados con su QR.</span>
+      <span style="font-size:15px;line-height:22px;text-wrap:pretty;border-bottom:1px solid #3F3F46;padding-bottom:12px">Las recetas usan fotos de producto; faltan fotos de platillo terminado.</span>
+      <span style="font-size:15px;line-height:22px;text-wrap:pretty">El dominio carni.mx del enlace de afiliado es de ejemplo.</span>
+    </div>
+  </div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const IMG = 'public/img/products/';
+const MENU = ['Mis pedidos', 'Mis direcciones', 'Favoritos', 'Recetario', 'Recetas guardadas', 'Calorías y proteína', 'Mi nivel', 'Mi enlace', 'Mis datos'];
+const ANCLA = { 'Mis pedidos': '34', 'Mis direcciones': '35', 'Favoritos': '36', 'Recetario': '37', 'Recetas guardadas': '46', 'Calorías y proteína': '39', 'Mi nivel': '40', 'Mi enlace': '41', 'Mis datos': '47' };
+const menu = act => MENU.map(t => {
+  const on = t === act;
+  return { t, href: '#s' + ANCLA[t], cur: on ? 'page' : 'false', bg: on ? 'rgba(220,38,38,0.12)' : 'transparent', fg: on ? '#F5F3EF' : '#A8A29B', w: on ? 600 : 400, barra: on ? '#DC2626' : 'transparent', cb: on ? '#DC2626' : '#151517', cbd: on ? '#DC2626' : '#3F3F46', cf: on ? '#FFFFFF' : '#F5F3EF' };
+});
+const railDe = act => { const m = menu(act); const i = m.findIndex(x => x.t === act); return [...m.slice(i), ...m.slice(0, i)]; };
+const marcos = (h1, h2) => [
+  { nombre: 'móvil 390', w: '390px', h: h1, mo: true, d: false, dir: 'column', pad: '20px 16px 32px', h3: '30px', colsT: 2, colsR: 1, colsS: 1, colsN: 1, colsA: '1fr', colsRec: '1fr', ar: '4/3', gap: '12px' },
+  { nombre: 'escritorio 1440', w: '1440px', h: h2, mo: false, d: true, dir: 'row', pad: '32px 40px 48px', h3: '44px', colsT: 4, colsR: 3, colsS: 2, colsN: 3, colsA: '1.4fr 1fr', colsRec: '1.3fr 1fr', ar: '16/9', gap: '20px' }
+];
+const EST = { Entregado: '#059669', Preparando: '#DC2626', Cancelado: '#A8A29B' };
+const chip = (n, on) => ({ n, bg: on ? '#DC2626' : '#151517', bd: on ? '#DC2626' : '#3F3F46', fg: on ? '#FFFFFF' : '#F5F3EF', w: on ? 600 : 400 });
+const rec = (o, n, meta, cortes, f, pos, guardada) => ({ o, n, meta, cortes, f, pos: pos ?? '50% 50%', cor: guardada ? '#DC2626' : '#F5F3EF', relleno: guardada ? '#DC2626' : 'none', guardarLabel: (guardada ? 'Quitar de guardadas: ' : 'Guardar: ') + n });
+const RECETAS = [
+  rec('Argentina', 'Vacío a la parrilla con chimichurri', '2 h · 4 personas', 'Vacío, Chorizo Argentino', IMG + 'bravette_steak.webp', null, true),
+  rec('México', 'Tacos de arrachera con cebollitas', '40 min · 4 personas', 'Arrachera, Tortillas', IMG + 'skirt_steak.webp'),
+  rec('España', 'Chuletón a la sal con pimientos', '35 min · 2 personas', 'Porterhouse', IMG + 'porterhouse.webp', null, true),
+  rec('México', 'Caldo de res con chambarete', '3 h · 6 personas', 'Chambarete, Retazo con Hueso', IMG + 'res-alto.webp', null, true),
+  rec('Argentina', 'Choripán con criolla', '25 min · 4 personas', 'Chorizo Argentino', IMG + 'preparadas.webp'),
+  rec('España', 'Cochinillo al horno, versión costilla', '2 h 30 · 6 personas', 'Costilla de Cerdo', IMG + 'cerdo-alto.webp')
+];
+const pest = g => [{ n: 'Todas', cuenta: '6', href: '#s37', sel: !g, w: g ? 400 : 600, fg: g ? '#A8A29B' : '#F5F3EF', barra: g ? 'transparent' : '#DC2626' }, { n: 'Guardadas', cuenta: '3', href: '#s46', sel: g, w: g ? 600 : 400, fg: g ? '#F5F3EF' : '#A8A29B', barra: g ? '#DC2626' : 'transparent' }];
+const base = { datos: null, pestanas: null, backend: false, bajada: null, accion: null, pedidos: null, direcciones: null, favoritos: null, recetas: null, origenes: [], receta: false, salud: null, niveles: null, afiliado: false };
+const P = [
+  { ...base, id: '34', nombre: 'Mis pedidos', menu: menu('Mis pedidos'), rail: railDe('Mis pedidos'), marcos: marcos('1100px', '900px'), titulo: 'Mis pedidos', bajada: '12 pedidos desde marzo',
+    pedidos: [
+      { folio: '1042', fecha: 'Hoy, 12:04', modo: 'A domicilio', estado: 'Preparando', total: '$524.50', items: 'Arrachera ½ kg, Chorizo Verde, Gorra Bordada', fotos: [IMG + 'skirt_steak.webp', IMG + 'preparadas.webp', IMG + 'merch.webp'], b2: 'Ver estado' },
+      { folio: '1019', fecha: '14 sep', modo: 'Recoger', estado: 'Entregado', total: '$1,599.00', items: 'Paquete Asador 4 a 6 Personas', fotos: [IMG + 'premium.webp'], b2: 'Ver detalle' },
+      { folio: '0987', fecha: '2 sep', modo: 'A domicilio', estado: 'Cancelado', total: '$412.00', items: 'Rib Eye 0.600 kg, Carbón de Mezquite', fotos: [IMG + 'rib-eye-alto.webp', IMG + 'otrosproductos.webp'], b2: 'Ver detalle' }
+    ].map(o => ({ ...o, dot: EST[o.estado] })),
+    vacioIcono: 'M6 7h12l-1.2 12.2a1 1 0 0 1-1 .8H8.2a1 1 0 0 1-1-.8ZM9 7V5.5a3 3 0 0 1 6 0V7', vacioT: 'Todavía no tienes pedidos', vacioD: 'Cuando pidas, aquí vas a ver su estado y podrás repetirlo con un toque.', vacioB: 'Ver productos',
+    n: '“Mis pedidos” con los estados que ya maneja el panel.', y: 'cada pedido con estado en chip, fotos de lo que llevó y su vacío.', m: 'repetir un pedido es un botón, no volver a armar el carrito.' },
+  { ...base, id: '35', nombre: 'Mis direcciones', menu: menu('Mis direcciones'), rail: railDe('Mis direcciones'), marcos: marcos('844px', '700px'), titulo: 'Mis direcciones', accion: 'Agregar dirección',
+    direcciones: [
+      { n: 'Casa', d: 'Río Verde 214, Col. Jardín, 78270 San Luis Potosí', pred: true, zona: 'Entregamos aquí', ic: '#059669', path: 'M5 12.5 9.5 17 19 7.5', bd: '#E4D1B0' },
+      { n: 'Oficina', d: 'Av. Venustiano Carranza 1500, Col. Tequisquiapan, 78250', pred: false, zona: 'Entregamos aquí', ic: '#059669', path: 'M5 12.5 9.5 17 19 7.5', bd: '#3F3F46' },
+      { n: 'Casa de mi mamá', d: 'Camino a Pozos 1200, Villa de Pozos, 78421', pred: false, zona: 'Fuera de zona: solo para recoger', ic: '#E4D1B0', path: 'M12 9v4M12 16.5h.01M10.3 4.2 2.8 17.5A2 2 0 0 0 4.5 20.5h15a2 2 0 0 0 1.7-3L13.7 4.2a2 2 0 0 0-3.4 0Z', bd: '#3F3F46' }
+    ],
+    vacioIcono: 'M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11ZM12 12.3a2.3 2.3 0 1 0 0-4.6 2.3 2.3 0 0 0 0 4.6Z', vacioT: 'Sin direcciones guardadas', vacioD: 'Guarda la de tu casa y la próxima vez el pedido sale en dos toques. Recoger en tienda no la necesita.', vacioB: 'Agregar dirección',
+    n: 'las direcciones de entrega del registro y del checkout.', y: 'tarjetas con etiqueta (Casa, Trabajo) y su vacío.', m: 'cada dirección dice si está en zona de entrega antes de llegar al pago.' },
+  { ...base, id: '36', nombre: 'Favoritos', menu: menu('Favoritos'), rail: railDe('Favoritos'), marcos: marcos('1100px', '900px'), titulo: 'Favoritos', bajada: '4 productos',
+    favoritos: [
+      { v: 'normal', f: IMG + 'rib-eye-alto.webp', cat: 'Cortes especiales', n: 'Rib Eye', d: 'El más jaspeado del lomo alto', precio: '$579', u: 'kg' },
+      { v: 'normal', f: IMG + 'preparadas.webp', cat: 'Preparadas', n: 'Chorizo Argentino', d: 'Fresco, el del choripán', precio: '$169', u: 'kg' },
+      { v: 'agotado', f: IMG + 'res-alto.webp', cat: 'Carnes rojas', n: 'Chambarete con Tuétano', d: 'Con hueso, la base del caldo', precio: '$189', u: 'kg' },
+      { v: 'oferta', f: IMG + 'premium.webp', cat: 'Ofertas', n: 'Paquete Asador 4 a 6 Personas', d: 'Arrachera, chorizo y carbón', precio: '$1,599', u: 'paquete' }
+    ],
+    vacioIcono: 'M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z', vacioT: 'Aún no guardas favoritos', vacioD: 'Toca el corazón en la ficha de un corte para tenerlo aquí a la mano.', vacioB: 'Explorar cortes',
+    n: 'la misma Tarjeta del catálogo.', y: 'variantes sin stock y oferta dentro de favoritos, con su vacío.', m: 'se agrega desde aquí sin volver a buscar el corte.' },
+  { ...base, id: '37', nombre: 'Recetario', backend: true, menu: menu('Recetario'), rail: railDe('Recetario'), marcos: marcos('1500px', '1040px'), titulo: 'Recetario', bajada: 'Recetas mexicanas, argentinas y españolas hechas con lo que vendemos',
+    pestanas: pest(false), origenes: [chip('Todos los orígenes', true), chip('México', false), chip('Argentina', false), chip('España', false)], recetas: RECETAS,
+    vacioIcono: 'M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3ZM5 17a3 3 0 0 1 3-3h11', vacioT: 'Sin recetas con ese filtro', vacioD: 'No hay recetas españolas con pollo todavía. Prueba otro origen o mira todas.', vacioB: 'Ver todas las recetas',
+    n: 'los cortes reales de la carnicería como base de cada receta.', y: 'recetas mexicanas, argentinas y españolas con filtro por origen.', m: 'cada receta dice origen, tiempo, porciones y qué cortes de la tienda lleva; marcador de 44 px.' },
+  { ...base, id: '38', nombre: 'Receta abierta', backend: true, menu: menu('Recetario'), rail: railDe('Recetario'), marcos: marcos('1720px', '1100px'), titulo: 'Vacío a la parrilla con chimichurri', bajada: 'Argentina · la receta de domingo', receta: true,
+    recMeta: [{ k: 'Tiempo', v: '2 h' }, { k: 'Porciones', v: '4' }, { k: 'Dificultad', v: 'Fácil' }],
+    pasos: [{ n: 1, t: 'Saca el vacío del refri una hora antes y sálalo con sal gruesa por ambos lados.' }, { n: 2, t: 'Brasa pareja de mezquite, sin llama. Pon el vacío con la grasa hacia abajo.' }, { n: 3, t: 'Una hora y media a fuego bajo, volteando una sola vez.' }, { n: 4, t: 'Reposa 10 minutos y rebana contra la fibra. Sirve con chimichurri.' }],
+    ingredientes: [
+      { n: 'Vacío en Oferta', q: '1.5 kg · $568.50', tienda: true }, { n: 'Chorizo Argentino', q: '½ kg · $84.50', tienda: true }, { n: 'Carbón de Mezquite', q: '1 bolsa · $120.00', tienda: true },
+      { n: 'Perejil', q: '1 manojo' }, { n: 'Ajo', q: '4 dientes' }, { n: 'Aceite de oliva y vinagre', q: 'al gusto' }
+    ].map(g => ({ ...g, dot: g.tienda ? '#DC2626' : '#3F3F46', w: g.tienda ? 600 : 400 })),
+    vacioIcono: 'M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3ZM5 17a3 3 0 0 1 3-3h11', vacioT: 'Esta receta ya no está', vacioD: 'La quitamos del recetario porque uno de sus cortes dejó de venderse. Te dejamos otras con lo que sí hay.', vacioB: 'Abrir el recetario',
+    n: 'los productos y precios del catálogo.', y: 'ingredientes de la tienda marcados en rojo con su precio.', m: 'un solo botón agrega todos los cortes de la receta al pedido.' },
+  { ...base, id: '39', nombre: 'Calorías y proteína', backend: true, menu: menu('Calorías y proteína'), rail: railDe('Calorías y proteína'), marcos: marcos('1100px', '760px'), titulo: 'Calorías y proteína', bajada: 'Por porción de 150 g de lo que pediste en septiembre',
+    salud: [
+      { t: 'Calorías', p: 'por porción de 150 g', v: '380', u: 'kcal', pct: '62%', meta: 'Promedio de tus 3 cortes más pedidos, en crudo', filas: [{ n: 'Rib Eye · 150 g', v: '435 kcal' }, { n: 'Chorizo Argentino · 150 g', v: '450 kcal' }, { n: 'Pierna y Muslo · 150 g', v: '255 kcal' }] },
+      { t: 'Proteína', p: 'por porción de 150 g', v: '30', u: 'g', pct: '78%', meta: 'Promedio de tus 3 cortes más pedidos, en crudo', filas: [{ n: 'Rib Eye · 150 g', v: '36 g' }, { n: 'Pierna y Muslo · 150 g', v: '27 g' }, { n: 'Molida de Res Especial · 150 g', v: '26 g' }] }
+    ],
+    vacioIcono: 'M4 19V5M4 19h16M8 15v-4M12 15V8M16 15v-6', vacioT: 'Sin datos todavía', vacioD: 'Estas cifras salen de tus pedidos. Con tu primer pedido del mes empezamos a contar.', vacioB: 'Ver productos',
+    n: 'los pedidos del cliente como fuente de los números.', y: 'dos widgets con cifra grande y avance en beige.', m: 'las cifras van por porción de 150 g, como en una etiqueta, y no por día; se dice de dónde salen y que son orientativas.' },
+  { ...base, id: '46', nombre: 'Recetas guardadas', backend: true, menu: menu('Recetas guardadas'), rail: railDe('Recetas guardadas'), marcos: marcos('1100px', '800px'), titulo: 'Recetario', bajada: '3 recetas guardadas', pestanas: pest(true), recetas: RECETAS.filter(r => r.relleno !== 'none'),
+    vacioIcono: 'M6 4h12v16l-6-4-6 4Z', vacioT: 'Aún no guardas recetas', vacioD: 'Toca el marcador en cualquier receta para guardarla y volver a ella cuando vayas a pedir.', vacioB: 'Ver todas las recetas',
+    n: 'el recetario con sus cortes de la tienda.', y: '“Recetas guardadas” en el menú abre la pestaña “Guardadas” del mismo recetario.', m: 'no es otra página: son las mismas tarjetas con el marcador en rojo lleno, y el vacío explica cómo guardar.' },
+  { ...base, id: '40', nombre: 'Mi nivel', backend: true, menu: menu('Mi nivel'), rail: railDe('Mi nivel'), marcos: marcos('1300px', '800px'), titulo: 'Mi nivel', bajada: 'Eres Asador desde julio',
+    niveles: [
+      { n: 'Vecino', desc: '0 %', regla: 'Al registrarte', da: ['Recetario completo', 'Avisos de ofertas'], bd: '1px solid #3F3F46', tuyo: false },
+      { n: 'Asador', desc: '5 %', regla: 'Desde 5 pedidos o $3,000', da: ['5 % en todos los cortes', 'Apartar cortes para el fin de semana', 'Todo lo de Vecino'], bd: '2px solid #DC2626', tuyo: true },
+      { n: 'Parrillero', desc: '10 %', regla: 'Desde 20 pedidos o $12,000', da: ['10 % en todos los cortes', 'Apartar cortes especiales', 'Todo lo de Asador'], bd: '1px solid #3F3F46', tuyo: false }
+    ],
+    vacioIcono: 'M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z', vacioT: 'Empiezas como Vecino', vacioD: 'Con 5 pedidos pasas a Asador y tienes 5 % en todos los cortes.', vacioB: 'Hacer mi primer pedido',
+    n: 'el Mercy Club que prometía el acceso viejo (puntos y ofertas).', y: 'tres niveles con lo que da cada uno y el tuyo en rojo.', m: 'cuánto falta para el siguiente, en pedidos y en pesos.' },
+  { ...base, id: '41', nombre: 'Mi enlace de afiliado', backend: true, menu: menu('Mi enlace'), rail: railDe('Mi enlace'), marcos: marcos('1100px', '760px'), titulo: 'Invita y gana', bajada: '$50 para ti y $50 para quien invitas', afiliado: true,
+    afCifras: [{ k: 'Invitados', v: '3' }, { k: 'Compraron', v: '2' }, { k: 'Tu saldo', v: '$100' }],
+    vacioIcono: 'M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1', vacioT: 'Aún no invitas a nadie', vacioD: 'Comparte tu enlace o tu código QR. Cuando alguien compre con él, verás aquí tu saldo.', vacioB: 'Copiar mi enlace',
+    n: 'la idea de recomendar a vecinos, que el sitio ya pedía por WhatsApp.', y: 'enlace, QR para el mostrador y tres formas de compartir: WhatsApp, Facebook y el menú del teléfono.', m: 'cada botón mide 72 px de alto; los $50 + $50 llevan “cifras por confirmar con el dueño”.' },
+  { ...base, id: '47', nombre: 'Mis datos', menu: menu('Mis datos'), rail: railDe('Mis datos'), marcos: marcos('844px', '700px'), titulo: 'Mis datos',
+    datos: [{ l: 'Nombre', v: 'Eduardo Torres' }, { l: 'Teléfono con WhatsApp', v: '444 123 4567' }, { l: 'Correo electrónico', v: 'eduardo@gmail.com' }, { l: 'Contraseña', v: '••••••••', b: 'Cambiar' }],
+    vacioIcono: 'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM4.5 20a7.5 7.5 0 0 1 15 0', vacioT: 'Completa tus datos', vacioD: 'Con tu nombre y teléfono te avisamos cuando tu pedido esté listo. El correo solo sirve para entrar.', vacioB: 'Agregar mis datos',
+    n: 'nombre, teléfono y correo que ya pide el registro.', y: 'los cuatro campos del sistema y “Cerrar sesión” al pie del mismo cuadro.', m: 'en 390 todo cabe en 844 px sin desplazar, y cerrar sesión no se esconde en otro menú.' }
+];
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      pantallas: [...P].sort((a, b) => Number(a.id) - Number(b.id)),
+      revision: [
+        { c: 'Se lee en el teléfono', m: 'Títulos 30 px, cuerpo 15 px, cifras de widgets 40 px en 390', x: 'Sin cambios necesarios.' },
+        { c: 'Contraste', m: 'Ingredientes de la tienda con punto rojo y texto claro; avance de widgets beige sobre #1C1C1F', x: 'Intento 1: los ingredientes de la tienda iban con texto rojo (4.1:1); pasó a texto claro con punto rojo.' },
+        { c: 'Botones de 44 px', m: 'Marcador de receta 44, chips 44, Editar/Quitar con 44, Copiar 52', x: 'Intento 1: el marcador sobre la foto medía 32; subió a 44.' },
+        { c: 'Misma tarjeta y botones', m: 'Favoritos importa Tarjeta; encabezado de Componentes; chips y botones de siempre', x: 'Sin cambios necesarios.' },
+        { c: 'Nada se sale ni se corta', m: '“Vacío a la parrilla con chimichurri” en 30 px, rail de secciones desliza', x: 'Intento 1: el rail empezaba siempre en “Mis pedidos” y escondía la activa; ahora la sección activa va primero.' },
+        { c: 'Mejor que lo viejo', m: 'El perfil viejo solo tenía nombre y correo', x: 'Ver las líneas de mejora.' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

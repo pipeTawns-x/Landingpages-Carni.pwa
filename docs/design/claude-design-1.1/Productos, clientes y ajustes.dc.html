@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..700&family=Geist:wght@400..700&display=swap" rel="stylesheet">
+<style>
+  body { margin:0; background:#0B0B0C; color:#F5F3EF; }
+  a { color:#DC2626; text-decoration:none; }
+  a:hover { color:#E4D1B0; }
+</style>
+</helmet>
+
+<section id="b6b" data-screen-label="Productos, clientes y ajustes" style="background:#0B0B0C;width:max-content;min-width:100%;box-sizing:border-box;padding:48px 48px 96px;font-family:Geist,system-ui,sans-serif;color:#F5F3EF;display:flex;flex-direction:column;gap:64px">
+
+  <div style="display:flex;flex-direction:column;gap:12px;max-width:960px">
+    <div style="font-size:12px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B">Carni · rediseño · panel administrativo · productos, clientes y ajustes</div>
+    <h1 style="margin:0;font-family:Fraunces,Georgia,serif;font-size:44px;line-height:50px;font-weight:480">22–27 — Productos, clientes, ajustes y cerrar sesión</h1>
+    <p style="margin:0;font-size:16px;line-height:26px;color:#A8A29B;max-width:74ch;text-wrap:pretty">Misma navegación AdminNav, mismos campos de Inicio de sesión, mismos chips y botones. En 390 las tablas se vuelven renglones apilados; ninguna tabla blanca.</p>
+  </div>
+
+  <!-- ===== 22 PRODUCTOS ===== -->
+  <div style="display:flex;flex-direction:column;gap:16px">
+    <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap">
+      <span style="font-size:12px;font-weight:600;letter-spacing:0.04em;color:#DC2626">22</span>
+      <h2 style="margin:0;font-family:Fraunces,serif;font-size:30px;line-height:36px;font-weight:440">Productos · lista con buscador y filtros</h2>
+    </div>
+    <div style="display:flex;gap:32px;align-items:flex-start">
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="width:390px;background:#0B0B0C;border:1px solid #3F3F46;border-radius:12px;overflow:hidden;box-sizing:border-box">
+          <dc-import name="AdminNav" ancho="movil-arriba" activo="Productos" titulo="Productos" accion="Nuevo producto" hint-size="100%,56px"></dc-import>
+          <div style="padding:16px 16px 8px;display:flex;flex-direction:column;gap:12px">
+            <span style="display:flex;align-items:center;gap:10px;height:52px;box-sizing:border-box;border-radius:999px;background:#151517;border:1px solid #3F3F46;padding:0 18px;font-size:16px;color:#A8A29B"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m16.5 16.5 4 4"></path></svg>Buscar por nombre o categoría</span>
+            <div style="display:flex;gap:8px;overflow:hidden">
+              <sc-for list="{{ filtros }}" as="c" hint-placeholder-count="5"><span style="min-height:44px;display:inline-flex;align-items:center;gap:6px;padding:0 14px;border-radius:999px;background:{{ c.bg }};border:1px solid {{ c.bd }};color:{{ c.fg }};font-size:15px;font-weight:{{ c.w }};white-space:nowrap;flex:0 0 auto">{{ c.n }}<span style="font-variant-numeric:tabular-nums;opacity:0.85">{{ c.k }}</span></span></sc-for>
+            </div>
+          </div>
+          <div style="padding:0 16px 24px">
+            <sc-for list="{{ productos }}" as="p" hint-placeholder-count="6">
+              <div style="display:flex;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid #3F3F46">
+                <span style="width:56px;height:56px;flex:0 0 56px;border-radius:12px;overflow:hidden;background:#1C1C1F"><img src="{{ p.f }}" alt="" style="width:100%;height:100%;object-fit:cover;filter:{{ p.filtro }};display:block"></span>
+                <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+                  <span style="font-size:15px;line-height:20px;font-weight:600;color:{{ p.fg }}">{{ p.n }}</span>
+                  <span style="font-size:13px;line-height:18px;color:#A8A29B;font-variant-numeric:tabular-nums">{{ p.cat }} · {{ p.precio }}</span>
+                  <span style="display:inline-flex;align-items:center;gap:6px;font-size:13px;line-height:18px;color:{{ p.sc }};font-variant-numeric:tabular-nums"><span style="width:8px;height:8px;border-radius:999px;background:{{ p.dot }}"></span>{{ p.stock }}</span>
+                </span>
+                <button aria-label="Editar {{ p.n }}" style="width:44px;height:44px;flex:0 0 44px;border-radius:999px;background:transparent;border:1px solid #3F3F46;color:#F5F3EF;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16Z"></path></svg></button>
+              </div>
+            </sc-for>
+            <span style="display:block;padding-top:14px;font-size:14px;color:#A8A29B;font-variant-numeric:tabular-nums">6 de 42 productos · <a href="Productos, clientes y ajustes.dc.html" style="color:#F5F3EF;text-decoration:underline;text-decoration-color:#E4D1B0;text-underline-offset:4px">ver más</a></span>
+          </div>
+          <dc-import name="AdminNav" ancho="movil-abajo" activo="Productos" hint-size="100%,72px"></dc-import>
+        </div>
+        <div style="font-size:13px;line-height:18px;font-weight:600">Productos · móvil 390</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="width:1440px;height:900px;background:#0B0B0C;border:1px solid #3F3F46;border-radius:12px;overflow:hidden;box-sizing:border-box;display:grid;grid-template-columns:248px minmax(0,1fr)">
+          <dc-import name="AdminNav" ancho="escritorio" activo="Productos" hint-size="248px,100%"></dc-import>
+          <div style="display:flex;flex-direction:column;min-width:0">
+            <div style="height:72px;flex:0 0 72px;display:flex;align-items:center;justify-content:space-between;gap:24px;padding:0 32px;border-bottom:1px solid #3F3F46">
+              <span style="display:flex;align-items:baseline;gap:14px"><span style="font-family:Fraunces,serif;font-size:28px;line-height:32px;font-weight:460">Productos</span><span style="font-size:14px;color:#A8A29B;font-variant-numeric:tabular-nums">42 activos · 3 sin stock · 5 con stock bajo</span></span>
+              <button style="height:48px;padding:0 22px;border-radius:999px;background:#DC2626;border:none;color:#FFFFFF;font-family:Geist,system-ui,sans-serif;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:8px" style-hover="background:#C81E1E"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>Nuevo producto</button>
+            </div>
+            <div style="padding:20px 32px;display:flex;gap:16px;align-items:center">
+              <span style="width:380px;display:flex;align-items:center;gap:10px;height:48px;box-sizing:border-box;border-radius:999px;background:#151517;border:1px solid #3F3F46;padding:0 18px;font-size:15px;color:#A8A29B"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m16.5 16.5 4 4"></path></svg>Buscar por nombre o categoría</span>
+              <div style="display:flex;gap:8px">
+                <sc-for list="{{ filtros }}" as="c" hint-placeholder-count="5"><span style="min-height:44px;display:inline-flex;align-items:center;gap:6px;padding:0 14px;border-radius:999px;background:{{ c.bg }};border:1px solid {{ c.bd }};color:{{ c.fg }};font-size:14px;font-weight:{{ c.w }};white-space:nowrap">{{ c.n }}<span style="font-variant-numeric:tabular-nums;opacity:0.85">{{ c.k }}</span></span></sc-for>
+              </div>
+            </div>
+            <div style="margin:0 32px;border-radius:16px;background:#151517;border:1px solid #3F3F46;overflow:hidden">
+              <div style="display:grid;grid-template-columns:minmax(0,2.2fr) minmax(0,1.2fr) 150px 110px 140px 136px;gap:16px;padding:12px 20px;border-bottom:1px solid #3F3F46;font-size:12px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B"><span>Producto</span><span>Categoría</span><span style="text-align:right">Precio</span><span style="text-align:right">Stock</span><span>Estado</span><span></span></div>
+              <sc-for list="{{ productos }}" as="p" hint-placeholder-count="6">
+                <div style="display:grid;grid-template-columns:minmax(0,2.2fr) minmax(0,1.2fr) 150px 110px 140px 136px;gap:16px;align-items:center;min-height:68px;padding:0 20px;border-bottom:1px solid #3F3F46;font-size:15px;font-variant-numeric:tabular-nums">
+                  <span style="display:flex;align-items:center;gap:12px;min-width:0"><span style="width:44px;height:44px;flex:0 0 44px;border-radius:10px;overflow:hidden;background:#1C1C1F"><img src="{{ p.f }}" alt="" style="width:100%;height:100%;object-fit:cover;filter:{{ p.filtro }};display:block"></span><span style="font-weight:600;color:{{ p.fg }}">{{ p.n }}</span></span>
+                  <span style="color:#A8A29B">{{ p.cat }}</span>
+                  <span style="text-align:right">{{ p.precio }}</span>
+                  <span style="text-align:right;color:{{ p.sc }}">{{ p.q }}</span>
+                  <span><span style="display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 10px;border-radius:999px;background:#1C1C1F;border:1px solid #3F3F46;font-size:13px;font-weight:600"><span style="width:8px;height:8px;border-radius:999px;background:{{ p.dot }}"></span>{{ p.estado }}</span></span>
+                  <span style="display:flex;gap:6px;justify-content:flex-end"><button aria-label="Editar {{ p.n }}" style="width:44px;height:44px;border-radius:999px;background:transparent;border:1px solid #3F3F46;color:#F5F3EF;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16Z"></path></svg></button><button aria-label="Borrar {{ p.n }}" style="width:44px;height:44px;border-radius:999px;background:transparent;border:1px solid #3F3F46;color:#A8A29B;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7h14M10 7V5h4v2M7 7l1 13h8l1-13"></path></svg></button></span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+        <div style="font-size:13px;line-height:18px;font-weight:600">Productos · escritorio 1440</div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:4px;font-size:13px;line-height:19px;color:#A8A29B;max-width:1100px;text-wrap:pretty"><span><span style="color:#E4D1B0;font-weight:600">De lo nuestro · </span>la lista de admin-products con su franja de resumen, nombre, categoría, precio, existencia y editar o borrar.</span><span><span style="color:#F5F3EF;font-weight:600">De lo mío · </span>renglones oscuros con foto, filtros con conteo y stock bajo en beige.</span><span><span style="color:#F5F3EF;font-weight:600">Mejora · </span>adiós a la tabla blanca de Bootstrap y a los botones azules y rojos; el agotado se ve en gris con la foto desaturada.</span></div>
+  </div>
+
+  <!-- ===== 23 ALTA Y EDICIÓN ===== -->
+  <div style="display:flex;flex-direction:column;gap:16px">
+    <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap">
+      <span style="font-size:12px;font-weight:600;letter-spacing:0.04em;color:#DC2626">23</span>
+      <h2 style="margin:0;font-family:Fraunces,serif;font-size:30px;line-height:36px;font-weight:440">Alta y edición por pestañas</h2>
+      <span style="font-size:13px;line-height:18px;color:#A8A29B">Datos · Precio y venta · Fotos · Inventario</span>
+    </div>
+    <div style="display:flex;gap:32px;align-items:flex-start">
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="width:390px;background:#0B0B0C;border:1px solid #3F3F46;border-radius:12px;overflow:hidden;box-sizing:border-box;position:relative">
+          <dc-import name="AdminNav" ancho="movil-arriba" activo="Productos" titulo="Editar Rib Eye" atras="{{ true }}" hint-size="100%,56px"></dc-import>
+          <div style="display:flex;gap:4px;padding:8px 8px 0;border-bottom:1px solid #3F3F46;overflow:hidden">
+            <sc-for list="{{ pestanas }}" as="t" hint-placeholder-count="4"><span style="min-height:48px;display:flex;align-items:center;padding:0 12px;font-size:15px;font-weight:{{ t.w }};color:{{ t.fg }};border-bottom:2px solid {{ t.bd }};white-space:nowrap">{{ t.t }}</span></sc-for>
+          </div>
+          <div style="padding:20px 16px 120px;display:flex;flex-direction:column;gap:16px">
+            <sc-for list="{{ campoPrecio }}" as="c" hint-placeholder-count="3">
+              <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:14px;font-weight:600">{{ c.l }}</span><span style="display:flex;align-items:center;height:52px;box-sizing:border-box;border-radius:14px;background:#151517;border:1px solid {{ c.bd }};outline:{{ c.ol }};outline-offset:2px;padding:0 16px;font-size:16px;font-variant-numeric:tabular-nums;color:{{ c.fg }}">{{ c.v }}</span><sc-if value="{{ c.ayuda }}"><span style="font-size:13px;line-height:18px;color:#A8A29B">{{ c.ayuda }}</span></sc-if><sc-if value="{{ c.error }}"><span role="alert" style="display:flex;gap:8px;font-size:14px;line-height:20px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2" stroke-linecap="round" style="flex:0 0 18px;margin-top:1px"><circle cx="12" cy="12" r="9"></circle><path d="M12 7.5v5.5M12 16.5h.01"></path></svg>{{ c.error }}</span></sc-if></label>
+            </sc-for>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <span style="font-size:14px;font-weight:600">Modos de venta</span>
+              <sc-for list="{{ modos }}" as="m" hint-placeholder-count="3">
+                <span style="min-height:52px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 6px 0 16px;border-radius:14px;background:#151517;border:1px solid #3F3F46"><span style="display:flex;flex-direction:column"><span style="font-size:15px;font-weight:600">{{ m.t }}</span><span style="font-size:13px;color:#A8A29B">{{ m.s }}</span></span><span role="switch" aria-checked="{{ m.on }}" style="width:52px;height:32px;flex:0 0 52px;margin-right:6px;box-sizing:border-box;border-radius:999px;background:{{ m.bg }};border:1px solid {{ m.bd }};position:relative"><span style="position:absolute;top:3px;left:{{ m.x }};width:24px;height:24px;border-radius:999px;background:#FFFFFF"></span></span></span>
+              </sc-for>
+            </div>
+          </div>
+          <div style="position:absolute;left:0;right:0;bottom:0;background:#151517;border-top:1px solid #3F3F46;padding:12px 16px 20px;display:grid;grid-template-columns:1fr 1.4fr;gap:8px">
+            <button style="height:52px;border-radius:999px;background:transparent;border:1px solid #E4D1B0;color:#F5F3EF;font-family:Geist,system-ui,sans-serif;font-size:15px;font-weight:600;cursor:pointer">Descartar</button>
+            <button style="height:52px;border-radius:999px;background:#DC2626;border:none;color:#FFFFFF;font-family:Geist,system-ui,sans-serif;font-size:15px;font-weight:600;cursor:pointer">Guardar cambios</button>
+          </div>
+        </div>
+        <div style="font-size:13px;line-height:18px;font-weight:600">Editar · pestaña Precio y venta · móvil 390</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="width:1440px;height:900px;background:#0B0B0C;border:1px solid #3F3F46;border-radius:12px;overflow:hidden;box-sizing:border-box;display:grid;grid-template-columns:248px minmax(0,1fr)">
+          <dc-import name="AdminNav" ancho="escritorio" activo="Productos" hint-size="248px,100%"></dc-import>
+          <div style="display:flex;flex-direction:column;min-width:0">
+            <div style="height:72px;flex:0 0 72px;display:flex;align-items:center;justify-content:space-between;gap:24px;padding:0 32px;border-bottom:1px solid #3F3F46">
+              <span style="display:flex;align-items:center;gap:12px"><a href="Productos, clientes y ajustes.dc.html" style="min-height:44px;display:flex;align-items:center;font-size:14px;color:#A8A29B;text-decoration:underline;text-decoration-color:#3F3F46;text-underline-offset:4px">Productos</a><span style="color:#A8A29B">/</span><span style="font-family:Fraunces,serif;font-size:28px;line-height:32px;font-weight:460">Editar Rib Eye</span></span>
+              <span style="display:flex;gap:10px"><button style="height:48px;padding:0 22px;border-radius:999px;background:transparent;border:1px solid #E4D1B0;color:#F5F3EF;font-family:Geist,system-ui,sans-serif;font-size:15px;font-weight:600;cursor:pointer">Descartar</button><button style="height:48px;padding:0 22px;border-radius:999px;background:#DC2626;border:none;color:#FFFFFF;font-family:Geist,system-ui,sans-serif;font-size:15px;font-weight:600;cursor:pointer">Guardar cambios</button></span>
+            </div>
+            <div style="display:flex;gap:4px;padding:8px 24px 0;border-bottom:1px solid #3F3F46">
+              <sc-for list="{{ pestanas }}" as="t" hint-placeholder-count="4"><span style="min-height:48px;display:flex;align-items:center;padding:0 16px;font-size:15px;font-weight:{{ t.w }};color:{{ t.fg }};border-bottom:2px solid {{ t.bd }}">{{ t.t }}</span></sc-for>
+            </div>
+            <div style="padding:32px;display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:40px;align-items:start">
+              <div style="display:flex;flex-direction:column;gap:24px">
+                <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px">
+                  <sc-for list="{{ campoPrecio }}" as="c" hint-placeholder-count="3">
+                    <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:14px;font-weight:600">{{ c.l }}</span><span style="display:flex;align-items:center;height:52px;box-sizing:border-box;border-radius:14px;background:#151517;border:1px solid {{ c.bd }};outline:{{ c.ol }};outline-offset:2px;padding:0 16px;font-size:16px;font-variant-numeric:tabular-nums;color:{{ c.fg }}">{{ c.v }}</span><sc-if value="{{ c.ayuda }}"><span style="font-size:13px;line-height:18px;color:#A8A29B">{{ c.ayuda }}</span></sc-if><sc-if value="{{ c.error }}"><span role="alert" style="display:flex;gap:8px;font-size:14px;line-height:20px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2" stroke-linecap="round" style="flex:0 0 18px;margin-top:1px"><circle cx="12" cy="12" r="9"></circle><path d="M12 7.5v5.5M12 16.5h.01"></path></svg>{{ c.error }}</span></sc-if></label>
+                  </sc-for>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:10px">
+                  <span style="font-size:14px;font-weight:600">Modos de venta</span>
+                  <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px">
+                    <sc-for list="{{ modos }}" as="m" hint-placeholder-count="3">
+                      <span style="min-height:64px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 12px 0 16px;border-radius:14px;background:#151517;border:1px solid #3F3F46"><span style="display:flex;flex-direction:column"><span style="font-size:15px;font-weight:600">{{ m.t }}</span><span style="font-size:13px;color:#A8A29B">{{ m.s }}</span></span><span role="switch" aria-checked="{{ m.on }}" style="width:52px;height:32px;flex:0 0 52px;box-sizing:border-box;border-radius:999px;background:{{ m.bg }};border:1px solid {{ m.bd }};position:relative"><span style="position:absolute;top:3px;left:{{ m.x }};width:24px;height:24px;border-radius:999px;background:#FFFFFF"></span></span></span>
+                    </sc-for>
+                  </div>
+                </div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:10px">
+                <span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B">Así se verá en la tienda</span>
+                <dc-import name="Tarjeta" foto="public/img/products/rib-eye-alto.webp" cat="Cortes especiales" nombre="Rib Eye" desc="El más jaspeado del lomo alto" precio="$579" unidad="kg" stock="12 en stock" hint-size="100%,560px"></dc-import>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="font-size:13px;line-height:18px;font-weight:600">Editar · pestaña Precio y venta · escritorio 1440 · vista previa con la Tarjeta real</div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:4px;font-size:13px;line-height:19px;color:#A8A29B;max-width:1100px;text-wrap:pretty"><span><span style="color:#E4D1B0;font-weight:600">De lo nuestro · </span>los campos del alta de producto y sus modos de venta.</span><span><span style="color:#F5F3EF;font-weight:600">De lo mío · </span>cuatro pestañas y la vista previa con la Tarjeta tal como la verá el cliente.</span><span><span style="color:#F5F3EF;font-weight:600">Mejora · </span>el precio por libra se calcula solo, los modos son interruptores y el campo deja de tener el bloque claro a la izquierda.</span></div>
+  </div>
+
+  <!-- ===== 24 CONFIRMACIONES ===== -->
+  <div style="display:flex;flex-direction:column;gap:16px">
+    <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap">
+      <span style="font-size:12px;font-weight:600;letter-spacing:0.04em;color:#DC2626">24</span>
+      <h2 style="margin:0;font-family:Fraunces,serif;font-size:30px;line-height:36px;font-weight:440">Confirmar borrado y cambio de precio</h2>
+    </div>
+    <div style="display:flex;gap:32px;align-items:flex-start">
+      <sc-for list="{{ confirmM }}" as="d" hint-placeholder-count="2">
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="width:390px;height:720px;background:#0B0B0C;border:1px solid #3F3F46;border-radius:12px;overflow:hidden;box-sizing:border-box;position:relative">
+            <div style="position:absolute;inset:0;background:rgba(11,11,12,0.72)"></div>
+            <div role="dialog" style="position:absolute;left:0;right:0;bottom:0;box-sizing:border-box;background:#1C1C1F;border:1px solid #3F3F46;border-bottom:none;border-radius:28px 28px 0 0;padding:8px 16px 24px;display:flex;flex-direction:column;gap:16px">
+              <div style="display:flex;justify-content:center"><span style="width:40px;height:4px;border-radius:999px;background:#3F3F46"></span></div>
+              <span style="font-family:Fraunces,serif;font-size:26px;line-height:32px;font-weight:460;text-wrap:balance">{{ d.titulo }}</span>
+              <span style="font-size:15px;line-height:23px;color:#A8A29B;text-wrap:pretty">{{ d.texto }}</span>
+              <sc-if value="{{ d.cambio }}">
+                <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center">
+                  <span style="display:flex;flex-direction:column;gap:2px;padding:14px;border-radius:14px;border:1px solid #3F3F46;background:#151517"><span style="font-size:13px;color:#A8A29B">Antes</span><span style="font-size:22px;font-weight:600;font-variant-numeric:tabular-nums;color:#A8A29B;text-decoration:line-through">$549 / kg</span><span style="font-size:13px;color:#A8A29B;font-variant-numeric:tabular-nums">$249.03 / lb</span></span>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#E4D1B0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+                  <span style="display:flex;flex-direction:column;gap:2px;padding:14px;border-radius:14px;border:1px solid #E4D1B0;background:#151517"><span style="font-size:13px;color:#A8A29B">Después</span><span style="font-size:22px;font-weight:600;font-variant-numeric:tabular-nums">$579 / kg</span><span style="font-size:13px;color:#A8A29B;font-variant-numeric:tabular-nums">$262.63 / lb</span></span>
+                </div>
+              </sc-if>
+              <div style="display:flex;flex-direction:column;border-top:1px solid #3F3F46">
+                <sc-for list="{{ d.datos }}" as="x" hint-placeholder-count="2"><span style="display:flex;justify-content:space-between;gap:12px;min-height:44px;align-items:center;border-bottom:1px solid #3F3F46;font-size:14px"><span style="color:#A8A29B">{{ x.k }}</span><span style="font-weight:600;font-variant-numeric:tabular-nums;text-align:right">{{ x.v }}</span></span></sc-for>
+              </div>
+              <button style="height:52px;border-radius:999px;background:#DC2626;border:none;color:#FFFFFF;font-family:Geist,system-ui,sans-serif;font-size:16px;font-weight:600;cursor:pointer">{{ d.si }}</button>
+              <button style="height:52px;border-radius:999px;background:transparent;border:1px solid #E4D1B0;color:#F5F3EF;font-family:Geist,system-ui,sans-serif;font-size:16px;font-weight:600;cursor:pointer">Cancelar</button>
+            </div>
+          </div>
+          <div style="font-size:13px;line-height:18px;font-weight:600">{{ d.nombre }} · móvil 390</div>
+        </div>
+      </sc-for>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="width:1026px;height:720px;background:#0B0B0C;border:1px solid #3F3F46;border-radius:12px;overflow:hidden;box-sizing:border-box;position:relative;display:flex;align-items:center;justify-content:center">
+          <div style="position:absolute;inset:0;background:rgba(11,11,12,0.72)"></div>
+          <div role="dialog" style="position:relative;width:520px;box-sizing:border-box;background:#1C1C1F;border:1px solid #3F3F46;border-radius:24px;padding:28px;display:flex;flex-direction:column;gap:16px">
+            <span style="font-family:Fraunces,serif;font-size:28px;line-height:34px;font-weight:460">¿Borrar “Chambarete con Tuétano”?</span>
+            <span style="font-size:15px;line-height:23px;color:#A8A29B;text-wrap:pretty">Tiene 14 pedidos en su historial, así que no se borra: se desactiva y deja de verse en la tienda. Los pedidos pasados lo siguen mostrando.</span>
+            <div style="display:flex;flex-direction:column;border-top:1px solid #3F3F46">
+              <span style="display:flex;justify-content:space-between;min-height:44px;align-items:center;border-bottom:1px solid #3F3F46;font-size:14px"><span style="color:#A8A29B">Pedidos con este producto</span><span style="font-weight:600;font-variant-numeric:tabular-nums">14</span></span>
+              <span style="display:flex;justify-content:space-between;min-height:44px;align-items:center;border-bottom:1px solid #3F3F46;font-size:14px"><span style="color:#A8A29B">Listas de favoritos que lo tienen</span><span style="font-weight:600;font-variant-numeric:tabular-nums">6</span></span>
+            </div>
+            <div style="display:flex;justify-content:flex-end;gap:10px;padding-top:4px"><button style="height:48px;padding:0 22px;border-radius:999px;background:transparent;border:1px solid #E4D1B0;color:#F5F3EF;font-family:Geist,system-ui,sans-serif;font-size:15px;font-weight:600;cursor:pointer">Cancelar</button><button style="height:48px;padding:0 22px;border-radius:999px;background:#DC2626;border:none;color:#FFFFFF;font-family:Geist,system-ui,sans-serif;font-size:15px;font-weight:600;cursor:pointer">Desactivar producto</button></div>
+          </div>
+        </div>
+        <div style="font-size:13px;line-height:18px;font-weight:600">Confirmar borrado · escritorio 1440 (recorte) · el cambio de precio usa la misma ventana con antes y después</div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:4px;font-size:13px;line-height:19px;color:#A8A29B;max-width:1100px;text-wrap:pretty"><span><span style="color:#E4D1B0;font-weight:600">De lo nuestro · </span>borrar y cambiar precio desde la lista de productos.</span><span><span style="color:#F5F3EF;font-weight:600">De lo mío · </span>ventanas de confirmación con antes y después en kilo y libra.</span><span><span style="color:#F5F3EF;font-weight:600">Mejora · </span>en vez del confirm() del navegador, dice qué pasa con pedidos, favoritos y carritos abiertos.</span></div>
+  </div>
+
+  <!-- ===== 25 CLIENTES ===== -->
+  <div style="display:flex;flex-direction:column;gap:16px">
+    <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap">
+      <span style="font-size:12px;font-weight:600;letter-spacing:0.04em;color:#DC2626">25</span>
+      <h2 style="margin:0;font-family:Fraunces,serif;font-size:30px;line-height:36px;font-weight:440">Clientes · directorio con sus cifras</h2>
+    </div>
+    <div style="display:flex;gap:32px;align-items:flex-start">
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="width:390px;background:#0B0B0C;border:1px solid #3F3F46;border-radius:12px;overflow:hidden;box-sizing:border-box">
+          <dc-import name="AdminNav" ancho="movil-arriba" activo="Clientes" titulo="Clientes" hint-size="100%,56px"></dc-import>
+          <div style="padding:16px;display:flex;flex-direction:column;gap:12px">
+            <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px">
+              <sc-for list="{{ resumenC }}" as="k" hint-placeholder-count="3"><span style="display:flex;flex-direction:column;gap:2px;padding:12px;border-radius:14px;background:#151517;border:1px solid #3F3F46"><span style="font-size:20px;font-weight:600;font-variant-numeric:tabular-nums">{{ k.v }}</span><span style="font-size:12px;line-height:16px;color:#A8A29B">{{ k.l }}</span></span></sc-for>
+            </div>
+            <span style="display:flex;align-items:center;gap:10px;height:52px;box-sizing:border-box;border-radius:999px;background:#151517;border:1px solid #3F3F46;padding:0 18px;font-size:16px;color:#A8A29B"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m16.5 16.5 4 4"></path></svg>Buscar por nombre o teléfono</span>
+          </div>
+          <div style="padding:0 16px 24px">
+            <sc-for list="{{ clientes }}" as="c" hint-placeholder-count="5">
+              <div style="display:flex;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid #3F3F46">
+                <span style="width:44px;height:44px;flex:0 0 44px;border-radius:999px;background:#1C1C1F;border:1px solid #3F3F46;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:#E4D1B0">{{ c.ini }}</span>
+                <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><span style="display:flex;align-items:center;gap:8px"><span style="font-size:15px;font-weight:600">{{ c.n }}</span><span style="font-size:11px;font-weight:600;color:#0B0B0C;background:#F59E0B;border-radius:999px;padding:2px 8px">{{ c.nivel }}</span></span><span style="font-size:13px;color:#A8A29B;font-variant-numeric:tabular-nums">{{ c.pedidos }} pedidos · {{ c.gasto }} · último {{ c.ultimo }}</span></span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A8A29B" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"></path></svg>
+              </div>
+            </sc-for>
+          </div>
+          <dc-import name="AdminNav" ancho="movil-abajo" activo="Clientes" hint-size="100%,72px"></dc-import>
+        </div>
+        <div style="font-size:13px;line-height:18px;font-weight:600">Clientes · móvil 390</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="width:1440px;height:900px;background:#0B0B0C;border:1px solid #3F3F46;border-radius:12px;overflow:hidden;box-sizing:border-box;display:grid;grid-template-columns:248px minmax(0,1fr)">
+          <dc-import name="AdminNav" ancho="escritorio" activo="Clientes" hint-size="248px,100%"></dc-import>
+          <div style="display:flex;flex-direction:column;min-width:0">
+            <div style="height:72px;flex:0 0 72px;display:flex;align-items:center;justify-content:space-between;gap:24px;padding:0 32px;border-bottom:1px solid #3F3F46">
+              <span style="font-family:Fraunces,serif;font-size:28px;line-height:32px;font-weight:460">Clientes</span>
+              <span style="width:340px;display:flex;align-items:center;gap:10px;height:48px;box-sizing:border-box;border-radius:999px;background:#151517;border:1px solid #3F3F46;padding:0 18px;font-size:15px;color:#A8A29B"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m16.5 16.5 4 4"></path></svg>Buscar por nombre o teléfono</span>
+            </div>
+            <div style="padding:24px 32px;display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:24px;align-items:start">
+              <div style="display:flex;flex-direction:column;gap:16px">
+                <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px">
+                  <sc-for list="{{ resumenC }}" as="k" hint-placeholder-count="3"><span style="display:flex;flex-direction:column;gap:4px;padding:18px 20px;border-radius:16px;background:#151517;border:1px solid #3F3F46"><span style="font-size:14px;color:#A8A29B">{{ k.l }}</span><span style="font-size:30px;font-weight:600;font-variant-numeric:tabular-nums">{{ k.v }}</span></span></sc-for>
+                </div>
+                <div style="border-radius:16px;background:#151517;border:1px solid #3F3F46;overflow:hidden">
+                  <div style="display:grid;grid-template-columns:minmax(0,1.6fr) 110px 90px 120px 120px;gap:16px;padding:12px 20px;border-bottom:1px solid #3F3F46;font-size:12px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B"><span>Cliente</span><span>Nivel</span><span style="text-align:right">Pedidos</span><span style="text-align:right">Gastado</span><span>Último</span></div>
+                  <sc-for list="{{ clientes }}" as="c" hint-placeholder-count="5">
+                    <div style="display:grid;grid-template-columns:minmax(0,1.6fr) 110px 90px 120px 120px;gap:16px;align-items:center;min-height:60px;padding:0 20px;border-bottom:1px solid #3F3F46;font-size:15px;font-variant-numeric:tabular-nums;background:{{ c.sel }}">
+                      <span style="display:flex;align-items:center;gap:12px"><span style="width:36px;height:36px;border-radius:999px;background:#1C1C1F;border:1px solid #3F3F46;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#E4D1B0">{{ c.ini }}</span><span style="display:flex;flex-direction:column"><span style="font-weight:600">{{ c.n }}</span><span style="font-size:13px;color:#A8A29B">{{ c.tel }}</span></span></span>
+                      <span><span style="font-size:12px;font-weight:600;color:#0B0B0C;background:#F59E0B;border-radius:999px;padding:3px 10px">{{ c.nivel }}</span></span>
+                      <span style="text-align:right">{{ c.pedidos }}</span><span style="text-align:right">{{ c.gasto }}</span><span style="color:#A8A29B">{{ c.ultimo }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:14px;padding:24px;border-radius:20px;background:#151517;border:1px solid #3F3F46">
+                <span style="display:flex;align-items:center;gap:12px"><span style="width:52px;height:52px;border-radius:999px;background:#1C1C1F;border:1px solid #E4D1B0;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:600;color:#E4D1B0">PR</span><span style="display:flex;flex-direction:column"><span style="font-family:Fraunces,serif;font-size:22px;font-weight:460">Patricia Ruiz</span><span style="font-size:14px;color:#A8A29B">Cliente desde marzo 2026</span></span></span>
+                <div style="display:flex;flex-direction:column;border-top:1px solid #3F3F46">
+                  <sc-for list="{{ ficha }}" as="x" hint-placeholder-count="5"><span style="display:flex;justify-content:space-between;gap:12px;min-height:44px;align-items:center;border-bottom:1px solid #3F3F46;font-size:14px"><span style="color:#A8A29B">{{ x.k }}</span><span style="font-weight:600;font-variant-numeric:tabular-nums;text-align:right">{{ x.v }}</span></span></sc-for>
+                </div>
+                <button style="height:48px;border-radius:999px;background:transparent;border:1px solid #E4D1B0;color:#F5F3EF;font-family:Geist,system-ui,sans-serif;font-size:15px;font-weight:600;cursor:pointer">Escribir por WhatsApp</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="font-size:13px;line-height:18px;font-weight:600">Clientes · escritorio 1440 · con ficha abierta</div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:4px;font-size:13px;line-height:19px;color:#A8A29B;max-width:1100px;text-wrap:pretty"><span><span style="color:#E4D1B0;font-weight:600">De lo nuestro · </span>admin-customers y su directorio de clientes con sus datos de contacto.</span><span><span style="color:#F5F3EF;font-weight:600">De lo mío · </span>pedidos, lo gastado, nivel en insignia dorada y último pedido por cliente.</span><span><span style="color:#F5F3EF;font-weight:600">Mejora · </span>la ficha lateral dice qué suele comprar cada cliente, sin tablas blancas.</span></div>
+  </div>
+
+  <!-- ===== 26 AJUSTES ===== -->
+  <div style="display:flex;flex-direction:column;gap:16px">
+    <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap">
+      <span style="font-size:12px;font-weight:600;letter-spacing:0.04em;color:#DC2626">26</span>
+      <h2 style="margin:0;font-family:Fraunces,serif;font-size:30px;line-height:36px;font-weight:440">Ajustes</h2>
+      <span style="font-size:13px;line-height:18px;color:#A8A29B">precios kg/lb · mínimos · niveles · afiliados · categorías que se crean, renombran y borran</span>
+      <span style="font-size:12px;line-height:16px;font-weight:600;color:#0B0B0C;background:#F59E0B;border-radius:999px;padding:4px 10px">falta backend: niveles y afiliados</span>
+    </div>
+    <div style="display:flex;gap:32px;align-items:flex-start">
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="width:390px;background:#0B0B0C;border:1px solid #3F3F46;border-radius:12px;overflow:hidden;box-sizing:border-box">
+          <dc-import name="AdminNav" ancho="movil-arriba" activo="Ajustes" titulo="Ajustes" hint-size="100%,56px"></dc-import>
+          <div style="padding:16px 16px 28px;display:flex;flex-direction:column;gap:20px">
+            <div style="display:flex;flex-direction:column;border-radius:16px;background:#151517;border:1px solid #3F3F46;overflow:hidden">
+              <sc-for list="{{ secciones }}" as="s" hint-placeholder-count="8"><span style="min-height:60px;display:flex;align-items:center;gap:12px;padding:0 16px;border-bottom:1px solid #3F3F46;background:{{ s.bg }}"><span style="flex:1;display:flex;flex-direction:column"><span style="font-size:15px;font-weight:600;color:{{ s.fg }}">{{ s.t }}</span><span style="font-size:13px;color:#A8A29B;font-variant-numeric:tabular-nums">{{ s.s }}</span></span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A8A29B" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"></path></svg></span></sc-for>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <span style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:17px;font-weight:600">Categorías</span><button style="height:44px;padding:0 16px;border-radius:999px;background:#DC2626;border:none;color:#FFFFFF;font-family:Geist,system-ui,sans-serif;font-size:14px;font-weight:600;cursor:pointer">Nueva</button></span>
+              <sc-for list="{{ categorias }}" as="c" hint-placeholder-count="6">
+                <span style="min-height:52px;display:flex;align-items:center;gap:8px;padding:0 4px 0 14px;border-radius:14px;background:#151517;border:1px solid {{ c.bd }}"><span style="flex:1;display:flex;flex-direction:column"><span style="font-size:15px;font-weight:600">{{ c.n }}</span><span style="font-size:13px;color:#A8A29B;font-variant-numeric:tabular-nums">{{ c.k }} productos</span></span><button aria-label="Renombrar {{ c.n }}" style="width:44px;height:44px;border:none;background:transparent;color:#F5F3EF;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:999px"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16Z"></path></svg></button><button aria-label="Borrar {{ c.n }}" style="width:44px;height:44px;border:none;background:transparent;color:#A8A29B;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:999px"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7h14M10 7V5h4v2M7 7l1 13h8l1-13"></path></svg></button></span>
+              </sc-for>
+              <span style="font-size:13px;line-height:18px;color:#A8A29B;text-wrap:pretty">Una categoría con productos no se borra: primero se mueven sus productos a otra.</span>
+            </div>
+          </div>
+          <dc-import name="AdminNav" ancho="movil-abajo" activo="Ajustes" hint-size="100%,72px"></dc-import>
+        </div>
+        <div style="font-size:13px;line-height:18px;font-weight:600">Ajustes · móvil 390 · índice y categorías</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="width:1440px;height:1100px;background:#0B0B0C;border:1px solid #3F3F46;border-radius:12px;overflow:hidden;box-sizing:border-box;display:grid;grid-template-columns:248px minmax(0,1fr)">
+          <dc-import name="AdminNav" ancho="escritorio" activo="Ajustes" hint-size="248px,100%"></dc-import>
+          <div style="display:flex;flex-direction:column;min-width:0">
+            <div style="height:72px;flex:0 0 72px;display:flex;align-items:center;justify-content:space-between;padding:0 32px;border-bottom:1px solid #3F3F46"><span style="font-family:Fraunces,serif;font-size:28px;line-height:32px;font-weight:460">Ajustes</span><button style="height:48px;padding:0 22px;border-radius:999px;background:#DC2626;border:none;color:#FFFFFF;font-family:Geist,system-ui,sans-serif;font-size:15px;font-weight:600;cursor:pointer">Guardar cambios</button></div>
+            <div style="padding:28px 32px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;align-items:start">
+              <div style="display:flex;flex-direction:column;gap:16px;padding:24px;border-radius:20px;background:#151517;border:1px solid #3F3F46">
+                <span style="font-size:17px;font-weight:600">Precios y unidades</span>
+                <span style="min-height:52px;display:flex;align-items:center;justify-content:space-between;gap:12px"><span style="display:flex;flex-direction:column"><span style="font-size:15px;font-weight:600">Mostrar precio por libra</span><span style="font-size:13px;color:#A8A29B">debajo del precio por kilo, en carnes</span></span><span role="switch" aria-checked="true" style="width:52px;height:32px;box-sizing:border-box;border-radius:999px;background:#DC2626;border:1px solid #DC2626;position:relative"><span style="position:absolute;top:3px;left:23px;width:24px;height:24px;border-radius:999px;background:#FFFFFF"></span></span></span>
+                <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:14px;font-weight:600">Factor kilo a libra</span><span style="display:flex;align-items:center;height:52px;box-sizing:border-box;border-radius:14px;background:#0B0B0C;border:1px solid #3F3F46;padding:0 16px;font-size:16px;font-variant-numeric:tabular-nums">0.4536</span></label>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:16px;padding:24px;border-radius:20px;background:#151517;border:1px solid #3F3F46">
+                <span style="font-size:17px;font-weight:600">Mínimos de pedido</span>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+                  <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:14px;font-weight:600">A domicilio</span><span style="display:flex;align-items:center;height:52px;box-sizing:border-box;border-radius:14px;background:#0B0B0C;border:1px solid #DC2626;outline:2px solid #DC2626;outline-offset:2px;padding:0 16px;font-size:16px;font-variant-numeric:tabular-nums">$150</span></label>
+                  <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:14px;font-weight:600">Recoger en tienda</span><span style="display:flex;align-items:center;height:52px;box-sizing:border-box;border-radius:14px;background:#0B0B0C;border:1px solid #3F3F46;padding:0 16px;font-size:16px;font-variant-numeric:tabular-nums">$0 · sin mínimo</span></label>
+                </div>
+                <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:14px;font-weight:600">Costo de envío</span><span style="display:flex;align-items:center;height:52px;box-sizing:border-box;border-radius:14px;background:#0B0B0C;border:1px solid #3F3F46;padding:0 16px;font-size:16px;color:#A8A29B">Sin costo</span></label>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:12px;padding:24px;border-radius:20px;background:#151517;border:1px solid #3F3F46">
+                <span style="font-size:17px;font-weight:600">Niveles de cliente</span>
+                <sc-for list="{{ niveles }}" as="n" hint-placeholder-count="3">
+                  <div style="display:grid;grid-template-columns:120px minmax(0,1fr) 110px;gap:12px;align-items:center;min-height:56px;border-bottom:1px solid #3F3F46"><span style="justify-self:start;font-size:12px;font-weight:600;color:#0B0B0C;background:#F59E0B;border-radius:999px;padding:3px 10px">{{ n.n }}</span><span style="font-size:14px;color:#A8A29B;font-variant-numeric:tabular-nums">{{ n.regla }}</span><span style="display:flex;align-items:center;height:44px;box-sizing:border-box;border-radius:12px;background:#0B0B0C;border:1px solid #3F3F46;padding:0 12px;font-size:15px;font-variant-numeric:tabular-nums">{{ n.desc }}</span></div>
+                </sc-for>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:12px;padding:24px;border-radius:20px;background:#151517;border:1px solid #3F3F46">
+                <span style="font-size:17px;font-weight:600">Afiliados</span>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+                  <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:14px;font-weight:600">Descuento a quien llega</span><span style="display:flex;align-items:center;height:52px;box-sizing:border-box;border-radius:14px;background:#0B0B0C;border:1px solid #3F3F46;padding:0 16px;font-size:16px;font-variant-numeric:tabular-nums">$50 en su primer pedido</span></label>
+                  <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:14px;font-weight:600">Premio a quien invita</span><span style="display:flex;align-items:center;height:52px;box-sizing:border-box;border-radius:14px;background:#0B0B0C;border:1px solid #3F3F46;padding:0 16px;font-size:16px;font-variant-numeric:tabular-nums">$50 de saldo</span></label>
+                </div>
+                <span style="font-size:14px;color:#A8A29B;font-variant-numeric:tabular-nums">18 afiliados activos · 41 clientes nuevos por enlace este año</span><span style="font-size:14px;font-weight:600;color:#E4D1B0">$50 + $50: cifras por confirmar con el dueño</span>
+              </div>
+              <div style="grid-column:1 / -1;display:flex;flex-direction:column;gap:14px;padding:24px;border-radius:20px;background:#151517;border:1px solid #3F3F46">
+                <span style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:17px;font-weight:600">Categorías</span><span style="display:flex;gap:8px;align-items:center"><span style="width:260px;display:flex;align-items:center;height:48px;box-sizing:border-box;border-radius:14px;background:#0B0B0C;border:1px solid #3F3F46;padding:0 16px;font-size:15px;color:#A8A29B">Nombre de la categoría</span><button style="height:48px;padding:0 20px;border-radius:999px;background:#DC2626;border:none;color:#FFFFFF;font-family:Geist,system-ui,sans-serif;font-size:15px;font-weight:600;cursor:pointer">Crear</button></span></span>
+                <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px">
+                  <sc-for list="{{ categorias }}" as="c" hint-placeholder-count="11">
+                    <span style="min-height:56px;display:flex;align-items:center;gap:4px;padding:0 4px 0 14px;border-radius:14px;background:#0B0B0C;border:1px solid {{ c.bd }}"><span style="flex:1;min-width:0;display:flex;flex-direction:column"><span style="font-size:15px;font-weight:600">{{ c.n }}</span><span style="font-size:13px;color:#A8A29B;font-variant-numeric:tabular-nums">{{ c.k }} productos</span></span><button aria-label="Renombrar {{ c.n }}" style="width:44px;height:44px;border:none;background:transparent;color:#F5F3EF;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:999px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16Z"></path></svg></button><button aria-label="Borrar {{ c.n }}" style="width:44px;height:44px;border:none;background:transparent;color:#A8A29B;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:999px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7h14M10 7V5h4v2M7 7l1 13h8l1-13"></path></svg></button></span>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="font-size:13px;line-height:18px;font-weight:600">Ajustes · escritorio 1440</div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:4px;font-size:13px;line-height:19px;color:#A8A29B;max-width:1100px;text-wrap:pretty"><span><span style="color:#E4D1B0;font-weight:600">De lo nuestro · </span>los precios por kilo y libra, el mínimo de $150 y las categorías que ya usa el sitio.</span><span><span style="color:#F5F3EF;font-weight:600">De lo mío · </span>tarjetas agrupadas, niveles con descuento y afiliados.</span><span><span style="color:#F5F3EF;font-weight:600">Mejora · </span>lo que estaba escrito a mano en el código se edita aquí, y borrar una categoría avisa si tiene productos; el envío queda sin costo.</span></div>
+  </div>
+
+  <!-- ===== 48 AJUSTES · TIENDA, ZONAS Y ASISTENTE ===== -->
+  <div id="s48" style="display:flex;flex-direction:column;gap:16px">
+    <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap">
+      <span style="font-size:12px;font-weight:600;letter-spacing:0.04em;color:#DC2626">48</span>
+      <h2 style="margin:0;font-family:Fraunces,serif;font-size:30px;line-height:36px;font-weight:440">Ajustes · tienda, zonas y asistente</h2>
+      <span style="font-size:13px;line-height:18px;color:#A8A29B">tres secciones nuevas dentro de Ajustes</span>
+    </div>
+    <div style="display:flex;gap:32px;align-items:flex-start">
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="width:390px;background:#0B0B0C;border:1px solid #3F3F46;border-radius:12px;overflow:hidden;box-sizing:border-box">
+          <dc-import name="AdminNav" ancho="movil-arriba" activo="Ajustes" titulo="Datos de la tienda" hint-size="100%,56px"></dc-import>
+          <div style="padding:16px 16px 28px;display:flex;flex-direction:column;gap:16px"><div style="display:flex;flex-direction:column;gap:14px;padding:20px;border-radius:20px;background:#151517;border:1px solid #3F3F46"><span style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap"><span style="font-size:17px;font-weight:600">Datos de la tienda y redes</span><span style="font-size:13px;color:#A8A29B">de aquí salen el Landing y el Pie</span></span>
+  <div style="display:grid;grid-template-columns:1fr;gap:12px"><label style="display:flex;flex-direction:column;gap:6px;min-width:0"><span style="font-size:14px;font-weight:600">Teléfono</span><span style="display:flex;align-items:center;height:52px;box-sizing:border-box;border-radius:14px;background:#0B0B0C;border:1px solid #3F3F46;padding:0 16px;font-size:16px;font-variant-numeric:tabular-nums;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">+52 444 271 5470</span></label><label style="display:flex;flex-direction:column;gap:6px;min-width:0"><span style="font-size:14px;font-weight:600">WhatsApp</span><span style="display:flex;align-items:center;height:52px;box-sizing:border-box;border-radius:14px;background:#0B0B0C;border:1px solid #3F3F46;padding:0 16px;font-size:16px;font-variant-numeric:tabular-nums;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">+52 444 271 5470</span></label><label style="display:flex;flex-direction:column;gap:6px;min-width:0"><span style="font-size:14px;font-weight:600">Correo electrónico</span><span style="display:flex;align-items:center;height:52px;box-sizing:border-box;border-radius:14px;background:#0B0B0C;border:1px solid #3F3F46;padding:0 16px;font-size:16px;font-variant-numeric:tabular-nums;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">contacto@carniceriasenmisericordia.com</span></label><label style="display:flex;flex-direction:column;gap:6px;min-width:0"><span style="font-size:14px;font-weight:600">Dirección</span><span style="display:flex;align-items:center;height:52px;box-sizing:border-box;border-radius:14px;background:#0B0B0C;border:1px solid #3F3F46;padding:0 16px;font-size:16px;font-variant-numeric:tabular-nums;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">Agua Marina 110, Manuel J. Othón, 78150 San Luis Potosí</span></label></div>
+  <div style="display:flex;flex-direction:column;gap:8px"><span style="font-size:14px;font-weight:600">Horario</span>
+    <div style="display:grid;grid-template-columns:minmax(0,1fr) 96px 96px;gap:8px;align-items:center;font-size:15px;font-variant-numeric:tabular-nums"><span>Lunes a sábado</span><span style="display:flex;align-items:center;height:52px;box-sizing:border-box;border-radius:14px;background:#0B0B0C;border:1px solid #3F3F46;padding:0 16px;font-size:16px;font-variant-numeric:tabular-nums;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;padding:0 12px;height:48px">8:00</span><span style="display:flex;align-items:center;height:52px;box-sizing:border-box;border-radius:14px;background:#0B0B0C;border:1px solid #3F3F46;padding:0 16px;font-size:16px;font-variant-numeric:tabular-nums;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;padding:0 12px;height:48px">17:00</span><span>Domingos y festivos</span><span style="grid-column:span 2;display:flex;align-items:center;height:52px;box-sizing:border-box;border-radius:14px;background:#0B0B0C;border:1px solid #3F3F46;padding:0 16px;font-size:16px;font-variant-numeric:tabular-nums;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;padding:0 12px;height:48px;color:#A8A29B">Cerrado</span></div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr;gap:12px"><label style="display:flex;flex-direction:column;gap:6px;min-width:0"><span style="font-size:14px;font-weight:600">Facebook</span><span style="display:flex;align-items:center;height:52px;box-sizing:border-box;border-radius:14px;background:#0B0B0C;border:1px solid #3F3F46;padding:0 16px;font-size:16px;font-variant-numeric:tabular-nums;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">facebook.com/profile.php?id=100054786668816</span></label><label style="display:flex;flex-direction:column;gap:6px;min-width:0"><span style="font-size:14px;font-weight:600">Instagram</span><span style="display:flex;align-items:center;height:52px;box-sizing:border-box;border-radius:14px;background:#0B0B0C;border:1px solid #3F3F46;padding:0 16px;font-size:16px;font-variant-numeric:tabular-nums;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">instagram.com/carniceria.misericordia</span></label></div>
+  <span style="font-size:13px;line-height:19px;color:#A8A29B;text-wrap:pretty">Al guardar, el teléfono, el horario y las redes cambian en el Landing, el Pie y el asistente a la vez.</span></div></div>
+          <dc-import name="AdminNav" ancho="movil-abajo" activo="Ajustes" hint-size="100%,72px"></dc-import>
+        </div>
+        <div style="font-size:13px;line-height:18px;font-weight:600">Datos de la tienda y redes · móvil 390</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="width:390px;background:#0B0B0C;border:1px solid #3F3F46;border-radius:12px;overflow:hidden;box-sizing:border-box">
+          <dc-import name="AdminNav" ancho="movil-arriba" activo="Ajustes" titulo="Zonas y asistente" hint-size="100%,56px"></dc-import>
+          <div style="padding:16px 16px 28px;display:flex;flex-direction:column;gap:16px"><div style="display:flex;flex-direction:column;gap:14px;padding:20px;border-radius:20px;background:#151517;border:1px solid #3F3F46"><span style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap"><span style="font-size:17px;font-weight:600">Zonas de entrega</span><span style="font-size:12px;line-height:16px;font-weight:600;color:#E4D1B0;background:transparent;border:1px solid #E4D1B0;border-radius:999px;padding:3px 10px;white-space:nowrap">confirmar colonias con el dueño</span></span>
+  <span style="font-size:14px;line-height:20px;color:#A8A29B;text-wrap:pretty">Las colonias donde llega el domicilio. Son las mismas que revisa Mis direcciones: si la colonia no está aquí, el cliente ve “Fuera de zona: solo para recoger”.</span>
+  <span style="display:flex;gap:8px"><span style="flex:1;min-width:0;display:flex;align-items:center;height:52px;box-sizing:border-box;border-radius:14px;background:#0B0B0C;border:1px solid #3F3F46;padding:0 16px;font-size:16px;font-variant-numeric:tabular-nums;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;color:#A8A29B">Agregar colonia</span><button style="height:52px;padding:0 18px;border-radius:999px;background:transparent;border:1px solid #E4D1B0;color:#F5F3EF;font-family:Geist,system-ui,sans-serif;font-size:15px;font-weight:600;cursor:pointer">Agregar</button></span>
+  <div style="display:grid;grid-template-columns:1fr;gap:8px"><span style="min-height:52px;display:flex;align-items:center;gap:8px;padding:0 4px 0 14px;border-radius:14px;background:#0B0B0C;border:1px solid #3F3F46"><span style="flex:1;min-width:0;display:flex;flex-direction:column"><span style="font-size:15px;font-weight:600">Manuel J. Othón</span><span style="font-size:13px;color:#A8A29B">Entregamos</span></span><span role="switch" aria-checked="true" aria-label="Entregar en Manuel J. Othón" style="width:52px;height:32px;box-sizing:border-box;border-radius:999px;background:#DC2626;border:1px solid #DC2626;position:relative;margin-right:6px;flex:0 0 52px"><span style="position:absolute;top:3px;left:23px;width:24px;height:24px;border-radius:999px;background:#FFFFFF"></span></span></span><span style="min-height:52px;display:flex;align-items:center;gap:8px;padding:0 4px 0 14px;border-radius:14px;background:#0B0B0C;border:1px solid #3F3F46"><span style="flex:1;min-width:0;display:flex;flex-direction:column"><span style="font-size:15px;font-weight:600">Jardín</span><span style="font-size:13px;color:#A8A29B">Entregamos</span></span><span role="switch" aria-checked="true" aria-label="Entregar en Jardín" style="width:52px;height:32px;box-sizing:border-box;border-radius:999px;background:#DC2626;border:1px solid #DC2626;position:relative;margin-right:6px;flex:0 0 52px"><span style="position:absolute;top:3px;left:23px;width:24px;height:24px;border-radius:999px;background:#FFFFFF"></span></span></span><span style="min-height:52px;display:flex;align-items:center;gap:8px;padding:0 4px 0 14px;border-radius:14px;background:#0B0B0C;border:1px solid #3F3F46"><span style="flex:1;min-width:0;display:flex;flex-direction:column"><span style="font-size:15px;font-weight:600">Tequisquiapan</span><span style="font-size:13px;color:#A8A29B">Entregamos</span></span><span role="switch" aria-checked="true" aria-label="Entregar en Tequisquiapan" style="width:52px;height:32px;box-sizing:border-box;border-radius:999px;background:#DC2626;border:1px solid #DC2626;position:relative;margin-right:6px;flex:0 0 52px"><span style="position:absolute;top:3px;left:23px;width:24px;height:24px;border-radius:999px;background:#FFFFFF"></span></span></span><span style="min-height:52px;display:flex;align-items:center;gap:8px;padding:0 4px 0 14px;border-radius:14px;background:#0B0B0C;border:1px solid #3F3F46"><span style="flex:1;min-width:0;display:flex;flex-direction:column"><span style="font-size:15px;font-weight:600">Centro</span><span style="font-size:13px;color:#A8A29B">Entregamos</span></span><span role="switch" aria-checked="true" aria-label="Entregar en Centro" style="width:52px;height:32px;box-sizing:border-box;border-radius:999px;background:#DC2626;border:1px solid #DC2626;position:relative;margin-right:6px;flex:0 0 52px"><span style="position:absolute;top:3px;left:23px;width:24px;height:24px;border-radius:999px;background:#FFFFFF"></span></span></span><span style="min-height:52px;display:flex;align-items:center;gap:8px;padding:0 4px 0 14px;border-radius:14px;background:#0B0B0C;border:1px solid #3F3F46"><span style="flex:1;min-width:0;display:flex;flex-direction:column"><span style="font-size:15px;font-weight:600">Himno Nacional</span><span style="font-size:13px;color:#A8A29B">Entregamos</span></span><span role="switch" aria-checked="true" aria-label="Entregar en Himno Nacional" style="width:52px;height:32px;box-sizing:border-box;border-radius:999px;background:#DC2626;border:1px solid #DC2626;position:relative;margin-right:6px;flex:0 0 52px"><span style="position:absolute;top:3px;left:23px;width:24px;height:24px;border-radius:999px;background:#FFFFFF"></span></span></span><span style="min-height:52px;display:flex;align-items:center;gap:8px;padding:0 4px 0 14px;border-radius:14px;background:#0B0B0C;border:1px solid #3F3F46"><span style="flex:1;min-width:0;display:flex;flex-direction:column"><span style="font-size:15px;font-weight:600">Del Valle</span><span style="font-size:13px;color:#A8A29B">Entregamos</span></span><span role="switch" aria-checked="true" aria-label="Entregar en Del Valle" style="width:52px;height:32px;box-sizing:border-box;border-radius:999px;background:#DC2626;border:1px solid #DC2626;position:relative;margin-right:6px;flex:0 0 52px"><span style="position:absolute;top:3px;left:23px;width:24px;height:24px;border-radius:999px;background:#FFFFFF"></span></span></span><span style="min-height:52px;display:flex;align-items:center;gap:8px;padding:0 4px 0 14px;border-radius:14px;background:#0B0B0C;border:1px solid #3F3F46"><span style="flex:1;min-width:0;display:flex;flex-direction:column"><span style="font-size:15px;font-weight:600">Industrial Aviación</span><span style="font-size:13px;color:#A8A29B">Entregamos</span></span><span role="switch" aria-checked="true" aria-label="Entregar en Industrial Aviación" style="width:52px;height:32px;box-sizing:border-box;border-radius:999px;background:#DC2626;border:1px solid #DC2626;position:relative;margin-right:6px;flex:0 0 52px"><span style="position:absolute;top:3px;left:23px;width:24px;height:24px;border-radius:999px;background:#FFFFFF"></span></span></span><span style="min-height:52px;display:flex;align-items:center;gap:8px;padding:0 4px 0 14px;border-radius:14px;background:#0B0B0C;border:1px solid #3F3F46"><span style="flex:1;min-width:0;display:flex;flex-direction:column"><span style="font-size:15px;font-weight:600">Simón Díaz</span><span style="font-size:13px;color:#A8A29B">Entregamos</span></span><span role="switch" aria-checked="true" aria-label="Entregar en Simón Díaz" style="width:52px;height:32px;box-sizing:border-box;border-radius:999px;background:#DC2626;border:1px solid #DC2626;position:relative;margin-right:6px;flex:0 0 52px"><span style="position:absolute;top:3px;left:23px;width:24px;height:24px;border-radius:999px;background:#FFFFFF"></span></span></span><span style="min-height:52px;display:flex;align-items:center;gap:8px;padding:0 4px 0 14px;border-radius:14px;background:#0B0B0C;border:1px solid #3F3F46"><span style="flex:1;min-width:0;display:flex;flex-direction:column"><span style="font-size:15px;font-weight:600">Villa de Pozos</span><span style="font-size:13px;color:#E4D1B0">Solo recoger en tienda</span></span><span role="switch" aria-checked="false" aria-label="Entregar en Villa de Pozos" style="width:52px;height:32px;box-sizing:border-box;border-radius:999px;background:#1C1C1F;border:1px solid #3F3F46;position:relative;margin-right:6px;flex:0 0 52px"><span style="position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:999px;background:#A8A29B"></span></span></span></div></div><div style="display:flex;flex-direction:column;gap:14px;padding:20px;border-radius:20px;background:#151517;border:1px solid #3F3F46"><span style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap"><span style="font-size:17px;font-weight:600">Asistente</span><span style="font-size:12px;line-height:16px;font-weight:600;color:#0B0B0C;background:#F59E0B;border:1px solid #F59E0B;border-radius:999px;padding:3px 10px;white-space:nowrap">falta backend</span></span>
+  <div style="display:grid;grid-template-columns:1fr;gap:14px;align-items:start">
+    <div style="display:flex;flex-direction:column;gap:8px"><span style="font-size:14px;font-weight:600">Contesta</span>
+      <div style="display:grid;grid-template-columns:96px 96px;gap:8px;font-variant-numeric:tabular-nums"><span style="display:flex;align-items:center;height:52px;box-sizing:border-box;border-radius:14px;background:#0B0B0C;border:1px solid #3F3F46;padding:0 16px;font-size:16px;font-variant-numeric:tabular-nums;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;height:48px;padding:0 12px">8:00</span><span style="display:flex;align-items:center;height:52px;box-sizing:border-box;border-radius:14px;background:#0B0B0C;border:1px solid #3F3F46;padding:0 16px;font-size:16px;font-variant-numeric:tabular-nums;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;height:48px;padding:0 12px">17:00</span></div>
+      <span style="font-size:13px;line-height:19px;color:#A8A29B;text-wrap:pretty">Fuera de horario responde lo básico (horario, mínimo, zonas) y deja el mensaje para WhatsApp.</span>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:4px"><span style="font-size:14px;font-weight:600;padding-bottom:4px">Pasa la conversación a WhatsApp cuando</span>
+      <span style="min-height:60px;display:flex;align-items:center;justify-content:space-between;gap:12px;border-top:1px solid #3F3F46;padding-top:8px"><span style="display:flex;flex-direction:column;gap:2px"><span style="font-size:15px;font-weight:600">El cliente pide hablar con una persona</span><span style="font-size:13px;line-height:18px;color:#A8A29B">siempre, con un toque</span></span><span role="switch" aria-checked="true" style="width:52px;height:32px;flex:0 0 52px;box-sizing:border-box;border-radius:999px;background:#DC2626;border:1px solid #DC2626;position:relative"><span style="position:absolute;top:3px;left:23px;width:24px;height:24px;border-radius:999px;background:#FFFFFF"></span></span></span>
+      <span style="min-height:60px;display:flex;align-items:center;justify-content:space-between;gap:12px;border-top:1px solid #3F3F46;padding-top:8px"><span style="display:flex;flex-direction:column;gap:2px"><span style="font-size:15px;font-weight:600">Pregunta por un pedido que ya hizo</span><span style="font-size:13px;line-height:18px;color:#A8A29B">con el folio en el mensaje</span></span><span role="switch" aria-checked="true" style="width:52px;height:32px;flex:0 0 52px;box-sizing:border-box;border-radius:999px;background:#DC2626;border:1px solid #DC2626;position:relative"><span style="position:absolute;top:3px;left:23px;width:24px;height:24px;border-radius:999px;background:#FFFFFF"></span></span></span>
+      <span style="min-height:60px;display:flex;align-items:center;justify-content:space-between;gap:12px;border-top:1px solid #3F3F46;padding-top:8px"><span style="display:flex;flex-direction:column;gap:2px"><span style="font-size:15px;font-weight:600">No sabe contestar dos veces seguidas</span><span style="font-size:13px;line-height:18px;color:#A8A29B">en lugar de adivinar</span></span><span role="switch" aria-checked="true" style="width:52px;height:32px;flex:0 0 52px;box-sizing:border-box;border-radius:999px;background:#DC2626;border:1px solid #DC2626;position:relative"><span style="position:absolute;top:3px;left:23px;width:24px;height:24px;border-radius:999px;background:#FFFFFF"></span></span></span>
+      <span style="min-height:60px;display:flex;align-items:center;justify-content:space-between;gap:12px;border-top:1px solid #3F3F46;padding-top:8px"><span style="display:flex;flex-direction:column;gap:2px"><span style="font-size:15px;font-weight:600">Pide un corte o evento especial</span><span style="font-size:13px;line-height:18px;color:#A8A29B">apartados, paquetes grandes</span></span><span role="switch" aria-checked="false" style="width:52px;height:32px;flex:0 0 52px;box-sizing:border-box;border-radius:999px;background:#1C1C1F;border:1px solid #3F3F46;position:relative"><span style="position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:999px;background:#A8A29B"></span></span></span>
+    </div>
+  </div></div></div>
+          <dc-import name="AdminNav" ancho="movil-abajo" activo="Ajustes" hint-size="100%,72px"></dc-import>
+        </div>
+        <div style="font-size:13px;line-height:18px;font-weight:600">Zonas de entrega y Asistente · móvil 390</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="width:1440px;background:#0B0B0C;border:1px solid #3F3F46;border-radius:12px;overflow:hidden;box-sizing:border-box;display:grid;grid-template-columns:248px minmax(0,1fr)">
+          <dc-import name="AdminNav" ancho="escritorio" activo="Ajustes" hint-size="248px,100%"></dc-import>
+          <div style="display:flex;flex-direction:column;min-width:0">
+            <div style="height:72px;flex:0 0 72px;display:flex;align-items:center;justify-content:space-between;padding:0 32px;border-bottom:1px solid #3F3F46"><span style="display:flex;align-items:baseline;gap:12px"><span style="font-family:Fraunces,serif;font-size:28px;line-height:32px;font-weight:460">Ajustes</span><span style="font-size:15px;color:#A8A29B">Tienda, zonas y asistente</span></span><button style="height:48px;padding:0 22px;border-radius:999px;background:#DC2626;border:none;color:#FFFFFF;font-family:Geist,system-ui,sans-serif;font-size:15px;font-weight:600;cursor:pointer">Guardar cambios</button></div>
+            <div style="padding:28px 32px 40px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;align-items:start"><div style="display:flex;flex-direction:column;gap:14px;padding:20px;border-radius:20px;background:#151517;border:1px solid #3F3F46"><span style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap"><span style="font-size:17px;font-weight:600">Datos de la tienda y redes</span><span style="font-size:13px;color:#A8A29B">de aquí salen el Landing y el Pie</span></span>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"><label style="display:flex;flex-direction:column;gap:6px;min-width:0"><span style="font-size:14px;font-weight:600">Teléfono</span><span style="display:flex;align-items:center;height:52px;box-sizing:border-box;border-radius:14px;background:#0B0B0C;border:1px solid #3F3F46;padding:0 16px;font-size:16px;font-variant-numeric:tabular-nums;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">+52 444 271 5470</span></label><label style="display:flex;flex-direction:column;gap:6px;min-width:0"><span style="font-size:14px;font-weight:600">WhatsApp</span><span style="display:flex;align-items:center;height:52px;box-sizing:border-box;border-radius:14px;background:#0B0B0C;border:1px solid #3F3F46;padding:0 16px;font-size:16px;font-variant-numeric:tabular-nums;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">+52 444 271 5470</span></label><label style="display:flex;flex-direction:column;gap:6px;min-width:0;grid-column:1 / -1"><span style="font-size:14px;font-weight:600">Correo electrónico</span><span style="display:flex;align-items:center;height:52px;box-sizing:border-box;border-radius:14px;background:#0B0B0C;border:1px solid #3F3F46;padding:0 16px;font-size:16px;font-variant-numeric:tabular-nums;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">contacto@carniceriasenmisericordia.com</span></label><label style="display:flex;flex-direction:column;gap:6px;min-width:0;grid-column:1 / -1"><span style="font-size:14px;font-weight:600">Dirección</span><span style="display:flex;align-items:center;height:52px;box-sizing:border-box;border-radius:14px;background:#0B0B0C;border:1px solid #3F3F46;padding:0 16px;font-size:16px;font-variant-numeric:tabular-nums;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">Agua Marina 110, Manuel J. Othón, 78150 San Luis Potosí</span></label></div>
+  <div style="display:flex;flex-direction:column;gap:8px"><span style="font-size:14px;font-weight:600">Horario</span>
+    <div style="display:grid;grid-template-columns:minmax(0,1fr) 96px 96px;gap:8px;align-items:center;font-size:15px;font-variant-numeric:tabular-nums"><span>Lunes a sábado</span><span style="display:flex;align-items:center;height:52px;box-sizing:border-box;border-radius:14px;background:#0B0B0C;border:1px solid #3F3F46;padding:0 16px;font-size:16px;font-variant-numeric:tabular-nums;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;padding:0 12px;height:48px">8:00</span><span style="display:flex;align-items:center;height:52px;box-sizing:border-box;border-radius:14px;background:#0B0B0C;border:1px solid #3F3F46;padding:0 16px;font-size:16px;font-variant-numeric:tabular-nums;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;padding:0 12px;height:48px">17:00</span><span>Domingos y festivos</span><span style="grid-column:span 2;display:flex;align-items:center;height:52px;box-sizing:border-box;border-radius:14px;background:#0B0B0C;border:1px solid #3F3F46;padding:0 16px;font-size:16px;font-variant-numeric:tabular-nums;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;padding:0 12px;height:48px;color:#A8A29B">Cerrado</span></div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"><label style="display:flex;flex-direction:column;gap:6px;min-width:0"><span style="font-size:14px;font-weight:600">Facebook</span><span style="display:flex;align-items:center;height:52px;box-sizing:border-box;border-radius:14px;background:#0B0B0C;border:1px solid #3F3F46;padding:0 16px;font-size:16px;font-variant-numeric:tabular-nums;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">facebook.com/profile.php?id=100054786668816</span></label><label style="display:flex;flex-direction:column;gap:6px;min-width:0"><span style="font-size:14px;font-weight:600">Instagram</span><span style="display:flex;align-items:center;height:52px;box-sizing:border-box;border-radius:14px;background:#0B0B0C;border:1px solid #3F3F46;padding:0 16px;font-size:16px;font-variant-numeric:tabular-nums;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">instagram.com/carniceria.misericordia</span></label></div>
+  <span style="font-size:13px;line-height:19px;color:#A8A29B;text-wrap:pretty">Al guardar, el teléfono, el horario y las redes cambian en el Landing, el Pie y el asistente a la vez.</span></div><div style="display:flex;flex-direction:column;gap:14px;padding:20px;border-radius:20px;background:#151517;border:1px solid #3F3F46"><span style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap"><span style="font-size:17px;font-weight:600">Zonas de entrega</span><span style="font-size:12px;line-height:16px;font-weight:600;color:#E4D1B0;background:transparent;border:1px solid #E4D1B0;border-radius:999px;padding:3px 10px;white-space:nowrap">confirmar colonias con el dueño</span></span>
+  <span style="font-size:14px;line-height:20px;color:#A8A29B;text-wrap:pretty">Las colonias donde llega el domicilio. Son las mismas que revisa Mis direcciones: si la colonia no está aquí, el cliente ve “Fuera de zona: solo para recoger”.</span>
+  <span style="display:flex;gap:8px"><span style="flex:1;min-width:0;display:flex;align-items:center;height:52px;box-sizing:border-box;border-radius:14px;background:#0B0B0C;border:1px solid #3F3F46;padding:0 16px;font-size:16px;font-variant-numeric:tabular-nums;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;color:#A8A29B">Agregar colonia</span><button style="height:52px;padding:0 18px;border-radius:999px;background:transparent;border:1px solid #E4D1B0;color:#F5F3EF;font-family:Geist,system-ui,sans-serif;font-size:15px;font-weight:600;cursor:pointer">Agregar</button></span>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><span style="min-height:52px;display:flex;align-items:center;gap:8px;padding:0 4px 0 14px;border-radius:14px;background:#0B0B0C;border:1px solid #3F3F46"><span style="flex:1;min-width:0;display:flex;flex-direction:column"><span style="font-size:15px;font-weight:600">Manuel J. Othón</span><span style="font-size:13px;color:#A8A29B">Entregamos</span></span><span role="switch" aria-checked="true" aria-label="Entregar en Manuel J. Othón" style="width:52px;height:32px;box-sizing:border-box;border-radius:999px;background:#DC2626;border:1px solid #DC2626;position:relative;margin-right:6px;flex:0 0 52px"><span style="position:absolute;top:3px;left:23px;width:24px;height:24px;border-radius:999px;background:#FFFFFF"></span></span></span><span style="min-height:52px;display:flex;align-items:center;gap:8px;padding:0 4px 0 14px;border-radius:14px;background:#0B0B0C;border:1px solid #3F3F46"><span style="flex:1;min-width:0;display:flex;flex-direction:column"><span style="font-size:15px;font-weight:600">Jardín</span><span style="font-size:13px;color:#A8A29B">Entregamos</span></span><span role="switch" aria-checked="true" aria-label="Entregar en Jardín" style="width:52px;height:32px;box-sizing:border-box;border-radius:999px;background:#DC2626;border:1px solid #DC2626;position:relative;margin-right:6px;flex:0 0 52px"><span style="position:absolute;top:3px;left:23px;width:24px;height:24px;border-radius:999px;background:#FFFFFF"></span></span></span><span style="min-height:52px;display:flex;align-items:center;gap:8px;padding:0 4px 0 14px;border-radius:14px;background:#0B0B0C;border:1px solid #3F3F46"><span style="flex:1;min-width:0;display:flex;flex-direction:column"><span style="font-size:15px;font-weight:600">Tequisquiapan</span><span style="font-size:13px;color:#A8A29B">Entregamos</span></span><span role="switch" aria-checked="true" aria-label="Entregar en Tequisquiapan" style="width:52px;height:32px;box-sizing:border-box;border-radius:999px;background:#DC2626;border:1px solid #DC2626;position:relative;margin-right:6px;flex:0 0 52px"><span style="position:absolute;top:3px;left:23px;width:24px;height:24px;border-radius:999px;background:#FFFFFF"></span></span></span><span style="min-height:52px;display:flex;align-items:center;gap:8px;padding:0 4px 0 14px;border-radius:14px;background:#0B0B0C;border:1px solid #3F3F46"><span style="flex:1;min-width:0;display:flex;flex-direction:column"><span style="font-size:15px;font-weight:600">Centro</span><span style="font-size:13px;color:#A8A29B">Entregamos</span></span><span role="switch" aria-checked="true" aria-label="Entregar en Centro" style="width:52px;height:32px;box-sizing:border-box;border-radius:999px;background:#DC2626;border:1px solid #DC2626;position:relative;margin-right:6px;flex:0 0 52px"><span style="position:absolute;top:3px;left:23px;width:24px;height:24px;border-radius:999px;background:#FFFFFF"></span></span></span><span style="min-height:52px;display:flex;align-items:center;gap:8px;padding:0 4px 0 14px;border-radius:14px;background:#0B0B0C;border:1px solid #3F3F46"><span style="flex:1;min-width:0;display:flex;flex-direction:column"><span style="font-size:15px;font-weight:600">Himno Nacional</span><span style="font-size:13px;color:#A8A29B">Entregamos</span></span><span role="switch" aria-checked="true" aria-label="Entregar en Himno Nacional" style="width:52px;height:32px;box-sizing:border-box;border-radius:999px;background:#DC2626;border:1px solid #DC2626;position:relative;margin-right:6px;flex:0 0 52px"><span style="position:absolute;top:3px;left:23px;width:24px;height:24px;border-radius:999px;background:#FFFFFF"></span></span></span><span style="min-height:52px;display:flex;align-items:center;gap:8px;padding:0 4px 0 14px;border-radius:14px;background:#0B0B0C;border:1px solid #3F3F46"><span style="flex:1;min-width:0;display:flex;flex-direction:column"><span style="font-size:15px;font-weight:600">Del Valle</span><span style="font-size:13px;color:#A8A29B">Entregamos</span></span><span role="switch" aria-checked="true" aria-label="Entregar en Del Valle" style="width:52px;height:32px;box-sizing:border-box;border-radius:999px;background:#DC2626;border:1px solid #DC2626;position:relative;margin-right:6px;flex:0 0 52px"><span style="position:absolute;top:3px;left:23px;width:24px;height:24px;border-radius:999px;background:#FFFFFF"></span></span></span><span style="min-height:52px;display:flex;align-items:center;gap:8px;padding:0 4px 0 14px;border-radius:14px;background:#0B0B0C;border:1px solid #3F3F46"><span style="flex:1;min-width:0;display:flex;flex-direction:column"><span style="font-size:15px;font-weight:600">Industrial Aviación</span><span style="font-size:13px;color:#A8A29B">Entregamos</span></span><span role="switch" aria-checked="true" aria-label="Entregar en Industrial Aviación" style="width:52px;height:32px;box-sizing:border-box;border-radius:999px;background:#DC2626;border:1px solid #DC2626;position:relative;margin-right:6px;flex:0 0 52px"><span style="position:absolute;top:3px;left:23px;width:24px;height:24px;border-radius:999px;background:#FFFFFF"></span></span></span><span style="min-height:52px;display:flex;align-items:center;gap:8px;padding:0 4px 0 14px;border-radius:14px;background:#0B0B0C;border:1px solid #3F3F46"><span style="flex:1;min-width:0;display:flex;flex-direction:column"><span style="font-size:15px;font-weight:600">Simón Díaz</span><span style="font-size:13px;color:#A8A29B">Entregamos</span></span><span role="switch" aria-checked="true" aria-label="Entregar en Simón Díaz" style="width:52px;height:32px;box-sizing:border-box;border-radius:999px;background:#DC2626;border:1px solid #DC2626;position:relative;margin-right:6px;flex:0 0 52px"><span style="position:absolute;top:3px;left:23px;width:24px;height:24px;border-radius:999px;background:#FFFFFF"></span></span></span><span style="min-height:52px;display:flex;align-items:center;gap:8px;padding:0 4px 0 14px;border-radius:14px;background:#0B0B0C;border:1px solid #3F3F46"><span style="flex:1;min-width:0;display:flex;flex-direction:column"><span style="font-size:15px;font-weight:600">Villa de Pozos</span><span style="font-size:13px;color:#E4D1B0">Solo recoger en tienda</span></span><span role="switch" aria-checked="false" aria-label="Entregar en Villa de Pozos" style="width:52px;height:32px;box-sizing:border-box;border-radius:999px;background:#1C1C1F;border:1px solid #3F3F46;position:relative;margin-right:6px;flex:0 0 52px"><span style="position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:999px;background:#A8A29B"></span></span></span></div></div><div style="display:flex;flex-direction:column;gap:14px;padding:20px;border-radius:20px;background:#151517;border:1px solid #3F3F46;grid-column:1 / -1"><span style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap"><span style="font-size:17px;font-weight:600">Asistente</span><span style="font-size:12px;line-height:16px;font-weight:600;color:#0B0B0C;background:#F59E0B;border:1px solid #F59E0B;border-radius:999px;padding:3px 10px;white-space:nowrap">falta backend</span></span>
+  <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);gap:28px;align-items:start">
+    <div style="display:flex;flex-direction:column;gap:8px"><span style="font-size:14px;font-weight:600">Contesta</span>
+      <div style="display:grid;grid-template-columns:96px 96px;gap:8px;font-variant-numeric:tabular-nums"><span style="display:flex;align-items:center;height:52px;box-sizing:border-box;border-radius:14px;background:#0B0B0C;border:1px solid #3F3F46;padding:0 16px;font-size:16px;font-variant-numeric:tabular-nums;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;height:48px;padding:0 12px">8:00</span><span style="display:flex;align-items:center;height:52px;box-sizing:border-box;border-radius:14px;background:#0B0B0C;border:1px solid #3F3F46;padding:0 16px;font-size:16px;font-variant-numeric:tabular-nums;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;height:48px;padding:0 12px">17:00</span></div>
+      <span style="font-size:13px;line-height:19px;color:#A8A29B;text-wrap:pretty">Fuera de horario responde lo básico (horario, mínimo, zonas) y deja el mensaje para WhatsApp.</span>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:4px"><span style="font-size:14px;font-weight:600;padding-bottom:4px">Pasa la conversación a WhatsApp cuando</span>
+      <span style="min-height:60px;display:flex;align-items:center;justify-content:space-between;gap:12px;border-top:1px solid #3F3F46;padding-top:8px"><span style="display:flex;flex-direction:column;gap:2px"><span style="font-size:15px;font-weight:600">El cliente pide hablar con una persona</span><span style="font-size:13px;line-height:18px;color:#A8A29B">siempre, con un toque</span></span><span role="switch" aria-checked="true" style="width:52px;height:32px;flex:0 0 52px;box-sizing:border-box;border-radius:999px;background:#DC2626;border:1px solid #DC2626;position:relative"><span style="position:absolute;top:3px;left:23px;width:24px;height:24px;border-radius:999px;background:#FFFFFF"></span></span></span>
+      <span style="min-height:60px;display:flex;align-items:center;justify-content:space-between;gap:12px;border-top:1px solid #3F3F46;padding-top:8px"><span style="display:flex;flex-direction:column;gap:2px"><span style="font-size:15px;font-weight:600">Pregunta por un pedido que ya hizo</span><span style="font-size:13px;line-height:18px;color:#A8A29B">con el folio en el mensaje</span></span><span role="switch" aria-checked="true" style="width:52px;height:32px;flex:0 0 52px;box-sizing:border-box;border-radius:999px;background:#DC2626;border:1px solid #DC2626;position:relative"><span style="position:absolute;top:3px;left:23px;width:24px;height:24px;border-radius:999px;background:#FFFFFF"></span></span></span>
+      <span style="min-height:60px;display:flex;align-items:center;justify-content:space-between;gap:12px;border-top:1px solid #3F3F46;padding-top:8px"><span style="display:flex;flex-direction:column;gap:2px"><span style="font-size:15px;font-weight:600">No sabe contestar dos veces seguidas</span><span style="font-size:13px;line-height:18px;color:#A8A29B">en lugar de adivinar</span></span><span role="switch" aria-checked="true" style="width:52px;height:32px;flex:0 0 52px;box-sizing:border-box;border-radius:999px;background:#DC2626;border:1px solid #DC2626;position:relative"><span style="position:absolute;top:3px;left:23px;width:24px;height:24px;border-radius:999px;background:#FFFFFF"></span></span></span>
+      <span style="min-height:60px;display:flex;align-items:center;justify-content:space-between;gap:12px;border-top:1px solid #3F3F46;padding-top:8px"><span style="display:flex;flex-direction:column;gap:2px"><span style="font-size:15px;font-weight:600">Pide un corte o evento especial</span><span style="font-size:13px;line-height:18px;color:#A8A29B">apartados, paquetes grandes</span></span><span role="switch" aria-checked="false" style="width:52px;height:32px;flex:0 0 52px;box-sizing:border-box;border-radius:999px;background:#1C1C1F;border:1px solid #3F3F46;position:relative"><span style="position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:999px;background:#A8A29B"></span></span></span>
+    </div>
+  </div></div></div>
+          </div>
+        </div>
+        <div style="font-size:13px;line-height:18px;font-weight:600">Ajustes · tienda, zonas y asistente · escritorio 1440</div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:4px;font-size:13px;line-height:19px;color:#A8A29B;max-width:1100px;text-wrap:pretty"><span><span style="color:#E4D1B0;font-weight:600">De lo nuestro · </span>el teléfono, WhatsApp, correo, dirección, horario y redes que hoy están escritos a mano en index.html y en chatbot.js.</span><span><span style="color:#F5F3EF;font-weight:600">De lo mío · </span>una sola fuente para el Landing, el Pie y el asistente; zonas como colonias con interruptor, las mismas que revisa Mis direcciones.</span><span><span style="color:#F5F3EF;font-weight:600">Mejora · </span>cambiar el horario ya no pide tocar código; campos de 52 px, interruptores de 52 × 32 dentro de filas de 52 a 60 px; zonas marcadas “confirmar colonias con el dueño” y el asistente “falta backend”.</span></div>
+  </div>
+
+  <!-- ===== 27 CERRAR SESIÓN ===== -->
+  <div style="display:flex;flex-direction:column;gap:16px">
+    <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap">
+      <span style="font-size:12px;font-weight:600;letter-spacing:0.04em;color:#DC2626">27</span>
+      <h2 style="margin:0;font-family:Fraunces,serif;font-size:30px;line-height:36px;font-weight:440">Cerrar sesión</h2>
+    </div>
+    <div style="display:flex;gap:32px;align-items:flex-start">
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="width:390px;height:560px;background:#0B0B0C;border:1px solid #3F3F46;border-radius:12px;overflow:hidden;box-sizing:border-box;position:relative">
+          <div style="position:absolute;inset:0;background:rgba(11,11,12,0.72)"></div>
+          <div role="dialog" style="position:absolute;left:0;right:0;bottom:0;box-sizing:border-box;background:#1C1C1F;border:1px solid #3F3F46;border-bottom:none;border-radius:28px 28px 0 0;padding:8px 16px 24px;display:flex;flex-direction:column;gap:16px">
+            <div style="display:flex;justify-content:center"><span style="width:40px;height:4px;border-radius:999px;background:#3F3F46"></span></div>
+            <span style="font-family:Fraunces,serif;font-size:26px;line-height:32px;font-weight:460">¿Cerrar sesión?</span>
+            <span style="font-size:15px;line-height:23px;color:#A8A29B;text-wrap:pretty">Hay 3 pedidos pendientes. Siguen en el tablero; los verás al volver a entrar.</span>
+            <button style="height:52px;border-radius:999px;background:#DC2626;border:none;color:#FFFFFF;font-family:Geist,system-ui,sans-serif;font-size:16px;font-weight:600;cursor:pointer">Cerrar sesión</button>
+            <button style="height:52px;border-radius:999px;background:transparent;border:1px solid #E4D1B0;color:#F5F3EF;font-family:Geist,system-ui,sans-serif;font-size:16px;font-weight:600;cursor:pointer">Seguir en el panel</button>
+          </div>
+        </div>
+        <div style="font-size:13px;line-height:18px;font-weight:600">Cerrar sesión · móvil 390</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="width:1026px;height:560px;background:#0B0B0C;border:1px solid #3F3F46;border-radius:12px;overflow:hidden;box-sizing:border-box;display:flex;align-items:center;justify-content:center">
+          <div style="width:440px;display:flex;flex-direction:column;gap:18px;align-items:flex-start">
+            <span style="width:64px;height:64px;border-radius:999px;border:1px solid #059669;background:#151517;display:flex;align-items:center;justify-content:center"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 9.5 17 19 7.5"></path></svg></span>
+            <span style="font-family:Fraunces,serif;font-size:40px;line-height:46px;font-weight:480">Cerraste sesión</span>
+            <span style="font-size:16px;line-height:25px;color:#A8A29B">Nadie puede entrar al panel desde este equipo sin tu contraseña.</span>
+            <div style="display:flex;gap:10px"><button style="height:48px;padding:0 22px;border-radius:999px;background:#DC2626;border:none;color:#FFFFFF;font-family:Geist,system-ui,sans-serif;font-size:15px;font-weight:600;cursor:pointer">Volver a ingresar</button><button style="height:48px;padding:0 22px;border-radius:999px;background:transparent;border:1px solid #E4D1B0;color:#F5F3EF;font-family:Geist,system-ui,sans-serif;font-size:15px;font-weight:600;cursor:pointer">Ir a la tienda</button></div>
+          </div>
+        </div>
+        <div style="font-size:13px;line-height:18px;font-weight:600">Sesión cerrada · escritorio 1440 (recorte)</div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:4px;font-size:13px;line-height:19px;color:#A8A29B;max-width:1100px;text-wrap:pretty"><span><span style="color:#E4D1B0;font-weight:600">De lo nuestro · </span>“Salir” en la navegación lateral y “Cerrar sesión” en el menú del administrador.</span><span><span style="color:#F5F3EF;font-weight:600">De lo mío · </span>confirmación con los pedidos pendientes a la vista.</span><span><span style="color:#F5F3EF;font-weight:600">Mejora · </span>antes eran enlaces a index.html que no cerraban la sesión; ahora la cierra de verdad y lo confirma.</span></div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:16px">
+    <h2 style="margin:0;font-family:Fraunces,serif;font-size:30px;line-height:36px;font-weight:440">Autorrevisión · productos, clientes y ajustes</h2>
+    <div style="background:#151517;border:1px solid #3F3F46;border-radius:12px;overflow:hidden;width:1440px;max-width:100%">
+      <div style="display:grid;grid-template-columns:200px minmax(0,1fr) 100px minmax(0,1.2fr);font-size:12px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B;border-bottom:1px solid #3F3F46"><span style="padding:12px 16px">Criterio</span><span style="padding:12px 16px">Qué se midió</span><span style="padding:12px 16px">Estado</span><span style="padding:12px 16px">Corrección</span></div>
+      <sc-for list="{{ revision }}" as="c" hint-placeholder-count="6">
+        <div style="display:grid;grid-template-columns:200px minmax(0,1fr) 100px minmax(0,1.2fr);font-size:13px;line-height:18px;border-bottom:1px solid #3F3F46"><span style="padding:12px 16px">{{ c.c }}</span><span style="padding:12px 16px;color:#A8A29B">{{ c.m }}</span><span style="padding:12px 16px;color:#059669;font-weight:600">Pasa</span><span style="padding:12px 16px;color:#A8A29B">{{ c.x }}</span></div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div id="reporte-b6" data-screen-label="Reporte" style="width:1440px;max-width:100%;box-sizing:border-box;background:#151517;border:1px solid #3F3F46;border-radius:16px;padding:40px;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:48px">
+    <div style="display:flex;flex-direction:column;gap:20px">
+      <span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#E4D1B0">Reporte · panel administrativo</span>
+      <span style="font-family:Fraunces,serif;font-size:40px;line-height:46px;font-weight:480">8 de 8 pantallas cerradas</span>
+      <div style="display:flex;flex-direction:column">
+        <sc-for list="{{ reporte }}" as="r" hint-placeholder-count="8"><span style="display:grid;grid-template-columns:40px minmax(0,1fr) 80px;gap:12px;padding:12px 0;border-bottom:1px solid #3F3F46;font-size:15px;line-height:22px"><span style="color:#A8A29B">{{ r.id }}</span><span>{{ r.t }}</span><span style="color:#059669;font-weight:600">Listo</span></span></sc-for>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B">Pendientes</span>
+      <span style="font-size:15px;line-height:22px;text-wrap:pretty;border-bottom:1px solid #3F3F46;padding-bottom:12px">Falta backend: niveles, afiliados, conteo de favoritos y de carritos abiertos por producto.</span>
+      <span style="font-size:15px;line-height:22px;text-wrap:pretty;border-bottom:1px solid #3F3F46;padding-bottom:12px">Arrastrar en el tablero necesita una librería de drag and drop accesible con alternativa de teclado (el botón “…” ya ofrece mover).</span>
+      <span style="font-size:15px;line-height:22px;text-wrap:pretty">Clientes, cifras y reglas de niveles son de ejemplo; confirmar con el dueño.</span>
+    </div>
+  </div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const IMG = 'public/img/products/';
+const chip = (n, on, k) => ({ n, k: k ?? '', bg: on ? '#DC2626' : '#151517', bd: on ? '#DC2626' : '#3F3F46', fg: on ? '#FFFFFF' : '#F5F3EF', w: on ? 600 : 400 });
+const prod = (n, cat, precio, q, f, est) => {
+  const ag = est === 'agotado', bajo = est === 'bajo';
+  return { n, cat, precio, q, f, stock: ag ? 'Sin stock' : (bajo ? 'Stock bajo · ' + q : q + ' en stock'), estado: ag ? 'Sin stock' : (bajo ? 'Stock bajo' : 'Activo'),
+    dot: ag ? '#A8A29B' : (bajo ? '#E4D1B0' : '#059669'), sc: ag ? '#A8A29B' : (bajo ? '#E4D1B0' : '#F5F3EF'), fg: ag ? '#A8A29B' : '#F5F3EF', filtro: ag ? 'saturate(0.3)' : 'none' };
+};
+const sw = on => ({ on, bg: on ? '#DC2626' : '#1C1C1F', bd: on ? '#DC2626' : '#3F3F46', x: on ? '23px' : '3px' });
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      filtros: [chip('Todos', true, '42'), chip('Stock bajo', false, '5'), chip('Sin stock', false, '3'), chip('Cortes especiales', false, '9'), chip('Merch', false, '4')],
+      productos: [
+        prod('Rib Eye', 'Cortes especiales', '$579 / kg', '12 kg', IMG + 'rib-eye-alto.webp'),
+        prod('Tomahawk', 'Cortes especiales', '$649 / kg', '3 pzas', IMG + 'tomahawk.webp', 'bajo'),
+        prod('Bistec de Res', 'Carnes rojas', '$289 / kg', '80 kg', IMG + 'res.webp'),
+        prod('Chambarete con Tuétano', 'Carnes rojas', '$189 / kg', '0', IMG + 'res-alto.webp', 'agotado'),
+        prod('Paquete Asador 4 a 6 Personas', 'Ofertas', '$1,599 / paquete', '12', IMG + 'premium.webp'),
+        prod('Gorra Bordada', 'Merch', '$250 / pieza', '20', IMG + 'merch.webp')
+      ],
+      pestanas: ['Datos', 'Precio y venta', 'Fotos', 'Inventario'].map((t, i) => ({ t, fg: i === 1 ? '#F5F3EF' : '#A8A29B', w: i === 1 ? 600 : 400, bd: i === 1 ? '#DC2626' : 'transparent' })),
+      campoPrecio: [
+        { l: 'Precio por kilo', v: '$579', bd: '#DC2626', ol: '2px solid #DC2626', fg: '#F5F3EF', ayuda: 'Antes $549. Al guardar te pedimos confirmar.', error: null },
+        { l: 'Precio por libra', v: '$262.63 · se calcula solo', bd: '#3F3F46', ol: 'none', fg: '#A8A29B', ayuda: null, error: null },
+        { l: 'Pedido mínimo del corte', v: '100 g', bd: '#DC2626', ol: 'none', fg: '#F5F3EF', ayuda: null, error: 'Para cortes gruesos el mínimo es 300 g: una pieza de 1” ya pesa eso.' }
+      ],
+      modos: [{ t: 'Por peso', s: 'kg, de 250 en 250 g', ...sw(true) }, { t: 'Por precio', s: 'el cliente dice cuánto gasta', ...sw(true) }, { t: 'Por pieza', s: 'pieza de ~350 g', ...sw(false) }],
+      confirmM: [
+        { nombre: 'Confirmar cambio de precio', titulo: '¿Cambiar el precio del Rib Eye?', texto: 'El precio nuevo se ve en la tienda en cuanto guardes. Los pedidos ya hechos conservan el de antes.', cambio: true, si: 'Sí, cambiar a $579', datos: [{ k: 'Carritos abiertos con Rib Eye', v: '4' }, { k: 'Diferencia', v: '+$30 / kg · +5.5 %' }] },
+        { nombre: 'Confirmar borrado', titulo: '¿Borrar “Chambarete con Tuétano”?', texto: 'Tiene 14 pedidos en su historial, así que se desactiva en vez de borrarse. Los pedidos pasados lo siguen mostrando.', cambio: false, si: 'Desactivar producto', datos: [{ k: 'Pedidos con este producto', v: '14' }, { k: 'Listas de favoritos que lo tienen', v: '6' }] }
+      ],
+      resumenC: [{ l: 'Clientes', v: '312' }, { l: 'Nuevos este mes', v: '27' }, { l: 'Volvieron a comprar', v: '64 %' }],
+      clientes: [
+        { ini: 'PR', n: 'Patricia Ruiz', tel: '444 812 3390', nivel: 'Parrillero', pedidos: 38, gasto: '$21,480', ultimo: 'hoy', sel: '#1C1C1F' },
+        { ini: 'ET', n: 'Eduardo Torres', tel: '444 123 4567', nivel: 'Asador', pedidos: 12, gasto: '$6,240', ultimo: 'hoy', sel: 'transparent' },
+        { ini: 'AR', n: 'Ana Rodríguez', tel: '444 550 1022', nivel: 'Asador', pedidos: 9, gasto: '$5,910', ultimo: 'hoy', sel: 'transparent' },
+        { ini: 'CP', n: 'Carlos Pérez', tel: '444 301 7788', nivel: 'Vecino', pedidos: 4, gasto: '$1,380', ultimo: 'hace 6 días', sel: 'transparent' },
+        { ini: 'LH', n: 'Lucía Hernández', tel: '444 667 2014', nivel: 'Vecino', pedidos: 1, gasto: '$449', ultimo: 'hoy', sel: 'transparent' }
+      ],
+      ficha: [{ k: 'Nivel', v: 'Parrillero · 10 %' }, { k: 'Pedidos', v: '38' }, { k: 'Gastado', v: '$21,480' }, { k: 'Ticket promedio', v: '$565' }, { k: 'Suele pedir', v: 'Rib Eye, Chorizo Argentino' }, { k: 'Entrega', v: 'A domicilio · Col. Tangamanga' }],
+      secciones: [
+        { t: 'Precios y unidades', s: 'libra visible · factor 0.4536' }, { t: 'Mínimos de pedido', s: 'domicilio $150 · recoger sin mínimo' },
+        { t: 'Niveles de cliente', s: '3 niveles · hasta 10 %' }, { t: 'Afiliados', s: '$50 y $50 · 18 activos' }, { t: 'Categorías', s: '9 categorías', on: true }, { t: 'Datos de la tienda y redes', s: 'teléfono, horario, Facebook, Instagram' }, { t: 'Zonas de entrega', s: '8 colonias · confirmar con el dueño' }, { t: 'Asistente', s: 'horario y paso a WhatsApp · falta backend' }
+      ].map(s => ({ ...s, bg: s.on ? 'rgba(220,38,38,0.12)' : 'transparent', fg: '#F5F3EF' })),
+      categorias: [['Cortes Especiales', 8], ['Pollo', 8], ['Carnes Rojas', 6], ['Cerdo', 6], ['Preparadas', 6], ['Embutidos', 5], ['Merch', 5], ['Otros', 5], ['Ofertas', 4]].map(([n, k]) => ({ n, k, bd: '#3F3F46' })),
+      niveles: [{ n: 'Vecino', regla: 'al registrarse', desc: '0 %' }, { n: 'Asador', regla: 'desde 5 pedidos o $3,000', desc: '5 %' }, { n: 'Parrillero', regla: 'desde 20 pedidos o $12,000', desc: '10 %' }],
+      reporte: [
+        { id: '20', t: 'Inicio con cuatro cifras, gráfica y últimos pedidos' }, { id: '21', t: 'Tablero de pedidos: arrastre en 1440, pilas con Avanzar en 390' },
+        { id: '22', t: 'Productos con buscador y filtros' }, { id: '23', t: 'Alta y edición por pestañas con vista previa' },
+        { id: '24', t: 'Confirmar borrado y cambio de precio con antes y después' }, { id: '25', t: 'Clientes con sus cifras y ficha' },
+        { id: '26', t: 'Ajustes: precios, mínimos, niveles, afiliados y categorías' }, { id: '27', t: 'Cerrar sesión' }
+      ],
+      revision: [
+        { c: 'Se lee en el teléfono', m: 'Nombres 15 px, cifras 13–20 px, títulos de ventana 26 px', x: 'Sin cambios necesarios.' },
+        { c: 'Contraste', m: 'Nivel en dorado con tinta #0B0B0C 9.9:1 · stock bajo beige 12.4:1 · agotado gris 7.2:1', x: 'Intento 1: el borrado usaba botón gris; se dejó rojo (es la acción) y Cancelar en contorno beige.' },
+        { c: 'Botones de 44 px', m: 'Editar, borrar, renombrar 44 · interruptores dentro de filas de 52–64 · pestañas 48', x: 'Intento 1: el interruptor suelto medía 32; la fila completa es el blanco táctil.' },
+        { c: 'Misma tarjeta y botones', m: 'Vista previa importa Tarjeta; chips, segmentado y campos de Componentes a Inicio de sesión', x: 'Sin cambios necesarios.' },
+        { c: 'Nada se sale ni se corta', m: '“Paquete Asador 4 a 6 Personas” en la lista de 390, reglas de niveles', x: 'Sin cambios necesarios.' },
+        { c: 'Mejor que lo viejo', m: 'Contra capturas 30–35', x: 'Ver las líneas de mejora.' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

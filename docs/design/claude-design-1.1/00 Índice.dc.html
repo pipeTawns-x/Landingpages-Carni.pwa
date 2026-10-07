@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..700&family=Geist:wght@400..700&display=swap" rel="stylesheet">
+<style>body{margin:0;background:#0B0B0C;color:#F5F3EF}a{color:#F5F3EF}a:hover{color:#E4D1B0}</style>
+</helmet>
+<main data-screen-label="Índice" style="min-height:100vh;background:#0B0B0C;color:#F5F3EF;font-family:Geist,system-ui,sans-serif;padding:56px clamp(16px,4vw,56px) 96px;box-sizing:border-box;display:flex;flex-direction:column;gap:64px">
+  <header style="display:flex;flex-direction:column;gap:14px;max-width:880px">
+    <span style="display:flex;flex-direction:column;gap:7px;line-height:1"><span style="font-size:22px;font-weight:600;letter-spacing:0.2em">CARNICERÍA</span><span style="display:flex;align-items:center;gap:10px;font-size:10.5px;font-weight:500;letter-spacing:0.16em;color:#E4D1B0">EL SEÑOR DE LA MISERICORDIA<span style="width:28px;height:1px;background:#E4D1B0"></span></span></span>
+    <h1 style="margin:12px 0 0;font-family:Fraunces,serif;font-size:clamp(40px,5vw,64px);line-height:1.05;font-weight:460;letter-spacing:-0.01em">Índice del rediseño</h1>
+    <p style="margin:0;font-size:17px;line-height:27px;color:#A8A29B;text-wrap:pretty">{{ resumen }}</p>
+    <nav aria-label="Grupos" style="display:flex;flex-wrap:wrap;gap:8px;padding-top:8px">
+      <sc-for list="{{ grupos }}" as="g" hint-placeholder-count="9">
+        <a href="{{ g.ancla }}" style="min-height:44px;display:flex;align-items:center;gap:8px;padding:0 16px;border-radius:999px;border:1px solid #3F3F46;background:#151517;font-size:14px;color:#F5F3EF;text-decoration:none">{{ g.t }}<span style="font-size:13px;color:#A8A29B;font-variant-numeric:tabular-nums">{{ g.n }}</span></a>
+      </sc-for>
+      <a href="#bitacora" style="min-height:44px;display:flex;align-items:center;padding:0 16px;border-radius:999px;border:1px solid #E4D1B0;font-size:14px;color:#F5F3EF;text-decoration:none">Bitácora</a>
+    </nav>
+  </header>
+
+  <sc-for list="{{ grupos }}" as="g" hint-placeholder-count="3">
+    <section id="{{ g.id }}" style="display:flex;flex-direction:column;gap:24px;scroll-margin-top:24px">
+      <div style="display:flex;align-items:baseline;justify-content:space-between;gap:16px;border-bottom:1px solid #3F3F46;padding-bottom:14px">
+        <h2 style="margin:0;font-family:Fraunces,serif;font-size:32px;line-height:38px;font-weight:460">{{ g.t }}</h2>
+        <span style="font-size:14px;color:#A8A29B;font-variant-numeric:tabular-nums">{{ g.cuenta }}</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(188px,1fr));gap:20px 16px">
+        <sc-for list="{{ g.items }}" as="p" hint-placeholder-count="6">
+          <a href="{{ p.href }}" style="display:flex;flex-direction:column;gap:10px;color:#F5F3EF;text-decoration:none" style-hover="color:#E4D1B0">
+            <span style="position:relative;display:flex;flex-direction:column;justify-content:space-between;aspect-ratio:390/844;box-sizing:border-box;padding:16px;border-radius:14px;overflow:hidden;background:#1C1C1F;border:1px dashed #52525B">
+              <span style="font-size:52px;line-height:52px;font-weight:600;letter-spacing:-0.02em;font-variant-numeric:tabular-nums;color:#F5F3EF">{{ p.n }}</span>
+              <span style="font-size:13px;line-height:18px;color:#A8A29B;text-wrap:pretty">{{ p.aviso }}</span>
+            </span>
+            <span style="display:flex;flex-direction:column;gap:6px">
+              <span style="font-family:Fraunces,serif;font-size:18px;line-height:23px;font-weight:460;text-wrap:pretty">{{ p.nombre }}</span>
+              <span style="font-size:13px;line-height:18px;color:#A8A29B">{{ p.grupo }}</span>
+              <span style="align-self:flex-start;font-size:12px;line-height:16px;padding:4px 9px;border-radius:999px;border:1px solid {{ p.bd }};color:{{ p.fg }}">{{ p.etiqueta }}</span>
+              <span style="font-size:13px;line-height:18px;color:#A8A29B">{{ p.pagina }}</span>
+            </span>
+          </a>
+        </sc-for>
+      </div>
+    </section>
+  </sc-for>
+
+  <section id="bitacora" style="display:flex;flex-direction:column;gap:24px;scroll-margin-top:24px">
+    <div style="display:flex;flex-direction:column;gap:8px;border-bottom:1px solid #3F3F46;padding-bottom:14px">
+      <h2 style="margin:0;font-family:Fraunces,serif;font-size:40px;line-height:46px;font-weight:460">Bitácora</h2>
+      <span style="font-size:15px;line-height:22px;color:#A8A29B">Loop final v2.1 · un renglón por ítem, con lo medido.</span>
+    </div>
+    <sc-for list="{{ bitacora }}" as="b" hint-placeholder-count="8">
+      <article style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:12px 32px;padding:20px 24px;border-radius:18px;background:#151517;border:1px solid #3F3F46">
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <span style="display:flex;align-items:center;gap:10px"><span style="font-size:22px;font-weight:600;font-variant-numeric:tabular-nums">{{ b.n }}</span><span style="font-size:12px;line-height:16px;font-weight:600;letter-spacing:0.04em;padding:4px 9px;border-radius:999px;border:1px solid {{ b.bd }};color:{{ b.fg }}">{{ b.estado }}</span></span>
+          <span style="font-family:Fraunces,serif;font-size:20px;line-height:26px;font-weight:460">{{ b.t }}</span>
+          <span style="font-size:14px;line-height:20px;color:#A8A29B;text-wrap:pretty">{{ b.pantallas }}</span>
+        </div>
+        <ul style="margin:0;padding:0 0 0 18px;display:flex;flex-direction:column;gap:6px;font-size:14px;line-height:21px;color:#F5F3EF;font-variant-numeric:tabular-nums">
+          <sc-for list="{{ b.medidas }}" as="m" hint-placeholder-count="3"><li style="text-wrap:pretty">{{ m }}</li></sc-for>
+        </ul>
+      </article>
+    </sc-for>
+    <sc-if value="{{ hayReporte }}">
+      <article style="display:flex;flex-direction:column;gap:16px;padding:28px;border-radius:20px;background:#151517;border:1px solid #E4D1B0">
+        <span style="font-family:Fraunces,serif;font-size:28px;line-height:34px;font-weight:460">{{ reporte.t }}</span>
+        <span style="font-size:13px;line-height:16px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:#E4D1B0">Abogado del diablo · 3 puntos débiles</span>
+        <ol style="margin:0;padding:0 0 0 20px;display:flex;flex-direction:column;gap:8px;font-size:15px;line-height:23px">
+          <sc-for list="{{ reporte.debiles }}" as="d" hint-placeholder-count="3"><li style="text-wrap:pretty">{{ d }}</li></sc-for>
+        </ol>
+        <span style="font-size:13px;line-height:16px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:#E4D1B0;padding-top:8px">Aceptación · lo medido</span>
+        <div style="display:flex;flex-direction:column">
+          <sc-for list="{{ reporte.aceptacion }}" as="a" hint-placeholder-count="8">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:4px 24px;padding:12px 0;border-top:1px solid #3F3F46;font-size:14px;line-height:21px"><span style="color:#A8A29B;text-wrap:pretty">{{ a.c }}</span><span style="font-variant-numeric:tabular-nums;text-wrap:pretty">{{ a.v }}</span></div>
+          </sc-for>
+        </div>
+        <span style="font-size:13px;line-height:16px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:#E4D1B0;padding-top:8px">Contraste · cada estilo de texto sobre su fondo</span>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px">
+          <sc-for list="{{ reporte.contraste }}" as="c" hint-placeholder-count="12">
+            <div style="display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:12px;border:1px solid #3F3F46;background:{{ c.bg }}">
+              <span style="font-size:18px;font-weight:600;color:{{ c.fg }}">Aa</span>
+              <span style="flex:1;display:flex;flex-direction:column;gap:2px;font-size:12px;line-height:16px;color:{{ c.fg }}"><span>{{ c.uso }}</span><span>{{ c.par }}</span></span>
+              <span style="font-size:15px;font-weight:600;font-variant-numeric:tabular-nums;color:{{ c.fg }}">{{ c.r }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </article>
+    </sc-if>
+  </section>
+</main>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const PG = {
+  comp: 'Componentes.dc.html', land: 'Landing.dc.html', cat: 'Catálogo y ficha.dc.html', acc: 'Inicio de sesión del cliente.dc.html',
+  compra: 'Compra.dc.html', perfil: 'Perfil del cliente.dc.html', panel: 'Panel administrativo.dc.html',
+  prod: 'Productos, clientes y ajustes.dc.html', dj: 'Inventario Django.dc.html', ads: 'BuildAds y ProductAds.dc.html'
+};
+const NOM = { comp: 'Componentes', land: 'Landing', cat: 'Catálogo y ficha', acc: 'Inicio de sesión del cliente', compra: 'Compra', perfil: 'Perfil del cliente', panel: 'Panel administrativo', prod: 'Productos, clientes y ajustes', dj: 'Inventario Django', ads: 'BuildAds y ProductAds' };
+const s = (n, nombre, pg, cap, extra = {}) => ({ n, nombre, pg, cap, ...extra });
+const GRUPOS = [
+  { id: 'componentes', t: 'Componentes', items: [s('01', 'Encabezado', 'comp', '01'), s('02', 'Menú lateral', 'comp', '37'), s('03', 'Buscador', 'comp', '03'), s('04', 'Tarjeta de producto', 'comp', '12'), s('05', 'Carrito', 'comp', '04'), s('06', 'Asistente', 'comp', '16'), s('49', 'Logotipo y monograma', 'comp', null)] },
+  { id: 'tienda', t: 'Tienda', items: [s('07', 'Landing', 'land', '36'), s('08', 'Catálogo', 'cat', '38'), s('09', 'Ficha de producto', 'cat', '17')] },
+  { id: 'cuenta', t: 'Cuenta del cliente', items: [s('10', 'Ingresar', 'acc', '23'), s('11', 'Registrarse', 'acc', '24'), s('12', 'Recuperar · pedir correo', 'acc', null), s('13', 'Revisa tu correo', 'acc', null), s('14', 'Código de 6 dígitos', 'acc', null), s('15', 'Nueva contraseña', 'acc', null), s('16', 'Sin conexión', 'acc', '40')] },
+  { id: 'compra', t: 'Compra', items: [s('17', 'Finalizar pedido', 'compra', '04'), s('18', 'Confirmación', 'compra', null), s('19', 'Estado del pedido', 'compra', null)] },
+  { id: 'mi-cuenta', t: 'Mi cuenta', items: [s('34', 'Mis pedidos', 'perfil', null), s('35', 'Direcciones', 'perfil', null), s('36', 'Favoritos', 'perfil', null), s('37', 'Recetario', 'perfil', null), s('38', 'Receta abierta', 'perfil', null), s('39', 'Calorías y proteína', 'perfil', null), s('40', 'Mi nivel', 'perfil', null), s('41', 'Mi enlace', 'perfil', null), s('46', 'Recetas guardadas', 'perfil', null), s('47', 'Mis datos', 'perfil', null)] },
+  { id: 'panel', t: 'Panel administrativo', items: [s('20', 'Inicio', 'panel', '28'), s('21', 'Pedidos · tablero', 'panel', '33'), s('22', 'Productos', 'prod', '31'), s('23', 'Alta y edición', 'prod', null), s('24', 'Confirmar borrado y precio', 'prod', null), s('25', 'Clientes', 'prod', '35'), s('26', 'Ajustes', 'prod', null), s('27', 'Cerrar sesión', 'prod', null), s('48', 'Ajustes · tienda, zonas y asistente', 'prod', null)] },
+  { id: 'chatbot', t: 'Métricas del chatbot', items: [s('43', 'Resumen', null, null, { pend: 'Se diseña en la pasada 3' }), s('44', 'Conversación', null, null, { pend: 'Se diseña en la pasada 3' }), s('45', 'Ayudante del panel', null, null, { pend: 'Se diseña en la pasada 3' })] },
+  { id: 'django', t: 'Inventario Django', items: [s('28', 'Lista y vacío', 'dj', null), s('29', 'Detalle', 'dj', null), s('30', 'Formulario con errores', 'dj', null), s('31', 'Confirmar desactivación', 'dj', null), s('32', 'Confirmar precio', 'dj', null), s('33', 'Ingreso y mensajes', 'dj', null)] },
+  { id: 'ads', t: 'BuildAds y ProductAds', items: [s('42', 'BuildAds y ProductAds', 'ads', '30'), s('50', 'Catálogo de la semana', 'ads', null)] }
+];
+const BITACORA = [
+  { n: '1.1', t: 'Índice', estado: 'CERRADO', pantallas: '00 Índice: 50 fichas en 9 grupos', medidas: ['50 fichas: 01–50; 43–45 reservadas para la pasada 3', 'ficha tipográfica: número de 52 px, nombre en Fraunces de 18 px, grupo y etiqueta', 'hueco gris 390:844 rotulado “miniatura pendiente”; 0 imágenes, 0 rotas', 'las miniaturas las genera Claude Code en la tanda 1B'] },
+  { n: '1.2', t: 'Logotipo', estado: 'CERRADO', pantallas: '49 en Componentes · Encabezado · AdminNav · Django · Acceso · Compra · BuildAds', medidas: ['CARNICERÍA Geist 560, espaciado 0.22em; subtítulo 0.16em entre líneas de 1 px', 'monograma en 512 × 512, 320 × 320 circular, 32 × 32 y 16 × 16 (public/img/marca)', 'la “C” ocupa el 90 % del favicon: se lee a 16 px', '0 fotos del letrero y 0 sellos en las páginas'] },
+  { n: '1.3', t: 'Links reales', estado: 'CERRADO', pantallas: 'Pie · Contacto directo del Landing · 41 Mi enlace · variantes A y B', medidas: ['href="#": 87 → 0', 'Facebook, Instagram y wa.me en el Pie y en Contacto directo', 'Mi enlace: WhatsApp, Facebook y el menú del teléfono, botones de 72 px', 'variante B: el verde #25D366 solo en WhatsApp'] },
+  { n: '1.4', t: 'Mi cuenta', estado: 'CERRADO', pantallas: '46 Recetas guardadas · 47 Mis datos', medidas: ['47: 4 campos de 52 px + Guardar 52 + Cerrar sesión 48 en 390 × 844', '46: pestaña “Guardadas” con 3 recetas y su estado vacío'] },
+  { n: '1.5', t: 'Ajustes', estado: 'CERRADO', pantallas: '48 Ajustes · tienda, zonas y asistente', medidas: ['campos de 52 px; interruptores de 52 × 32', '8 colonias con entrega y 1 solo para recoger · “confirmar colonias con el dueño”', 'Asistente: horario 8:00–17:00 y 4 reglas de paso a WhatsApp · falta backend'] },
+  { n: '1.6', t: 'Paquetes', estado: 'CERRADO', pantallas: 'Tarjeta · Landing · Componentes · 17 con paquete', medidas: ['las dos frases salen solas en toda Tarjeta de paquete', 'anticipo de $799.50 y resto de $874.00 sobre $1,673.50', '“Promoción Martes”, que no existe, se cambió por Paquete Carnitas $389'] },
+  { n: '1.7', t: 'Catálogo de la semana', estado: 'CERRADO', pantallas: '50 en BuildAds y ProductAds', medidas: ['hoja A4 de 794 × 1123 y carrusel de 6 cuadros de 1080 × 1350', 'las 4 ofertas reales: $1,599 · $3,249 · $389 · $379 / kg', 'botones Descargar (52 px) y Compartir (48 px), más Abrir en Canva'] },
+  { n: '1.8', t: 'Correcciones de oficio', estado: 'CERRADO', pantallas: 'Componentes 03 · Django 28 · Acceso 13 y 14 · Panel 20 · BuildAds 42 · Perfil 39 · todas las páginas', medidas: ['sin resultados: “picaña” → “salmón”; 4 → 0 en Componentes y 2 → 0 en Django; en Django “Ver todos” es la principal y “Dar de alta” la secundaria', '“Revisa tu correo”: se quitó “Llega en menos de un minuto”, 0 plazos; 1 nota “falta configurar la plantilla del correo en Supabase” junto al código de 6 dígitos', 'Panel: 4 de 4 KPI con minigráfico de 7 días (28 px de alto en 390, 36 px en 1440; 8 en pantalla); eje $0 / $5k / $10k / $15k y barras a escala de $15k', 'el asistente de BuildAds oculta AdminNav y deja “Salir” arriba (44 px en 390, 48 px en 1440)', 'calorías y proteína por porción de 150 g', 'texto base #F5F3EF en todas las páginas, para que nada herede el negro (1.05:1)'] }
+];
+BITACORA.push(
+  { n: 'B2', t: 'Portada', estado: 'CERRADO', pantallas: '07 Landing · portada y Sobre nosotros', medidas: ['video a sangre: 390 × 700 (83 %) y 1440 × 765 (85 %), sin caja negra; degradado 0 % al 40 %, 55 % al 65 %, 80 % abajo', 'titular Fraunces 56 / 96 px, −0.03em, 3 líneas en 390 y 2 en 1440, desde el 65 %; palabra por palabra cada 50 ms, 420 ms', 'contraste de #F5F3EF en la línea más alta sobre portada-carne-cuadro-claro.jpg: 7.98:1 en 1440 y 8.66:1 en 390', '1 botón principal; Sobre nosotros con 3 cifras reales y 0 “por tomar”', 'SIN RECURSOS: portada-carne.mp4 (el repo lo rechaza por peso); el video usa el póster'] },
+  { n: 'B3', t: 'Catálogo y fotos', estado: 'CERRADO', pantallas: 'Tarjeta · 08 Catálogo · 09 Ficha · 09b Ficha con foto de categoría · 02 Menú', medidas: ['Tarjeta: foto, nombre, precio y + de 44 px en contorno; hover −2 px y presión 0.97 en 160 ms; “Agregado ✓” en 180 ms, vuelve a los 1500 ms', 'rellenos rojos: 0 en la rejilla y 1 por cuadro de ficha (Agregar)', '6 tarjetas vecinas con 3 fotos distintas en ciclo: 0 repetidas', '“Foto ilustrativa” en 09b; Porterhouse con su única foto propia, sin galería', 'stock: Disponible · Pocas piezas · Agotado; “Es todo lo disponible” en el tope', '9 categorías; 0 “Frutas y verduras” y 0 “Especias”'] },
+  { n: 'B4', t: 'Compra', estado: 'CERRADO', pantallas: '17 Finalizar pedido · 17 con paquete', medidas: ['1.º “Pagar al recoger o al recibir”, 2.º “Tarjeta en línea” por pasarela (falta backend)', '0 campos de tarjeta', '“¿Tienes un código?” plegado en una fila de 48 px', 'a domicilio desde $150 y recoger sin mínimo; anticipo del 50 % con paquete'] },
+  { n: 'A1', t: 'Índice con miniaturas', estado: 'PARCIAL', pantallas: '00 Índice', medidas: ['PARCIAL: falta montar los iframes en 390 con #ancla'] },
+  { n: 'B1', t: 'Movimiento', estado: 'PARCIAL', pantallas: 'Componentes', medidas: ['hecho en código: Tarjeta (160 / 180 ms) y titular (50 ms entre palabras)', 'PARCIAL: falta el cuadro Movimiento con la tabla y las tiras de 3 cuadros'] },
+  { n: 'C1', t: 'Acceso con mascota', estado: 'PARCIAL', pantallas: '10 y 11', medidas: ['recursos de mascota/ importados y README leído', 'PARCIAL: falta montar panel-escritorio y panel-movil, el cambio de pose a los 229 ms y la tira de 5 cuadros'] },
+  { n: 'C2', t: 'Métricas del chatbot', estado: 'PARCIAL', pantallas: '43 · 44 · 45 · AdminNav', medidas: ['PARCIAL: sin empezar'] }
+);
+const REPORTE = null;
+class Component extends DCLogic {
+  renderVals() {
+    const total = GRUPOS.reduce((a, g) => a + g.items.length, 0);
+    const grupos = GRUPOS.map(g => ({
+      ...g, ancla: '#' + g.id, n: String(g.items.length), cuenta: g.items.length + (g.items.length === 1 ? ' pantalla' : ' pantallas'),
+      items: g.items.map(p => {
+        const nueva = !p.cap;
+        return {
+          ...p,
+          href: p.pg ? PG[p.pg] : '#bitacora',
+          pagina: p.pg ? NOM[p.pg] : 'Pasada 3',
+          grupo: g.t,
+          aviso: p.pend ? p.pend : 'miniatura pendiente · 390 × 844',
+          etiqueta: p.pend ? 'nueva · pasada 3' : (nueva ? 'nueva' : 'rediseño de la captura ' + p.cap),
+          bd: nueva ? '#E4D1B0' : '#3F3F46', fg: nueva ? '#E4D1B0' : '#A8A29B'
+        };
+      })
+    }));
+    const est = e => e === 'CERRADO' ? { bd: '#059669', fg: '#F5F3EF' } : { bd: '#E4D1B0', fg: '#E4D1B0' };
+    return {
+      grupos,
+      resumen: total + ' pantallas en 9 grupos. Cada ficha abre su página; las miniaturas son el cuadro móvil de 390 px. Al final, la Bitácora del loop.',
+      bitacora: BITACORA.map(b => ({ ...b, ...est(b.estado) })),
+      hayReporte: !!REPORTE, reporte: REPORTE || { debiles: [], aceptacion: [], contraste: [] }
+    };
+  }
+}
+</script>
+</body>
+</html>

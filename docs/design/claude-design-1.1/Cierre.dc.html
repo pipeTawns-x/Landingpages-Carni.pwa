@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..700&family=Geist:wght@400..700&display=swap" rel="stylesheet">
+<style>
+  body { margin:0; background:#0B0B0C; color:#F5F3EF; }
+  a { color:#F5F3EF; text-decoration:underline; text-decoration-color:#E4D1B0; text-underline-offset:4px; }
+  a:hover { color:#E4D1B0; }
+</style>
+</helmet>
+
+<section id="b10" data-screen-label="Cierre" style="background:#0B0B0C;width:1440px;min-width:100%;box-sizing:border-box;padding:56px 56px 96px;font-family:Geist,system-ui,sans-serif;color:#F5F3EF;display:flex;flex-direction:column;gap:56px">
+
+  <div style="display:flex;flex-direction:column;gap:12px;max-width:980px">
+    <div style="font-size:12px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B">Carni · rediseño · cierre</div>
+    <h1 style="margin:0;font-family:Fraunces,Georgia,serif;font-size:52px;line-height:58px;font-weight:480">Todas las piezas, juntas</h1>
+    <p style="margin:0;font-size:17px;line-height:27px;color:#A8A29B;max-width:76ch;text-wrap:pretty">Las mismas tarjetas, botones, campos y chips que usan las 42 pantallas, puestos lado a lado. Al juntarlos aparecieron cinco diferencias: una corregida, tres convertidas en regla y una pantalla reemplazada. Están anotadas al final.</p>
+  </div>
+
+  <!-- tarjetas -->
+  <div style="display:flex;flex-direction:column;gap:20px">
+    <div style="display:flex;align-items:baseline;justify-content:space-between;gap:16px;border-bottom:1px solid #3F3F46;padding-bottom:12px"><h2 style="margin:0;font-family:Fraunces,serif;font-size:32px;line-height:38px;font-weight:460">Tarjeta de producto · la única</h2><span style="font-size:14px;color:#A8A29B">Tarjeta.dc.html · Componentes, Landing, Catálogo y ficha, Inicio de sesión, Compra, Panel administrativo y Perfil</span></div>
+    <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px;align-items:start">
+      <sc-for list="{{ tarjetas }}" as="t" hint-placeholder-count="4">
+        <div style="display:flex;flex-direction:column;gap:10px"><dc-import name="Tarjeta" variante="{{ t.v }}" foto="{{ t.f }}" cat="{{ t.cat }}" nombre="{{ t.n }}" desc="{{ t.d }}" precio="{{ t.precio }}" unidad="{{ t.u }}" stock="{{ t.s }}" hint-size="100%,600px"></dc-import><span style="font-size:13px;line-height:18px;color:#A8A29B">{{ t.nota }}</span></div>
+      </sc-for>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px">
+      <sc-for list="{{ chicas }}" as="t" hint-placeholder-count="3"><dc-import name="Tarjeta" variante="chica" boton="{{ t.b }}" foto="{{ t.f }}" cat="{{ t.cat }}" nombre="{{ t.n }}" precio="{{ t.precio }}" unidad="{{ t.u }}" hint-size="100%,90px"></dc-import></sc-for>
+    </div>
+    <span style="font-size:13px;line-height:18px;color:#A8A29B">Versión chica: buscador, asistente, sin conexión y carruseles. Con o sin “+” según quepa el nombre.</span>
+  </div>
+
+  <!-- botones -->
+  <div style="display:flex;flex-direction:column;gap:20px">
+    <div style="display:flex;align-items:baseline;justify-content:space-between;gap:16px;border-bottom:1px solid #3F3F46;padding-bottom:12px"><h2 style="margin:0;font-family:Fraunces,serif;font-size:32px;line-height:38px;font-weight:460">Botones</h2><span style="font-size:14px;color:#A8A29B">siempre redondos · rojo = acción · contorno beige = alternativa</span></div>
+    <div style="display:grid;grid-template-columns:220px repeat(3,minmax(0,1fr));gap:16px 24px;align-items:center">
+      <span></span><span style="font-size:12px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B">52 px · formularios y pago</span><span style="font-size:12px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B">48 px · escritorio y secundarios</span><span style="font-size:12px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B">44 px · dentro de tarjetas y renglones</span>
+      <sc-for list="{{ botones }}" as="b" hint-placeholder-count="4">
+        <span style="font-size:15px;font-weight:600">{{ b.t }}<br><span style="font-size:13px;font-weight:400;color:#A8A29B">{{ b.uso }}</span></span>
+        <sc-for list="{{ b.tam }}" as="s" hint-placeholder-count="3"><span><button disabled="{{ b.dis }}" style="height:{{ s.h }};padding:0 24px;border-radius:999px;background:{{ b.bg }};border:{{ b.bd }};color:{{ b.fg }};font-family:Geist,system-ui,sans-serif;font-size:{{ s.fs }};font-weight:600;cursor:{{ b.cur }}">{{ b.label }}</button></span></sc-for>
+      </sc-for>
+    </div>
+    <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;border-top:1px solid #3F3F46;padding-top:20px">
+      <span style="font-size:14px;color:#A8A29B;width:200px">Botones de ícono · 44 px</span>
+      <button aria-label="Cerrar" style="width:44px;height:44px;border-radius:999px;border:1px solid #3F3F46;background:#151517;color:#F5F3EF;display:flex;align-items:center;justify-content:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
+      <button aria-label="Cerrar la búsqueda" style="width:48px;height:48px;border-radius:999px;border:1px solid #3F3F46;background:#1C1C1F;color:#F5F3EF;display:flex;align-items:center;justify-content:center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
+      <button aria-label="Editar" style="width:44px;height:44px;border-radius:999px;background:transparent;border:1px solid #3F3F46;color:#F5F3EF;display:flex;align-items:center;justify-content:center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16Z"></path></svg></button>
+      <button aria-label="Agregar" style="width:44px;height:44px;border-radius:999px;background:#DC2626;border:none;color:#FFFFFF;font-size:20px">+</button>
+      <span style="display:flex;align-items:center;justify-content:space-between;width:180px;height:56px;border-radius:999px;border:1px solid #3F3F46;background:#151517;padding:0 6px;box-sizing:border-box"><button aria-label="Menos" style="width:44px;height:44px;border-radius:999px;border:1px solid #3F3F46;background:#1C1C1F;color:#F5F3EF;font-size:20px">−</button><span style="font-size:18px;font-weight:600;font-variant-numeric:tabular-nums">0.500 kg</span><button aria-label="Más" style="width:44px;height:44px;border-radius:999px;border:1px solid #3F3F46;background:#1C1C1F;color:#F5F3EF;font-size:20px">+</button></span>
+      <span style="font-size:13px;color:#A8A29B">La X del buscador es la única de 48: sale a pantalla completa.</span>
+    </div>
+  </div>
+
+  <!-- campos -->
+  <div style="display:flex;flex-direction:column;gap:20px">
+    <div style="display:flex;align-items:baseline;justify-content:space-between;gap:16px;border-bottom:1px solid #3F3F46;padding-bottom:12px"><h2 style="margin:0;font-family:Fraunces,serif;font-size:32px;line-height:38px;font-weight:460">Campos</h2><span style="font-size:14px;color:#A8A29B">52 px · radio 14 · un solo tono · buscadores en píldora</span></div>
+    <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:20px;align-items:start">
+      <sc-for list="{{ campos }}" as="c" hint-placeholder-count="4">
+        <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:12px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B;padding-bottom:4px">{{ c.estado }}</span><span style="font-size:14px;font-weight:600">{{ c.l }}</span><span style="display:flex;align-items:center;height:52px;box-sizing:border-box;border-radius:14px;background:#151517;border:1px solid {{ c.bd }};outline:{{ c.ol }};outline-offset:2px;padding:0 16px;font-size:16px;color:{{ c.fg }}">{{ c.v }}</span><sc-if value="{{ c.msg }}"><span style="display:flex;gap:8px;font-size:14px;line-height:20px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="{{ c.ic }}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:0 0 18px;margin-top:1px"><path d="{{ c.path }}"></path></svg>{{ c.msg }}</span></sc-if></label>
+      </sc-for>
+    </div>
+    <div style="display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr) minmax(0,1fr);gap:20px;align-items:start">
+      <div style="display:flex;flex-direction:column;gap:6px"><span style="font-size:12px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B;padding-bottom:4px">Buscador · píldora, sin ícono en el de pantalla completa</span><span style="display:flex;align-items:center;height:56px;box-sizing:border-box;background:#151517;border:1px solid #DC2626;outline:2px solid #DC2626;outline-offset:2px;border-radius:999px;padding:0 22px;font-size:17px;color:#A8A29B">¿Qué corte buscas?</span></div>
+      <div style="display:flex;flex-direction:column;gap:6px"><span style="font-size:12px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B;padding-bottom:4px">Código de 6 dígitos</span><div style="display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px"><sc-for list="{{ codigo }}" as="d" hint-placeholder-count="6"><span style="height:56px;box-sizing:border-box;border-radius:14px;background:#151517;border:1px solid {{ d.bd }};display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:600;font-variant-numeric:tabular-nums">{{ d.v }}</span></sc-for></div></div>
+      <div style="display:flex;flex-direction:column;gap:10px"><span style="font-size:12px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B;padding-bottom:4px">Selección</span>
+        <span style="min-height:64px;box-sizing:border-box;display:flex;align-items:center;gap:14px;padding:12px 16px;border-radius:16px;background:#151517;border:2px solid #DC2626"><span style="width:22px;height:22px;box-sizing:border-box;border-radius:999px;border:2px solid #DC2626;display:flex;align-items:center;justify-content:center"><span style="width:10px;height:10px;border-radius:999px;background:#DC2626"></span></span><span style="font-size:16px;font-weight:600">A domicilio</span></span>
+        <span style="display:flex;gap:20px;align-items:center"><span role="switch" aria-checked="true" style="width:52px;height:32px;box-sizing:border-box;border-radius:999px;background:#DC2626;position:relative"><span style="position:absolute;top:4px;left:24px;width:24px;height:24px;border-radius:999px;background:#FFFFFF"></span></span><span role="switch" aria-checked="false" style="width:52px;height:32px;box-sizing:border-box;border-radius:999px;background:#1C1C1F;border:1px solid #3F3F46;position:relative"><span style="position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:999px;background:#FFFFFF"></span></span><span style="width:22px;height:22px;border-radius:6px;background:#DC2626;display:flex;align-items:center;justify-content:center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 9.5 17 19 7.5"></path></svg></span></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- chips -->
+  <div style="display:flex;flex-direction:column;gap:20px">
+    <div style="display:flex;align-items:baseline;justify-content:space-between;gap:16px;border-bottom:1px solid #3F3F46;padding-bottom:12px"><h2 style="margin:0;font-family:Fraunces,serif;font-size:32px;line-height:38px;font-weight:460">Chips, segmentado, insignias y estados</h2><span style="font-size:14px;color:#A8A29B">chips que se tocan: 44 px · insignias que solo informan: 24–28 px</span></div>
+    <div style="display:grid;grid-template-columns:220px minmax(0,1fr);gap:20px 24px;align-items:center">
+      <span style="font-size:15px;font-weight:600">Filtro<br><span style="font-size:13px;font-weight:400;color:#A8A29B">catálogo, menú, recetario</span></span>
+      <div style="display:flex;gap:8px;flex-wrap:wrap"><sc-for list="{{ chips }}" as="c" hint-placeholder-count="5"><span style="min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;background:{{ c.bg }};border:1px solid {{ c.bd }};color:{{ c.fg }};font-size:15px;font-weight:{{ c.w }}">{{ c.n }}</span></sc-for></div>
+      <span style="font-size:15px;font-weight:600">Segmentado<br><span style="font-size:13px;font-weight:400;color:#A8A29B">modo de venta, periodo</span></span>
+      <div style="width:420px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;padding:4px;border-radius:999px;background:#151517;border:1px solid #3F3F46"><span style="height:44px;display:flex;align-items:center;justify-content:center;border-radius:999px;background:#DC2626;color:#FFFFFF;font-size:15px;font-weight:600">Por peso</span><span style="height:44px;display:flex;align-items:center;justify-content:center;border-radius:999px;color:#A8A29B;font-size:15px">Por precio</span><span style="height:44px;display:flex;align-items:center;justify-content:center;border-radius:999px;color:#A8A29B;font-size:15px">Por pieza</span></div>
+      <span style="font-size:15px;font-weight:600">Insignias<br><span style="font-size:13px;font-weight:400;color:#A8A29B">dorado solo aquí</span></span>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center"><span style="font-size:12px;line-height:16px;font-weight:600;color:#0B0B0C;background:#F59E0B;border-radius:999px;padding:4px 10px">Oferta</span><span style="font-size:12px;line-height:16px;font-weight:600;color:#0B0B0C;background:#F59E0B;border-radius:999px;padding:4px 10px">Asador</span><span style="font-size:12px;line-height:16px;font-weight:600;color:#0B0B0C;background:#F59E0B;border-radius:999px;padding:4px 10px">falta backend</span><span style="display:flex;gap:2px"><sc-for list="{{ estrellas }}" as="e" hint-placeholder-count="5"><svg width="18" height="18" viewBox="0 0 24 24"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z" fill="{{ e }}"></path></svg></sc-for></span><span style="font-size:12px;line-height:16px;font-weight:500;color:#F5F3EF;background:#1C1C1F;border:1px solid #3F3F46;border-radius:999px;padding:4px 10px">12 en stock</span><span style="font-size:12px;font-weight:600;color:#E4D1B0;border:1px solid #E4D1B0;border-radius:999px;padding:3px 10px">Opcional</span></div>
+      <span style="font-size:15px;font-weight:600">Estado del pedido<br><span style="font-size:13px;font-weight:400;color:#A8A29B">punto de color, texto claro</span></span>
+      <div style="display:flex;gap:10px;flex-wrap:wrap"><sc-for list="{{ estados }}" as="s" hint-placeholder-count="6"><span style="display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 12px;border-radius:999px;background:#1C1C1F;border:1px solid #3F3F46;font-size:13px;font-weight:600"><span style="width:8px;height:8px;border-radius:999px;background:{{ s.c }}"></span>{{ s.t }}</span></sc-for></div>
+      <span style="font-size:15px;font-weight:600">Mensajes<br><span style="font-size:13px;font-weight:400;color:#A8A29B">color en borde e ícono</span></span>
+      <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px"><sc-for list="{{ mensajes }}" as="x" hint-placeholder-count="3"><div style="display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:14px;background:#151517;border:1px solid {{ x.c }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="{{ x.c }}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:0 0 18px;margin-top:2px"><path d="{{ x.p }}"></path></svg><span style="font-size:14px;line-height:20px">{{ x.t }}</span></div></sc-for></div>
+    </div>
+  </div>
+
+  <!-- correcciones -->
+  <div style="display:flex;flex-direction:column;gap:16px">
+    <h2 style="margin:0;font-family:Fraunces,serif;font-size:32px;line-height:38px;font-weight:460">Lo que no coincidía y cómo quedó</h2>
+    <div style="background:#151517;border:1px solid #3F3F46;border-radius:12px;overflow:hidden">
+      <div style="display:grid;grid-template-columns:220px minmax(0,1fr) minmax(0,1fr) 110px;font-size:12px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B;border-bottom:1px solid #3F3F46"><span style="padding:12px 16px">Pieza</span><span style="padding:12px 16px">Diferencia encontrada</span><span style="padding:12px 16px">Corrección</span><span style="padding:12px 16px">Estado</span></div>
+      <sc-for list="{{ correcciones }}" as="c" hint-placeholder-count="5">
+        <div style="display:grid;grid-template-columns:220px minmax(0,1fr) minmax(0,1fr) 110px;font-size:14px;line-height:20px;border-bottom:1px solid #3F3F46"><span style="padding:14px 16px;font-weight:600">{{ c.p }}</span><span style="padding:14px 16px;color:#A8A29B">{{ c.d }}</span><span style="padding:14px 16px">{{ c.x }}</span><span style="padding:14px 16px;color:{{ c.c }};font-weight:600">{{ c.e }}</span></div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div id="reporte-final" data-screen-label="Reporte final" style="box-sizing:border-box;background:#151517;border:1px solid #3F3F46;border-radius:16px;padding:40px;display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:48px">
+    <div style="display:flex;flex-direction:column;gap:20px">
+      <span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#E4D1B0">Reporte final</span>
+      <span style="font-family:Fraunces,serif;font-size:40px;line-height:46px;font-weight:480">42 pantallas en 11 páginas</span>
+      <div style="display:flex;flex-direction:column">
+        <sc-for list="{{ bloques }}" as="b" hint-placeholder-count="11"><span style="display:grid;grid-template-columns:40px minmax(0,1fr) 140px;gap:12px;padding:12px 0;border-bottom:1px solid #3F3F46;font-size:15px;line-height:22px"><span style="color:#A8A29B;font-variant-numeric:tabular-nums">{{ b.n }}</span><a href="{{ b.f }}" style="color:#F5F3EF;text-decoration:underline;text-decoration-color:#E4D1B0;text-underline-offset:4px">{{ b.t }}</a><span style="color:#A8A29B;font-variant-numeric:tabular-nums;text-align:right">{{ b.p }}</span></span></sc-for>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#A8A29B">Pendientes que siguen abiertos</span>
+      <sc-for list="{{ pendientes }}" as="x" hint-placeholder-count="6"><span style="font-size:15px;line-height:22px;text-wrap:pretty;border-bottom:1px solid #3F3F46;padding-bottom:12px">{{ x }}</span></sc-for>
+    </div>
+  </div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const IMG = 'public/img/products/';
+const chip = (n, on) => ({ n, bg: on ? '#DC2626' : '#151517', bd: on ? '#DC2626' : '#3F3F46', fg: on ? '#FFFFFF' : '#F5F3EF', w: on ? 600 : 400 });
+const tam = [{ h: '52px', fs: '16px' }, { h: '48px', fs: '15px' }, { h: '44px', fs: '14px' }];
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      tarjetas: [
+        { v: 'normal', f: IMG + 'rib-eye-alto.webp', cat: 'Cortes especiales', n: 'Rib Eye', d: 'El más jaspeado del lomo alto', precio: '$579', u: 'kg', s: '12 en stock', nota: 'Normal · carne: $ / kg con la libra debajo' },
+        { v: 'agotado', f: IMG + 'res-alto.webp', cat: 'Carnes rojas', n: 'Chambarete con Tuétano', d: 'Con hueso, la base del caldo', precio: '$189', u: 'kg', s: null, nota: 'Sin existencias · foto desaturada, botón apagado' },
+        { v: 'oferta', f: IMG + 'premium.webp', cat: 'Ofertas', n: 'Paquete Asador 4 a 6 Personas', d: 'Arrachera, chorizo, cebolla y carbón', precio: '$1,599', u: 'paquete', s: '12 en stock', nota: 'En oferta · paquete: $ / paquete' },
+        { v: 'normal', f: IMG + 'merch.webp', cat: 'Merch', n: 'Gorra Bordada', d: 'Logo bordado, ajustable', precio: '$250', u: 'pieza', s: '20 en stock', nota: 'Normal · merch: $ / pieza' }
+      ],
+      chicas: [
+        { b: true, f: IMG + 'flak_steak.webp', cat: 'Cortes especiales', n: 'Flank Steak', precio: '$399', u: 'kg' },
+        { b: false, f: IMG + 'skirt_steak.webp', cat: 'Especiales', n: 'Arrachera', precio: '$449', u: 'kg' },
+        { b: true, f: IMG + 'premium-alto.webp', cat: 'Ofertas', n: 'Parrillada Familiar', precio: '$3,249', u: 'paquete' }
+      ],
+      botones: [
+        { t: 'Principal', uso: 'Agregar, Pagar, Guardar', label: 'Agregar', bg: '#DC2626', bd: 'none', fg: '#FFFFFF', dis: false, cur: 'pointer', tam },
+        { t: 'Alternativa', uso: 'Ver ofertas, Cancelar, Descartar', label: 'Ver ofertas', bg: 'transparent', bd: '1px solid #E4D1B0', fg: '#F5F3EF', dis: false, cur: 'pointer', tam },
+        { t: 'Discreto', uso: 'Detener el giro, Más acciones', label: 'Detener el giro', bg: 'transparent', bd: '1px solid #3F3F46', fg: '#F5F3EF', dis: false, cur: 'pointer', tam },
+        { t: 'Apagado', uso: 'Sin stock, tope alcanzado', label: 'Sin stock', bg: '#1C1C1F', bd: '1px solid #3F3F46', fg: '#A8A29B', dis: true, cur: 'not-allowed', tam }
+      ],
+      campos: [
+        { estado: 'Normal', l: 'Correo electrónico', v: 'nombre@correo.com', fg: '#A8A29B', bd: '#3F3F46', ol: 'none', msg: null },
+        { estado: 'Foco', l: 'Contraseña', v: '••••••••', fg: '#F5F3EF', bd: '#DC2626', ol: '2px solid #DC2626', msg: null },
+        { estado: 'Error', l: 'Precio por kilo', v: '$44.9', fg: '#F5F3EF', bd: '#DC2626', ol: 'none', msg: 'Escribe el precio completo, por ejemplo 449.00.', ic: '#DC2626', path: 'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18ZM12 7.5v5.5M12 16.5h.01' },
+        { estado: 'Bien', l: 'Código promocional', v: 'VECINOS50', fg: '#F5F3EF', bd: '#059669', ol: 'none', msg: 'Listo: −$50.00 en este pedido.', ic: '#059669', path: 'M5 12.5 9.5 17 19 7.5' }
+      ],
+      codigo: ['4', '8', '1', '0', '6', ''].map((v, i) => ({ v, bd: i === 5 ? '#DC2626' : '#3F3F46' })),
+      chips: [chip('Carnes rojas', true), chip('Cortes especiales', false), chip('Cerdo', false), chip('Pollo', false), chip('Merch', false)],
+      estrellas: ['#F59E0B', '#F59E0B', '#F59E0B', '#F59E0B', '#3F3F46'],
+      estados: [['Pendiente', '#A8A29B'], ['Confirmado', '#E4D1B0'], ['Preparando', '#DC2626'], ['Listo', '#F5F3EF'], ['Entregado', '#059669'], ['Cancelado', '#52525B']].map(([t, c]) => ({ t, c })),
+      mensajes: [
+        { t: 'Guardaste “Arrachera”.', c: '#059669', p: 'M5 12.5 9.5 17 19 7.5' },
+        { t: 'Tomahawk: quedan 3 piezas.', c: '#E4D1B0', p: 'M12 9v4M12 16.5h.01M10.3 4.2 2.8 17.5A2 2 0 0 0 4.5 20.5h15a2 2 0 0 0 1.7-3L13.7 4.2a2 2 0 0 0-3.4 0Z' },
+        { t: 'No se pudo guardar. Intenta de nuevo.', c: '#DC2626', p: 'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18ZM12 7.5v5.5M12 16.5h.01' }
+      ],
+      correcciones: [
+        { p: 'Chips de Componentes', d: 'La primera pasada (G0 y el encabezado G3) usaba chips de 32 px, texto de 13 px y gris; el resto de la web, 44 px y 15 px en tinta clara.', x: 'Los 19 chips viejos pasan a 44 px, 15 px y tinta clara; el activo a rojo lleno con peso 600.', e: 'Corregido', c: '#059669' },
+        { p: 'Campo de búsqueda vs. formulario', d: 'Parecía que había dos campos distintos (píldora y radio 14).', x: 'Se deja como regla: píldora solo para buscar; todo lo que se llena, radio 14. Documentado arriba.', e: 'Regla', c: '#059669' },
+        { p: 'Tres alturas de botón', d: '52, 48 y 44 aparecían mezclados sin criterio aparente.', x: 'Regla: 52 en formularios y pago, 48 en escritorio y secundarios, 44 dentro de tarjetas y renglones. Revisado en las 11 páginas.', e: 'Regla', c: '#059669' },
+        { p: 'Estado “Cancelado”', d: 'Compartía el gris #A8A29B con “Pendiente”; solo la X los distinguía.', x: 'Regla: Pendiente lleva punto gris claro; Cancelado, punto #52525B o X, y siempre fuera del flujo.', e: 'Regla', c: '#059669' },
+        { p: 'Buscador G1 de la primera pasada', d: 'Tenía lupa dentro del campo y tendencias en chips; el brief final pide campo sin ícono y tendencias como enlaces.', x: 'Queda reemplazado por la pantalla 03 de Componentes; el viejo se conserva abajo solo como historial.', e: 'Reemplazado', c: '#E4D1B0' }
+      ],
+      bloques: [
+        { n: '1', t: 'Componentes', f: 'Componentes.dc.html', p: '01–06' },
+        { n: '2', t: 'Landing', f: 'Landing.dc.html', p: '07' },
+        { n: '3', t: 'Catálogo y ficha', f: 'Catálogo y ficha.dc.html', p: '08–09' },
+        { n: '4', t: 'Inicio de sesión del cliente', f: 'Inicio de sesión del cliente.dc.html', p: '10–16' },
+        { n: '5', t: 'Compra', f: 'Compra.dc.html', p: '17–19' },
+        { n: '6', t: 'Panel administrativo', f: 'Panel administrativo.dc.html', p: '20–21' },
+        { n: '7', t: 'Productos, clientes y ajustes', f: 'Productos, clientes y ajustes.dc.html', p: '22–27' },
+        { n: '8', t: 'Inventario Django', f: 'Inventario Django.dc.html', p: '28–33' },
+        { n: '9', t: 'Perfil del cliente', f: 'Perfil del cliente.dc.html', p: '34–41' },
+        { n: '10', t: 'BuildAds y ProductAds', f: 'BuildAds y ProductAds.dc.html', p: '42' },
+        { n: '11', t: 'Cierre', f: 'Cierre.dc.html', p: 'esta lámina' }
+      ],
+      pendientes: [
+        'Falta backend: pago con tarjeta, folio corto, niveles, afiliados, recetario, calorías y proteína, anuncios.',
+        'Falta material: video de la portada (.mp4), foto real de rib eye (la del repo es un T-bone), foto del mostrador para Nosotros, fotos de platillos.',
+        'Confirmar con el dueño: cómo se cobra el peso real, pago en mostrador, correo oficial.',
+        'Supabase manda enlace mágico, no código de 6 dígitos: hay que cambiarlo para el flujo de recuperar contraseña.',
+        'Arrastrar en el tablero necesita librería accesible con alternativa de teclado.'
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>
