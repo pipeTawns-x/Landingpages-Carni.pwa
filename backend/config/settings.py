@@ -14,6 +14,8 @@ from pathlib import Path
 from django.core.exceptions import ImproperlyConfigured
 from dotenv import load_dotenv
 
+from .env import parse_http_url, parse_origin, parse_origins, parse_positive_int
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -55,6 +57,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "inventory.apps.InventoryConfig",
+    "panel.apps.PanelConfig",
     # EBAC M14 practice: course-only, not part of the store (see ecommerce/README.md).
     "ecommerce.apps.EcommerceConfig",
 ]
@@ -151,6 +154,61 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 # The course uses the built-in admin login page as the app's login page, so
 # @login_required redirects there instead of a dedicated login view.
 LOGIN_URL = "/admin/login/"
+
+
+# Panel session handoff (Supabase -> Django)
+# See docs/CONTRATO_PANEL_DJANGO.md, sections 5b and 6.
+#
+# The store signs an admin in with Supabase Auth and posts the access token to
+# /panel/sesion/. Django opens its own session only after it has checked the
+# token's signature, expiry, audience and issuer, and the role in profiles.
+
+# The Supabase project that issues the tokens. `<SUPABASE_URL>/auth/v1` is the
+# issuer a token must carry.
+SUPABASE_URL = parse_http_url(require_env("SUPABASE_URL"), "SUPABASE_URL").rstrip("/")
+
+# How the signature is checked. Production signs with asymmetric keys that the
+# project publishes (JWKS); the local Supabase signs with a shared secret
+# (HS256). Exactly one mode is used: the JWKS URL when it is set, otherwise the
+# secret. The token never chooses the mode, so a token signed with the other
+# kind of key is refused instead of being checked against the wrong one.
+SUPABASE_JWKS_URL = os.environ.get("SUPABASE_JWKS_URL", "").strip()
+SUPABASE_JWT_SECRET = os.environ.get("SUPABASE_JWT_SECRET", "").strip()
+if SUPABASE_JWKS_URL:
+    parse_http_url(SUPABASE_JWKS_URL, "SUPABASE_JWKS_URL")
+elif not SUPABASE_JWT_SECRET:
+    raise ImproperlyConfigured(
+        "Neither SUPABASE_JWKS_URL nor SUPABASE_JWT_SECRET is set. Add one to backend/.env "
+        "(see the comments in that file): the first for a project that signs with "
+        "asymmetric keys, the second for the local Supabase."
+    )
+
+# Where the store lives, and which origins may post a token to the panel. They
+# are separate on purpose: the second list is a security allow-list.
+STORE_ORIGIN = parse_origin(require_env("STORE_ORIGIN"), "STORE_ORIGIN")
+STORE_LOGIN_URL = f"{STORE_ORIGIN}/accessweb.html"
+PANEL_ALLOWED_ORIGINS = parse_origins(require_env("PANEL_ALLOWED_ORIGINS"), "PANEL_ALLOWED_ORIGINS")
+
+# The oldest a token may be (counted from its `iat`) when it is handed over.
+PANEL_TOKEN_MAX_AGE_SECONDS = parse_positive_int(
+    require_env("PANEL_TOKEN_MAX_AGE_SECONDS"), "PANEL_TOKEN_MAX_AGE_SECONDS"
+)
+
+# The panel logs why it refused a handoff (never the token) so the reason can
+# be found on the server while the browser only gets a generic refusal.
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "plain": {"format": "%(levelname)s %(name)s: %(message)s"},
+    },
+    "handlers": {
+        "console": {"class": "logging.StreamHandler", "formatter": "plain"},
+    },
+    "loggers": {
+        "panel": {"handlers": ["console"], "level": "INFO"},
+    },
+}
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
