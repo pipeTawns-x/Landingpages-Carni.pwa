@@ -38,11 +38,17 @@ Entregar el REDISEÑO DE TODO EL PROYECTO hecho en Claude Design. Se mejoran EN 
 1. **Engram.** Busca en los dos proyectos, `carni-mvp` y `Landingpages-Carni.pwa`.
    - `mem_search` NO encuentra por `topic_key`. Busca con palabras del título: "Admin panel served by Django", "Panel contract", "contrato panel Django", "frontend backend gaps".
    - Para claves exactas: `sqlite3 -readonly ~/.engram/engram.db "SELECT id, project, title FROM observations WHERE topic_key LIKE 'panel-django/%' OR topic_key LIKE 'revision/%';"`
-2. **Verifica en el repo lo que recuerdes** y repórtalo así: "recordaba X; verifiqué Y". Nunca digas "no existe" sin buscar en Engram y en git.
-3. **Documentos del backend:** `origin/practicas-ebac:docs/` → `CONTRATO_PANEL_DJANGO.md` (rutas, dueños, sincronización y seguridad del traspaso en §5b), `DECISION_PANEL_DJANGO_2026-10-06.md`, `PANEL_DJANGO_ESTADO.md`.
-4. **Diseño:** ya está en tu rama, en `docs/design/claude-design-1.1/`: 16 pantallas `.dc.html`, `LEEME.md` y `github.md`. Es idéntico a `Caarni1.zip`.
-5. **M14:** EXISTE en `origin/practicas-ebac`. Está en `backend/ecommerce/` y en la paginación de `inventory` (commits `4ed789e4` y `2e222757`). `HANDOFF-BACKEND.md` §8 y la nota #652 están desactualizados.
-6. **Tu MAPA, ESTADO y `gates.sh`:**
+2. **Contexto del otro agente, antes de CADA paso.** Revisa lo último que hizo el backend antes de escribir:
+   - `sqlite3 -readonly ~/.engram/engram.db "SELECT id, project, title FROM observations WHERE topic_key LIKE 'panel-django/%' OR topic_key LIKE 'contrato/%' OR topic_key LIKE 'revision/backend-a-frontend/%' ORDER BY id DESC LIMIT 15;"`
+   - `git -C ~/Desktop/Carni-mvp fetch origin` y `git -C ~/Desktop/Carni-mvp show origin/practicas-ebac:docs/PANEL_DJANGO_ESTADO.md`.
+   - Si el backend cambió el contrato o pidió una página, ajusta el paso antes de tocar código.
+3. **Verifica en el repo lo que recuerdes** y repórtalo así: "recordaba X; verifiqué Y". Nunca digas "no existe" sin buscar en Engram y en git.
+4. **Documentos del backend:** `origin/practicas-ebac:docs/` → `CONTRATO_PANEL_DJANGO.md` (rutas, dueños, sincronización y seguridad del traspaso en §5b), `DECISION_PANEL_DJANGO_2026-10-06.md`, `PANEL_DJANGO_ESTADO.md`.
+5. **Diseño:** ya está en tu rama, en `docs/design/claude-design-1.1/`: 16 pantallas `.dc.html`, `LEEME.md` y `github.md`. Es idéntico a `Caarni1.zip`.
+6. **M14:** el código EXISTE en `origin/practicas-ebac`, en `backend/ecommerce/` y en la paginación de `inventory` (commits `4ed789e4` y `2e222757`).
+   - **La M14 NO está entregada en el LMS.** Se entrega cuando Django sirva el panel rediseñado (B5 del backend), con capturas de ese panel.
+   - `HANDOFF-BACKEND.md` §8 (commit `69b2f231`), la nota #652 y tu nota que dice "M14 entregada 30-sep" están mal: corrígelos en F0.
+7. **Tu MAPA, ESTADO y `gates.sh`:**
    - MAPA §4.2–4.5 y ESTADO #12 / 06-plano §5.4 ("panel en React, Django aparte") quedan SUPERADOS.
    - El trabajo sin commitear de tu árbol (Lupa/Hoja, `jest.config.js`, `supabase.ts`, `products.tsx`, `busquedaSlice`, `Carcasa`, `Encabezado`) se termina como su propio slice o se anota en ESTADO.
 
@@ -51,7 +57,10 @@ Entregar el REDISEÑO DE TODO EL PROYECTO hecho en Claude Design. Se mejoran EN 
 - Un archivo por commit, con commit convencional bilingüe ("tipo(ámbito): English / español") y sin atribución a IA. `git add` con rutas exactas.
 - **GGA solo revisa `*.ts`, `*.tsx`, `*.js`, `*.jsx` y `*.py`.**
   - Los commits de HTML, CSS y documentos no lo activan.
-  - Para TS/JS hay una decisión pendiente de Eduardo (la enmienda de `AGENTS.md` y el proveedor de GGA). No uses `--no-verify` por tu cuenta: si GGA bloquea, escribe BLOQUEADO y sigue con los pasos de HTML/CSS.
+  - Eduardo ya decidió dos cosas, y las dos van en F0:
+    - **La enmienda de `AGENTS.md`** (Tailwind v4 en las páginas migradas y en el panel). Copia el texto idéntico desde `git show origin/practicas-ebac:AGENTS.md`: es la viñeta que sigue a "Ningun otro directorio contiene SCSS" y la línea de Tailwind en "Contexto Visual y Producto".
+    - **GGA gratis.** Tu `.gga` lleva `PROVIDER="opencode:opencode/mimo-v2.6-flash-free"` y `export OPENCODE_CONFIG_CONTENT='{"snapshot":false}'`. Cópialos desde `git show origin/practicas-ebac:.gga`. Sin esa segunda línea, el snapshot de OpenCode mete y saca archivos del commit que GGA está revisando.
+  - Nunca `--no-verify`. Si GGA responde ambiguo (sin la línea `STATUS:`), reintenta el commit una vez. Si vuelve a pasar, escribe BLOQUEADO y sigue con los pasos de HTML/CSS.
 - npm solo en Docker. Nada de CDN, ni `innerHTML` con datos. Solo tokens del `@theme`.
 - Conserva del primer diseño lo que Eduardo pidió mantener (por ejemplo, el encabezado). Anota cada excepción frente a Claude Design en ESTADO.
 - Datos de ejemplo reales: 53 productos y 9 categorías.
@@ -61,6 +70,16 @@ Entregar el REDISEÑO DE TODO EL PROYECTO hecho en Claude Design. Se mejoran EN 
 - Rutas: SOLO las de la tabla de la §10 (es la misma del contrato).
 - `VITE_PANEL_URL` se suma a la lista permitida de G6 en `gates.sh`, en el mismo commit que la introduce.
 - El traspaso de sesión cumple la §5b del contrato y pasa revisión de seguridad antes de F4.
+- **Variables de entorno:** no crees ningún archivo de entorno nuevo.
+  - Las del proyecto viven en el `.env` de la raíz y en `backend/.env`, los dos en `.gitignore`, ordenados por secciones.
+  - Las llaves de proveedores de IA viven en `~/.omniroute/.env`, fuera del repo. Nunca las copies al proyecto.
+- **Cada instrucción de Eduardo va a Engram en el momento**, con un título buscable ("Eduardo: …"). El grafo de graphify se actualiza solo en cada commit (hook).
+- **Modelos:** OpenCode ya tiene un modelo por fase en `~/.config/opencode/opencode.json`:
+  - pensar (propose, design, verify): `nemotron-3-ultra-free`;
+  - código (orquestador, spec, tasks, apply): `big-pickle`;
+  - leer mucho (explore): `gemini-3.5-flash-lite`;
+  - lo liviano: `mimo-v2.6-flash-free`.
+  - Groq no sirve para agentes: su tier gratis acepta 8000 tokens por minuto y un pedido de OpenCode ya supera eso.
 
 ## 4. Equipo (subagentes; un escritor por archivo; tú eres el único que commitea)
 
@@ -81,6 +100,10 @@ Entregar el REDISEÑO DE TODO EL PROYECTO hecho en Claude Design. Se mejoran EN 
 ## 5. Pasos (cada uno: gates → revisión → commit → push → línea en ESTADO → nota en Engram con el sha)
 
 - **F0.**
+  - Revisa el contexto del backend (§2.2).
+  - Aplica en `pruebas` la enmienda de `AGENTS.md` y el `.gga` copiados de `origin/practicas-ebac` (§3). Va un archivo por commit.
+  - Corrige `HANDOFF-BACKEND.md` §8 y tu nota de Engram: la M14 NO está entregada.
+  - Termina tu trabajo sin commitear como su propio slice, o anótalo en ESTADO.
   - Anota la decisión en MAPA y ESTADO.
   - Copia este loop a `docs/design/rediseno/LOOP-REDISENO-TOTAL.md`.
   - Crea la tabla de COBERTURA (§9).
@@ -126,6 +149,7 @@ Entregar el REDISEÑO DE TODO EL PROYECTO hecho en Claude Design. Se mejoran EN 
 
 ## 8. Guardar y retomar · coordinación
 
+- Antes de cada paso, revisa el contexto del backend (§2.2). Al terminarlo, deja el tuyo en Engram para que el backend lo lea.
 - Una línea por paso en ESTADO y una nota en Engram, con títulos buscables, por ejemplo "Rediseño: entrega de admin-products".
 - El backend pide páginas en `contrato/pedido/<pagina>`. Tú entregas en `frontend/entrega/<pagina>` con el sha empujado.
 - Los avances del backend están en `git show origin/practicas-ebac:docs/PANEL_DJANGO_ESTADO.md`.
@@ -181,4 +205,4 @@ Por cada pantalla: pantalla → archivo → estado → sha → captura 390/1440.
 
 ## 12. Mensaje de arranque
 
-No preguntes nada que no sea una decisión de Eduardo. Si algo bloquea, escribe BLOQUEADO en ESTADO y sigue con el siguiente paso independiente. Empieza por F0.
+No preguntes nada que no sea una decisión de Eduardo. Si algo bloquea, escribe BLOQUEADO en ESTADO y sigue con el siguiente paso independiente. No pares hasta que la COBERTURA (§9) diga HECHO en todo. Empieza por F0.
