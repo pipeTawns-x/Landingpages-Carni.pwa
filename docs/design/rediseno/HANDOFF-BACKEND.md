@@ -73,8 +73,15 @@ El frente migra el sitio actual a React + Tailwind v4 **dentro de las mismas pá
 - Engram: guarda con el proyecto **`carni-mvp` en minúsculas**. Guardar como `Carni-mvp` lo manda a otro cajón (OpenCode lo hizo y nadie lo encontró). Claves útiles: `handoff/chat-backend-desde-frontend`, `rediseno-mvp/progreso`.
 - `npm`/`node` solo dentro de Docker (`docker exec carni-landing-dev …`, puerto 3002). Python con `uv`.
 
-## 8 · Estado del frente de backend al 2026-09-30 (lo que dicen los informes)
+## 8 · Estado del frente de backend (corregido el 2026-10-07, verificado en `origin/practicas-ebac`)
 
-- Último trabajo cerrado: práctica M13 (CRUD de inventario en Django), entregada el 2026-09-21 (commit `24725c6d`, PR #10 a #12).
-- OpenCode iba en M14 (`seed_demo_products`: 500 productos con `bulk_create` más una fixture); sus subagentes fallaban por cuota del modelo y **no había nada implementado** (`backend/inventory/management/` no existía). Antes de seguir, confirmar que `backend/.env` apunta a Supabase **local** (el rol `django` tiene CRUD completo sobre productos).
+**Corrección:** la versión anterior de esta sección decía que la M14 no existía. Era falso: yo había leído la rama local, que va atrasada, sin hacer `git fetch origin`. Se lee siempre con `git -C ~/Desktop/Carni-mvp fetch origin` y `git show origin/practicas-ebac:<ruta>`.
+
+- **M13** (CRUD de inventario en Django): entregada el 2026-09-21 (`24725c6d`, PR #10 a #12).
+- **M14** (modelos y admin con 500 productos): **existe y está entregada** el 2026-09-30.
+  - `2e222757`: `backend/ecommerce/` con `models.py`, `admin.py`, la migración `0001_initial.py`, el comando `create_test_products.py` y `fixtures/products/500Products.json`.
+  - `4ed789e4`: paginación del listado de `inventory` y pruebas sobre SQLite.
+  - `6954d2ff`: documento de entrega, capturas y mensaje para el LMS.
+  - El README de `backend/` indica que `POSTGRES_*` debe apuntar a la instancia **local** de Supabase (puerto 54322).
+- **Documentos del panel servido por Django** (decisión de Eduardo del 2026-10-06), todos en `origin/practicas-ebac:docs/`: `CONTRATO_PANEL_DJANGO.md`, `DECISION_PANEL_DJANGO_2026-10-06.md`, `PANEL_DJANGO_ESTADO.md` y `LOOP_REDISENO_TOTAL.md`. **Este traspaso queda superado donde choque con ellos**, sobre todo en el panel: ya no es un shell React aparte, el HTML lo sirve Django.
 - Pregunta abierta para Eduardo: dónde se alojará Django y cuándo pasa el backend a `main`.
