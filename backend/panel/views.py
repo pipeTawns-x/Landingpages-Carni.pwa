@@ -1,8 +1,9 @@
-"""Views of the panel shell: the Supabase handoff, the access bridge and the landing page."""
+"""Views of the panel shell: the Supabase handoff, the way out, the bridge and the landing page."""
 
 import logging
 
 from django.conf import settings
+from django.contrib.auth import logout
 from django.http import HttpResponseForbidden
 from django.shortcuts import redirect
 from django.views.decorators.cache import never_cache
@@ -12,6 +13,7 @@ from django.views.decorators.http import require_POST, require_safe
 
 from panel import supabase_auth
 from panel.access import (
+    PANEL_SESSION_KEY,
     get_or_create_panel_user,
     is_panel_admin,
     open_panel_session,
@@ -78,6 +80,23 @@ def sesion(request):
     open_panel_session(request, user)
     logger.info("Panel session opened for Supabase user %s.", verified.user_id)
     return redirect("panel:inicio")
+
+
+# Not behind `panel_admin_required` on purpose: whoever has a session has to be
+# able to end it, including an admin whose role was just taken away. A POST with
+# Django's CSRF check, so another site cannot sign anyone out.
+@require_POST
+def salir(request):
+    """End the session and send the person to the store login.
+
+    This closes the Django session only. The Supabase one lives in the store's
+    browser storage, so the store has to sign out of Supabase as well.
+    """
+    supabase_user_id = request.session.get(PANEL_SESSION_KEY)
+    logout(request)
+    if supabase_user_id:
+        logger.info("Panel session closed for Supabase user %s.", supabase_user_id)
+    return redirect(settings.STORE_LOGIN_URL)
 
 
 @require_safe

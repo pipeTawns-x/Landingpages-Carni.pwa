@@ -22,6 +22,11 @@ os.environ["SUPABASE_JWT_SECRET"] = secrets.token_urlsafe(48)
 os.environ["STORE_ORIGIN"] = "http://store.test"
 os.environ["PANEL_ALLOWED_ORIGINS"] = "http://store.test"
 os.environ["PANEL_TOKEN_MAX_AGE_SECONDS"] = "300"
+# The cookie flags too: the test client speaks plain http, and the expected
+# values must not depend on whether DJANGO_DEBUG is on in backend/.env.
+os.environ["DJANGO_COOKIE_SECURE"] = "False"
+os.environ["DJANGO_COOKIE_HTTPONLY"] = "True"
+os.environ["DJANGO_COOKIE_SAMESITE"] = "Lax"
 
 from .settings import *  # noqa: E402, F403
 

@@ -46,10 +46,14 @@ uv run python -c "from django.core.management.utils import get_random_secret_key
 | `STORE_ORIGIN` | Origin of the store (`http://localhost:3002` locally). The panel sends people there to sign in and after signing out. Required. |
 | `PANEL_ALLOWED_ORIGINS` | Comma-separated origins that may post a token to `/panel/sesion/` (`http://localhost:3002` locally). Required. |
 | `PANEL_TOKEN_MAX_AGE_SECONDS` | The oldest a token may be, counted from when Supabase issued it, when it is handed over (`300` is five minutes). Required. |
+| `DJANGO_COOKIE_SECURE` | `True`/`False`. Marks the session and CSRF cookies `Secure`. Optional: on whenever `DJANGO_DEBUG` is off. |
+| `DJANGO_COOKIE_HTTPONLY` | `True`/`False`. Hides the session cookie from JavaScript. Optional: `True`. |
+| `DJANGO_COOKIE_SAMESITE` | `Lax` or `None` (which needs `Secure`). Optional: `Lax`. `Strict` is refused because it would break the panel handoff. |
 
-Django refuses to start when a required variable is missing, naming it. The
-test settings supply their own values for the `SUPABASE_*`, `STORE_ORIGIN` and
-`PANEL_*` variables, so the tests never depend on what `backend/.env` holds.
+Django refuses to start when a required variable is missing or has a value it
+cannot use, naming it. The test settings supply their own values for the
+`SUPABASE_*`, `STORE_ORIGIN`, `PANEL_*` and `DJANGO_COOKIE_*` variables, so the
+tests never depend on what `backend/.env` holds.
 
 ## Common commands
 
@@ -139,6 +143,7 @@ to Supabase at the store and the store hands the session over (see
 | --- | --- | --- |
 | `POST /panel/sesion/` | `panel:sesion` | Takes the Supabase access token from the body, checks it and opens a Django session. |
 | `GET /panel/acceso/` | `panel:acceso` | Where anonymous visitors land: sends them to the store login. |
+| `POST /panel/salir/` | `panel:salir` | Ends the session and sends the person to the store login. Works for any session, behind Django's CSRF check. |
 | `GET /panel/` | `panel:inicio` | Landing page, admins only. Until the dashboard exists it forwards to the products. |
 
 `/panel/sesion/` checks the following, in this order. Whatever fails, the
@@ -167,13 +172,30 @@ Behaviour worth knowing before touching it:
 - `panel/access.py` marks the session the handoff opens, and
   `panel_admin_required` only lets a session with that mark in. A Django user
   made some other way (`createsuperuser`, the admin site) is not a panel admin.
+  The decorator also reads `profiles.role` on every request, so demoting an
+  admin in Supabase ends their panel access on the next click, and it closes
+  that session instead of leaving it open. A test fails when a panel route is
+  neither guarded nor listed as public. The inventory views still use
+  `login_required` (any Django user) until they are mounted under
+  `/panel/productos/`; that move is where they should switch to this decorator.
+- `panel:salir` is the one panel route that is not behind the decorator, so that
+  an admin whose role was just revoked can still sign out. It ends the Django
+  session only: the Supabase one lives in the store's browser storage, so the
+  store has to sign out of Supabase as well.
 - The view is `csrf_exempt` because the form that posts to it lives on the
   store, another origin, which cannot read Django's CSRF token. The origin
   allow-list and the token itself stand in for it.
-- The page that posts must not send `Referrer-Policy: no-referrer` (nor
-  `same-origin`): browsers then send `Origin: null` on a cross-origin form POST
-  and every handoff would be refused. `strict-origin` hides the path and keeps
-  the origin.
+- With `Referrer-Policy: no-referrer` (or `same-origin` for a cross-origin POST)
+  browsers send `Origin: null` on form POSTs. So the store page that posts the
+  token must send `strict-origin`, which hides the path and keeps the origin, or
+  every handoff is refused. The same applies to Django itself: its answers send
+  `Referrer-Policy: same-origin`, not `no-referrer`, because `Origin: null` on
+  the panel's own POSTs fails Django's CSRF check (a null origin is refused) and
+  the logout, the product forms and the admin would stop working.
+- The session cookie is `HttpOnly` and `SameSite=Lax`, lasts eight hours without
+  sliding, and is `Secure` whenever `DJANGO_DEBUG` is off. There is no
+  Content-Security-Policy yet: it arrives with `panel/base.html`, whose scripts
+  and styles decide what it has to allow.
 - `Profile` (`panel/models.py`) is a read-only mirror of `public.profiles`
   with only `id` and `role`, the columns the `django` Postgres role may read
   (`supabase/migrations/20261007042348_grant_django_profiles_select.sql`, which
@@ -203,8 +225,8 @@ the Django secret key and the `POSTGRES_*` variables of `backend/.env` must be
 set even though the tests run on SQLite.
 
 `panel/tests.py` covers the token check (in both key modes), the handoff, the
-access bridge and the guard of the panel views, and `config/tests.py` the
-parsers of the environment variables. The test settings set the panel's
+access bridge, the guard of the panel views, the logout and the cookie flags and
+headers, and `config/tests.py` the parsers of the environment variables. The test settings set the panel's
 configuration themselves, with a signing secret that is random on every run.
 
 `inventory/tests.py` covers `price_per_lb_for()`, the pagination, the staff

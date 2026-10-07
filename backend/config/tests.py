@@ -3,7 +3,14 @@
 from django.core.exceptions import ImproperlyConfigured
 from django.test import SimpleTestCase
 
-from config.env import parse_http_url, parse_origin, parse_origins, parse_positive_int
+from config.env import (
+    parse_bool,
+    parse_http_url,
+    parse_origin,
+    parse_origins,
+    parse_positive_int,
+    parse_samesite,
+)
 
 
 class ParseOriginTests(SimpleTestCase):
@@ -100,3 +107,48 @@ class ParseHttpUrlTests(SimpleTestCase):
         for value in ("", "127.0.0.1:54321", "file:///etc/passwd", "ftp://host", "http://"):
             with self.subTest(value=value), self.assertRaises(ImproperlyConfigured):
                 parse_http_url(value, "X")
+
+
+class ParseBoolTests(SimpleTestCase):
+    def test_the_usual_spellings_of_true_and_false_are_read(self):
+        for raw in ("1", "true", "True", " YES ", "on"):
+            with self.subTest(raw=raw):
+                self.assertIs(parse_bool(raw, "X", default=False), True)
+        for raw in ("0", "false", "False", " NO ", "off"):
+            with self.subTest(raw=raw):
+                self.assertIs(parse_bool(raw, "X", default=True), False)
+
+    def test_an_unset_or_empty_variable_gives_the_default(self):
+        for raw in (None, "", "   "):
+            with self.subTest(raw=raw):
+                self.assertIs(parse_bool(raw, "X", default=True), True)
+                self.assertIs(parse_bool(raw, "X", default=False), False)
+
+    def test_a_typo_fails_instead_of_switching_the_flag_off(self):
+        for raw in ("ture", "2", "enabled"):
+            with self.subTest(raw=raw), self.assertRaisesMessage(ImproperlyConfigured, "X"):
+                parse_bool(raw, "X", default=True)
+
+
+class ParseSameSiteTests(SimpleTestCase):
+    def test_lax_is_the_default(self):
+        for raw in (None, "", " "):
+            with self.subTest(raw=raw):
+                self.assertEqual(parse_samesite(raw, "X", secure=False), "Lax")
+
+    def test_lax_is_read_in_any_case(self):
+        self.assertEqual(parse_samesite("lax", "X", secure=False), "Lax")
+        self.assertEqual(parse_samesite(" LAX ", "X", secure=True), "Lax")
+
+    def test_none_needs_secure_cookies(self):
+        self.assertEqual(parse_samesite("None", "X", secure=True), "None")
+        with self.assertRaisesMessage(ImproperlyConfigured, "Secure"):
+            parse_samesite("None", "X", secure=False)
+
+    def test_strict_is_refused_because_the_handoff_could_not_work_with_it(self):
+        with self.assertRaisesMessage(ImproperlyConfigured, "Strict"):
+            parse_samesite("Strict", "DJANGO_COOKIE_SAMESITE", secure=True)
+
+    def test_anything_else_fails(self):
+        with self.assertRaisesMessage(ImproperlyConfigured, "DJANGO_COOKIE_SAMESITE"):
+            parse_samesite("sometimes", "DJANGO_COOKIE_SAMESITE", secure=True)

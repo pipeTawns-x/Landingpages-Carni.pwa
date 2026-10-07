@@ -24,11 +24,12 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db import connection
 from django.test import Client, SimpleTestCase, TestCase, override_settings
-from django.urls import reverse
+from django.urls import URLResolver, reverse
 from jwt.algorithms import ECAlgorithm
 
 from inventory.models import ReadOnlyModelError
 from panel import supabase_auth
+from panel import urls as panel_urls
 from panel.access import (
     PANEL_SESSION_KEY,
     get_or_create_panel_user,
@@ -49,6 +50,24 @@ def insert_profile(user_id, role):
     """Add a Supabase profile the way Supabase does: the mirror refuses writes from Django."""
     with connection.cursor() as cursor:
         cursor.execute("INSERT INTO profiles (id, role) VALUES (%s, %s)", [user_id.hex, role])
+
+
+def leaf_patterns(patterns):
+    """Yield every route under `patterns`, going into the `include()` of other apps."""
+    for pattern in patterns:
+        if isinstance(pattern, URLResolver):
+            yield from leaf_patterns(pattern.url_patterns)
+        else:
+            yield pattern
+
+
+def hand_off(client, user_id):
+    """Post an admin token to the handoff the way the store does, from the allowed origin."""
+    return client.post(
+        reverse("panel:sesion"),
+        {"access_token": make_token(user_id)},
+        HTTP_ORIGIN=ALLOWED_ORIGIN,
+    )
 
 
 def token_claims(user_id, **overrides):
@@ -762,10 +781,236 @@ class PanelAccessTests(TestCase):
         self.assertFalse(is_panel_admin(response.wsgi_request))
 
     def test_every_panel_route_is_guarded_unless_it_is_meant_to_be_public(self):
-        from panel import urls
-
-        public = {"acceso", "sesion"}
-        for pattern in urls.urlpatterns:
+        # The way in (`sesion`), the bridge (`acceso`) and the way out (`salir`)
+        # have to work without being an admin. A route added later has to be
+        # guarded or be added here on purpose.
+        public = {"acceso", "sesion", "salir"}
+        for pattern in leaf_patterns(panel_urls.urlpatterns):
             guarded = getattr(pattern.callback, "panel_admin_required", False)
             with self.subTest(route=pattern.name):
                 self.assertEqual(guarded, pattern.name not in public)
+
+
+class RoleRevalidationTests(TestCase):
+    """The role is read from Supabase on every request, not trusted from the session."""
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.admin_id = uuid.uuid4()
+        insert_profile(cls.admin_id, "admin")
+
+    def setUp(self):
+        self.url = reverse("panel:inicio")
+        self.bridge = reverse("panel:acceso")
+        hand_off(self.client, self.admin_id)
+
+    def change_profile(self, sql):
+        with connection.cursor() as cursor:
+            cursor.execute(sql, [self.admin_id.hex])
+
+    def test_an_admin_keeps_getting_in_while_the_role_holds(self):
+        for _ in range(2):
+            response = self.client.get(self.url)
+
+            self.assertRedirects(response, reverse("inventory:list"), fetch_redirect_response=False)
+
+    def test_an_admin_demoted_after_the_handoff_is_sent_to_the_bridge(self):
+        self.change_profile("UPDATE profiles SET role = 'customer' WHERE id = %s")
+
+        response = self.client.get(self.url)
+
+        self.assertRedirects(response, self.bridge, fetch_redirect_response=False)
+
+    def test_the_session_of_a_demoted_admin_is_closed_and_not_just_refused(self):
+        self.change_profile("UPDATE profiles SET role = 'customer' WHERE id = %s")
+
+        self.client.get(self.url)
+
+        self.assertNotIn("_auth_user_id", self.client.session)
+        self.assertNotIn(PANEL_SESSION_KEY, self.client.session)
+
+    def test_an_admin_whose_profile_disappeared_is_sent_away_too(self):
+        self.change_profile("DELETE FROM profiles WHERE id = %s")
+
+        response = self.client.get(self.url)
+
+        self.assertRedirects(response, self.bridge, fetch_redirect_response=False)
+        self.assertNotIn("_auth_user_id", self.client.session)
+
+    def test_visiting_the_panel_does_not_log_a_django_staff_member_out(self):
+        # A session that never came from a handoff is just not a panel session.
+        staff_client = Client()
+        staff_client.force_login(get_user_model().objects.create_superuser("local"))
+
+        response = staff_client.get(self.url)
+
+        self.assertRedirects(response, self.bridge, fetch_redirect_response=False)
+        self.assertIn("_auth_user_id", staff_client.session)
+
+    def test_a_marker_that_is_not_a_uuid_is_refused_without_a_crash(self):
+        staff_client = Client()
+        staff_client.force_login(get_user_model().objects.create_user("local"))
+        session = staff_client.session
+        session[PANEL_SESSION_KEY] = "local"
+        session.save()
+
+        response = staff_client.get(self.url)
+
+        self.assertRedirects(response, self.bridge, fetch_redirect_response=False)
+
+
+class LogoutTests(TestCase):
+    """POST /panel/salir/: the way out."""
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.admin_id = uuid.uuid4()
+        insert_profile(cls.admin_id, "admin")
+
+    def setUp(self):
+        self.url = reverse("panel:salir")
+        hand_off(self.client, self.admin_id)
+
+    def csrf_client(self):
+        """A client that enforces CSRF, handed off, and the token that goes with its cookie."""
+        client = Client(enforce_csrf_checks=True)
+        hand_off(client, self.admin_id)
+        return client, client.cookies[settings.CSRF_COOKIE_NAME].value
+
+    def test_it_ends_the_session_and_goes_to_the_store_login(self):
+        response = self.client.post(self.url)
+
+        self.assertRedirects(response, settings.STORE_LOGIN_URL, fetch_redirect_response=False)
+        self.assertNotIn("_auth_user_id", self.client.session)
+        self.assertNotIn(PANEL_SESSION_KEY, self.client.session)
+
+    def test_the_panel_is_closed_afterwards(self):
+        self.client.post(self.url)
+
+        response = self.client.get(reverse("panel:inicio"))
+
+        self.assertRedirects(response, reverse("panel:acceso"), fetch_redirect_response=False)
+
+    def test_a_get_is_refused_and_does_not_log_out(self):
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, 405)
+        self.assertEqual(response["Allow"], "POST")
+        self.assertEqual(self.client.session[PANEL_SESSION_KEY], str(self.admin_id))
+
+    def test_it_is_protected_by_the_csrf_check(self):
+        client, _token = self.csrf_client()
+
+        response = client.post(self.url)
+
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(client.session[PANEL_SESSION_KEY], str(self.admin_id))
+
+    def test_it_works_with_the_csrf_token(self):
+        client, token = self.csrf_client()
+
+        response = client.post(self.url, HTTP_X_CSRFTOKEN=token)
+
+        self.assertRedirects(response, settings.STORE_LOGIN_URL, fetch_redirect_response=False)
+        self.assertNotIn("_auth_user_id", client.session)
+
+    def test_a_null_origin_fails_the_csrf_check(self):
+        # What a browser sends on EVERY post, same site included, when the page has
+        # `Referrer-Policy: no-referrer`. It is why Django's policy is `same-origin`.
+        client, token = self.csrf_client()
+
+        response = client.post(self.url, HTTP_X_CSRFTOKEN=token, HTTP_ORIGIN="null")
+
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(client.session[PANEL_SESSION_KEY], str(self.admin_id))
+
+    def test_an_admin_whose_role_was_revoked_can_still_log_out(self):
+        with connection.cursor() as cursor:
+            cursor.execute(
+                "UPDATE profiles SET role = 'customer' WHERE id = %s", [self.admin_id.hex]
+            )
+
+        response = self.client.post(self.url)
+
+        self.assertRedirects(response, settings.STORE_LOGIN_URL, fetch_redirect_response=False)
+        self.assertNotIn("_auth_user_id", self.client.session)
+
+    def test_a_visitor_without_a_session_is_just_sent_to_the_store(self):
+        response = Client().post(self.url)
+
+        self.assertRedirects(response, settings.STORE_LOGIN_URL, fetch_redirect_response=False)
+
+    def test_a_django_user_made_some_other_way_can_log_out_too(self):
+        client = Client()
+        client.force_login(get_user_model().objects.create_superuser("local"))
+
+        client.post(self.url)
+
+        self.assertNotIn("_auth_user_id", client.session)
+
+    def test_logging_out_is_logged_with_the_user(self):
+        with self.assertLogs("panel", level="INFO") as logs:
+            self.client.post(self.url)
+
+        self.assertIn(str(self.admin_id), "\n".join(logs.output))
+
+
+class CookieAndHeaderTests(TestCase):
+    """Cookie flags and headers of the panel's answers."""
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.admin_id = uuid.uuid4()
+        insert_profile(cls.admin_id, "admin")
+
+    def session_cookie(self, response):
+        return response.cookies[settings.SESSION_COOKIE_NAME]
+
+    def test_the_session_cookie_is_http_only_and_lax(self):
+        cookie = self.session_cookie(hand_off(self.client, self.admin_id))
+
+        self.assertTrue(cookie["httponly"])
+        self.assertEqual(cookie["samesite"], "Lax")
+
+    def test_the_session_cookie_is_secure_when_the_setting_says_so(self):
+        self.assertFalse(self.session_cookie(hand_off(self.client, self.admin_id))["secure"])
+
+        with override_settings(SESSION_COOKIE_SECURE=True):
+            response = hand_off(Client(), self.admin_id)
+
+        self.assertTrue(self.session_cookie(response)["secure"])
+
+    def test_the_csrf_cookie_follows_the_same_flags(self):
+        with override_settings(CSRF_COOKIE_SECURE=True):
+            response = hand_off(self.client, self.admin_id)
+
+        cookie = response.cookies[settings.CSRF_COOKIE_NAME]
+        self.assertTrue(cookie["secure"])
+        self.assertEqual(cookie["samesite"], "Lax")
+
+    def test_the_session_does_not_last_longer_than_a_working_day(self):
+        cookie = self.session_cookie(hand_off(self.client, self.admin_id))
+
+        self.assertLessEqual(int(cookie["max-age"]), 12 * 60 * 60)
+
+    def test_the_answers_of_the_panel_never_hand_the_referrer_to_another_site(self):
+        responses = [
+            hand_off(self.client, self.admin_id),
+            self.client.get(reverse("panel:acceso")),
+            self.client.get(reverse("panel:inicio")),
+            self.client.post(reverse("panel:salir")),
+        ]
+
+        for response in responses:
+            self.assertEqual(response["Referrer-Policy"], "same-origin")
+
+    def test_the_policy_is_not_no_referrer(self):
+        # `no-referrer` makes browsers send `Origin: null` on every post, which
+        # Django's CSRF check refuses: the logout, the forms and the admin would
+        # stop working (see LogoutTests.test_a_null_origin_fails_the_csrf_check).
+        self.assertEqual(settings.SECURE_REFERRER_POLICY, "same-origin")
+
+    def test_the_panel_cannot_be_framed(self):
+        response = self.client.get(reverse("panel:acceso"))
+
+        self.assertEqual(response["X-Frame-Options"], "DENY")

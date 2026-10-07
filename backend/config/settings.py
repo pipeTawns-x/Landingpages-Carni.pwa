@@ -14,7 +14,14 @@ from pathlib import Path
 from django.core.exceptions import ImproperlyConfigured
 from dotenv import load_dotenv
 
-from .env import parse_http_url, parse_origin, parse_origins, parse_positive_int
+from .env import (
+    parse_bool,
+    parse_http_url,
+    parse_origin,
+    parse_origins,
+    parse_positive_int,
+    parse_samesite,
+)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -193,6 +200,37 @@ PANEL_ALLOWED_ORIGINS = parse_origins(require_env("PANEL_ALLOWED_ORIGINS"), "PAN
 PANEL_TOKEN_MAX_AGE_SECONDS = parse_positive_int(
     require_env("PANEL_TOKEN_MAX_AGE_SECONDS"), "PANEL_TOKEN_MAX_AGE_SECONDS"
 )
+
+# Session and CSRF cookies, and the Referrer-Policy header
+# https://docs.djangoproject.com/en/5.2/topics/security/
+#
+# `Secure` keeps the cookies off plain http. It is on whenever DEBUG is off, so a
+# deployment cannot forget it, and local development over http keeps working with
+# DJANGO_DEBUG=True. The three flags can be set from backend/.env.
+SESSION_COOKIE_SECURE = parse_bool(
+    os.environ.get("DJANGO_COOKIE_SECURE"), "DJANGO_COOKIE_SECURE", default=not DEBUG
+)
+CSRF_COOKIE_SECURE = SESSION_COOKIE_SECURE
+# The panel's pages never read the session cookie from JavaScript.
+SESSION_COOKIE_HTTPONLY = parse_bool(
+    os.environ.get("DJANGO_COOKIE_HTTPONLY"), "DJANGO_COOKIE_HTTPONLY", default=True
+)
+# Lax, never Strict: see parse_samesite for why the handoff cannot work with Strict.
+SESSION_COOKIE_SAMESITE = parse_samesite(
+    os.environ.get("DJANGO_COOKIE_SAMESITE"),
+    "DJANGO_COOKIE_SAMESITE",
+    secure=SESSION_COOKIE_SECURE,
+)
+CSRF_COOKIE_SAMESITE = SESSION_COOKIE_SAMESITE
+# A panel session lasts a working day, not Django's two weeks. It does not slide,
+# so it ends eight hours after the handoff and the admin hands over again.
+SESSION_COOKIE_AGE = 8 * 60 * 60
+
+# Nothing the panel links to learns where the visitor came from. It is
+# `same-origin` and not `no-referrer` on purpose: with `no-referrer` browsers send
+# `Origin: null` on every POST, even to the same site, and Django's CSRF check
+# refuses `null`, which would break the logout, the product forms and the admin.
+SECURE_REFERRER_POLICY = "same-origin"
 
 # The panel logs why it refused a handoff (never the token) so the reason can
 # be found on the server while the browser only gets a generic refusal.

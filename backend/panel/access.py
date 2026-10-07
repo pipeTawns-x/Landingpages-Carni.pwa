@@ -1,19 +1,21 @@
 """Who may use the panel: admins whose session was opened by a Supabase handoff.
 
 Django keeps no passwords for the people who use the panel. A Supabase admin
-signs in at the store, the store hands the access token over, and `views.sesion`
-turns it into a Django session through the functions below. Every panel view is
-then wrapped in `panel_admin_required`, which only lets such a session in: a
-Django user created some other way (the admin site, `createsuperuser`) has no
-marker in its session and is not a panel admin, whatever its other permissions.
+signs in at the store, the store hands the token over, and `views.sesion` turns
+it into a Django session through the functions below. Every panel view is then
+wrapped in `panel_admin_required`, which only lets such a session in: a Django
+user created some other way (the admin site, `createsuperuser`) has no marker in
+its session and is not a panel admin, whatever its other permissions.
 """
 
+import uuid
 from functools import wraps
 
-from django.contrib.auth import get_user_model, login
+from django.contrib.auth import get_user_model, login, logout
 from django.contrib.auth.hashers import make_password
 from django.shortcuts import redirect
 
+from panel.models import Profile
 from panel.supabase_auth import VerifiedToken
 
 # Written to the session by the handoff. Its value is the Supabase user id, the
@@ -55,17 +57,35 @@ def open_panel_session(request, user) -> None:
 
 
 def is_panel_admin(request) -> bool:
-    """Say whether the request carries a session opened by the handoff for its own user."""
+    """Say whether the request carries a handoff session of someone who is still an admin.
+
+    The session has to be one the handoff opened, for its own user, and that
+    user has to be an admin in Supabase right now: the role is read on every
+    request, so taking it away there ends the access at once and not when the
+    session expires.
+    """
     user = request.user
-    return bool(
-        user.is_authenticated
-        and user.is_active
-        and request.session.get(PANEL_SESSION_KEY) == user.get_username()
-    )
+    if not (user.is_authenticated and user.is_active):
+        return False
+
+    marker = request.session.get(PANEL_SESSION_KEY)
+    if marker != user.get_username():
+        return False
+
+    try:
+        supabase_user_id = uuid.UUID(marker)
+    except ValueError:
+        return False
+    return Profile.is_admin(supabase_user_id)
 
 
 def panel_admin_required(view):
     """Send everyone but a handed-off admin to the access bridge instead of running `view`.
+
+    A session that came from a handoff and no longer qualifies (the admin was
+    demoted in Supabase, or deactivated here) is closed on the spot instead of
+    being left open. A session that never came from one, such as a staff member
+    of the Django admin site, is left alone: it is just not a panel session.
 
     The wrapper carries `panel_admin_required = True` so a test can tell which
     panel routes are guarded and fail when a new one is not.
@@ -74,6 +94,8 @@ def panel_admin_required(view):
     @wraps(view)
     def wrapper(request, *args, **kwargs):
         if not is_panel_admin(request):
+            if PANEL_SESSION_KEY in request.session:
+                logout(request)
             return redirect("panel:acceso")
         return view(request, *args, **kwargs)
 
