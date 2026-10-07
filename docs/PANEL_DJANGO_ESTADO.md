@@ -6,7 +6,7 @@ Se actualiza en cada slice. Se retoma en la primera que no esté HECHA.
 |---|---|---|---|---|
 | B0 | Decisión, contrato, loop y estado | HECHO | (este commit) | — |
 | B1 | Bug: ficha con todos los valores en cero | HECHO | `8e750cc2` | — |
-| B2 | `inventory/services.py` + mirrors `OrderItem` y `Favorite` | PENDIENTE | | — |
+| B2 | `inventory/services.py` + mirrors `OrderItem` y `Favorite` | HECHO | `7aa61146` | — |
 | B4 | Django Admin con las reglas del panel | PENDIENTE | | B2 |
 | B8 | Traspaso Supabase → Django | PENDIENTE | | Docker/Supabase prendidos para el gate SQL |
 | B9 | Salida, permisos y endurecimiento | PENDIENTE | | B8 |
@@ -30,3 +30,4 @@ Se actualiza en cada slice. Se retoma en la primera que no esté HECHA.
   - GGA revisa gratis: Gemini Flash-Lite con el revisor `gga-reviewer` y el snapshot de OpenCode apagado (`e77de1f3`, `7b513e8e`).
   - Los dos loops leen el contexto del otro agente en Engram antes de cada paso (`1869c669`, `541ddfeb`).
   - B1 hecho (`8e750cc2`): `product_update` guarda la ficha aunque todos sus valores sean cero, igual que `product_create`. Pasan 42 pruebas.
+  - B2 hecho (`7aa61146`): `inventory/services.py` concentra la confirmación de precio, borrar o desactivar y cuándo se guarda la ficha; los mirrors `OrderItem` y `Favorite` (solo lectura, sin DDL: la migración `0002` es solo estado) reemplazan el SQL crudo. Pasan 81 pruebas.
