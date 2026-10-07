@@ -10,11 +10,12 @@ Supabase does in production.
 
 import uuid
 from decimal import Decimal
+from unittest import mock
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.messages import get_messages
-from django.db import connection
+from django.db import IntegrityError, connection
 from django.test import SimpleTestCase, TestCase
 from django.test.utils import CaptureQueriesContext
 from django.urls import reverse
@@ -56,6 +57,18 @@ def insert_favorite(product):
             "INSERT INTO favorites (user_id, product_id) VALUES (%s, %s)",
             [uuid.uuid4().hex, product.pk],
         )
+
+
+def refuse_delete_like_restrict():
+    """Make `Product.delete()` fail the way `ON DELETE RESTRICT` does when an order shows up.
+
+    The test database builds the mirrored tables without foreign keys, so the
+    refusal Postgres gives a delete that races with a new order cannot happen
+    for real here: it is raised by hand, which is what the service has to survive.
+    """
+    return mock.patch.object(
+        Product, "delete", side_effect=IntegrityError("violates foreign key constraint")
+    )
 
 
 class PricePerLbForTests(SimpleTestCase):
@@ -408,6 +421,24 @@ class ProductDeleteViewTests(TestCase):
             ],
         )
 
+    def test_an_order_that_arrives_during_the_delete_deactivates_the_product_without_a_500(self):
+        with refuse_delete_like_restrict():
+            response = self.client.post(self.url)
+
+        self.assertRedirects(response, self.list_url)
+        self.product.refresh_from_db()
+        self.assertFalse(self.product.is_active)
+        self.assertEqual(
+            levels_and_texts(response),
+            [
+                (
+                    "warning",
+                    '"Rib Eye" tiene pedidos registrados, así que se desactivó '
+                    "en lugar de eliminarse para conservar el historial.",
+                )
+            ],
+        )
+
     def test_an_anonymous_user_cannot_delete_a_product(self):
         self.client.logout()
 
@@ -690,6 +721,40 @@ class DeleteOrDeactivateTests(TestCase):
         stored = Product.objects.get(pk=product.pk)
         self.assertFalse(stored.is_active)
         self.assertEqual(stored.stock, 99)
+
+    def test_an_order_that_appears_after_the_count_turns_the_delete_into_a_deactivation(self):
+        # No order existed when the references were counted, so the delete is
+        # attempted, and the database refuses it because one showed up meanwhile.
+        product = make_product()
+
+        with refuse_delete_like_restrict():
+            outcome = services.delete_or_deactivate(product)
+
+        self.assertEqual(outcome, services.DeleteOutcome(deactivated=True, favorites_removed=0))
+        self.assertFalse(Product.objects.get(pk=product.pk).is_active)
+
+    def test_the_deactivation_after_a_refused_delete_writes_only_the_is_active_column(self):
+        product = make_product(stock=12)
+        Product.objects.filter(pk=product.pk).update(stock=99)
+
+        with refuse_delete_like_restrict():
+            services.delete_or_deactivate(product)
+
+        stored = Product.objects.get(pk=product.pk)
+        self.assertFalse(stored.is_active)
+        self.assertEqual(stored.stock, 99)
+
+    def test_the_delete_runs_inside_a_savepoint_that_is_rolled_back_when_it_fails(self):
+        # Without the savepoint, Postgres would refuse every later statement of
+        # the surrounding transaction, including the deactivation itself.
+        product = make_product()
+
+        with CaptureQueriesContext(connection) as queries, refuse_delete_like_restrict():
+            services.delete_or_deactivate(product)
+
+        statements = [query["sql"] for query in queries.captured_queries]
+        self.assertTrue(any(sql.startswith("SAVEPOINT") for sql in statements))
+        self.assertTrue(any(sql.startswith("ROLLBACK TO SAVEPOINT") for sql in statements))
 
 
 class SaveProductTests(TestCase):

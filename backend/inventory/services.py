@@ -9,6 +9,8 @@ from dataclasses import dataclass
 from decimal import Decimal
 from typing import NamedTuple
 
+from django.db import IntegrityError, transaction
+
 from inventory.forms import CutSpecForm, ProductForm
 from inventory.models import Favorite, OrderItem, Product
 
@@ -71,23 +73,42 @@ class DeleteOutcome:
     favorites_removed: int = 0
 
 
+def _deactivate(product: Product) -> DeleteOutcome:
+    """Hide a product from the shop by turning `is_active` off."""
+    product.is_active = False
+    # Write only that column: a full save would put back every other value
+    # as it was read, and overwrite whatever changed in the meantime.
+    product.save(update_fields=["is_active"])
+    return DeleteOutcome(deactivated=True)
+
+
 def delete_or_deactivate(product: Product) -> DeleteOutcome:
     """Delete a product, unless it has order history: then deactivate it instead.
 
     The database refuses to delete a product that an order item points at, and
     an order is history worth keeping, so that product is hidden from the shop
     by turning `is_active` off.
+
+    Counting the references and deleting are two separate statements, so a
+    customer can place an order for the product between them. The database
+    still refuses the delete then (`ON DELETE RESTRICT`), and that refusal is
+    handled as the same case as an order that was already there: the product is
+    deactivated instead of the panel failing with a server error.
     """
     references = find_references(product)
 
     if references.orders:
-        product.is_active = False
-        # Write only that column: a full save would put back every other value
-        # as it was read, and overwrite whatever changed in the meantime.
-        product.save(update_fields=["is_active"])
-        return DeleteOutcome(deactivated=True)
+        return _deactivate(product)
 
-    product.delete()
+    try:
+        # A savepoint, not just a try/except: on Postgres a statement that
+        # fails poisons the surrounding transaction, so without it the
+        # fallback below could not run its own UPDATE.
+        with transaction.atomic():
+            product.delete()
+    except IntegrityError:
+        return _deactivate(product)
+
     return DeleteOutcome(deactivated=False, favorites_removed=references.favorites)
 
 
