@@ -74,6 +74,7 @@ Viven en `.claude/skills/<nombre>/SKILL.md`. Estuvieron en `agents/skills/` hast
 - `css/` mantiene la arquitectura 7-1 para los estilos globales del sitio: variables, base, layout, paginas y componentes compartidos entre paginas HTML.
 - Los componentes de React llevan su propia hoja de estilos co-locada en su carpeta, bajo `src/components/<Componente>/styles.scss`, compilada al `.css` hermano que importa el componente. Es el patron de co-locacion habitual en React y lo exige la actividad 6.28.9 de EBAC.
 - Ningun otro directorio contiene SCSS.
+- Las paginas migradas y sus componentes (`src/ui`, `src/landing`, `src/catalogo`, `src/asistente`) y las plantillas del panel en `backend/templates/` usan Tailwind v4 con un unico `@theme` compartido; el `styles.scss` co-locado aplica solo a `src/components/`.
 
 - Variables publicas del frontend solo con prefijo `VITE_*`.
 - El contrato local de entorno es `.env`; no agregar archivos espejo de entorno ni duplicados documentales.
@@ -142,7 +143,7 @@ Se requiere aprobacion explicita antes de:
 - La direccion visual objetivo es maximalismo mexicano equilibrado.
 - El dashboard debe sentirse operativo, no generico.
 - El rediseño puede evolucionar a bento grid si mantiene claridad comercial.
-- Astro, Tailwind y Alpine son objetivos de evolucion, no estado actual del repo.
+- Tailwind v4 ya esta adoptado en las paginas migradas y en el panel de Django; Astro y Alpine siguen siendo objetivos de evolucion.
 
 ## Seguridad
 
