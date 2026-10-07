@@ -11,7 +11,7 @@ Se actualiza en cada slice. Se retoma en la primera que no esté HECHA.
 | R | Carrera al borrar: un pedido nuevo desactiva el producto en vez de dar un 500 | HECHO | `61f891c7` | — |
 | B8 | Traspaso Supabase → Django | HECHO | `877d2510`, migración `4e5d6137` | Variables nuevas en `backend/.env` (Eduardo) |
 | B9 | Salida, permisos y endurecimiento | HECHO | `c3095506` | — |
-| B6 | Tokens y Tailwind | ESPERA | | S1 (tokens.css del rediseño) |
+| B6 | Tokens y Tailwind | HECHO | `0720d60b` | — |
 | B7 | `panel/base.html` desde `dashboar.html` | ESPERA | | S2 |
 | B10–B13 | Productos en el panel | ESPERA | | S3 |
 | B14 | Rutas `/panel/productos/` | HECHO (se adelantó a B10–B13) | `6dc3429e` | — |
@@ -47,3 +47,9 @@ Se actualiza en cada slice. Se retoma en la primera que no esté HECHA.
     - el cliente no aparece;
     - `full_name`, INSERT, UPDATE y DELETE dan `permission denied`.
   - Para el gate, `postgres` necesita `GRANT django TO postgres` dentro de la misma transacción. Por defecto tiene la membresía de creador de Postgres 16 (admin sí, `SET ROLE` no), y el `ROLLBACK` la deja como estaba. `supabase_admin` pide contraseña.
+  - B6 hecho (`0720d60b`): Django tiene su hoja de Tailwind v4 compilada con los tokens de la tienda.
+    - S1 llegó en `3e471379`, `7991d6af` y `3e5d1e79`. `backend/assets/tokens.css` es copia idéntica de `src/styles/tokens.css` en `pruebas` (sha256 `6847e086ea66e78e94ee4ca60890e721f693fa50f8ead7e416bd324743d5cd05`).
+    - `backend/scripts/build_panel_css.sh` revisa la deriva (los tokens y las versiones fijadas de Tailwind y de las dos fuentes contra `origin/pruebas`), compila en Docker con la imagen de `.devcontainer` y tiene `--check` y `--sync-tokens`. El resultado, `backend/static/panel/panel.css`, va versionado y lo sirve `staticfiles` (`STATICFILES_DIRS`); `backend/assets/` no se publica.
+    - Geist y Fraunces van autoalojadas (solo `latin`, con su licencia OFL junto a cada archivo), de los mismos paquetes y versiones que la tienda. La salida es idéntica byte a byte entre ejecuciones y entre `linux/arm64` y `linux/amd64`.
+    - Pasan 247 pruebas, ruff limpio y `--check` en verde. En Chrome, las dos fuentes cargan desde el `staticfiles` de Django.
+    - Ninguna plantilla la enlaza todavía: eso es B7 (espera a S2). Cuando el rediseño cambie `tokens.css` o suba una de esas versiones, el script falla hasta que el backend resincronice (`--sync-tokens`).
