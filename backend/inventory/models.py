@@ -2,12 +2,16 @@
 
 `Category` and `Product` are unmanaged mirrors of the Supabase-owned tables
 `public.categories` and `public.products` (Django must never emit DDL for
-them). `CutSpec` is the only Django-managed table in this app and lives in
-the `django` schema, linked to `Product` without a DB-level foreign key
-(`db_constraint=False`) so Django cannot alter a Supabase-owned table.
+them). `OrderItem` and `Favorite` mirror `public.order_items` and
+`public.favorites` the same way, but read-only: the panel only counts the rows
+that point at a product. `CutSpec` is the only Django-managed table in this app
+and lives in the `django` schema, linked to `Product` without a DB-level
+foreign key (`db_constraint=False`) so Django cannot alter a Supabase-owned
+table.
 """
 
 from decimal import ROUND_HALF_UP, Decimal
+from typing import NoReturn
 
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
@@ -107,6 +111,89 @@ class Product(models.Model):
         """Keep price_per_lb consistent with price_per_kg on every save."""
         self.price_per_lb = price_per_lb_for(self.price_per_kg)
         super().save(*args, **kwargs)
+
+
+class ReadOnlyModelError(Exception):
+    """Raised when code tries to write to a table that only Supabase may change."""
+
+
+def _refuse_write(model: type[models.Model]) -> NoReturn:
+    raise ReadOnlyModelError(f"{model.__name__} is read-only: its table belongs to Supabase.")
+
+
+class ReadOnlyQuerySet(models.QuerySet):
+    """QuerySet that refuses every write, so a mirror cannot be changed by accident."""
+
+    def _refuse(self, *args: object, **kwargs: object) -> NoReturn:
+        _refuse_write(self.model)
+
+    create = bulk_create = bulk_update = get_or_create = update_or_create = _refuse
+    update = delete = _refuse
+
+
+class ReadOnlyModel(models.Model):
+    """Base class for mirrors of Supabase tables that Django may read but never write.
+
+    The `django` Postgres role only has SELECT on them, so a write would fail in
+    production anyway. Refusing it in Python gives a clear message and also
+    makes the tests catch it, because SQLite has no roles.
+    """
+
+    objects = ReadOnlyQuerySet.as_manager()
+
+    class Meta:
+        abstract = True
+
+    def save(self, *args: object, **kwargs: object) -> NoReturn:
+        _refuse_write(type(self))
+
+    def delete(self, *args: object, **kwargs: object) -> NoReturn:
+        _refuse_write(type(self))
+
+
+class OrderItem(ReadOnlyModel):
+    """One line of an order. Owned by Supabase; the panel only counts them per product.
+
+    Only the columns the reference check needs are mapped. `product_id` is a
+    plain integer and not a ForeignKey on purpose: a relation would hook this
+    table into Django's delete collector and into the admin's delete
+    confirmation, and the database already enforces `ON DELETE RESTRICT`.
+    """
+
+    id = models.AutoField(primary_key=True)
+    product_id = models.IntegerField()
+
+    class Meta:
+        managed = False
+        db_table = "order_items"
+        verbose_name = "ítem de pedido"
+        verbose_name_plural = "ítems de pedido"
+
+    def __str__(self) -> str:
+        return f"order item {self.pk}"
+
+
+class Favorite(ReadOnlyModel):
+    """A product a customer saved. Owned by Supabase; the panel only counts them.
+
+    The table has no `id`: its primary key is the pair (user_id, product_id).
+    `product_id` is a plain integer for the same reason as in `OrderItem`. The
+    database cascades the delete of a product to its favorites, and Django must
+    not try to do it as well: the `django` role has no DELETE on this table.
+    """
+
+    pk = models.CompositePrimaryKey("user_id", "product_id")
+    user_id = models.UUIDField()
+    product_id = models.IntegerField()
+
+    class Meta:
+        managed = False
+        db_table = "favorites"
+        verbose_name = "favorito"
+        verbose_name_plural = "favoritos"
+
+    def __str__(self) -> str:
+        return f"favorite of user {self.user_id} (product {self.product_id})"
 
 
 class CutSpec(models.Model):

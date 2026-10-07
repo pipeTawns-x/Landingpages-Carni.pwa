@@ -2,16 +2,18 @@
 
 Implements the EBAC M13 "Django Views" practice: five FBVs (list, detail,
 create, update, delete) backed by ModelForms, `get_object_or_404`,
-`django.contrib.messages`, and POST-redirect-GET.
+`django.contrib.messages`, and POST-redirect-GET. The business rules (price
+confirmation, delete or deactivate, when a cut spec is stored) live in
+`inventory.services`; the views only translate them into pages and messages.
 """
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from django.db import connection
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 
+from inventory import services
 from inventory.forms import CutSpecForm, ProductForm
 from inventory.models import Category, CutSpec, Product
 
@@ -55,36 +57,12 @@ def product_list(request):
     return render(request, "inventory/product_list.html", context)
 
 
-def _product_references(product_id: int) -> tuple[int, int]:
-    """Return how many order items and favorites point at a product.
-
-    Neither table has a Django model (both belong to Supabase), so this is a
-    parameterised raw query. `order_items.product_id` is ON DELETE RESTRICT
-    and `favorites.product_id` is ON DELETE CASCADE, so the first number
-    blocks a delete and the second one warns about what it drags along.
-    """
-    with connection.cursor() as cursor:
-        cursor.execute(
-            "SELECT "
-            "(SELECT count(*) FROM public.order_items WHERE product_id = %s), "
-            "(SELECT count(*) FROM public.favorites WHERE product_id = %s)",
-            [product_id, product_id],
-        )
-        orders, favorites = cursor.fetchone()
-    return orders, favorites
-
-
 @login_required
 def product_detail(request, product_id):
     """Show a single product and its cut spec, if it has one."""
     product = get_object_or_404(Product.objects.select_related("category"), pk=product_id)
     spec = CutSpec.objects.filter(product=product).first()
     return render(request, "inventory/product_detail.html", {"product": product, "spec": spec})
-
-
-def _spec_form_has_data(spec_form: CutSpecForm) -> bool:
-    """Return True if the staff member filled in at least one spec field."""
-    return any(value not in (None, "", []) for value in spec_form.cleaned_data.values())
 
 
 @login_required
@@ -95,13 +73,7 @@ def product_create(request):
         spec_form = CutSpecForm(request.POST)
 
         if product_form.is_valid() and spec_form.is_valid():
-            product = product_form.save()
-
-            if _spec_form_has_data(spec_form):
-                spec = spec_form.save(commit=False)
-                spec.product = product
-                spec.save()
-
+            product = services.save_product(product_form, spec_form)
             messages.success(request, f'Producto "{product.name}" creado correctamente.')
             return redirect("inventory:detail", product_id=product.id)
     else:
@@ -132,6 +104,9 @@ def product_update(request, product_id):
         # The row is created only when the form is submitted with data.
         spec = CutSpec(product=product)
 
+    # Read the stored values before the forms are built: validating a
+    # ModelForm overwrites the instance in place, so afterwards the "old"
+    # values would already be the new ones.
     old_price_per_kg = product.price_per_kg
     old_min_quantity_kg = product.min_quantity_kg
 
@@ -140,13 +115,14 @@ def product_update(request, product_id):
         spec_form = CutSpecForm(request.POST, instance=spec)
 
         if product_form.is_valid() and spec_form.is_valid():
-            new_price_per_kg = product_form.cleaned_data["price_per_kg"]
-            new_min_quantity_kg = product_form.cleaned_data["min_quantity_kg"]
-            price_changed = new_price_per_kg != old_price_per_kg
-            min_quantity_changed = new_min_quantity_kg != old_min_quantity_kg
-            needs_confirmation = price_changed or min_quantity_changed
+            change = services.PriceChange(
+                old_price_per_kg=old_price_per_kg,
+                new_price_per_kg=product_form.cleaned_data["price_per_kg"],
+                old_min_quantity_kg=old_min_quantity_kg,
+                new_min_quantity_kg=product_form.cleaned_data["min_quantity_kg"],
+            )
 
-            if needs_confirmation and request.POST.get("confirm") != "1":
+            if change.needs_confirmation and request.POST.get("confirm") != "1":
                 hidden_fields = {
                     key: value
                     for key, value in request.POST.items()
@@ -154,24 +130,17 @@ def product_update(request, product_id):
                 }
                 context = {
                     "product": product,
-                    "price_changed": price_changed,
-                    "min_quantity_changed": min_quantity_changed,
-                    "old_price_per_kg": old_price_per_kg,
-                    "new_price_per_kg": new_price_per_kg,
-                    "old_min_quantity_kg": old_min_quantity_kg,
-                    "new_min_quantity_kg": new_min_quantity_kg,
+                    "price_changed": change.price_changed,
+                    "min_quantity_changed": change.min_quantity_changed,
+                    "old_price_per_kg": change.old_price_per_kg,
+                    "new_price_per_kg": change.new_price_per_kg,
+                    "old_min_quantity_kg": change.old_min_quantity_kg,
+                    "new_min_quantity_kg": change.new_min_quantity_kg,
                     "hidden_fields": hidden_fields,
                 }
                 return render(request, "inventory/product_confirm_price_change.html", context)
 
-            product = product_form.save()
-            spec_instance = spec_form.save(commit=False)
-            # Keep the table clean: only store a spec that already exists or
-            # that the user actually filled in. A zero counts as filled in,
-            # the same criterion product_create uses.
-            if spec_instance.pk or _spec_form_has_data(spec_form):
-                spec_instance.product = product
-                spec_instance.save()
+            product = services.save_product(product_form, spec_form)
             messages.success(request, f'Producto "{product.name}" actualizado correctamente.')
             return redirect("inventory:detail", product_id=product.id)
     else:
@@ -191,38 +160,37 @@ def product_update(request, product_id):
 def product_delete(request, product_id):
     """Delete a product, unless it has order history — then deactivate it.
 
-    `order_items` has no Django model (it belongs to Supabase), so the
-    check is a parameterised raw query through `django.db.connection`.
+    `services.delete_or_deactivate` decides which of the two happens; this
+    view only words the result.
     """
     product = get_object_or_404(Product, pk=product_id)
-    order_count, favorite_count = _product_references(product.id)
 
     if request.method == "POST":
-        if order_count:
-            product.is_active = False
-            product.save()
+        outcome = services.delete_or_deactivate(product)
+
+        if outcome.deactivated:
             messages.warning(
                 request,
                 f'"{product.name}" tiene pedidos registrados, así que se desactivó '
                 "en lugar de eliminarse para conservar el historial.",
             )
         else:
-            product.delete()
             success = f'"{product.name}" se eliminó correctamente.'
-            if favorite_count:
+            if outcome.favorites_removed:
                 # favorites.product_id cascades in the database, so those rows
                 # disappear with the product. Say it instead of hiding it.
                 success += (
-                    f" También se quitó de {favorite_count} "
-                    f"lista{'s' if favorite_count != 1 else ''} de favoritos."
+                    f" También se quitó de {outcome.favorites_removed} "
+                    f"lista{'s' if outcome.favorites_removed != 1 else ''} de favoritos."
                 )
             messages.success(request, success)
 
         return redirect("inventory:list")
 
+    references = services.find_references(product)
     context = {
         "product": product,
-        "order_count": order_count,
-        "favorite_count": favorite_count,
+        "order_count": references.orders,
+        "favorite_count": references.favorites,
     }
     return render(request, "inventory/product_confirm_delete.html", context)

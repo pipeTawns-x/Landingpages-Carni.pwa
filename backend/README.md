@@ -58,12 +58,18 @@ uv run ruff format .
 The `inventory` app is the staff panel for the catalog, served at
 `/inventario/` and protected with `login_required` (sign in through
 `/admin/login/`). `Category` and `Product` mirror the Supabase-owned tables
-with `managed = False`; `CutSpec` is the only Django-managed table and stores
-the data the storefront still lacks: average weight per piece, thickness range,
-supplier and presentation.
+with `managed = False`, and so do `OrderItem` and `Favorite`, which are
+read-only (`save()`, `delete()` and every queryset write raise
+`ReadOnlyModelError`) because the panel only counts the rows that point at a
+product. `CutSpec` is the only Django-managed table and stores the data the
+storefront still lacks: average weight per piece, thickness range, supplier and
+presentation.
 
 Behaviour worth knowing before touching it:
 
+- The rules below (price confirmation, delete or deactivate, when a cut spec is
+  stored) live in `inventory/services.py`. The views only turn what a service
+  returns into pages and messages.
 - `price_per_lb` is always derived from `price_per_kg`, so it is not editable.
 - Changing a price or a minimum quantity shows a before/after confirmation
   before saving.
@@ -84,7 +90,7 @@ Behaviour worth knowing before touching it:
 | Requirement | File |
 | --- | --- |
 | New attributes on the product model | `inventory/models.py` (`CutSpec`: weight per piece, thickness min/max/default, supplier, presentation, notes) |
-| Migrations created and applied | `inventory/migrations/0001_initial.py` (only `CutSpec`; the mirrored tables emit no DDL) |
+| Migrations created and applied | `inventory/migrations/0001_initial.py` (only `CutSpec`; the mirrored tables emit no DDL) and `0002_favorite_orderitem.py` (state only: the two read-only mirrors, no DDL) |
 | Admin registration | `inventory/admin.py` (product with the spec as an inline) |
 | list-view | `inventory/views.py::product_list` + `templates/inventory/product_list.html` |
 | detail-view | `inventory/views.py::product_detail` + `templates/inventory/product_detail.html` |
@@ -112,16 +118,19 @@ uv run python manage.py test
 even when `DJANGO_SETTINGS_MODULE` is exported in your shell. Only an explicit
 `--settings X` or `--settings=X` overrides it; do not point it at
 `config.settings`, because the `django` role cannot create a test database in
-Postgres. `Category` and `Product` are unmanaged mirrors of Supabase tables, so
-`config/test_runner.py` sets `managed = True` on them only while the tests run,
-which makes Django create their tables in the test database. The test settings
-import the regular ones, so the required variables (`backend/.env`) must be set
-even though the tests run on SQLite.
+Postgres. `Category`, `Product`, `OrderItem` and `Favorite` are unmanaged
+mirrors of Supabase tables, so `config/test_runner.py` sets `managed = True` on
+them only while the tests run, which makes Django create their tables in the
+test database. The test settings import the regular ones, so the required
+variables (`backend/.env`) must be set even though the tests run on SQLite.
 
-`inventory/tests.py` covers `price_per_lb_for()` and the pagination. It starts
-from the fixture `inventory/fixtures/categories.json`, the 9 real categories
-dumped with `dumpdata inventory.Category`. The `config.E001` system check only
-runs against Postgres; other databases have no `django` schema to verify.
+`inventory/tests.py` covers `price_per_lb_for()`, the pagination, the staff
+views, the rules in `inventory/services.py` and the read-only mirrors. Those
+mirrors refuse writes from Django, so the tests add their rows with raw SQL,
+the way Supabase does. It starts from the fixture
+`inventory/fixtures/categories.json`, the 9 real categories dumped with
+`dumpdata inventory.Category`. The `config.E001` system check only runs against
+Postgres; other databases have no `django` schema to verify.
 
 ## Warning
 
