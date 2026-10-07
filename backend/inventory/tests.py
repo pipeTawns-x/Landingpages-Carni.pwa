@@ -38,6 +38,11 @@ def make_product(name="Rib Eye", **fields):
     return Product.objects.create(category=Category.objects.first(), name=name, **fields)
 
 
+def levels_and_texts(response):
+    """Return the (level, text) pairs of the messages the request queued."""
+    return [(message.level_tag, str(message)) for message in get_messages(response.wsgi_request)]
+
+
 def insert_order_item(product):
     """Add an order line the way Supabase does: the mirrors refuse writes from Django."""
     with connection.cursor() as cursor:
@@ -321,11 +326,6 @@ class ProductDeleteViewTests(TestCase):
         self.list_url = reverse("inventory:list")
         self.client.force_login(self.staff)
 
-    def levels_and_texts(self, response):
-        return [
-            (message.level_tag, str(message)) for message in get_messages(response.wsgi_request)
-        ]
-
     def test_the_confirmation_page_counts_the_orders_and_the_favorites(self):
         insert_order_item(self.product)
         insert_order_item(self.product)
@@ -353,7 +353,7 @@ class ProductDeleteViewTests(TestCase):
         self.assertRedirects(response, self.list_url)
         self.assertFalse(Product.objects.filter(pk=self.product.pk).exists())
         self.assertEqual(
-            self.levels_and_texts(response),
+            levels_and_texts(response),
             [("success", '"Rib Eye" se eliminó correctamente.')],
         )
 
@@ -364,7 +364,7 @@ class ProductDeleteViewTests(TestCase):
         response = self.client.post(self.url)
 
         self.assertEqual(
-            self.levels_and_texts(response),
+            levels_and_texts(response),
             [
                 (
                     "success",
@@ -380,7 +380,7 @@ class ProductDeleteViewTests(TestCase):
         response = self.client.post(self.url)
 
         self.assertEqual(
-            self.levels_and_texts(response),
+            levels_and_texts(response),
             [
                 (
                     "success",
@@ -398,7 +398,7 @@ class ProductDeleteViewTests(TestCase):
         self.product.refresh_from_db()
         self.assertFalse(self.product.is_active)
         self.assertEqual(
-            self.levels_and_texts(response),
+            levels_and_texts(response),
             [
                 (
                     "warning",
@@ -787,3 +787,221 @@ class ReadOnlyMirrorTests(SimpleTestCase):
     def test_the_error_names_the_model(self):
         with self.assertRaisesMessage(ReadOnlyModelError, "OrderItem is read-only"):
             OrderItem(product_id=1).save()
+
+
+class ProductAdminTests(TestCase):
+    """The admin applies the rules of the panel through the services."""
+
+    fixtures = ["categories.json"]
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.superuser = get_user_model().objects.create_superuser("admin")
+
+    def setUp(self):
+        self.product = make_product(stock=12)
+        self.change_url = reverse("admin:inventory_product_change", args=[self.product.pk])
+        self.delete_url = reverse("admin:inventory_product_delete", args=[self.product.pk])
+        self.add_url = reverse("admin:inventory_product_add")
+        self.changelist_url = reverse("admin:inventory_product_changelist")
+        self.client.force_login(self.superuser)
+
+    def form_data(self, **overrides):
+        """Return admin form data that keeps the product as it is, except for the overrides."""
+        return {
+            "name": self.product.name,
+            "category": self.product.category_id,
+            "description": "",
+            "price_per_kg": "549.00",
+            "min_quantity_kg": "0",
+            "stock": "12",
+            "is_active": "on",
+            "image_url": "",
+            "metadata": "{}",
+            # Management form of the cut spec inline. No spec row is submitted.
+            "spec-TOTAL_FORMS": "0",
+            "spec-INITIAL_FORMS": "0",
+            "spec-MIN_NUM_FORMS": "0",
+            "spec-MAX_NUM_FORMS": "1",
+            **overrides,
+        }
+
+    def stored_product(self):
+        return Product.objects.get(pk=self.product.pk)
+
+    def delete_selected(self, *products):
+        """Run the admin's bulk "delete selected" action, already confirmed."""
+        return self.client.post(
+            self.changelist_url,
+            {
+                "action": "delete_selected",
+                "_selected_action": [product.pk for product in products],
+                "post": "yes",
+            },
+        )
+
+    def warnings(self, response):
+        return [text for level, text in levels_and_texts(response) if level == "warning"]
+
+    # price_per_lb
+
+    def test_price_per_lb_is_shown_but_cannot_be_edited(self):
+        response = self.client.get(self.change_url)
+
+        self.assertIn("price_per_lb", response.context["adminform"].readonly_fields)
+        self.assertNotContains(response, 'name="price_per_lb"')
+        self.assertContains(response, "249.03")
+
+    def test_a_submitted_price_per_lb_is_ignored(self):
+        response = self.client.post(self.change_url, self.form_data(price_per_lb="1.00"))
+
+        self.assertRedirects(response, self.changelist_url)
+        self.assertEqual(self.stored_product().price_per_lb, Decimal("249.03"))
+
+    # confirmation of a price or minimum quantity change
+
+    def test_a_new_price_needs_confirmation(self):
+        response = self.client.post(self.change_url, self.form_data(price_per_kg="600.00"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.context["adminform"].form.errors["confirm_price_change"],
+            [
+                "Este cambio necesita confirmación: el precio por kg pasa de $549.00 a $600.00. "
+                "Marca la casilla «Confirmar cambio de precio o cantidad mínima» para guardarlo."
+            ],
+        )
+        self.assertEqual(self.stored_product().price_per_kg, Decimal("549.00"))
+
+    def test_a_new_minimum_quantity_needs_confirmation(self):
+        response = self.client.post(self.change_url, self.form_data(min_quantity_kg="0.250"))
+
+        self.assertEqual(response.status_code, 200)
+        errors = response.context["adminform"].form.errors["confirm_price_change"]
+        self.assertIn("la cantidad mínima pasa de 0.000 kg a 0.250 kg", errors[0])
+        self.assertEqual(self.stored_product().min_quantity_kg, Decimal("0"))
+
+    def test_the_message_names_both_fields_when_both_change(self):
+        data = self.form_data(price_per_kg="600.00", min_quantity_kg="0.250")
+
+        response = self.client.post(self.change_url, data)
+
+        message = response.context["adminform"].form.errors["confirm_price_change"][0]
+        self.assertIn("el precio por kg pasa de $549.00 a $600.00 y la cantidad mínima", message)
+
+    def test_confirming_saves_the_change_and_derives_price_per_lb(self):
+        data = self.form_data(price_per_kg="600.00", confirm_price_change="on")
+
+        response = self.client.post(self.change_url, data)
+
+        self.assertRedirects(response, self.changelist_url)
+        stored = self.stored_product()
+        self.assertEqual(stored.price_per_kg, Decimal("600.00"))
+        self.assertEqual(stored.price_per_lb, Decimal("272.16"))
+
+    def test_confirming_saves_a_minimum_quantity_change(self):
+        data = self.form_data(min_quantity_kg="0.250", confirm_price_change="on")
+
+        response = self.client.post(self.change_url, data)
+
+        self.assertRedirects(response, self.changelist_url)
+        self.assertEqual(self.stored_product().min_quantity_kg, Decimal("0.250"))
+
+    def test_a_change_to_another_field_needs_no_confirmation(self):
+        response = self.client.post(self.change_url, self.form_data(stock="20"))
+
+        self.assertRedirects(response, self.changelist_url)
+        self.assertEqual(self.stored_product().stock, 20)
+
+    def test_the_same_price_written_differently_needs_no_confirmation(self):
+        response = self.client.post(self.change_url, self.form_data(price_per_kg="549"))
+
+        self.assertRedirects(response, self.changelist_url)
+
+    def test_an_invalid_price_shows_its_own_error_and_not_the_confirmation(self):
+        response = self.client.post(self.change_url, self.form_data(price_per_kg="abc"))
+
+        self.assertEqual(response.status_code, 200)
+        errors = response.context["adminform"].form.errors
+        self.assertIn("price_per_kg", errors)
+        self.assertNotIn("confirm_price_change", errors)
+
+    def test_the_change_page_has_the_confirmation_checkbox(self):
+        response = self.client.get(self.change_url)
+
+        self.assertContains(response, 'name="confirm_price_change"')
+
+    def test_a_new_product_needs_no_confirmation_and_has_no_checkbox(self):
+        self.assertNotContains(self.client.get(self.add_url), "confirm_price_change")
+
+        data = self.form_data(name="Arrachera", price_per_kg="320.00")
+        response = self.client.post(self.add_url, data)
+
+        self.assertRedirects(response, self.changelist_url)
+        self.assertEqual(Product.objects.get(name="Arrachera").price_per_lb, Decimal("145.15"))
+
+    # delete or deactivate
+
+    def test_deleting_a_product_without_orders_removes_it(self):
+        response = self.client.post(self.delete_url, {"post": "yes"})
+
+        self.assertRedirects(response, self.changelist_url)
+        self.assertFalse(Product.objects.filter(pk=self.product.pk).exists())
+        self.assertEqual(self.warnings(response), [])
+
+    def test_deleting_a_product_with_orders_deactivates_it_and_says_so(self):
+        insert_order_item(self.product)
+
+        response = self.client.post(self.delete_url, {"post": "yes"})
+
+        self.assertRedirects(response, self.changelist_url)
+        self.assertFalse(self.stored_product().is_active)
+        self.assertEqual(
+            self.warnings(response),
+            [
+                '"Rib Eye" tiene pedidos registrados, así que se desactivó '
+                "en lugar de eliminarse para conservar el historial."
+            ],
+        )
+
+    def test_delete_selected_deactivates_only_the_products_with_orders(self):
+        insert_order_item(self.product)
+        without_orders = make_product("T-Bone")
+
+        response = self.delete_selected(self.product, without_orders)
+
+        self.assertRedirects(response, self.changelist_url)
+        self.assertFalse(self.stored_product().is_active)
+        self.assertFalse(Product.objects.filter(pk=without_orders.pk).exists())
+        self.assertEqual(
+            self.warnings(response),
+            [
+                '"Rib Eye" tiene pedidos registrados, así que se desactivó '
+                "en lugar de eliminarse para conservar el historial."
+            ],
+        )
+
+    def test_delete_selected_names_every_deactivated_product(self):
+        other = make_product("T-Bone")
+        insert_order_item(self.product)
+        insert_order_item(other)
+
+        response = self.delete_selected(self.product, other)
+
+        self.assertEqual(
+            self.warnings(response),
+            [
+                '"Rib Eye", "T-Bone" tienen pedidos registrados, así que se desactivaron '
+                "en lugar de eliminarse para conservar el historial."
+            ],
+        )
+        self.assertEqual(Product.objects.filter(is_active=False).count(), 2)
+
+    def test_delete_selected_removes_products_without_orders_without_a_warning(self):
+        other = make_product("T-Bone")
+
+        response = self.delete_selected(self.product, other)
+
+        self.assertRedirects(response, self.changelist_url)
+        self.assertFalse(Product.objects.exists())
+        self.assertEqual(self.warnings(response), [])

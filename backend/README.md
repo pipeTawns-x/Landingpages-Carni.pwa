@@ -77,6 +77,14 @@ Behaviour worth knowing before touching it:
   `order_items.product_id` is `ON DELETE RESTRICT`. When a delete does go
   through, the panel reports how many favorite lists lost the product
   (`favorites.product_id` cascades).
+- The Django admin (`inventory/admin.py`) applies the same rules through the
+  services. `price_per_lb` is shown read-only. A product whose price or minimum
+  quantity changes is not saved until the "Confirmar cambio de precio o
+  cantidad mínima" box is ticked (a new product needs none). Deleting products,
+  one by one or with the bulk action, deactivates those that have orders and
+  shows a warning that names them. Django still adds its own "deleted
+  successfully" message and logs a deletion for them, because both come from
+  the admin itself and not from `delete_model` or `delete_queryset`.
 - The list is paginated, 25 per page (`PRODUCTS_PER_PAGE` in
   `inventory/views.py`, using `Paginator.get_page`). `{% querystring %}` keeps
   `q` and `category` in the page links. A page that is zero, negative or past
@@ -91,7 +99,7 @@ Behaviour worth knowing before touching it:
 | --- | --- |
 | New attributes on the product model | `inventory/models.py` (`CutSpec`: weight per piece, thickness min/max/default, supplier, presentation, notes) |
 | Migrations created and applied | `inventory/migrations/0001_initial.py` (only `CutSpec`; the mirrored tables emit no DDL) and `0002_favorite_orderitem.py` (state only: the two read-only mirrors, no DDL) |
-| Admin registration | `inventory/admin.py` (product with the spec as an inline) |
+| Admin registration | `inventory/admin.py` (product with the spec as an inline, plus the panel's rules through `inventory/services.py`) |
 | list-view | `inventory/views.py::product_list` + `templates/inventory/product_list.html` |
 | detail-view | `inventory/views.py::product_detail` + `templates/inventory/product_detail.html` |
 | create-view | `inventory/views.py::product_create` + `templates/inventory/product_form.html` |
@@ -125,9 +133,10 @@ test database. The test settings import the regular ones, so the required
 variables (`backend/.env`) must be set even though the tests run on SQLite.
 
 `inventory/tests.py` covers `price_per_lb_for()`, the pagination, the staff
-views, the rules in `inventory/services.py` and the read-only mirrors. Those
-mirrors refuse writes from Django, so the tests add their rows with raw SQL,
-the way Supabase does. It starts from the fixture
+views, the rules in `inventory/services.py`, the read-only mirrors and the
+product admin (through the test client, as a superuser). Those mirrors refuse
+writes from Django, so the tests add their rows with raw SQL, the way Supabase
+does. It starts from the fixture
 `inventory/fixtures/categories.json`, the 9 real categories dumped with
 `dumpdata inventory.Category`. The `config.E001` system check only runs against
 Postgres; other databases have no `django` schema to verify.
