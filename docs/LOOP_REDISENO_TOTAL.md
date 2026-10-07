@@ -59,7 +59,10 @@ Entregar el REDISEÑO DE TODO EL PROYECTO hecho en Claude Design. Se mejoran EN 
   - Los commits de HTML, CSS y documentos no lo activan.
   - Eduardo ya decidió dos cosas, y las dos van en F0:
     - **La enmienda de `AGENTS.md`** (Tailwind v4 en las páginas migradas y en el panel). Copia el texto idéntico desde `git show origin/practicas-ebac:AGENTS.md`: es la viñeta que sigue a "Ningun otro directorio contiene SCSS" y la línea de Tailwind en "Contexto Visual y Producto".
-    - **GGA gratis.** Tu `.gga` lleva `PROVIDER="opencode:opencode/mimo-v2.6-flash-free"` y `export OPENCODE_CONFIG_CONTENT='{"snapshot":false}'`. Cópialos desde `git show origin/practicas-ebac:.gga`. Sin esa segunda línea, el snapshot de OpenCode mete y saca archivos del commit que GGA está revisando.
+    - **GGA gratis.** Copia de `git show origin/practicas-ebac:.gga` las líneas `PROVIDER`, `OPENCODE_AGENT` y `export OPENCODE_CONFIG_CONTENT`. Configuran Gemini Flash-Lite con un revisor que no puede ejecutar bash ni editar, y con el snapshot apagado.
+      - Sin el snapshot apagado, OpenCode mete y saca archivos del commit que GGA está revisando.
+      - Sin el revisor propio, el modelo gratis de Zen escribe el `STATUS:` después de la línea 30 y GGA bloquea el commit.
+      - El tier gratis de Zen rechaza agentes propios; por eso el revisor usa Gemini.
   - Nunca `--no-verify`. Si GGA responde ambiguo (sin la línea `STATUS:`), reintenta el commit una vez. Si vuelve a pasar, escribe BLOQUEADO y sigue con los pasos de HTML/CSS.
 - npm solo en Docker. Nada de CDN, ni `innerHTML` con datos. Solo tokens del `@theme`.
 - Conserva del primer diseño lo que Eduardo pidió mantener (por ejemplo, el encabezado). Anota cada excepción frente a Claude Design en ESTADO.

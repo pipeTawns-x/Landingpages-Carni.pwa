@@ -37,7 +37,7 @@ Se trabaja en el worktree de la sesión y se sube directo a `practicas-ebac`.
 - Toda plantilla del panel nace de un archivo HTML que ya existe (`git mv`). El commit dice cuál.
 - Si una ruta cambia, se buscan con `rg` todas las referencias y se actualizan en el mismo commit.
 - Commits de producto y de curso, separados.
-- GGA revisa con un modelo gratis (`.gga`: `opencode/mimo-v2.6-flash-free`, con el snapshot de OpenCode apagado). Si responde sin la línea `STATUS:`, se reintenta el commit; nunca se salta.
+- GGA revisa gratis con Gemini Flash-Lite, a través de un revisor (`gga-reviewer`, en `.gga`) que no puede ejecutar bash ni editar, y con el snapshot de OpenCode apagado. Si responde sin la línea `STATUS:`, se reintenta el commit; nunca se salta.
 - **Variables de entorno:** ningún archivo de entorno nuevo.
   - Django lee solo `backend/.env`, ordenado por secciones.
   - Las llaves de IA viven en `~/.omniroute/.env`, fuera del repo.
