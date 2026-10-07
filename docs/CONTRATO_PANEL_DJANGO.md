@@ -91,7 +91,7 @@ Los datos de ejemplo son los reales: 53 productos y 9 categorías.
 ## 5b. Seguridad del traspaso (revisión obligatoria antes de F4/B8)
 
 - El `access_token` viaja solo en el cuerpo de un POST y por HTTPS (en local, `http://localhost`). Nunca en la URL ni en la consola. Un token en la URL se rechaza.
-- La página de la tienda que hace el traspaso NO puede mandar `Referrer-Policy: no-referrer` (ni `same-origin`): con esas políticas el navegador manda `Origin: null` en un POST de formulario a otro origen (comprobado en Chrome el 2026-10-07), y Django rechazaría todo traspaso legítimo. Debe mandar `strict-origin`, que solo deja salir el origen y no la ruta.
+- La página de la tienda que hace el traspaso NO puede mandar `Referrer-Policy: no-referrer` (ni `same-origin`): con esas políticas el navegador manda `Origin: null` en un POST de formulario a otro origen (comprobado en Chrome el 2026-10-07), y Django rechazaría todo traspaso legítimo. Sirven `strict-origin` y el `strict-origin-when-cross-origin` que `netlify.toml` ya manda en todas las páginas (comprobados en Chrome): dejan salir el origen y no la ruta. Lo que no hay que hacer es cambiar esa página a `no-referrer`.
 - Django exige que la cabecera `Origin` sea una de `PANEL_ALLOWED_ORIGINS`. Sin cabecera, o con `null`, rechaza. Sus propias respuestas mandan `Referrer-Policy: same-origin`, no `no-referrer`: con `no-referrer` el navegador manda `Origin: null` en TODOS los POST, también en los de las páginas de Django, y la verificación CSRF de Django rechaza `null` (comprobado en Chrome el 2026-10-07: salir, los formularios y el admin dejarían de funcionar).
 - `/panel/salir/` es un POST con token CSRF de Django (los formularios del panel lo llevan con `{% csrf_token %}`) y redirige a `STORE_ORIGIN/accessweb.html`. Cierra la sesión de Django, no la de Supabase: la tienda debe llamar `supabase.auth.signOut()`.
 - La sesión de Django dura 8 horas sin renovarse y Django lee `profiles.role` en cada petición: quitarle el rol de admin a alguien en Supabase le cierra el panel en su siguiente clic. La cookie va `HttpOnly`, `SameSite=Lax` (con `Strict` el navegador no la manda en la redirección que sigue al POST, porque ese POST viene de otro sitio) y `Secure` cuando `DJANGO_DEBUG` está apagado.
@@ -134,7 +134,7 @@ En local: Django en `localhost:8000`, la tienda en `localhost:3002` y Supabase e
   - G6 para `VITE_PANEL_URL`.
   - El diseño son 16 pantallas `.dc.html` (`docs/design/claude-design-1.1/`).
 - 2026-10-07 (B8): corregido §5b y completado §6 al implementar el traspaso.
-  - La página de la tienda que hace el traspaso no puede mandar `Referrer-Policy: no-referrer`: el navegador manda `Origin: null` y Django rechaza el traspaso. Tiene que mandar `strict-origin`. Cambia lo que decía la versión anterior; avisado al agente de rediseño antes de S4.
+  - La página de la tienda que hace el traspaso no puede mandar `Referrer-Policy: no-referrer`: el navegador manda `Origin: null` y Django rechaza el traspaso. Sirven `strict-origin` y el `strict-origin-when-cross-origin` que `netlify.toml` ya manda. Cambia lo que decía la versión anterior; avisado al agente de rediseño antes de S4.
   - Se agrega `SUPABASE_JWKS_URL`. `SUPABASE_JWT_SECRET` pasa a ser solo para local.
   - Se documentan la edad máxima del token (la tienda debe entregar uno recién emitido), el 302/403/405 de `/panel/sesion/` y que esa ruta va sin token CSRF.
 - 2026-10-07 (B9): `/panel/salir/`, el rol leído en cada petición, cookies y cabeceras.

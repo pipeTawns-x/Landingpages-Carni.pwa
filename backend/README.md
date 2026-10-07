@@ -187,8 +187,9 @@ Behaviour worth knowing before touching it:
   allow-list and the token itself stand in for it.
 - With `Referrer-Policy: no-referrer` (or `same-origin` for a cross-origin POST)
   browsers send `Origin: null` on form POSTs. So the store page that posts the
-  token must send `strict-origin`, which hides the path and keeps the origin, or
-  every handoff is refused. The same applies to Django itself: its answers send
+  token has to keep a policy that leaves the origin in (`strict-origin`, or the
+  `strict-origin-when-cross-origin` that `netlify.toml` sends today), or every
+  handoff is refused. The same applies to Django itself: its answers send
   `Referrer-Policy: same-origin`, not `no-referrer`, because `Origin: null` on
   the panel's own POSTs fails Django's CSRF check (a null origin is refused) and
   the logout, the product forms and the admin would stop working.
