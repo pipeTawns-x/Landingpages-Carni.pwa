@@ -69,15 +69,32 @@ uv run ruff format .
 
 ## Inventory panel
 
-The `inventory` app is the staff panel for the catalog, served at
-`/inventario/` and protected with `login_required` (sign in through
-`/admin/login/`). `Category` and `Product` mirror the Supabase-owned tables
-with `managed = False`, and so do `OrderItem` and `Favorite`, which are
-read-only (`save()`, `delete()` and every queryset write raise
-`ReadOnlyModelError`) because the panel only counts the rows that point at a
-product. `CutSpec` is the only Django-managed table and stores the data the
-storefront still lacks: average weight per piece, thickness range, supplier and
-presentation.
+The `inventory` app is the products section of the panel. Its five views are
+wrapped in `panel_admin_required`, so only an admin whose session the Supabase
+handoff opened gets in (see "Panel session handoff"). There is no Django login
+for them: an admin signs in at the store and the store hands the session over,
+and `/admin/login/` opens the Django admin site only.
+
+| Route | Name | View |
+| --- | --- | --- |
+| `/panel/productos/` | `inventory:list` | `product_list` |
+| `/panel/productos/<id>/` | `inventory:detail` | `product_detail` |
+| `/panel/productos/nuevo/` | `inventory:create` | `product_create` |
+| `/panel/productos/<id>/editar/` | `inventory:update` | `product_update` |
+| `/panel/productos/<id>/eliminar/` | `inventory:delete` | `product_delete` |
+
+The routes are mounted from `config/urls.py` and not from `panel/urls.py`: an
+include inside the `panel` namespace would rename them `panel:inventory:*`, and
+the contract (`docs/CONTRATO_PANEL_DJANGO.md`) names them `inventory:*`. They
+used to live at `/inventario/`; that address no longer exists and does not
+redirect, because the old page is now this one.
+
+`Category` and `Product` mirror the Supabase-owned tables with
+`managed = False`, and so do `OrderItem` and `Favorite`, which are read-only
+(`save()`, `delete()` and every queryset write raise `ReadOnlyModelError`)
+because the panel only counts the rows that point at a product. `CutSpec` is the
+only Django-managed table and stores the data the storefront still lacks:
+average weight per piece, thickness range, supplier and presentation.
 
 Behaviour worth knowing before touching it:
 
@@ -122,9 +139,9 @@ Behaviour worth knowing before touching it:
 | create-view | `inventory/views.py::product_create` + `templates/inventory/product_form.html` |
 | update-view | `inventory/views.py::product_update` + `product_form.html`, `product_confirm_price_change.html` |
 | delete-view | `inventory/views.py::product_delete` + `templates/inventory/product_confirm_delete.html` |
-| URLs | `inventory/urls.py` (namespace `inventory`), mounted in `config/urls.py` |
+| URLs | `inventory/urls.py` (namespace `inventory`), mounted in `config/urls.py` at `/panel/productos/` |
 | Forms | `inventory/forms.py` (`ProductForm`, `CutSpecForm`) |
-| Search and protection | `Q` filter in `product_list`; `login_required` on the five views, `LOGIN_URL` in `config/settings.py` |
+| Search and protection | `Q` filter in `product_list`; `panel_admin_required` on the five views (it replaced `login_required` and `LOGIN_URL` when the views moved under `/panel/productos/`) |
 
 ### EBAC practice M14 — Django Models & Admin
 
@@ -174,10 +191,10 @@ Behaviour worth knowing before touching it:
   made some other way (`createsuperuser`, the admin site) is not a panel admin.
   The decorator also reads `profiles.role` on every request, so demoting an
   admin in Supabase ends their panel access on the next click, and it closes
-  that session instead of leaving it open. A test fails when a panel route is
-  neither guarded nor listed as public. The inventory views still use
-  `login_required` (any Django user) until they are mounted under
-  `/panel/productos/`; that move is where they should switch to this decorator.
+  that session instead of leaving it open. A test fails when a route mounted
+  under `/panel/` is neither guarded nor listed as public; it walks the root
+  URLconf, so it covers the products (`/panel/productos/`) as well as the routes
+  of the `panel` app.
 - `panel:salir` is the one panel route that is not behind the decorator, so that
   an admin whose role was just revoked can still sign out. It ends the Django
   session only: the Supabase one lives in the store's browser storage, so the
@@ -230,11 +247,13 @@ access bridge, the guard of the panel views, the logout and the cookie flags and
 headers, and `config/tests.py` the parsers of the environment variables. The test settings set the panel's
 configuration themselves, with a signing secret that is random on every run.
 
-`inventory/tests.py` covers `price_per_lb_for()`, the pagination, the staff
-views, the rules in `inventory/services.py`, the read-only mirrors and the
-product admin (through the test client, as a superuser). Those mirrors refuse
-writes from Django, so the tests add their rows with raw SQL, the way Supabase
-does. It starts from the fixture
+`inventory/tests.py` covers `price_per_lb_for()`, the pagination, the panel
+views and their routes, the rules in `inventory/services.py`, the read-only
+mirrors and the product admin (through the test client, as a superuser). The
+panel views are tested signed in the way a real admin signs in, through the
+handoff (`sign_in_as_panel_admin` in `panel/tests.py`), so the guard is never
+skipped. Those mirrors refuse writes from Django, so the tests add their rows
+with raw SQL, the way Supabase does. It starts from the fixture
 `inventory/fixtures/categories.json`, the 9 real categories dumped with
 `dumpdata inventory.Category`. The `config.E001` system check only runs against
 Postgres; other databases have no `django` schema to verify.

@@ -5,10 +5,13 @@ create, update, delete) backed by ModelForms, `get_object_or_404`,
 `django.contrib.messages`, and POST-redirect-GET. The business rules (price
 confirmation, delete or deactivate, when a cut spec is stored) live in
 `inventory.services`; the views only translate them into pages and messages.
+
+They are the products section of the panel, mounted at `/panel/productos/`, and
+every one is wrapped in `panel_admin_required`: only an admin whose session a
+Supabase handoff opened gets in, not just any Django user.
 """
 
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
@@ -16,11 +19,12 @@ from django.shortcuts import get_object_or_404, redirect, render
 from inventory import services
 from inventory.forms import CutSpecForm, ProductForm
 from inventory.models import Category, CutSpec, Product
+from panel.access import panel_admin_required
 
 PRODUCTS_PER_PAGE = 25
 
 
-@login_required
+@panel_admin_required
 def product_list(request):
     """List products, paginated, with optional free-text search and category filter."""
     query = request.GET.get("q", "").strip()
@@ -57,7 +61,7 @@ def product_list(request):
     return render(request, "inventory/product_list.html", context)
 
 
-@login_required
+@panel_admin_required
 def product_detail(request, product_id):
     """Show a single product and its cut spec, if it has one."""
     product = get_object_or_404(Product.objects.select_related("category"), pk=product_id)
@@ -65,7 +69,7 @@ def product_detail(request, product_id):
     return render(request, "inventory/product_detail.html", {"product": product, "spec": spec})
 
 
-@login_required
+@panel_admin_required
 def product_create(request):
     """Create a product and, optionally, its cut spec."""
     if request.method == "POST":
@@ -88,7 +92,7 @@ def product_create(request):
     return render(request, "inventory/product_form.html", context)
 
 
-@login_required
+@panel_admin_required
 def product_update(request, product_id):
     """Update a product and its cut spec.
 
@@ -156,7 +160,7 @@ def product_update(request, product_id):
     return render(request, "inventory/product_form.html", context)
 
 
-@login_required
+@panel_admin_required
 def product_delete(request, product_id):
     """Delete a product, unless it has order history — then deactivate it.
 

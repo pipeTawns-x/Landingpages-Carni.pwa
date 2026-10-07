@@ -28,7 +28,7 @@ Decisión de fondo: `docs/DECISION_PANEL_DJANGO_2026-10-06.md`.
 | Traspaso de sesión (POST) | — | — | `/panel/sesion/` | `panel:sesion` |
 | Salir (POST) | — | — | `/panel/salir/` | `panel:salir` |
 
-Las rutas de Productos ya existen en Django como `inventory:*`. Se montan bajo `/panel/productos/`, y `/inventario/` deja de existir como panel aparte. Ninguno de los dos agentes inventa rutas fuera de esta tabla.
+Las rutas de Productos son `inventory:*` y están montadas bajo `/panel/productos/` desde B14. `/inventario/` ya no existe como panel aparte y no redirige: la página vieja pasó a ser la nueva. Solo entra un admin del traspaso (`panel_admin_required`). Ninguno de los dos agentes inventa rutas fuera de esta tabla.
 
 ## 2. Dueños de archivos (un escritor por ruta)
 
@@ -141,3 +141,7 @@ En local: Django en `localhost:8000`, la tienda en `localhost:3002` y Supabase e
   - Corregido lo que se había escrito en B8: las respuestas de Django mandan `Referrer-Policy: same-origin` y no `no-referrer`, porque con `no-referrer` el navegador manda `Origin: null` también en los POST del propio Django y su verificación CSRF los rechaza.
   - Se agregan `DJANGO_COOKIE_SECURE`, `DJANGO_COOKIE_HTTPONLY` y `DJANGO_COOKIE_SAMESITE` (opcionales) y la vida de 8 horas de la sesión.
   - Sin CSP de Django todavía: el contrato no la pide (el CSP de §5b es el de Netlify) y la define `panel/base.html` (B7).
+- 2026-10-07 (B14): las rutas de Productos ya viven bajo `/panel/productos/`, con las rutas y los nombres de §1 sin cambios (`inventory:*`).
+  - `/inventario/` desapareció sin redirección: la página vieja pasó a ser la nueva.
+  - Las cinco vistas exigen un admin del traspaso (`panel_admin_required`) en lugar de cualquier usuario de Django. `panel:inicio` sigue llevando a `inventory:list`.
+  - Siguen las plantillas claras de la M13 hasta B15, que las reemplaza con el HTML rediseñado.

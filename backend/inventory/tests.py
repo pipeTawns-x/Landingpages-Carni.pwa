@@ -1,18 +1,23 @@
-"""Tests for the inventory app: the price helper, the staff views, the services
-that hold the catalogue rules and the read-only mirrors of Supabase tables.
+"""Tests for the inventory app: the price helper, the panel views and their routes,
+the services that hold the catalogue rules and the read-only mirrors of Supabase
+tables.
 
 They run on SQLite through config.settings_test. `Category`, `Product`,
 `OrderItem` and `Favorite` are unmanaged mirrors of Supabase tables, so
 config.test_runner builds their tables for the test database. The last two
 refuse writes from Django, so the tests add their rows with raw SQL, the way
 Supabase does in production.
+
+The views are the products section of the panel, so only a panel admin gets in.
+Their tests sign in the way a real admin does, through the Supabase handoff
+(`sign_in_as_panel_admin`), and skip nothing of the guard. The Django admin site
+is not the panel: its tests sign in as a superuser.
 """
 
 import uuid
 from decimal import Decimal
 from unittest import mock
 
-from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.messages import get_messages
 from django.db import IntegrityError, connection
@@ -31,6 +36,7 @@ from inventory.models import (
     ReadOnlyModelError,
     price_per_lb_for,
 )
+from panel.tests import sign_in_as_panel_admin
 
 
 def make_product(name="Rib Eye", **fields):
@@ -111,7 +117,6 @@ class ProductUpdateSpecTests(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.staff = get_user_model().objects.create_user("staff")
         cls.product = Product.objects.create(
             category=Category.objects.first(),
             name="Rib Eye",
@@ -122,7 +127,7 @@ class ProductUpdateSpecTests(TestCase):
     def setUp(self):
         self.url = reverse("inventory:update", args=[self.product.pk])
         self.detail_url = reverse("inventory:detail", args=[self.product.pk])
-        self.client.force_login(self.staff)
+        sign_in_as_panel_admin(self.client)
 
     def post_data(self, **spec_fields):
         """Return POST data that keeps the product as it is, plus the given spec fields.
@@ -188,11 +193,10 @@ class ProductCreateTests(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.category = Category.objects.first()
-        cls.staff = get_user_model().objects.create_user("staff")
 
     def setUp(self):
         self.url = reverse("inventory:create")
-        self.client.force_login(self.staff)
+        sign_in_as_panel_admin(self.client)
 
     def post_data(self, **spec_fields):
         return {
@@ -239,7 +243,6 @@ class ProductUpdateConfirmationTests(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.staff = get_user_model().objects.create_user("staff")
         cls.product = Product.objects.create(
             category=Category.objects.first(),
             name="Rib Eye",
@@ -250,7 +253,7 @@ class ProductUpdateConfirmationTests(TestCase):
     def setUp(self):
         self.url = reverse("inventory:update", args=[self.product.pk])
         self.detail_url = reverse("inventory:detail", args=[self.product.pk])
-        self.client.force_login(self.staff)
+        sign_in_as_panel_admin(self.client)
 
     def post_data(self, **overrides):
         """Return POST data that keeps the product as it is, except for the overrides."""
@@ -329,15 +332,11 @@ class ProductDeleteViewTests(TestCase):
 
     fixtures = ["categories.json"]
 
-    @classmethod
-    def setUpTestData(cls):
-        cls.staff = get_user_model().objects.create_user("staff")
-
     def setUp(self):
         self.product = make_product()
         self.url = reverse("inventory:delete", args=[self.product.pk])
         self.list_url = reverse("inventory:list")
-        self.client.force_login(self.staff)
+        sign_in_as_panel_admin(self.client)
 
     def test_the_confirmation_page_counts_the_orders_and_the_favorites(self):
         insert_order_item(self.product)
@@ -444,11 +443,7 @@ class ProductDeleteViewTests(TestCase):
 
         response = self.client.post(self.url)
 
-        self.assertRedirects(
-            response,
-            f"{settings.LOGIN_URL}?next={self.url}",
-            fetch_redirect_response=False,
-        )
+        self.assertRedirects(response, reverse("panel:acceso"), fetch_redirect_response=False)
         self.product.refresh_from_db()
         self.assertTrue(self.product.is_active)
 
@@ -474,22 +469,17 @@ class ProductListPaginationTests(TestCase):
                 )
             )
         Product.objects.bulk_create(products)
-        cls.staff = get_user_model().objects.create_user("staff")
 
     def setUp(self):
         self.url = reverse("inventory:list")
-        self.client.force_login(self.staff)
+        sign_in_as_panel_admin(self.client)
 
-    def test_anonymous_user_is_redirected_to_login(self):
+    def test_anonymous_user_is_redirected_to_the_access_bridge(self):
         self.client.logout()
 
         response = self.client.get(self.url)
 
-        self.assertRedirects(
-            response,
-            f"{settings.LOGIN_URL}?next={self.url}",
-            fetch_redirect_response=False,
-        )
+        self.assertRedirects(response, reverse("panel:acceso"), fetch_redirect_response=False)
 
     def test_first_page_has_25_of_500_products(self):
         response = self.client.get(self.url)
@@ -586,6 +576,90 @@ class ProductListPaginationTests(TestCase):
 
         self.assertContains(response, "No se encontraron productos")
         self.assertNotContains(response, "Mostrando")
+
+
+class ProductRoutesTests(SimpleTestCase):
+    """The products live under /panel/productos/, with the paths and names of the contract."""
+
+    def test_the_routes_are_the_ones_of_the_contract(self):
+        # docs/CONTRATO_PANEL_DJANGO.md, section 1.
+        self.assertEqual(reverse("panel:inicio"), "/panel/")
+        self.assertEqual(reverse("inventory:list"), "/panel/productos/")
+        self.assertEqual(reverse("inventory:create"), "/panel/productos/nuevo/")
+        self.assertEqual(reverse("inventory:detail", args=[7]), "/panel/productos/7/")
+        self.assertEqual(reverse("inventory:update", args=[7]), "/panel/productos/7/editar/")
+        self.assertEqual(reverse("inventory:delete", args=[7]), "/panel/productos/7/eliminar/")
+
+
+class ProductAccessTests(TestCase):
+    """Only a panel admin gets into the products, however the request comes in."""
+
+    fixtures = ["categories.json"]
+
+    def setUp(self):
+        self.product = make_product()
+        self.routes = {
+            "list": reverse("inventory:list"),
+            "detail": reverse("inventory:detail", args=[self.product.pk]),
+            "create": reverse("inventory:create"),
+            "update": reverse("inventory:update", args=[self.product.pk]),
+            "delete": reverse("inventory:delete", args=[self.product.pk]),
+        }
+        self.bridge = reverse("panel:acceso")
+
+    def test_a_panel_admin_reaches_every_route(self):
+        sign_in_as_panel_admin(self.client)
+
+        for name, url in self.routes.items():
+            with self.subTest(route=name):
+                self.assertEqual(self.client.get(url).status_code, 200)
+
+    def test_an_anonymous_visitor_is_sent_to_the_bridge_from_every_route(self):
+        for name, url in self.routes.items():
+            for method in ("get", "post"):
+                with self.subTest(route=name, method=method):
+                    response = getattr(self.client, method)(url)
+
+                    self.assertRedirects(response, self.bridge, fetch_redirect_response=False)
+
+        # The posts to create, update and delete ran into the guard, not into the views.
+        self.assertEqual(list(Product.objects.all()), [self.product])
+        self.assertTrue(Product.objects.get(pk=self.product.pk).is_active)
+
+    def test_a_django_superuser_made_some_other_way_is_not_let_in(self):
+        # Before the products moved under /panel/, any Django user could open them.
+        self.client.force_login(get_user_model().objects.create_superuser("local"))
+
+        for name, url in self.routes.items():
+            with self.subTest(route=name):
+                response = self.client.get(url)
+
+                self.assertRedirects(response, self.bridge, fetch_redirect_response=False)
+
+    def test_an_admin_demoted_after_signing_in_loses_the_products_at_the_next_click(self):
+        admin_id = sign_in_as_panel_admin(self.client)
+        with connection.cursor() as cursor:
+            cursor.execute("UPDATE profiles SET role = 'customer' WHERE id = %s", [admin_id.hex])
+
+        response = self.client.get(self.routes["list"])
+
+        self.assertRedirects(response, self.bridge, fetch_redirect_response=False)
+        self.assertNotIn("_auth_user_id", self.client.session)
+
+    def test_the_old_inventario_urls_are_gone_and_do_not_redirect(self):
+        # The old page became the new one: there is no redirect layer to keep.
+        sign_in_as_panel_admin(self.client)
+        old_paths = (
+            "/inventario/",
+            "/inventario/1/",
+            "/inventario/nuevo/",
+            "/inventario/1/editar/",
+            "/inventario/1/eliminar/",
+        )
+
+        for path in old_paths:
+            with self.subTest(path=path):
+                self.assertEqual(self.client.get(path).status_code, 404)
 
 
 class PriceChangeTests(SimpleTestCase):

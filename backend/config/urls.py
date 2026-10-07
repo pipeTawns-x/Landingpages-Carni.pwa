@@ -20,6 +20,10 @@ from django.urls import include, path
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("inventario/", include("inventory.urls")),
+    # The products are a section of the panel, not a panel of their own. They are
+    # mounted here and not from panel/urls.py on purpose: an include inside the
+    # `panel` namespace would rename their routes to `panel:inventory:*`, and the
+    # contract (docs/CONTRATO_PANEL_DJANGO.md) names them `inventory:*`.
+    path("panel/productos/", include("inventory.urls")),
     path("panel/", include("panel.urls")),
 ]

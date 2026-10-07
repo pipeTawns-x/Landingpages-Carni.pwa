@@ -24,12 +24,11 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db import connection
 from django.test import Client, SimpleTestCase, TestCase, override_settings
-from django.urls import URLResolver, reverse
+from django.urls import URLResolver, get_resolver, reverse
 from jwt.algorithms import ECAlgorithm
 
 from inventory.models import ReadOnlyModelError
 from panel import supabase_auth
-from panel import urls as panel_urls
 from panel.access import (
     PANEL_SESSION_KEY,
     get_or_create_panel_user,
@@ -52,13 +51,19 @@ def insert_profile(user_id, role):
         cursor.execute("INSERT INTO profiles (id, role) VALUES (%s, %s)", [user_id.hex, role])
 
 
-def leaf_patterns(patterns):
-    """Yield every route under `patterns`, going into the `include()` of other apps."""
+def routes(patterns, prefix=""):
+    """Yield (path, callback) for every route under `patterns`, going into each `include()`.
+
+    The path is the whole route as it is mounted, so what comes out does not
+    depend on which app a route lives in: `panel/productos/nuevo/` is found
+    whether it was declared by the panel app or by the inventory one.
+    """
     for pattern in patterns:
+        path = prefix + str(pattern.pattern)
         if isinstance(pattern, URLResolver):
-            yield from leaf_patterns(pattern.url_patterns)
+            yield from routes(pattern.url_patterns, path)
         else:
-            yield pattern
+            yield path, pattern.callback
 
 
 def hand_off(client, user_id):
@@ -68,6 +73,22 @@ def hand_off(client, user_id):
         {"access_token": make_token(user_id)},
         HTTP_ORIGIN=ALLOWED_ORIGIN,
     )
+
+
+def sign_in_as_panel_admin(client):
+    """Sign `client` in the way a real admin gets in, and return the Supabase user id.
+
+    The admin's profile is added first (Supabase owns that table, so with raw
+    SQL, as in production) and its token is handed over from the allowed origin.
+    Nothing in the guard is skipped, so the tests of any other app that sign in
+    like this exercise `panel_admin_required` for real.
+    """
+    user_id = uuid.uuid4()
+    insert_profile(user_id, "admin")
+    response = hand_off(client, user_id)
+    if response.status_code != 302:
+        raise AssertionError(f"The handoff of the test admin was refused ({response.status_code}).")
+    return user_id
 
 
 def token_claims(user_id, **overrides):
@@ -782,13 +803,25 @@ class PanelAccessTests(TestCase):
 
     def test_every_panel_route_is_guarded_unless_it_is_meant_to_be_public(self):
         # The way in (`sesion`), the bridge (`acceso`) and the way out (`salir`)
-        # have to work without being an admin. A route added later has to be
-        # guarded or be added here on purpose.
-        public = {"acceso", "sesion", "salir"}
-        for pattern in leaf_patterns(panel_urls.urlpatterns):
-            guarded = getattr(pattern.callback, "panel_admin_required", False)
-            with self.subTest(route=pattern.name):
-                self.assertEqual(guarded, pattern.name not in public)
+        # have to work without being an admin. Anything else mounted under
+        # /panel/, whichever app declares it, has to be guarded or be added here
+        # on purpose. The walk starts at the root URLconf, so it reaches the
+        # products (`panel/productos/`) and not only the routes of the panel app.
+        public = {"panel/acceso/", "panel/sesion/", "panel/salir/"}
+        panel_routes = {
+            path: callback
+            for path, callback in routes(get_resolver().url_patterns)
+            if path.startswith("panel/")
+        }
+
+        for path, callback in panel_routes.items():
+            guarded = getattr(callback, "panel_admin_required", False)
+            with self.subTest(route=path):
+                self.assertEqual(guarded, path not in public)
+
+        # A walk that found nothing under panel/productos/ would pass for the wrong reason.
+        products = [path for path in panel_routes if path.startswith("panel/productos/")]
+        self.assertEqual(len(products), 5)
 
 
 class RoleRevalidationTests(TestCase):

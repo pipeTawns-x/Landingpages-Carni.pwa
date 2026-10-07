@@ -155,13 +155,6 @@ USE_TZ = True
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
-# Auth
-# https://docs.djangoproject.com/en/5.2/topics/auth/default/#the-login-required-decorator
-#
-# The course uses the built-in admin login page as the app's login page, so
-# @login_required redirects there instead of a dedicated login view.
-LOGIN_URL = "/admin/login/"
-
 
 # Panel session handoff (Supabase -> Django)
 # See docs/CONTRATO_PANEL_DJANGO.md, sections 5b and 6.
