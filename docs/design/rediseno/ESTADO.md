@@ -177,8 +177,8 @@ Fuente de verdad: `origin/practicas-ebac:docs/LOOP_REDISENO_TOTAL.md` y `docs/CO
 |---|---|---|---|
 | F0 | Enmienda de `AGENTS.md`, `.gga` gratis, corrección del traspaso (M14: código existe, entrega al LMS pendiente en B5) | HECHO | `1bfb1d8f`, `4d4abf3f`, `d778b84d` |
 | F1 | `tokens.css` exportable (S1); hash del CSS de la tienda intacto (`tailwind-B8PZhvSI.css`); `DESIGN.md` conciliado | HECHO | `3e471379`, `7991d6af`, DESIGN.md |
-| F2 | `dashboar.html` rediseñado en el lugar (S2) | PENDIENTE ← siguiente | |
-| F3 | `admin-products.html` y kit de Productos (S3, prioridad M14) | PENDIENTE | |
+| F2 | `dashboar.html` rediseñado en el lugar (S2) | EN CURSO (workflow `wf_9e86359c-e35`) | |
+| F3 | `admin-products.html` y kit de Productos (S3, prioridad M14) | EN CURSO (mismo workflow, tras F2) | |
 | F4 a F10 | Tienda, perfil, islas, resto del panel, PWA, auditoría | PENDIENTE | |
 
 **Trabajo sin commit heredado (OpenCode, verificado verde: tipos OK y 64 pruebas):** `jest.config.js`, `src/components/Lupa/*`, `src/components/__tests__/*`, `src/data/supabase.ts`, `src/entry/products.tsx`, `src/redux/slices/busquedaSlice.ts`, `src/ui/{Carcasa,Encabezado,Hoja}.tsx`, `src/ui/Hoja.css`, `src/ui/LupaHoja.tsx` y sus pruebas. Se commitea por componente cuando se toque la Lupa o la Hoja (F4); mientras tanto no se pierde nada. También quedan sin commit `docs/design/loop-final.md` y `loop-v3.md` (ajenos).
@@ -188,3 +188,4 @@ Componentes · Encabezado · Pie · Tarjeta · Cierre · Landing (`index.html`) 
 
 **Excepciones frente a Claude Design a anotar:** la landing y el encabezado ya tienen el efecto de video que Eduardo pidió conservar (`rgba(0,0,0,.92)` en hover o foco, sin desenfoque).
 - 2026-10-07 · F0 y F1 HECHOS. 5 h ~33 % · semanal ~42 % · contexto del chat 83 % (conviene una sesión nueva con el prompt de la etapa 2 para F2 y F3).
+- 2026-10-07 · S1 entregado al backend (nota en Engram `frontend/entrega/tokens`, sha256 de tokens.css 6847e086…cd05). F2 y F3 lanzados en un solo Workflow (`wf_9e86359c-e35`: escritor Sonnet → revisor fresco → corrección → siguiente). Si se corta: `Workflow({scriptPath: "…/workflows/scripts/rediseno-f2-f3-panel-wf_9e86359c-e35.js", resumeFromRunId: "wf_9e86359c-e35"})`. Al volver: verificar con capturas a 390 y 1440, reconfirmar el hash `tailwind-B8PZhvSI.css`, commitear un archivo por commit (panel.css, dashboar.html, kit/mas.html, admin-products.html, cada bloque del kit), push y nota `frontend/entrega/<pagina>`.
