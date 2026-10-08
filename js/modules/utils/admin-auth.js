@@ -43,8 +43,10 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
       
-      // Redirigir al panel de administración
-      window.location.href = 'dashboar.html';
+      // El panel de administración lo sirve Django (/panel/) y dashboar.html ya no
+      // existe en la tienda. Mientras el traspaso a Django no se conecte aquí
+      // (contrato S4), el admin vuelve al inicio.
+      window.location.href = 'index.html';
     });
   }
 });

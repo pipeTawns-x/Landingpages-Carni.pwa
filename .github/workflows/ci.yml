@@ -34,5 +34,4 @@ jobs:
           test -f dist/index.html
           test -f dist/products.html
           test -f dist/accessweb.html
-          test -f dist/dashboar.html
           test -f dist/offline.html

@@ -22,6 +22,57 @@
 @source "../templates";
 
 /*
+ * Base layer of the panel pages: the page background, the type of the body and of the headings, the
+ * selection colour and the sand focus ring that every control shows. It is the one in
+ * src/styles/panel.css on `pruebas` (the store's own entry for these same pages), copied here
+ * because that file also imports the fonts through npm packages Django does not have: the
+ * @font-face rules below replace those imports. If the redesign changes the base layer, it
+ * announces it like a change to tokens.css (Engram frontend/entrega/tokens) and this block follows.
+ */
+@layer base {
+  html {
+    color-scheme: dark;
+    scrollbar-gutter: stable;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    margin: 0;
+    background: var(--color-bg);
+    color: var(--color-text);
+    font-family: var(--font-sans);
+    font-size: var(--text-ui);
+    line-height: var(--text-ui--line-height);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    text-wrap: balance;
+    margin: 0;
+  }
+
+  ::selection {
+    background: rgb(228 209 176 / 0.32);
+  }
+
+  /* The global focus ring: visible on red and on every surface. */
+  :focus-visible {
+    outline: 2px solid var(--color-sand);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+}
+
+/*
  * Fonts, self-hosted: the same packages, versions, subset and axes as the store
  * (src/styles/fuentes.ts on `pruebas`):
  *   @fontsource-variable/geist 5.3.0                 "Geist Variable", wght axis

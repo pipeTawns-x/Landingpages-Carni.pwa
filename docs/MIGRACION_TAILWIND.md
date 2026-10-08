@@ -104,5 +104,6 @@ alguien que lo mantenga.
 
 - Los 45 SCSS vanilla y el sistema `css/` 7-1.
 - `vite.config.js`, `netlify.toml`, `server/routes/buildads.ts`.
-- Las rutas públicas: `index.html`, `products.html`, `accessweb.html`,
-  `dashboar.html`.
+- Las rutas públicas: `index.html`, `products.html`, `accessweb.html`.
+  (`dashboar.html` ya no existe en la tienda: lo sirve Django como
+  `backend/templates/panel/base.html`.)

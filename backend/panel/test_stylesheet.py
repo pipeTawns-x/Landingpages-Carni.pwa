@@ -97,6 +97,35 @@ class CompiledStylesheetTests(SimpleTestCase):
                 checked += 1
         self.assertGreater(checked, 10)
 
+    def test_it_carries_the_base_layer_of_the_panel_pages(self):
+        # What src/styles/panel.css gives the store's copy of these pages, and what panel/base.html
+        # relies on: the page background and type, the heading font and the sand focus ring.
+        css = squash(self.css)
+        for rule in (
+            "html{color-scheme:dark;scrollbar-gutter:stable;",
+            "body{background:var(--color-bg);color:var(--color-text);font-family:var(--font-sans);",
+            "font-size:var(--text-ui);line-height:var(--text-ui--line-height);",
+            "h1,h2,h3{font-family:var(--font-display);",
+            ":focus-visible{outline:2pxsolidvar(--color-sand);outline-offset:2px}",
+        ):
+            with self.subTest(rule=rule):
+                self.assertIn(rule, css)
+
+    def test_it_has_the_utilities_the_frame_and_the_pages_use(self):
+        # A spot check that Tailwind scanned the templates: the frame's own utilities, and the
+        # variants it builds on aria-current.
+        utilities = (
+            ".lg\\:pl-62",
+            ".min-h-dvh",
+            ".duration-160",
+            ".size-5\\.5",
+            ".rounded-control",
+        )
+        for selector in utilities:
+            with self.subTest(selector=selector):
+                self.assertIn(selector, self.css)
+        self.assertIn("[aria-current]", self.css)
+
     def test_it_declares_both_font_families_with_font_display_swap(self):
         faces = re.findall(r"@font-face\s*\{([^}]*)\}", self.css)
         families = set()

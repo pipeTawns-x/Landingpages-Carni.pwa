@@ -8,7 +8,7 @@ user-invocable: true
 
 ## When to Use
 
-- Editing `index.html`, `products.html`, `accessweb.html`, `dashboar.html`, or admin HTML pages
+- Editing `index.html`, `products.html`, `accessweb.html`, or admin HTML pages (`dashboar.html` is now the Django template `backend/templates/panel/base.html`)
 - Fixing Vite build issues tied to frontend files
 - Adjusting SCSS inside the 7-1 structure
 - Improving UI without breaking the existing MVP flows

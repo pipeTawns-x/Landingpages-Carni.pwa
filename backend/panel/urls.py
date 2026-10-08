@@ -11,4 +11,5 @@ urlpatterns = [
     path("acceso/", views.acceso, name="acceso"),
     path("sesion/", views.sesion, name="sesion"),
     path("salir/", views.salir, name="salir"),
+    path("mas/", views.mas, name="mas"),
 ]

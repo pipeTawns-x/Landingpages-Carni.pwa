@@ -212,12 +212,11 @@ function setupLoginForm() {
 
       syncAppState(data.user);
 
-      // Redirección según tipo de usuario
-      if (isAdmin) {
-        window.location.href = 'dashboar.html';
-      } else {
-        window.location.href = 'index.html';
-      }
+      // El panel de administración lo sirve Django (/panel/) y dashboar.html ya no
+      // existe en la tienda. Hasta que el traspaso de la sesión a Django se conecte
+      // aquí (contrato S4, docs/CONTRATO_PANEL_DJANGO.md), un admin entra por el
+      // inicio igual que cualquier usuario.
+      window.location.href = 'index.html';
     } catch (error) {
       console.error('Login error:', error);
       alert('Error al iniciar sesión: ' + error.message);
@@ -349,7 +348,7 @@ async function loginWithGoogle() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: window.location.origin + (isAdminLogin ? '/dashboar.html' : '/index.html')
+        redirectTo: window.location.origin + '/index.html'
       }
     });
     
@@ -368,7 +367,7 @@ async function loginWithFacebook() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'facebook',
       options: {
-        redirectTo: window.location.origin + (isAdminLogin ? '/dashboar.html' : '/index.html')
+        redirectTo: window.location.origin + '/index.html'
       }
     });
     

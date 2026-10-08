@@ -164,6 +164,7 @@ to Supabase at the store and the store hands the session over (see
 | `GET /panel/acceso/` | `panel:acceso` | Where anonymous visitors land: sends them to the store login. |
 | `POST /panel/salir/` | `panel:salir` | Ends the session and sends the person to the store login. Works for any session, behind Django's CSRF check. |
 | `GET /panel/` | `panel:inicio` | Landing page, admins only. Until the dashboard exists it forwards to the products. |
+| `GET /panel/mas/` | `panel:mas` | The "Más" page of the phone layout: Clientes, Publicidad, Ajustes and the sign-out. Admins only. |
 
 `/panel/sesion/` checks the following, in this order. Whatever fails, the
 browser gets the same plain 403 and the reason (never the token) goes to the
@@ -227,6 +228,42 @@ Behaviour worth knowing before touching it:
   `PANEL_ALLOWED_ORIGINS=http://localhost:3002` and
   `PANEL_TOKEN_MAX_AGE_SECONDS=300`.
 
+## Panel frame
+
+Every page of the panel extends `templates/panel/base.html`: the sidebar from
+1024 px, the tab bar below it, the top bar and `<main>`. It is `dashboar.html` as
+the redesign delivered it (`pruebas` `3254d3b4`), moved here with `git mv`; the
+Inicio content that file also held is `panel/inicio.html`. The store's root no
+longer has a `dashboar.html`.
+
+| Block | What a page puts in it |
+| --- | --- |
+| `title` | The whole `<title>` element. |
+| `titulo` | The text of the `<h1>` in the top bar. |
+| `accion` | The button on the right of the top bar, when the page has one. |
+| `contenido` | The page itself. |
+
+- No JavaScript and no inline styles anywhere in the panel: a link or a form is
+  all the interaction there is. A test fails when a panel page gets a `<script>`,
+  a `<style>` or a `style=` attribute.
+- The current entry of both navigations gets `aria-current`. It is read from
+  `request.resolver_match`: `view_name` is `namespace:name` and `section` is the
+  namespace, so every route of the `inventory` namespace marks Productos. "Más"
+  is `page` on `panel:mas` and `true` on `panel:ads` and `settings:index`, which
+  live inside it on the phone. `panel/test_frame.py` pins the whole table.
+- Pedidos, Clientes, Publicidad and Ajustes have no route yet (backlog), so the
+  frame links them by their path from the contract and they answer 404 today.
+  `PENDING_PATHS` in `panel/test_frame.py` lists them; the day one of them
+  resolves, that test fails and the literal link becomes a url tag in
+  `panel/base.html` and `panel/mas.html`.
+- `store_origin` (`panel/context_processors.py`) is `STORE_ORIGIN`. The logo and
+  the product pictures are files of the store, not of Django, so a template links
+  them as `{{ store_origin }}/img/...`.
+- `panel/messages.html` draws the messages the previous request queued: a check
+  for success, a sand triangle for a warning and a red one for an error.
+- A stylesheet class that only appears in Python (a form widget's `attrs`) is not
+  seen by Tailwind: see "Things to know" below.
+
 ## Panel stylesheet (Tailwind v4)
 
 The panel is styled with Tailwind v4 from the same design tokens as the store.
@@ -242,9 +279,16 @@ result is committed.
 | `scripts/build_panel_css.sh` | Drift check, build and `--check`. |
 
 `STATICFILES_DIRS` is `[BASE_DIR / "static"]`. `assets/` is left out on purpose,
-so `collectstatic` and `runserver` never publish the sources. No template links
-the stylesheet yet: `panel/base.html` (B7) will, with
-`{% static 'panel/panel.css' %}`.
+so `collectstatic` and `runserver` never publish the sources. `panel/base.html`
+links the stylesheet with `{% static 'panel/panel.css' %}`.
+
+`assets/panel.css` also carries the base layer of the panel pages (page
+background and type, the heading font, the selection colour and the sand focus
+ring). It is the one in `src/styles/panel.css` on `pruebas`, copied here because
+that file gets its fonts from npm packages Django does not have: the
+`@font-face` rules replace those imports. When the redesign changes its base
+layer, it says so like it does for `tokens.css` (Engram `frontend/entrega/tokens`)
+and the block here follows.
 
 ### Build and check
 
@@ -375,6 +419,11 @@ with raw SQL, the way Supabase does. It starts from the fixture
 `inventory/fixtures/categories.json`, the 9 real categories dumped with
 `dumpdata inventory.Category`. The `config.E001` system check only runs against
 Postgres; other databases have no `django` schema to verify.
+
+`panel/test_frame.py` covers the frame: the Más page through the panel admin
+session, which entry of both navigations is current for every route of the
+contract, the links the frame still owes to missing routes, the messages partial
+and the `store_origin` context processor.
 
 `panel/test_stylesheet.py` covers the static files of the panel: the finders
 serve the stylesheet, both woff2 files and their licenses, and do not serve the

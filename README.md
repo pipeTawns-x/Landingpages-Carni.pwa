@@ -100,7 +100,6 @@ Carni-mvp/
 ├── index.html
 ├── products.html
 ├── accessweb.html
-├── dashboar.html
 ├── admin-products.html
 ├── admin-customers.html
 ├── admin-orders.html
@@ -218,7 +217,7 @@ Carni-mvp busca transformar una carnicería tradicional en una plataforma digita
 ### Criterio actual de calidad
 
 - **Rediseño real, no recolor**: el estándar esperado no es cambiar la paleta y ya; debe mejorar jerarquía visual, espaciado, padding, cards, composición y consistencia entre landing, ecommerce y paneles.
-- **Cobertura completa del sitio**: cualquier rediseño debe revisar `index.html`, `products.html`, `accessweb.html`, `dashboar.html` y vistas administrativas relacionadas. No se considera válida una mejora que solo favorece la landing.
+- **Cobertura completa del sitio**: cualquier rediseño debe revisar `index.html`, `products.html`, `accessweb.html` y las vistas administrativas relacionadas (el panel lo sirve Django desde `backend/templates/`). No se considera válida una mejora que solo favorece la landing.
 - **Cero regressions funcionales**: no se deben romper rutas, navegación, carga de páginas, flujos públicos, vistas admin, ni compatibilidad con la estructura actual del proyecto.
 - **Referencias como inspiración, no copia**: los assets visuales del workspace sirven para elevar el criterio estético, especialmente en bento grid, espaciado y densidad visual, sin clonar layouts literal o ciegamente.
 - **Base apta para entorno real**: toda mejora debe dejar el proyecto más cerca de un producto real, con mejor UX, mejor legibilidad, mejor organización visual y una ruta clara hacia seguridad de acceso.
@@ -525,7 +524,7 @@ Este proyecto hoy es un frontend estático con tooling Node definido para ejecut
 | Landing         | `/index.html`           |
 | Catálogo        | `/products.html`        |
 | Auth            | `/accessweb.html`       |
-| Dashboard admin | `/dashboar.html`        |
+| Dashboard admin | `/panel/` (lo sirve Django) |
 | Admin productos | `/admin-products.html`  |
 | Admin clientes  | `/admin-customers.html` |
 | Admin pedidos   | `/admin-orders.html`    |
@@ -768,7 +767,7 @@ function sanitizeInput(str) {
 
 ### Reglas prácticas
 
-1. No romper rutas raíz como `accessweb.html` o `dashboar.html`.
+1. No romper rutas raíz como `index.html`, `products.html` o `accessweb.html`.
 2. No mover archivos sin rastrear referencias HTML, JS, SCSS y service worker.
 3. No crear CSS aislado fuera del patrón SCSS del proyecto.
 4. No hardcodear colores o tamaños si ya existe una convención equivalente.
@@ -823,7 +822,7 @@ function sanitizeInput(str) {
 ```text
 Usuario -> /accessweb.html -> Supabase Auth (stub hoy)
                            -> cliente -> /index.html o /products.html
-                           -> admin -> /dashboar.html
+                           -> admin -> /index.html (hasta que el traspaso a /panel/ de Django se conecte aqui)
 ```
 
 ### Variables de entorno objetivo

@@ -1,0 +1,149 @@
+{% load static %}<!DOCTYPE html>
+{% comment %}
+  Frame of every page of the panel: sidebar from 1024 px, tab bar below it, top bar and <main>.
+  It comes from dashboar.html as redesigned on pruebas (3254d3b4), moved here with git mv; the
+  Inicio content that file also held is panel/inicio.html. Plain HTML and CSS, no JavaScript and no
+  inline styles. Pages fill the blocks: title (the whole <title> element), titulo (the h1),
+  accion (the button on the right of the top bar) and contenido.
+  Which entry is current is read from request.resolver_match: `view_name` is "namespace:name" and
+  `section` is the namespace. The links to sections that do not exist yet keep their literal path
+  from the contract (docs/CONTRATO_PANEL_DJANGO.md, section 1); swap each for the url tag when its
+  route lands (a test lists them and fails the day one of them resolves).
+{% endcomment %}
+<html lang="es-MX">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0B0B0C" />
+  <meta name="color-scheme" content="dark" />
+  <meta name="robots" content="noindex" />
+  {% block title %}<title>Panel · Carnicería El Señor de La Misericordia</title>{% endblock %}
+  {# The logo belongs to the store (it is 700 KB): the panel links it there instead of copying it. #}
+  <link rel="icon" href="{{ store_origin }}/img/recursos_web/logo-user.png" type="image/png" />
+  <link rel="stylesheet" href="{% static 'panel/panel.css' %}" />
+</head>
+<body class="min-h-dvh bg-bg text-text lg:pl-62">
+  {# Sidebar from 1024 px of width. Fixed, 248 px wide. #}
+  {% with view_name=request.resolver_match.view_name section=request.resolver_match.namespace %}
+  <aside class="fixed inset-y-0 left-0 z-20 hidden w-62 flex-col border-r border-border bg-surface-1 lg:flex">
+    <div class="flex h-18 shrink-0 items-center border-b border-border px-5">
+      <span class="flex flex-col gap-1 leading-none">
+        <span class="font-sans text-ui font-semibold tracking-[0.22em]">CARNICERÍA</span>
+        <span class="text-meta text-text-muted">Panel de la tienda</span>
+      </span>
+    </div>
+
+    <nav aria-label="Secciones del panel" class="flex-1 overflow-y-auto p-3">
+      <ul role="list" class="flex flex-col gap-2">
+        <li>
+          <a href="{% url 'panel:inicio' %}"{% if view_name == 'panel:inicio' %} aria-current="page"{% endif %} class="group flex min-h-11 items-center gap-3 rounded-control px-3 text-ui text-text-muted transition-transform duration-160 ease-out-strong hover:bg-surface-2 hover:text-text active:scale-[0.97] motion-reduce:transition-none aria-[current]:bg-surface-2 aria-[current]:font-semibold aria-[current]:text-text">
+            <svg class="size-5 shrink-0 group-aria-[current]:text-red-text" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 11.5 12 5l8 6.5V19a1 1 0 0 1-1 1h-4.5v-5h-5v5H5a1 1 0 0 1-1-1Z" /></svg>
+            <span>Inicio</span>
+          </a>
+        </li>
+        <li>
+          <a href="/panel/pedidos/"{% if section == 'orders' %} aria-current="page"{% endif %} class="group flex min-h-11 items-center gap-3 rounded-control px-3 text-ui text-text-muted transition-transform duration-160 ease-out-strong hover:bg-surface-2 hover:text-text active:scale-[0.97] motion-reduce:transition-none aria-[current]:bg-surface-2 aria-[current]:font-semibold aria-[current]:text-text">
+            <svg class="size-5 shrink-0 group-aria-[current]:text-red-text" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 5h4.5v14H4zM9.75 5h4.5v9h-4.5zM15.5 5H20v11h-4.5z" /></svg>
+            <span>Pedidos</span>
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'inventory:list' %}"{% if section == 'inventory' %} aria-current="page"{% endif %} class="group flex min-h-11 items-center gap-3 rounded-control px-3 text-ui text-text-muted transition-transform duration-160 ease-out-strong hover:bg-surface-2 hover:text-text active:scale-[0.97] motion-reduce:transition-none aria-[current]:bg-surface-2 aria-[current]:font-semibold aria-[current]:text-text">
+            <svg class="size-5 shrink-0 group-aria-[current]:text-red-text" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M20 13.5 13.5 20a1.5 1.5 0 0 1-2.1 0L4 12.6V4h8.6l7.4 7.4a1.5 1.5 0 0 1 0 2.1ZM8.5 8.5h.01" /></svg>
+            <span>Productos</span>
+          </a>
+        </li>
+        <li>
+          <a href="/panel/clientes/"{% if section == 'customers' %} aria-current="page"{% endif %} class="group flex min-h-11 items-center gap-3 rounded-control px-3 text-ui text-text-muted transition-transform duration-160 ease-out-strong hover:bg-surface-2 hover:text-text active:scale-[0.97] motion-reduce:transition-none aria-[current]:bg-surface-2 aria-[current]:font-semibold aria-[current]:text-text">
+            <svg class="size-5 shrink-0 group-aria-[current]:text-red-text" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7ZM3 20a6 6 0 0 1 12 0M16 4.3a3.5 3.5 0 0 1 0 6.4M21 20a6 6 0 0 0-3.5-5.4" /></svg>
+            <span>Clientes</span>
+          </a>
+        </li>
+        <li>
+          <a href="/panel/publicidad/"{% if view_name == 'panel:ads' %} aria-current="page"{% endif %} class="group flex min-h-11 items-center gap-3 rounded-control px-3 text-ui text-text-muted transition-transform duration-160 ease-out-strong hover:bg-surface-2 hover:text-text active:scale-[0.97] motion-reduce:transition-none aria-[current]:bg-surface-2 aria-[current]:font-semibold aria-[current]:text-text">
+            <svg class="size-5 shrink-0 group-aria-[current]:text-red-text" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 10v4a1 1 0 0 0 1 1h2l6 4V5L7 9H5a1 1 0 0 0-1 1ZM17 9a4 4 0 0 1 0 6" /></svg>
+            <span>Publicidad</span>
+          </a>
+        </li>
+        <li>
+          <a href="/panel/ajustes/"{% if section == 'settings' %} aria-current="page"{% endif %} class="group flex min-h-11 items-center gap-3 rounded-control px-3 text-ui text-text-muted transition-transform duration-160 ease-out-strong hover:bg-surface-2 hover:text-text active:scale-[0.97] motion-reduce:transition-none aria-[current]:bg-surface-2 aria-[current]:font-semibold aria-[current]:text-text">
+            <svg class="size-5 shrink-0 group-aria-[current]:text-red-text" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 7h10M18 7h2M4 17h4M12 17h8M16 5v4M10 15v4" /></svg>
+            <span>Ajustes</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+    <div class="flex flex-col gap-2 border-t border-border p-3">
+      <p class="flex items-center gap-3 px-3 py-1">
+        <span class="grid size-9 shrink-0 place-items-center rounded-control bg-surface-3 text-sand">
+          <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM4.5 20a7.5 7.5 0 0 1 15 0" /></svg>
+        </span>
+        <span class="flex min-w-0 flex-col">
+          {% if user.email %}<span class="truncate text-meta font-semibold">{{ user.email }}</span>{% endif %}
+          <span class="text-meta text-text-muted">Administrador</span>
+        </span>
+      </p>
+      <form method="post" action="{% url 'panel:salir' %}">
+        {% csrf_token %}
+        <button type="submit" class="flex min-h-11 w-full items-center gap-3 rounded-control px-3 text-left text-ui text-text-muted transition-transform duration-160 ease-out-strong hover:bg-surface-2 hover:text-text active:scale-[0.97] motion-reduce:transition-none">
+          <svg class="size-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4M9 16l-4-4 4-4M5 12h10" /></svg>
+          <span>Cerrar sesión</span>
+        </button>
+      </form>
+    </div>
+  </aside>
+  {% endwith %}
+
+  {# Top bar: the title of the page and, when it has one, its action. #}
+  <header class="sticky top-0 z-10 flex h-14 items-center gap-3 border-b border-border bg-bg px-4 lg:h-18 lg:px-8">
+    <h1 class="min-w-0 flex-1 truncate font-display text-titulo font-medium">
+      {% block titulo %}Panel{% endblock %}
+    </h1>
+    {% block accion %}{% endblock %}
+  </header>
+
+  <main class="px-4 pt-5 pb-28 lg:px-8 lg:pt-7 lg:pb-12">
+    {% include "panel/messages.html" %}
+    {% block contenido %}{% endblock %}
+  </main>
+
+  {# Tab bar below 1024 px. The fifth tab, "Más", is a page of its own: /panel/mas/. #}
+  {% with view_name=request.resolver_match.view_name section=request.resolver_match.namespace %}
+  <nav aria-label="Secciones del panel" class="fixed inset-x-0 bottom-0 z-20 border-t border-border bg-surface-1 px-1 pt-1 pb-[max(0.5rem,env(safe-area-inset-bottom))] lg:hidden">
+    <ul role="list" class="grid grid-cols-5">
+      <li>
+        <a href="{% url 'panel:inicio' %}"{% if view_name == 'panel:inicio' %} aria-current="page"{% endif %} class="flex min-h-14 flex-col items-center justify-center gap-1 rounded-control text-meta text-text-muted transition-transform duration-160 ease-out-strong hover:text-text active:scale-[0.97] motion-reduce:transition-none aria-[current]:font-semibold aria-[current]:text-red-text">
+          <svg class="size-5.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 11.5 12 5l8 6.5V19a1 1 0 0 1-1 1h-4.5v-5h-5v5H5a1 1 0 0 1-1-1Z" /></svg>
+          <span>Inicio</span>
+        </a>
+      </li>
+      <li>
+        <a href="/panel/pedidos/"{% if section == 'orders' %} aria-current="page"{% endif %} class="flex min-h-14 flex-col items-center justify-center gap-1 rounded-control text-meta text-text-muted transition-transform duration-160 ease-out-strong hover:text-text active:scale-[0.97] motion-reduce:transition-none aria-[current]:font-semibold aria-[current]:text-red-text">
+          <svg class="size-5.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 5h4.5v14H4zM9.75 5h4.5v9h-4.5zM15.5 5H20v11h-4.5z" /></svg>
+          <span>Pedidos</span>
+        </a>
+      </li>
+      <li>
+        <a href="{% url 'inventory:list' %}"{% if section == 'inventory' %} aria-current="page"{% endif %} class="flex min-h-14 flex-col items-center justify-center gap-1 rounded-control text-meta text-text-muted transition-transform duration-160 ease-out-strong hover:text-text active:scale-[0.97] motion-reduce:transition-none aria-[current]:font-semibold aria-[current]:text-red-text">
+          <svg class="size-5.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M20 13.5 13.5 20a1.5 1.5 0 0 1-2.1 0L4 12.6V4h8.6l7.4 7.4a1.5 1.5 0 0 1 0 2.1ZM8.5 8.5h.01" /></svg>
+          <span>Productos</span>
+        </a>
+      </li>
+      <li>
+        <a href="/panel/clientes/"{% if section == 'customers' %} aria-current="page"{% endif %} class="flex min-h-14 flex-col items-center justify-center gap-1 rounded-control text-meta text-text-muted transition-transform duration-160 ease-out-strong hover:text-text active:scale-[0.97] motion-reduce:transition-none aria-[current]:font-semibold aria-[current]:text-red-text">
+          <svg class="size-5.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7ZM3 20a6 6 0 0 1 12 0M16 4.3a3.5 3.5 0 0 1 0 6.4M21 20a6 6 0 0 0-3.5-5.4" /></svg>
+          <span>Clientes</span>
+        </a>
+      </li>
+      <li>
+        <a href="{% url 'panel:mas' %}"{% if view_name == 'panel:mas' %} aria-current="page"{% elif view_name == 'panel:ads' or view_name == 'settings:index' %} aria-current="true"{% endif %} class="flex min-h-14 flex-col items-center justify-center gap-1 rounded-control text-meta text-text-muted transition-transform duration-160 ease-out-strong hover:text-text active:scale-[0.97] motion-reduce:transition-none aria-[current]:font-semibold aria-[current]:text-red-text">
+          <svg class="size-5.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h.01M12 12h.01M19 12h.01" /></svg>
+          <span>Más</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+  {% endwith %}
+</body>
+</html>

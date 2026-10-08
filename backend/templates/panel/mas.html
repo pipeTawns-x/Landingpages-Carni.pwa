@@ -1,0 +1,51 @@
+{% extends "panel/base.html" %}
+{% comment %}
+  The "Más" page of the phone layout (/panel/mas/, panel:mas): the sections that do not fit in the
+  five tabs, and the sign-out. It is the block the redesign delivered as kit/mas.html (pruebas
+  2d3d89bf) applied to the frame. The three links go to sections that do not exist yet, so they keep
+  their literal path from the contract until each route lands.
+{% endcomment %}
+{% block title %}<title>Más · Panel · Carnicería El Señor de La Misericordia</title>{% endblock %}
+{% block titulo %}Más{% endblock %}
+{% block contenido %}
+<div class="flex flex-col gap-5">
+  <nav aria-label="Más secciones">
+    <ul role="list" class="flex flex-col gap-2">
+      <li>
+        <a href="/panel/clientes/" class="flex min-h-14 items-center gap-3 rounded-control border border-border-control bg-surface-1 px-4 text-ui transition-transform duration-160 ease-out-strong hover:bg-surface-2 active:scale-[0.97] motion-reduce:transition-none">
+          <svg class="size-5 shrink-0 text-sand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7ZM3 20a6 6 0 0 1 12 0M16 4.3a3.5 3.5 0 0 1 0 6.4M21 20a6 6 0 0 0-3.5-5.4" /></svg>
+          <span class="flex-1">Clientes</span>
+          <svg class="size-5 shrink-0 text-text-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m9 5 7 7-7 7" /></svg>
+        </a>
+      </li>
+      <li>
+        <a href="/panel/publicidad/" class="flex min-h-14 items-center gap-3 rounded-control border border-border-control bg-surface-1 px-4 text-ui transition-transform duration-160 ease-out-strong hover:bg-surface-2 active:scale-[0.97] motion-reduce:transition-none">
+          <svg class="size-5 shrink-0 text-sand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 10v4a1 1 0 0 0 1 1h2l6 4V5L7 9H5a1 1 0 0 0-1 1ZM17 9a4 4 0 0 1 0 6" /></svg>
+          <span class="flex-1">Publicidad</span>
+          <svg class="size-5 shrink-0 text-text-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m9 5 7 7-7 7" /></svg>
+        </a>
+      </li>
+      <li>
+        <a href="/panel/ajustes/" class="flex min-h-14 items-center gap-3 rounded-control border border-border-control bg-surface-1 px-4 text-ui transition-transform duration-160 ease-out-strong hover:bg-surface-2 active:scale-[0.97] motion-reduce:transition-none">
+          <svg class="size-5 shrink-0 text-sand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 7h10M18 7h2M4 17h4M12 17h8M16 5v4M10 15v4" /></svg>
+          <span class="flex-1">Ajustes</span>
+          <svg class="size-5 shrink-0 text-text-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m9 5 7 7-7 7" /></svg>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  {# Signing out is a POST with Django's CSRF token (contract, section 5b), not a link. #}
+  <form method="post" action="{% url 'panel:salir' %}">
+    {% csrf_token %}
+    <button type="submit" class="flex min-h-14 w-full items-center gap-3 rounded-control border border-border-control bg-surface-1 px-4 text-left text-ui transition-transform duration-160 ease-out-strong hover:bg-surface-2 active:scale-[0.97] motion-reduce:transition-none">
+      <svg class="size-5 shrink-0 text-sand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4M9 16l-4-4 4-4M5 12h10" /></svg>
+      <span class="flex-1">Cerrar sesión</span>
+    </button>
+  </form>
+
+  {% if user.email %}
+  <p class="px-1 text-meta text-text-muted">Sesión iniciada como <span class="font-semibold text-text">{{ user.email }}</span></p>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,22 @@
+{% comment %}
+  The messages the previous request queued, in the design of the panel (from the messages.html
+  branch the redesign drew inside dashboar.html). Nothing is drawn without messages. The level
+  picks the icon and its colour and the rest stays the same: a warning or an error gets a triangle
+  (sand or danger), anything else (success, info, debug) the check.
+{% endcomment %}
+{% if messages %}
+<ul role="list" class="mb-5 flex flex-col gap-2 lg:mb-6">
+  {% for message in messages %}
+  <li class="flex items-start gap-3 rounded-control border border-border bg-surface-2 px-4 py-3 text-ui">
+    {% if message.level_tag == 'warning' %}
+    <svg class="mt-0.5 size-5 shrink-0 text-sand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 9v4M12 16.5h.01M10.3 4.2 2.8 17.5A2 2 0 0 0 4.5 20.5h15a2 2 0 0 0 1.7-3L13.7 4.2a2 2 0 0 0-3.4 0Z" /></svg>
+    {% elif message.level_tag == 'error' %}
+    <svg class="mt-0.5 size-5 shrink-0 text-danger" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 9v4M12 16.5h.01M10.3 4.2 2.8 17.5A2 2 0 0 0 4.5 20.5h15a2 2 0 0 0 1.7-3L13.7 4.2a2 2 0 0 0-3.4 0Z" /></svg>
+    {% else %}
+    <svg class="mt-0.5 size-5 shrink-0 text-success" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12.5 9.5 17 19 7.5" /></svg>
+    {% endif %}
+    <span>{{ message }}</span>
+  </li>
+  {% endfor %}
+</ul>
+{% endif %}

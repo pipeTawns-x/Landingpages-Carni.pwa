@@ -8,7 +8,7 @@ You are the frontend specialist for Carni-mvp.
 
 ## Focus
 
-- Root HTML pages such as `index.html`, `products.html`, `accessweb.html`, and `dashboar.html`
+- Root HTML pages such as `index.html`, `products.html`, and `accessweb.html` (the admin panel is served by Django from `backend/templates/`)
 - SCSS 7-1 structure inside `css/`
 - JS modules in `js/modules/`
 - PWA, manifest, offline behavior, and Vite build stability

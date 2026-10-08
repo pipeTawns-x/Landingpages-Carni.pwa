@@ -5,7 +5,7 @@ import logging
 from django.conf import settings
 from django.contrib.auth import logout
 from django.http import HttpResponseForbidden
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.debug import sensitive_post_parameters
@@ -120,3 +120,14 @@ def inicio(request):
     so for now the panel opens on the only section that exists: the products.
     """
     return redirect("inventory:list")
+
+
+@panel_admin_required
+@require_safe
+def mas(request):
+    """The "Más" page of the phone layout: the sections that do not fit in the tab bar.
+
+    The tab bar has room for five entries, so Clientes, Publicidad, Ajustes and the
+    sign-out live on a page of their own instead of in a drawer.
+    """
+    return render(request, "panel/mas.html")

@@ -65,7 +65,8 @@ Viven en `.claude/skills/<nombre>/SKILL.md`. Estuvieron en `agents/skills/` hast
 
 ## Reglas para Desarrolladores y Colaboradores
 
-- Mantener entrypoints HTML en raiz: `index.html`, `products.html`, `accessweb.html`, `dashboar.html`.
+- Mantener entrypoints HTML de la tienda en raiz: `index.html`, `products.html`, `accessweb.html`.
+- El panel de administracion no vive en la raiz: lo sirve Django desde `backend/templates/`. `dashboar.html` se movio a `backend/templates/panel/base.html` (marco) y `panel/inicio.html` (Inicio).
 - No renombrar rutas ni mover HTML sin revisar referencias en JS, CSS, manifest y service worker.
 - Mantener JS modular dentro de `js/modules/`.
 
