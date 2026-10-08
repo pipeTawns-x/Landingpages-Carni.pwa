@@ -18,8 +18,14 @@
  */
 @import "./tokens.css" theme(static);
 
-/* source(none) turns the automatic scan off: only the Django templates count. */
+/* source(none) turns the automatic scan off: only the Django templates count... */
 @source "../templates";
+/*
+ * ...and the classes that Python hands to a widget. A form widget is drawn by Django, so its
+ * Tailwind classes (the controls of the product form) live in inventory/forms.py. List here every
+ * file that holds classes outside the templates, and nothing else.
+ */
+@source "../inventory/forms.py";
 
 /*
  * Base layer of the panel pages: the page background, the type of the body and of the headings, the

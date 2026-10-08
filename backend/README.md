@@ -144,6 +144,20 @@ Behaviour worth knowing before touching it:
   unit and the price per pound only when the price is by the kilo. Eliminar and
   desactivar are one route (`inventory:delete`): that page says which of the two
   will happen, and the button of the detail names both.
+- The form (`templates/inventory/product_form.html`, create and edit) is the
+  redesign's `kit/productos/form.html` (`pruebas` `2d7cf5d3`), with fieldsets in
+  place of tabs. Django draws every control, and `inventory/forms.py` gives each
+  widget the Tailwind classes of its control (the wrappers around them, the "$"
+  and the unit, are in the template). `name` and `image_url` are text inputs:
+  they are `TextField`s, which Django would draw as a `<textarea>`, and
+  `image_url` cannot be a `URLInput` because it holds a relative path.
+  `price_per_lb` is shown as text. The error of each field is drawn by
+  `inventory/_field_error.html` and the alert at the top also says the errors that
+  belong to no field.
+- "Confirmar cambio de precio o cantidad mínima" is not a field of the form: it is
+  a checkbox (`confirm=1`) that only exists when editing. It is a shortcut,
+  because without it a change of the price or of the minimum quantity stops at the
+  confirmation page.
 - `Product.image_src` is the picture as an address the panel can load.
   `image_url` is a path of the store (`/img/products/tomahawk.webp`), which Django
   does not serve, so `store_image_url()` joins it to `STORE_ORIGIN`. An absolute
@@ -399,9 +413,10 @@ package version and rebuild.
 - `assets/panel.css` imports the tokens with `theme(static)`, so the build emits
   every token as a custom property on `:root`, not only the ones a utility uses.
   A template can read `var(--color-sand)` from its own CSS.
-- Tailwind only scans `templates/`. A class that lives anywhere else (a form
-  widget's `attrs`, a message tag in Python, a template inside an app) is not
-  seen; add an `@source` line to `assets/panel.css` for it.
+- Tailwind only scans `templates/` and the files `assets/panel.css` lists with
+  `@source`. A class that lives anywhere else (a message tag in Python, a template
+  inside an app) is not seen: add its file there. `inventory/forms.py` is already
+  listed, because the classes of the product form's controls live in it.
 - The `url()` paths in `assets/panel.css` are relative to the compiled file
   (`static/panel/`), not to the source.
 - Do not edit `static/panel/panel.css` by hand: `--check` fails and the next
@@ -436,7 +451,8 @@ configuration themselves, with a signing secret that is random on every run.
 `inventory/tests.py` covers `price_per_lb_for()`, the unit of a price, the
 pagination and the list page (rows, chips, search, empty state and a query count
 that does not grow with the products), the detail page, the picture address, the
-panel views and their routes, the
+form page (controls, required marks, errors and what comes back), the panel
+views and their routes, the
 rules in `inventory/services.py`, the read-only mirrors and the product admin
 (through the test client, as a superuser). The
 panel views are tested signed in the way a real admin signs in, through the

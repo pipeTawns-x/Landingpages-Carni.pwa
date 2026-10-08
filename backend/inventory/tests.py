@@ -18,10 +18,12 @@ import re
 import uuid
 from decimal import Decimal
 from html import unescape
+from html.parser import HTMLParser
 from unittest import mock
 
 from django.contrib.auth import get_user_model
 from django.contrib.messages import get_messages
+from django.core.exceptions import ValidationError
 from django.db import IntegrityError, connection
 from django.test import SimpleTestCase, TestCase, override_settings
 from django.test.utils import CaptureQueriesContext
@@ -43,6 +45,9 @@ from inventory.models import (
 )
 from panel.test_frame import anchors, current_links
 from panel.tests import sign_in_as_panel_admin
+
+# What every title of the panel ends with.
+PANEL_TITLE = "Panel · Carnicería El Señor de La Misericordia"
 
 
 def make_product(name="Rib Eye", **fields):
@@ -969,7 +974,7 @@ class ProductDetailPageTests(TestCase):
         self.assertTemplateUsed(response, "panel/base.html")
         self.assertContains(
             response,
-            "<title>Tomahawk · Productos · Panel · Carnicería El Señor de La Misericordia</title>",
+            f"<title>Tomahawk · Productos · {PANEL_TITLE}</title>",
         )
         html = response.content.decode()
         self.assertEqual(re.findall(r"<h1[^>]*>\s*(.*?)\s*</h1>", html, flags=re.S), ["Tomahawk"])
@@ -1165,6 +1170,324 @@ class ProductDetailPageTests(TestCase):
         self.assertEqual(
             self.client.get(reverse("inventory:detail", args=[999999])).status_code, 404
         )
+
+
+class ControlParser(HTMLParser):
+    """Collect the controls of a form: the attributes by name, the options of each select and the
+    text of each textarea."""
+
+    def __init__(self):
+        super().__init__()
+        self.controls = {}
+        self.options = {}
+        self.texts = {}
+        self._select = None
+        self._option = None
+        self._textarea = None
+
+    def handle_starttag(self, tag, attrs):
+        attrs = dict(attrs)
+        if tag in ("input", "select", "textarea") and attrs.get("name"):
+            self.controls[attrs["name"]] = attrs
+        if tag == "select":
+            self._select = attrs["name"]
+            self.options[self._select] = []
+        elif tag == "option" and self._select:
+            self._option = [attrs.get("value"), "", "selected" in attrs]
+            self.options[self._select].append(self._option)
+        elif tag == "textarea":
+            self._textarea = attrs["name"]
+            self.texts[self._textarea] = ""
+
+    def handle_endtag(self, tag):
+        if tag == "select":
+            self._select = None
+        elif tag == "option":
+            self._option = None
+        elif tag == "textarea":
+            self._textarea = None
+
+    def handle_data(self, data):
+        if self._option is not None:
+            self._option[1] += data
+        elif self._textarea is not None:
+            self.texts[self._textarea] += data
+
+
+def form_controls(html):
+    """Parse the <main> of a page and return its ControlParser."""
+    parser = ControlParser()
+    parser.feed(html_between(html, "<main", "</main>"))
+    return parser
+
+
+class ProductFormPageTests(TestCase):
+    """The create and edit page as the redesign drew it (kit/productos/form.html)."""
+
+    fixtures = ["categories.json"]
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.cortes = Category.objects.get(slug="cortes-especiales")
+        cls.tomahawk = Product.objects.create(
+            category=cls.cortes,
+            name="Tomahawk",
+            description="Rib eye con el hueso largo entero.",
+            price_per_kg=Decimal("649.00"),
+            stock=15,
+            min_quantity_kg=Decimal("0.800"),
+            image_url="/img/products/tomahawk.webp",
+        )
+
+    def setUp(self):
+        self.create_url = reverse("inventory:create")
+        self.edit_url = reverse("inventory:update", args=[self.tomahawk.pk])
+        sign_in_as_panel_admin(self.client)
+
+    def create_page(self):
+        return self.client.get(self.create_url).content.decode()
+
+    def edit_page(self):
+        return self.client.get(self.edit_url).content.decode()
+
+    def post(self, **overrides):
+        data = {
+            "name": "Tomahawk",
+            "category": self.cortes.pk,
+            "price_per_kg": "649.00",
+            "min_quantity_kg": "0.800",
+            "stock": "15",
+            "is_active": "on",
+            **overrides,
+        }
+        return self.client.post(self.edit_url, data)
+
+    def main_text(self, html):
+        return " ".join(unescape(strip_tags(html_between(html, "<main", "</main>"))).split())
+
+    def test_the_create_page_is_served_on_the_frame_with_its_own_title(self):
+        response = self.client.get(self.create_url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "inventory/product_form.html")
+        self.assertTemplateUsed(response, "panel/base.html")
+        self.assertContains(
+            response,
+            f"<title>Nuevo producto · Productos · {PANEL_TITLE}</title>",
+        )
+        html = response.content.decode()
+        self.assertEqual(
+            re.findall(r"<h1[^>]*>\s*(.*?)\s*</h1>", html, flags=re.S), ["Nuevo producto"]
+        )
+        self.assertEqual(
+            current_links(html_between(html, "<aside", "</aside>")), {"/panel/productos/": "page"}
+        )
+
+    def test_the_create_page_has_no_confirmation_and_calculates_the_price_per_pound(self):
+        html = self.create_page()
+
+        self.assertNotIn("confirm", form_controls(html).controls)
+        text = self.main_text(html)
+        self.assertNotIn("Confirmar cambio de precio o cantidad mínima", text)
+        self.assertIn("Precio por libra Se calcula al guardar", text)
+
+    def test_the_create_page_breadcrumb_and_cancel_go_back_to_the_list(self):
+        html = self.create_page()
+
+        crumbs = html_between(html, '<nav aria-label="Ruta"', "</nav>")
+        self.assertEqual([a["href"] for a in anchors(crumbs)], ["/panel/productos/"])
+        self.assertIn('aria-current="page" class="min-w-0 text-text">Nuevo producto</span>', crumbs)
+        form = html_between(html_between(html, "<main", "</main>"), "<form", "</form>")
+        self.assertEqual([a["href"] for a in anchors(form)], ["/panel/productos/"])
+
+    def test_the_edit_page_has_its_title_the_breadcrumb_and_a_cancel_to_the_detail(self):
+        response = self.client.get(self.edit_url)
+
+        self.assertContains(
+            response,
+            f"<title>Editar producto · Productos · {PANEL_TITLE}</title>",
+        )
+        html = response.content.decode()
+        crumbs = html_between(html, '<nav aria-label="Ruta"', "</nav>")
+        detail = reverse("inventory:detail", args=[self.tomahawk.pk])
+        self.assertEqual([a["href"] for a in anchors(crumbs)], ["/panel/productos/", detail])
+        self.assertIn("Tomahawk", crumbs)
+        form = html_between(html_between(html, "<main", "</main>"), "<form", "</form>")
+        self.assertEqual([a["href"] for a in anchors(form)], [detail])
+
+    def test_the_form_posts_to_the_page_it_is_on_with_the_csrf_token(self):
+        html = self.edit_page()
+
+        form_tag = re.search(r"<form[^>]*>", html_between(html, "<main", "</main>")).group(0)
+        self.assertIn('method="post"', form_tag)
+        self.assertNotIn("action=", form_tag)
+        main = html_between(html, "<main", "</main>")
+        self.assertIn("csrfmiddlewaretoken", html_between(main, "<form", "</form>"))
+
+    def test_the_edit_page_is_filled_with_the_stored_values(self):
+        parser = form_controls(self.edit_page())
+
+        self.assertEqual(parser.controls["name"]["value"], "Tomahawk")
+        self.assertEqual(parser.controls["price_per_kg"]["value"], "649.00")
+        self.assertEqual(parser.controls["min_quantity_kg"]["value"], "0.800")
+        self.assertEqual(parser.controls["stock"]["value"], "15")
+        self.assertEqual(parser.controls["image_url"]["value"], "/img/products/tomahawk.webp")
+        self.assertIn("checked", parser.controls["is_active"])
+        self.assertEqual(parser.texts["description"].strip(), "Rib eye con el hueso largo entero.")
+        selected = [label for value, label, chosen in parser.options["category"] if chosen]
+        self.assertEqual(selected, ["Cortes Especiales"])
+
+    def test_the_price_per_pound_is_text_and_not_a_field(self):
+        html = self.edit_page()
+
+        self.assertNotIn("price_per_lb", form_controls(html).controls)
+        self.assertIn("Precio por libra $294.39", self.main_text(html))
+
+    def test_the_confirmation_checkbox_is_there_when_editing_and_starts_unticked(self):
+        confirm = form_controls(self.edit_page()).controls["confirm"]
+
+        self.assertEqual(confirm["type"], "checkbox")
+        self.assertEqual(confirm["value"], "1")
+        self.assertNotIn("checked", confirm)
+        self.assertNotIn("required", confirm)
+
+    def test_the_text_fields_are_text_inputs_and_the_picture_path_is_not_a_url_input(self):
+        controls = form_controls(self.edit_page()).controls
+
+        for name in ("name", "image_url", "supplier"):
+            with self.subTest(name=name):
+                self.assertEqual(controls[name]["type"], "text")
+        # type="url" refuses a relative path such as /img/products/tomahawk.webp.
+        self.assertEqual(controls["image_url"]["inputmode"], "url")
+        self.assertEqual(controls["supplier"]["maxlength"], "120")
+
+    def test_the_numbers_carry_their_steps_and_limits(self):
+        controls = form_controls(self.edit_page()).controls
+
+        expected = {
+            "price_per_kg": ("0.01", "0.01"),
+            "min_quantity_kg": ("0.001", "0"),
+            "stock": ("1", "0"),
+            "avg_piece_weight_kg": ("0.001", "0"),
+            "thickness_min_in": ("0.01", "0"),
+            "thickness_max_in": ("0.01", "0"),
+            "thickness_default_in": ("0.01", "0"),
+        }
+        for name, (step, minimum) in expected.items():
+            with self.subTest(name=name):
+                self.assertEqual(controls[name]["type"], "number")
+                self.assertEqual(controls[name]["step"], step)
+                self.assertEqual(controls[name]["min"], minimum)
+
+    def test_only_the_fields_the_form_requires_are_marked_required(self):
+        controls = form_controls(self.edit_page()).controls
+
+        required = {name for name, attrs in controls.items() if "required" in attrs}
+        self.assertEqual(required, {"name", "category", "price_per_kg", "min_quantity_kg", "stock"})
+
+    def test_the_category_select_starts_with_the_prompt_and_lists_the_nine_categories(self):
+        options = form_controls(self.create_page()).options["category"]
+
+        self.assertEqual(options[0][:2], ["", "Elige una categoría"])
+        self.assertEqual(
+            [label for _, label, _ in options[1:]],
+            [category.name for category in Category.objects.all()],
+        )
+        self.assertEqual(len(options), 10)
+
+    def test_the_presentation_select_calls_the_blank_choice_sin_definir(self):
+        options = form_controls(self.create_page()).options["presentation"]
+
+        self.assertEqual(
+            [(value, label) for value, label, _ in options],
+            [("", "Sin definir"), ("piece", "Pieza"), ("package", "Paquete")],
+        )
+
+    def test_the_page_has_no_row_of_dashes_where_the_prompt_goes(self):
+        self.assertNotIn("---------", self.edit_page())
+
+    def test_every_control_wears_the_classes_of_the_kit(self):
+        controls = form_controls(self.edit_page()).controls
+
+        expected = {
+            "name": ("h-12", "rounded-control", "border-border-control", "px-4"),
+            "description": ("py-3", "rounded-control"),
+            "price_per_kg": ("pl-8", "tabular-nums"),
+            "min_quantity_kg": ("pr-11", "tabular-nums"),
+            "category": ("appearance-none", "pr-11"),
+            "is_active": ("peer", "appearance-none", "cursor-pointer"),
+        }
+        for name, classes in expected.items():
+            for css_class in classes:
+                with self.subTest(name=name, css_class=css_class):
+                    self.assertIn(css_class, controls[name]["class"].split())
+
+    def test_a_fresh_form_shows_no_alert_and_no_error(self):
+        html = self.edit_page()
+
+        self.assertNotIn('role="alert"', html)
+        self.assertNotIn('id="error-', html)
+        self.assertNotIn('aria-invalid="true"', html)
+
+    def test_an_invalid_save_shows_the_alert_and_each_error_next_to_its_field(self):
+        response = self.post(name="", price_per_kg="0", thickness_min_in="3", thickness_max_in="1")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "inventory/product_form.html")
+        html = response.content.decode()
+        self.assertIn(
+            "Revisa los campos marcados. No se guardó nada todavía.", self.main_text(html)
+        )
+        for name in ("name", "price_per_kg", "thickness_min_in"):
+            with self.subTest(name=name):
+                self.assertIn(f'<p id="error-{name}"', html)
+                self.assertEqual(form_controls(html).controls[name]["aria-invalid"], "true")
+        controls = form_controls(html).controls
+        self.assertNotIn("aria-invalid", controls["stock"])
+        self.assertNotIn("aria-invalid", controls["thickness_max_in"])
+        self.assertIn("Este campo es obligatorio.", html)
+        self.assertIn("El grosor mínimo no puede ser mayor que el grosor máximo.", html)
+        self.assertEqual(Product.objects.get(pk=self.tomahawk.pk).price_per_kg, Decimal("649.00"))
+
+    def test_what_was_typed_comes_back_with_the_errors(self):
+        response = self.post(name="", stock="-3", supplier="Rancho Sur", confirm="1")
+
+        controls = form_controls(response.content.decode()).controls
+        self.assertEqual(controls["stock"]["value"], "-3")
+        self.assertEqual(controls["supplier"]["value"], "Rancho Sur")
+        self.assertIn("checked", controls["confirm"])
+
+    def test_the_switch_comes_back_off_when_it_was_sent_off(self):
+        data = {"name": "", "category": self.cortes.pk, "price_per_kg": "10", "stock": "1"}
+
+        response = self.client.post(self.edit_url, data)
+
+        self.assertNotIn("checked", form_controls(response.content.decode()).controls["is_active"])
+
+    def test_what_comes_back_is_escaped(self):
+        response = self.post(name='"><script>alert(1)</script>', price_per_kg="0")
+
+        html = response.content.decode()
+        self.assertNotIn("<script>alert", html)
+        self.assertIn("&quot;&gt;&lt;script&gt;alert(1)&lt;/script&gt;", html)
+
+    def test_an_error_that_belongs_to_no_field_is_said_in_the_alert(self):
+        error = ValidationError("Este producto ya existe en la tienda.")
+
+        with mock.patch.object(ProductForm, "clean", side_effect=error):
+            response = self.post()
+
+        self.assertIn(
+            "Revisa los campos marcados. No se guardó nada todavía. "
+            "Este producto ya existe en la tienda.",
+            self.main_text(response.content.decode()),
+        )
+
+    def test_the_page_still_saves_a_valid_edit(self):
+        response = self.post(stock="20")
+
+        self.assertRedirects(response, reverse("inventory:detail", args=[self.tomahawk.pk]))
+        self.assertEqual(Product.objects.get(pk=self.tomahawk.pk).stock, 20)
 
 
 class ProductRoutesTests(SimpleTestCase):

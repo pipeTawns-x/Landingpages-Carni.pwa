@@ -1,48 +1,201 @@
-{% extends "base.html" %}
+{% extends "panel/base.html" %}
+{% comment %}
+  Products, create and edit (/panel/productos/nuevo/ and /panel/productos/<id>/editar/). It is
+  kit/productos/form.html as the redesign delivered it (pruebas 2d7cf5d3, sync point S3), applied
+  over the light template of the M13. Fieldsets stand in for tabs, and there is no JavaScript.
 
-{% block title %}
-  {% if is_update %}Editar producto{% else %}Nuevo producto{% endif %} · Carni MVP
-{% endblock %}
+  Context of the view: product_form, spec_form, is_update and, when editing, product. The controls
+  are drawn by Django with the classes that inventory/forms.py gives each widget, inside the
+  wrappers of the design (the "$" and the unit are text over the padding of the control, and the
+  arrow of a select is an icon). A form without action posts to the page it is on.
 
-{% block content %}
-  <div class="card">
-    <h1>{% if is_update %}Editar producto{% else %}Nuevo producto{% endif %}</h1>
-    <form method="post">
-      {% csrf_token %}
+  The price per pound is not a field: it is shown as text and recalculated on every save.
+  "Confirmar cambio de precio o cantidad mínima" is not a field of the form either: it is the
+  checkbox the view reads as confirm=1, and it is a shortcut, because without it a change of the
+  price or of the minimum quantity stops at the confirmation page. It only exists when editing.
+{% endcomment %}
+{% block title %}<title>{% if is_update %}Editar producto{% else %}Nuevo producto{% endif %} · Productos · Panel · Carnicería El Señor de La Misericordia</title>{% endblock %}
+{% block titulo %}{% if is_update %}Editar producto{% else %}Nuevo producto{% endif %}{% endblock %}
+{% block contenido %}
+<div class="flex max-w-4xl flex-col gap-5 lg:gap-6">
+  <nav aria-label="Ruta" class="flex flex-wrap items-center gap-x-2 text-ui">
+    <a href="{% url 'inventory:list' %}" class="inline-flex min-h-11 items-center text-text-muted underline decoration-border-control underline-offset-4 transition-colors duration-160 hover:text-text">Productos</a>
+    <span aria-hidden="true" class="text-text-muted">/</span>
+    {% if is_update %}
+    <a href="{% url 'inventory:detail' product.id %}" class="inline-flex min-h-11 items-center text-text-muted underline decoration-border-control underline-offset-4 transition-colors duration-160 hover:text-text">{{ product.name }}</a>
+    <span aria-hidden="true" class="text-text-muted">/</span>
+    <span aria-current="page" class="min-w-0 text-text">Editar</span>
+    {% else %}
+    <span aria-current="page" class="min-w-0 text-text">Nuevo producto</span>
+    {% endif %}
+  </nav>
 
-      <h2>Datos del producto</h2>
-      {% for field in product_form %}
-        <div class="field {% if field.field.widget.input_type == 'checkbox' %}checkbox-field{% endif %}">
-          {% if field.field.widget.input_type == 'checkbox' %}
-            {{ field }}
-            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-          {% else %}
-            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-            {{ field }}
-          {% endif %}
-          {% if field.help_text %}<small>{{ field.help_text }}</small>{% endif %}
-          {{ field.errors }}
+  <form method="post" class="flex flex-col gap-5 lg:gap-6">
+    {% csrf_token %}
+
+    {% if product_form.errors or spec_form.errors %}
+    <p role="alert" class="flex items-start gap-3 rounded-control border border-danger bg-surface-2 px-4 py-3 text-ui"><svg class="mt-0.5 size-5 shrink-0 text-danger" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18ZM12 7.5v5.5M12 16.5h.01" /></svg><span><span class="font-semibold">Revisa los campos marcados.</span> No se guardó nada todavía.{% for error in product_form.non_field_errors %} {{ error }}{% endfor %}{% for error in spec_form.non_field_errors %} {{ error }}{% endfor %}</span></p>
+    {% endif %}
+
+    <fieldset class="min-w-0 rounded-card border border-border bg-surface-1 p-4 lg:p-6">
+      <legend class="float-left mb-4 w-full p-0 font-sans text-ui font-semibold">Datos del producto</legend>
+      <div class="clear-both grid gap-5 lg:grid-cols-2">
+        <div class="flex flex-col gap-2">
+          <label for="{{ product_form.name.id_for_label }}" class="text-ui font-semibold">Nombre<span class="font-normal text-text-muted"> · obligatorio</span></label>
+          {{ product_form.name }}
+          {% include "inventory/_field_error.html" with field=product_form.name %}
         </div>
-      {% endfor %}
-
-      <h2>Especificación de corte (opcional)</h2>
-      {% for field in spec_form %}
-        <div class="field">
-          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-          {{ field }}
-          {% if field.help_text %}<small>{{ field.help_text }}</small>{% endif %}
-          {{ field.errors }}
+        <div class="flex flex-col gap-2">
+          <label for="{{ product_form.category.id_for_label }}" class="text-ui font-semibold">Categoría<span class="font-normal text-text-muted"> · obligatorio</span></label>
+          <div class="relative">
+            {{ product_form.category }}
+            <svg class="pointer-events-none absolute top-1/2 right-4 size-5 -translate-y-1/2 text-text-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m6 9 6 6 6-6" /></svg>
+          </div>
+          {% include "inventory/_field_error.html" with field=product_form.category %}
         </div>
-      {% endfor %}
+        <div class="flex flex-col gap-2 lg:col-span-2">
+          <label for="{{ product_form.description.id_for_label }}" class="text-ui font-semibold">Descripción</label>
+          {{ product_form.description }}
+          {% include "inventory/_field_error.html" with field=product_form.description %}
+        </div>
+      </div>
+    </fieldset>
 
-      <div class="actions">
-        <button type="submit" class="btn">Guardar</button>
+    <fieldset class="min-w-0 rounded-card border border-border bg-surface-1 p-4 lg:p-6">
+      <legend class="float-left mb-4 w-full p-0 font-sans text-ui font-semibold">Precio y cantidad</legend>
+      <div class="clear-both grid gap-5 lg:grid-cols-3">
+        <div class="flex flex-col gap-2">
+          <label for="{{ product_form.price_per_kg.id_for_label }}" class="text-ui font-semibold">Precio por kg<span class="font-normal text-text-muted"> · obligatorio</span></label>
+          <div class="relative">
+            <span aria-hidden="true" class="pointer-events-none absolute top-1/2 left-4 -translate-y-1/2 text-text-muted">$</span>
+            {{ product_form.price_per_kg }}
+          </div>
+          {% include "inventory/_field_error.html" with field=product_form.price_per_kg %}
+          <p id="help-price_per_kg" class="text-meta text-text-muted">En un paquete, es el precio del paquete.</p>
+        </div>
+        <div class="flex flex-col gap-2">
+          <span id="lb-etiqueta" class="text-ui font-semibold">Precio por libra</span>
+          <p class="flex h-12 items-center rounded-control border border-border bg-surface-2 px-4 text-lead text-text-muted tabular-nums lg:text-ui">{% if is_update %}<span>${{ product.price_per_lb|floatformat:"2g" }}</span>{% else %}Se calcula al guardar{% endif %}</p>
+          <p id="help-price_per_lb" class="text-meta text-text-muted">No se edita: se calcula del precio por kg (× 0.4536) al guardar.</p>
+        </div>
+        <div class="flex flex-col gap-2">
+          <label for="{{ product_form.min_quantity_kg.id_for_label }}" class="text-ui font-semibold">Cantidad mínima<span class="font-normal text-text-muted"> · obligatorio</span></label>
+          <div class="relative">
+            {{ product_form.min_quantity_kg }}
+            <span aria-hidden="true" class="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-text-muted">kg</span>
+          </div>
+          {% include "inventory/_field_error.html" with field=product_form.min_quantity_kg %}
+          <p id="help-min_quantity_kg" class="text-meta text-text-muted">Lo menos que un cliente puede pedir. 0.250 es un cuarto de kilo.</p>
+        </div>
         {% if is_update %}
-          <a href="{% url 'inventory:detail' product.id %}" class="btn btn-secondary">Cancelar</a>
-        {% else %}
-          <a href="{% url 'inventory:list' %}" class="btn btn-secondary">Cancelar</a>
+        <div class="flex flex-col gap-2 lg:col-span-3">
+          <label for="id_confirm" class="relative flex min-h-12 items-start gap-3 rounded-control border border-border-control bg-surface-2 px-4 py-3">
+            <input type="checkbox" name="confirm" id="id_confirm" value="1"{% if request.POST.confirm == "1" %} checked{% endif %} aria-describedby="help-confirm" class="peer absolute inset-0 size-full cursor-pointer appearance-none rounded-control focus-visible:outline-none" />
+            <span aria-hidden="true" class="grid size-8 shrink-0 place-items-center rounded-control border border-border-control bg-surface-2 text-white transition-[background-color,border-color] duration-160 motion-reduce:transition-none peer-checked:border-red peer-checked:bg-red peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-sand *:opacity-0 peer-checked:*:opacity-100"><svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12.5 9.5 17 19 7.5" /></svg></span>
+            <span class="text-ui font-semibold">Confirmar cambio de precio o cantidad mínima</span>
+          </label>
+          <p id="help-confirm" class="text-meta text-text-muted">Márcala si vas a cambiar el precio por kg o la cantidad mínima. Si no la marcas, el panel te muestra el antes y el después para que lo confirmes antes de guardar.</p>
+        </div>
         {% endif %}
       </div>
-    </form>
-  </div>
+    </fieldset>
+
+    <fieldset class="min-w-0 rounded-card border border-border bg-surface-1 p-4 lg:p-6">
+      <legend class="float-left mb-4 w-full p-0 font-sans text-ui font-semibold">Existencia, estado e imagen</legend>
+      <div class="clear-both grid gap-5 lg:grid-cols-2">
+        <div class="flex flex-col gap-2">
+          <label for="{{ product_form.stock.id_for_label }}" class="text-ui font-semibold">Existencia<span class="font-normal text-text-muted"> · obligatorio</span></label>
+          <div class="relative">
+            {{ product_form.stock }}
+          </div>
+          {% include "inventory/_field_error.html" with field=product_form.stock %}
+          <p id="help-stock" class="text-meta text-text-muted">Piezas o kilos disponibles. La tienda no muestra el número.</p>
+        </div>
+        <div class="flex flex-col gap-2">
+          <span class="text-ui font-semibold">Estado</span>
+          <label for="{{ product_form.is_active.id_for_label }}" class="relative flex min-h-12 items-center justify-between gap-4 rounded-control border border-border-control bg-surface-1 px-4 py-2">
+            <span class="text-ui">Activo: visible en la tienda</span>
+            {{ product_form.is_active }}
+            <span aria-hidden="true" class="relative h-7 w-12 shrink-0 rounded-control border border-border-control bg-surface-3 transition-[background-color,border-color] duration-160 motion-reduce:transition-none peer-checked:border-red peer-checked:bg-red peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-sand after:absolute after:top-1/2 after:left-1 after:size-5 after:-translate-y-1/2 after:rounded-control after:bg-white after:transition-transform after:duration-160 after:ease-out-strong motion-reduce:after:transition-none peer-checked:after:translate-x-5"></span>
+          </label>
+          {% include "inventory/_field_error.html" with field=product_form.is_active %}
+          <p class="text-meta text-text-muted">Si lo desactivas, deja de verse en la tienda.</p>
+        </div>
+        <div class="flex flex-col gap-2 lg:col-span-2">
+          <label for="{{ product_form.image_url.id_for_label }}" class="text-ui font-semibold">Imagen (ruta)</label>
+          {{ product_form.image_url }}
+          {% include "inventory/_field_error.html" with field=product_form.image_url %}
+          <p id="help-image_url" class="text-meta text-text-muted">Ruta de la imagen en la tienda, por ejemplo /img/products/tomahawk.webp.</p>
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset class="min-w-0 rounded-card border border-border bg-surface-1 p-4 lg:p-6">
+      <legend class="float-left mb-4 w-full p-0 font-sans text-ui font-semibold">Especificación de corte (opcional)</legend>
+      <p class="clear-both mb-4 text-meta text-text-muted">Déjala en blanco si no aplica. Si llenas algún campo, se guarda junto con el producto.</p>
+      <div class="clear-both grid gap-5 lg:grid-cols-3">
+        <div class="flex flex-col gap-2">
+          <label for="{{ spec_form.avg_piece_weight_kg.id_for_label }}" class="text-ui font-semibold">Peso promedio por pieza (kg)</label>
+          <div class="relative">
+            {{ spec_form.avg_piece_weight_kg }}
+            <span aria-hidden="true" class="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-text-muted">kg</span>
+          </div>
+          {% include "inventory/_field_error.html" with field=spec_form.avg_piece_weight_kg %}
+          <p id="help-avg_piece_weight_kg" class="text-meta text-text-muted">Con este dato la tienda puede ofrecer pedir por pieza.</p>
+        </div>
+        <div class="flex flex-col gap-2">
+          <label for="{{ spec_form.thickness_min_in.id_for_label }}" class="text-ui font-semibold">Grosor mínimo (in)</label>
+          <div class="relative">
+            {{ spec_form.thickness_min_in }}
+            <span aria-hidden="true" class="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-text-muted">in</span>
+          </div>
+          {% include "inventory/_field_error.html" with field=spec_form.thickness_min_in %}
+        </div>
+        <div class="flex flex-col gap-2">
+          <label for="{{ spec_form.thickness_max_in.id_for_label }}" class="text-ui font-semibold">Grosor máximo (in)</label>
+          <div class="relative">
+            {{ spec_form.thickness_max_in }}
+            <span aria-hidden="true" class="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-text-muted">in</span>
+          </div>
+          {% include "inventory/_field_error.html" with field=spec_form.thickness_max_in %}
+        </div>
+        <div class="flex flex-col gap-2">
+          <label for="{{ spec_form.thickness_default_in.id_for_label }}" class="text-ui font-semibold">Grosor por defecto (in)</label>
+          <div class="relative">
+            {{ spec_form.thickness_default_in }}
+            <span aria-hidden="true" class="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-text-muted">in</span>
+          </div>
+          {% include "inventory/_field_error.html" with field=spec_form.thickness_default_in %}
+        </div>
+        <div class="flex flex-col gap-2">
+          <label for="{{ spec_form.supplier.id_for_label }}" class="text-ui font-semibold">Proveedor</label>
+          {{ spec_form.supplier }}
+          {% include "inventory/_field_error.html" with field=spec_form.supplier %}
+        </div>
+        <div class="flex flex-col gap-2">
+          <label for="{{ spec_form.presentation.id_for_label }}" class="text-ui font-semibold">Presentación</label>
+          <div class="relative">
+            {{ spec_form.presentation }}
+            <svg class="pointer-events-none absolute top-1/2 right-4 size-5 -translate-y-1/2 text-text-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m6 9 6 6 6-6" /></svg>
+          </div>
+          {% include "inventory/_field_error.html" with field=spec_form.presentation %}
+        </div>
+        <div class="flex flex-col gap-2 lg:col-span-3">
+          <label for="{{ spec_form.notes.id_for_label }}" class="text-ui font-semibold">Notas</label>
+          {{ spec_form.notes }}
+          {% include "inventory/_field_error.html" with field=spec_form.notes %}
+        </div>
+      </div>
+    </fieldset>
+
+    <div class="flex flex-col gap-3 sm:flex-row">
+      <button type="submit" class="inline-flex min-h-12 items-center justify-center gap-2 rounded-pill bg-red px-6 text-ui font-semibold text-white transition-[background-color,scale] duration-160 ease-out-strong hover:bg-red-hover active:scale-[0.97] motion-reduce:transition-none">Guardar cambios</button>
+      {% if is_update %}
+      <a href="{% url 'inventory:detail' product.id %}" class="inline-flex min-h-12 items-center justify-center gap-2 rounded-pill border border-sand px-6 text-ui font-semibold text-text transition-[background-color,scale] duration-160 ease-out-strong hover:bg-surface-2 active:scale-[0.97] motion-reduce:transition-none">Cancelar</a>
+      {% else %}
+      <a href="{% url 'inventory:list' %}" class="inline-flex min-h-12 items-center justify-center gap-2 rounded-pill border border-sand px-6 text-ui font-semibold text-text transition-[background-color,scale] duration-160 ease-out-strong hover:bg-surface-2 active:scale-[0.97] motion-reduce:transition-none">Cancelar</a>
+      {% endif %}
+    </div>
+  </form>
+</div>
 {% endblock %}
