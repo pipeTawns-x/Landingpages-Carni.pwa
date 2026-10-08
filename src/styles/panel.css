@@ -1,0 +1,72 @@
+/**
+ * Entrada de Tailwind v4 de las páginas del panel (dashboar.html, admin-*.html
+ * y el kit de bloques que el backend aplica en sus plantillas de Django).
+ *
+ * El HTML del panel no lleva JavaScript: se vincula con
+ *   <link rel="stylesheet" href="/src/styles/panel.css">
+ * y Vite (desarrollo y build) lo compila con el plugin de Tailwind. Django
+ * compila este mismo archivo con su propia canalización de Tailwind v4, así que
+ * el panel y la tienda generan los mismos valores desde `tokens.css` (contrato S1).
+ *
+ * Solo se usan los tokens: sin tamaños de texto ni radios por defecto de Tailwind.
+ * La base repite a propósito la de `tailwind.css`: ese archivo escanea `src/` y las
+ * tres páginas de la tienda, y el panel no debe cargar nada de eso.
+ */
+@import "tailwindcss" source(none);
+@import "./tokens.css";
+
+/* Fuentes autoalojadas, igual que `fuentes.ts` pero como CSS (el panel no tiene JS). */
+@import "@fontsource-variable/geist"; /* familia "Geist Variable", eje wght */
+@import "@fontsource-variable/fraunces/opsz.css"; /* familia "Fraunces Variable", ejes opsz y wght */
+
+/*
+ * Dónde buscar clases. Sin `source(none)` Tailwind lee todo el repositorio,
+ * incluidos los documentos de diseño; aquí solo cuentan las páginas del panel
+ * y la carpeta del kit.
+ */
+@source "../../dashboar.html";
+@source "../../admin-*.html";
+@source "../../docs/design/rediseno/panel/kit/*.html";
+
+@layer base {
+  html {
+    color-scheme: dark;
+    scrollbar-gutter: stable;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    margin: 0;
+    background: var(--color-bg);
+    color: var(--color-text);
+    font-family: var(--font-sans);
+    font-size: var(--text-ui);
+    line-height: var(--text-ui--line-height);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    text-wrap: balance;
+    margin: 0;
+  }
+
+  ::selection {
+    background: rgb(228 209 176 / 0.32);
+  }
+
+  /* El anillo de foco global: visible también sobre el rojo y sobre cualquier superficie. */
+  :focus-visible {
+    outline: 2px solid var(--color-sand);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+}
