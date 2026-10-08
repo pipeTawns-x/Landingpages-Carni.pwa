@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+  <!--
+    Panel · Productos · detalle (pantalla 29 de Claude Design 1.1). HTML y CSS planos, sin JavaScript.
+    Pasa a ser backend/templates/inventory/product_detail.html (ruta /panel/productos/<id>/, nombre inventory:detail).
+    Contexto de la vista: product (con category) y spec (CutSpec o None).
+    Marco: es el de dashboar.html (barra lateral, barra superior, pestañas). Lo que queda fuera de los bloques django:block
+    ya vive en panel/base.html; el backend toma solo los bloques title, titulo, accion y contenido. Se deja completo para que
+    la página se pueda ver sola. Marcas: docs/design/rediseno/panel/kit/README.md y las que define admin-products.html.
+    Datos de ejemplo: el producto real Tomahawk (id 7) de la base local.
+    Eliminar o desactivar: la ruta es una sola (inventory:delete). Si el producto tiene pedidos se desactiva y si no se
+    elimina; la página de confirmación dice cuál de los dos pasa, por eso el botón nombra los dos.
+    Pedido al backend: product.unit_label (ver admin-products.html).
+  -->
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0B0B0C" />
+  <meta name="color-scheme" content="dark" />
+  <meta name="robots" content="noindex" />
+  <!-- django:block title -->
+  <title>Tomahawk · Productos · Panel · Carnicería El Señor de La Misericordia</title>
+  <!-- django:endblock -->
+  <!-- django:static img/recursos_web/logo-user.png -->
+  <link rel="icon" href="/img/recursos_web/logo-user.png" type="image/png" />
+  <!-- django:static panel.css -->
+  <link rel="stylesheet" href="/src/styles/panel.css" />
+</head>
+<body class="min-h-dvh bg-bg text-text lg:pl-62">
+  <!-- Barra lateral · desde 1024 px de ancho. Fija, de 248 px. -->
+  <aside class="fixed inset-y-0 left-0 z-20 hidden w-62 flex-col border-r border-border bg-surface-1 lg:flex">
+    <div class="flex h-18 shrink-0 items-center border-b border-border px-5">
+      <span class="flex flex-col gap-1 leading-none">
+        <span class="font-sans text-ui font-semibold tracking-[0.22em]">CARNICERÍA</span>
+        <span class="text-meta text-text-muted">Panel de la tienda</span>
+      </span>
+    </div>
+
+    <nav aria-label="Secciones del panel" class="flex-1 overflow-y-auto p-3">
+      <ul role="list" class="flex flex-col gap-2">
+        <li>
+          <!-- django:url panel:inicio -->
+          <!-- django:active panel:inicio -->
+          <a href="/panel/" class="group flex min-h-11 items-center gap-3 rounded-control px-3 text-ui text-text-muted transition-transform duration-160 ease-out-strong hover:bg-surface-2 hover:text-text active:scale-[0.97] motion-reduce:transition-none aria-[current]:bg-surface-2 aria-[current]:font-semibold aria-[current]:text-text">
+            <svg class="size-5 shrink-0 group-aria-[current]:text-red-text" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 11.5 12 5l8 6.5V19a1 1 0 0 1-1 1h-4.5v-5h-5v5H5a1 1 0 0 1-1-1Z" /></svg>
+            <span>Inicio</span>
+          </a>
+        </li>
+        <li>
+          <!-- django:url orders:board -->
+          <!-- django:active orders:board -->
+          <a href="/panel/pedidos/" class="group flex min-h-11 items-center gap-3 rounded-control px-3 text-ui text-text-muted transition-transform duration-160 ease-out-strong hover:bg-surface-2 hover:text-text active:scale-[0.97] motion-reduce:transition-none aria-[current]:bg-surface-2 aria-[current]:font-semibold aria-[current]:text-text">
+            <svg class="size-5 shrink-0 group-aria-[current]:text-red-text" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 5h4.5v14H4zM9.75 5h4.5v9h-4.5zM15.5 5H20v11h-4.5z" /></svg>
+            <span>Pedidos</span>
+          </a>
+        </li>
+        <li>
+          <!-- django:url inventory:list -->
+          <!-- django:active inventory:* (activo en las cinco rutas de productos) -->
+          <a href="/panel/productos/" aria-current="page" class="group flex min-h-11 items-center gap-3 rounded-control px-3 text-ui text-text-muted transition-transform duration-160 ease-out-strong hover:bg-surface-2 hover:text-text active:scale-[0.97] motion-reduce:transition-none aria-[current]:bg-surface-2 aria-[current]:font-semibold aria-[current]:text-text">
+            <svg class="size-5 shrink-0 group-aria-[current]:text-red-text" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M20 13.5 13.5 20a1.5 1.5 0 0 1-2.1 0L4 12.6V4h8.6l7.4 7.4a1.5 1.5 0 0 1 0 2.1ZM8.5 8.5h.01" /></svg>
+            <span>Productos</span>
+          </a>
+        </li>
+        <li>
+          <!-- django:url customers:list -->
+          <!-- django:active customers:list -->
+          <a href="/panel/clientes/" class="group flex min-h-11 items-center gap-3 rounded-control px-3 text-ui text-text-muted transition-transform duration-160 ease-out-strong hover:bg-surface-2 hover:text-text active:scale-[0.97] motion-reduce:transition-none aria-[current]:bg-surface-2 aria-[current]:font-semibold aria-[current]:text-text">
+            <svg class="size-5 shrink-0 group-aria-[current]:text-red-text" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7ZM3 20a6 6 0 0 1 12 0M16 4.3a3.5 3.5 0 0 1 0 6.4M21 20a6 6 0 0 0-3.5-5.4" /></svg>
+            <span>Clientes</span>
+          </a>
+        </li>
+        <li>
+          <!-- django:url panel:ads -->
+          <!-- django:active panel:ads -->
+          <a href="/panel/publicidad/" class="group flex min-h-11 items-center gap-3 rounded-control px-3 text-ui text-text-muted transition-transform duration-160 ease-out-strong hover:bg-surface-2 hover:text-text active:scale-[0.97] motion-reduce:transition-none aria-[current]:bg-surface-2 aria-[current]:font-semibold aria-[current]:text-text">
+            <svg class="size-5 shrink-0 group-aria-[current]:text-red-text" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 10v4a1 1 0 0 0 1 1h2l6 4V5L7 9H5a1 1 0 0 0-1 1ZM17 9a4 4 0 0 1 0 6" /></svg>
+            <span>Publicidad</span>
+          </a>
+        </li>
+        <li>
+          <!-- django:url settings:index -->
+          <!-- django:active settings:index -->
+          <a href="/panel/ajustes/" class="group flex min-h-11 items-center gap-3 rounded-control px-3 text-ui text-text-muted transition-transform duration-160 ease-out-strong hover:bg-surface-2 hover:text-text active:scale-[0.97] motion-reduce:transition-none aria-[current]:bg-surface-2 aria-[current]:font-semibold aria-[current]:text-text">
+            <svg class="size-5 shrink-0 group-aria-[current]:text-red-text" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 7h10M18 7h2M4 17h4M12 17h8M16 5v4M10 15v4" /></svg>
+            <span>Ajustes</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+    <div class="flex flex-col gap-2 border-t border-border p-3">
+      <p class="flex items-center gap-3 px-3 py-1">
+        <span class="grid size-9 shrink-0 place-items-center rounded-control bg-surface-3 text-sand">
+          <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM4.5 20a7.5 7.5 0 0 1 15 0" /></svg>
+        </span>
+        <span class="flex min-w-0 flex-col">
+          <span class="truncate text-meta font-semibold" data-dj="user.email">admin@ejemplo.com</span>
+          <span class="text-meta text-text-muted">Administrador</span>
+        </span>
+      </p>
+      <!-- django:url panel:salir -->
+      <form method="post" action="/panel/salir/">
+        <!-- django:csrf -->
+        <button type="submit" class="flex min-h-11 w-full items-center gap-3 rounded-control px-3 text-left text-ui text-text-muted transition-transform duration-160 ease-out-strong hover:bg-surface-2 hover:text-text active:scale-[0.97] motion-reduce:transition-none">
+          <svg class="size-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4M9 16l-4-4 4-4M5 12h10" /></svg>
+          <span>Cerrar sesión</span>
+        </button>
+      </form>
+    </div>
+  </aside>
+
+  <!-- Barra superior · título de la página y, si la hay, su acción. -->
+  <header class="sticky top-0 z-10 flex h-14 items-center gap-3 border-b border-border bg-bg px-4 lg:h-18 lg:px-8">
+    <h1 class="min-w-0 flex-1 truncate font-display text-titulo font-medium">
+      <!-- django:block titulo --><span data-dj="product.name">Tomahawk</span><!-- django:endblock -->
+    </h1>
+    <!-- django:block accion -->
+    <!-- django:endblock -->
+  </header>
+
+  <main class="px-4 pt-5 pb-28 lg:px-8 lg:pt-7 lg:pb-12">
+    <!-- django:include messages.html -->
+    <!-- Diseño de messages.html. Sin mensajes no se dibuja nada; Django lo desenvuelve en su parcial. -->
+    <template data-dj-rama="messages.html">
+      <!-- django:if messages -->
+      <ul role="list" class="mb-5 flex flex-col gap-2 lg:mb-6">
+        <!-- django:for message in messages -->
+        <!--
+          Según message.tags, el ícono y su color cambian y el resto queda igual:
+          success: este ícono con text-success.
+          warning: triángulo (M12 9v4M12 16.5h.01M10.3 4.2 2.8 17.5A2 2 0 0 0 4.5 20.5h15a2 2 0 0 0 1.7-3L13.7 4.2a2 2 0 0 0-3.4 0Z) con text-sand.
+          error: el mismo triángulo con text-danger.
+        -->
+        <li class="flex items-start gap-3 rounded-control border border-border bg-surface-2 px-4 py-3 text-ui">
+          <svg class="mt-0.5 size-5 shrink-0 text-success" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12.5 9.5 17 19 7.5" /></svg>
+          <span data-dj="message">Producto "Tomahawk" actualizado correctamente.</span>
+        </li>
+        <!-- django:endfor -->
+      </ul>
+      <!-- django:endif -->
+    </template>
+
+    <!-- django:block contenido -->
+    <div class="flex flex-col gap-5 lg:gap-6">
+      <nav aria-label="Ruta" class="flex flex-wrap items-center gap-x-2 text-ui">
+        <!-- django:url inventory:list -->
+        <a href="/panel/productos/" class="inline-flex min-h-11 items-center text-text-muted underline decoration-border-control underline-offset-4 transition-colors duration-160 hover:text-text">Productos</a>
+        <span aria-hidden="true" class="text-text-muted">/</span>
+        <span aria-current="page" class="min-w-0 text-text" data-dj="product.name">Tomahawk</span>
+      </nav>
+
+      <div class="grid gap-5 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-6">
+        <!-- Imagen: image_url es una ruta de la tienda; Django debe anteponer STORE_ORIGIN para que cargue. -->
+        <section aria-label="Imagen del producto" class="flex flex-col gap-3">
+          <!-- django:if product.image_url -->
+          <div class="aspect-4/3 overflow-hidden rounded-card border border-border bg-surface-2">
+            <!-- django:src product.image_url -->
+            <img src="/img/products/tomahawk.webp" alt="" width="640" height="480" loading="lazy" class="size-full object-cover" />
+          </div>
+          <p class="text-meta text-text-muted">Imagen registrada: <span class="break-all text-text" data-dj="product.image_url">/img/products/tomahawk.webp</span></p>
+          <!-- django:else -->
+          <template data-dj-rama="sin-imagen">
+            <div class="grid aspect-4/3 place-items-center rounded-card border border-border bg-surface-2 text-text-muted"><svg class="size-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 5h16v14H4zM4 16l5-5 4 4 3-3 4 4M9 9.5h.01" /></svg></div>
+            <p class="text-meta text-text-muted">Este producto no tiene imagen registrada.</p>
+          </template>
+          <!-- django:endif -->
+        </section>
+
+        <section aria-labelledby="datos-titulo" class="flex flex-col gap-2 rounded-card border border-border bg-surface-1 p-4 lg:p-6">
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <h2 id="datos-titulo" class="font-sans text-ui font-semibold">Datos del producto</h2>
+            <span data-dj="product.is_active">
+              <!-- django:if product.is_active -->
+              <span class="inline-flex h-6 items-center gap-1.5 rounded-control border border-border bg-surface-2 px-2 text-meta font-semibold"><svg class="size-3.5 shrink-0 text-success" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0ZM8 12.5l3 3 5-6" /></svg><span>Activo</span></span>
+              <!-- django:else -->
+              <template data-dj-rama="inactivo">
+                <span class="inline-flex h-6 items-center gap-1.5 rounded-control border border-border bg-surface-2 px-2 text-meta font-semibold"><svg class="size-3.5 shrink-0 text-text-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0ZM8.5 12h7" /></svg><span>Inactivo</span></span>
+              </template>
+              <!-- django:endif -->
+            </span>
+          </div>
+          <p class="flex flex-wrap items-baseline gap-x-2 tabular-nums">
+            <span class="text-seccion font-semibold" data-dj="product.price_per_kg">$649.00</span>
+            <span class="text-ui text-text-muted">/ <span data-dj="product.unit_label">kg</span><!-- django:if product.unit_label == "kg" --> · <span data-dj="product.price_per_lb">$294.39</span> / lb<!-- django:endif --></span>
+          </p>
+          <dl class="mt-2 divide-y divide-border border-t border-border">
+            <div class="grid gap-1 py-3 sm:grid-cols-[11rem_minmax(0,1fr)] sm:gap-4">
+              <dt class="text-ui text-text-muted">Categoría</dt>
+              <dd class="min-w-0 text-ui"><span data-dj="product.category.name">Cortes Especiales</span></dd>
+            </div>
+            <div class="grid gap-1 py-3 sm:grid-cols-[11rem_minmax(0,1fr)] sm:gap-4">
+              <dt class="text-ui text-text-muted">Descripción</dt>
+              <dd class="min-w-0 text-ui"><span class="text-pretty" data-dj="product.description">Rib eye con el hueso largo entero. Corte de exhibición: pesa de 1.2 a 1.5 kg por pieza.</span></dd>
+            </div>
+            <div class="grid gap-1 py-3 sm:grid-cols-[11rem_minmax(0,1fr)] sm:gap-4">
+              <dt class="text-ui text-text-muted">Cantidad mínima</dt>
+              <dd class="min-w-0 text-ui"><span class="tabular-nums"><span data-dj="product.min_quantity_kg">0.800</span> kg</span></dd>
+            </div>
+            <div class="grid gap-1 py-3 sm:grid-cols-[11rem_minmax(0,1fr)] sm:gap-4">
+              <dt class="text-ui text-text-muted">Existencia</dt>
+              <dd class="min-w-0 text-ui"><span class="font-semibold tabular-nums" data-dj="product.stock">15</span><span class="mt-1 block text-meta text-text-muted">El número solo se ve aquí. La tienda muestra Disponible, Pocas piezas o Agotado.</span></dd>
+            </div>
+          </dl>
+        </section>
+      </div>
+
+      <section aria-labelledby="spec-titulo" class="flex flex-col gap-2 rounded-card border border-border bg-surface-1 p-4 lg:p-6">
+        <h2 id="spec-titulo" class="font-sans text-ui font-semibold">Especificación de corte</h2>
+        <!-- django:if spec -->
+        <template data-dj-rama="con-especificacion">
+          <dl class="divide-y divide-border border-t border-border lg:grid lg:grid-cols-2 lg:gap-x-8 lg:divide-y-0">
+            <div class="grid gap-1 py-3 sm:grid-cols-[11rem_minmax(0,1fr)] sm:gap-4">
+              <dt class="text-ui text-text-muted">Peso promedio por pieza (kg)</dt>
+              <dd class="min-w-0 text-ui"><span class="tabular-nums" data-dj="spec.avg_piece_weight_kg">1.350</span></dd>
+            </div>
+            <div class="grid gap-1 py-3 sm:grid-cols-[11rem_minmax(0,1fr)] sm:gap-4">
+              <dt class="text-ui text-text-muted">Grosor mínimo (in)</dt>
+              <dd class="min-w-0 text-ui"><span class="tabular-nums" data-dj="spec.thickness_min_in">1.00</span></dd>
+            </div>
+            <div class="grid gap-1 py-3 sm:grid-cols-[11rem_minmax(0,1fr)] sm:gap-4">
+              <dt class="text-ui text-text-muted">Grosor máximo (in)</dt>
+              <dd class="min-w-0 text-ui"><span class="tabular-nums" data-dj="spec.thickness_max_in">2.00</span></dd>
+            </div>
+            <div class="grid gap-1 py-3 sm:grid-cols-[11rem_minmax(0,1fr)] sm:gap-4">
+              <dt class="text-ui text-text-muted">Grosor por defecto (in)</dt>
+              <dd class="min-w-0 text-ui"><span class="tabular-nums" data-dj="spec.thickness_default_in">1.50</span></dd>
+            </div>
+            <div class="grid gap-1 py-3 sm:grid-cols-[11rem_minmax(0,1fr)] sm:gap-4">
+              <dt class="text-ui text-text-muted">Proveedor</dt>
+              <dd class="min-w-0 text-ui"><span data-dj="spec.supplier">Nombre del proveedor</span></dd>
+            </div>
+            <div class="grid gap-1 py-3 sm:grid-cols-[11rem_minmax(0,1fr)] sm:gap-4">
+              <dt class="text-ui text-text-muted">Presentación</dt>
+              <dd class="min-w-0 text-ui"><span data-dj="spec.get_presentation_display">Pieza</span></dd>
+            </div>
+            <div class="grid gap-1 py-3 sm:grid-cols-[11rem_minmax(0,1fr)] sm:gap-4">
+              <dt class="text-ui text-text-muted">Notas</dt>
+              <dd class="min-w-0 text-ui"><span data-dj="spec.notes">Notas de la especificación.</span></dd>
+            </div>
+          </dl>
+        </template>
+        <!-- django:else -->
+        <div class="flex flex-col items-start gap-3 py-2">
+          <p class="text-ui text-text-muted">Este producto no tiene especificación de corte.</p>
+          <!-- django:url inventory:update product.id -->
+          <a href="/panel/productos/7/editar/" class="inline-flex min-h-11 items-center text-ui font-semibold text-text underline decoration-sand underline-offset-4">Agregar especificación</a>
+        </div>
+        <!-- django:endif -->
+      </section>
+
+      <div class="flex flex-col gap-3 sm:flex-row">
+        <!-- django:url inventory:update product.id -->
+        <a href="/panel/productos/7/editar/" class="inline-flex min-h-12 items-center justify-center gap-2 rounded-pill bg-red px-6 text-ui font-semibold text-white transition-[background-color,scale] duration-160 ease-out-strong hover:bg-red-hover active:scale-[0.97] motion-reduce:transition-none"><svg class="size-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 20h4L19 9l-4-4L4 16Z" /></svg><span>Editar</span></a>
+        <!-- django:url inventory:delete product.id -->
+        <a href="/panel/productos/7/eliminar/" class="inline-flex min-h-12 items-center justify-center gap-2 rounded-pill border border-border-control px-6 text-ui font-semibold text-red-text transition-[background-color,scale] duration-160 ease-out-strong hover:bg-surface-2 active:scale-[0.97] motion-reduce:transition-none"><svg class="size-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 7h14M10 7V5h4v2M7 7l1 13h8l1-13" /></svg><span>Eliminar o desactivar</span></a>
+      </div>
+    </div>
+    <!-- django:endblock -->
+  </main>
+
+  <!-- Pestañas · debajo de 1024 px de ancho. La quinta, "Más", es una página: /panel/mas/. -->
+  <nav aria-label="Secciones del panel" class="fixed inset-x-0 bottom-0 z-20 border-t border-border bg-surface-1 px-1 pt-1 pb-[max(0.5rem,env(safe-area-inset-bottom))] lg:hidden">
+    <ul role="list" class="grid grid-cols-5">
+      <li>
+        <!-- django:url panel:inicio -->
+        <!-- django:active panel:inicio -->
+        <a href="/panel/" class="flex min-h-14 flex-col items-center justify-center gap-1 rounded-control text-meta text-text-muted transition-transform duration-160 ease-out-strong hover:text-text active:scale-[0.97] motion-reduce:transition-none aria-[current]:font-semibold aria-[current]:text-red-text">
+          <svg class="size-5.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 11.5 12 5l8 6.5V19a1 1 0 0 1-1 1h-4.5v-5h-5v5H5a1 1 0 0 1-1-1Z" /></svg>
+          <span>Inicio</span>
+        </a>
+      </li>
+      <li>
+        <!-- django:url orders:board -->
+        <!-- django:active orders:board -->
+        <a href="/panel/pedidos/" class="flex min-h-14 flex-col items-center justify-center gap-1 rounded-control text-meta text-text-muted transition-transform duration-160 ease-out-strong hover:text-text active:scale-[0.97] motion-reduce:transition-none aria-[current]:font-semibold aria-[current]:text-red-text">
+          <svg class="size-5.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 5h4.5v14H4zM9.75 5h4.5v9h-4.5zM15.5 5H20v11h-4.5z" /></svg>
+          <span>Pedidos</span>
+        </a>
+      </li>
+      <li>
+        <!-- django:url inventory:list -->
+        <!-- django:active inventory:* (activo en las cinco rutas de productos) -->
+        <a href="/panel/productos/" aria-current="page" class="flex min-h-14 flex-col items-center justify-center gap-1 rounded-control text-meta text-text-muted transition-transform duration-160 ease-out-strong hover:text-text active:scale-[0.97] motion-reduce:transition-none aria-[current]:font-semibold aria-[current]:text-red-text">
+          <svg class="size-5.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M20 13.5 13.5 20a1.5 1.5 0 0 1-2.1 0L4 12.6V4h8.6l7.4 7.4a1.5 1.5 0 0 1 0 2.1ZM8.5 8.5h.01" /></svg>
+          <span>Productos</span>
+        </a>
+      </li>
+      <li>
+        <!-- django:url customers:list -->
+        <!-- django:active customers:list -->
+        <a href="/panel/clientes/" class="flex min-h-14 flex-col items-center justify-center gap-1 rounded-control text-meta text-text-muted transition-transform duration-160 ease-out-strong hover:text-text active:scale-[0.97] motion-reduce:transition-none aria-[current]:font-semibold aria-[current]:text-red-text">
+          <svg class="size-5.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7ZM3 20a6 6 0 0 1 12 0M16 4.3a3.5 3.5 0 0 1 0 6.4M21 20a6 6 0 0 0-3.5-5.4" /></svg>
+          <span>Clientes</span>
+        </a>
+      </li>
+      <li>
+        <!-- django:url panel:mas -->
+        <!-- django:active panel:mas (aria-current="page" en /panel/mas/; aria-current="true" en panel:ads y settings:index, que viven dentro de Más) -->
+        <a href="/panel/mas/" class="flex min-h-14 flex-col items-center justify-center gap-1 rounded-control text-meta text-text-muted transition-transform duration-160 ease-out-strong hover:text-text active:scale-[0.97] motion-reduce:transition-none aria-[current]:font-semibold aria-[current]:text-red-text">
+          <svg class="size-5.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h.01M12 12h.01M19 12h.01" /></svg>
+          <span>Más</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+</body>
+</html>
