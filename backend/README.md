@@ -121,10 +121,24 @@ Behaviour worth knowing before touching it:
   shows a warning that names them. Django still adds its own "deleted
   successfully" message and logs a deletion for them, because both come from
   the admin itself and not from `delete_model` or `delete_queryset`.
-- The list is paginated, 25 per page (`PRODUCTS_PER_PAGE` in
-  `inventory/views.py`, using `Paginator.get_page`). `{% querystring %}` keeps
-  `q` and `category` in the page links. A page that is zero, negative or past
-  the end falls back to the last page, and a non-numeric one to the first.
+- The list (`templates/inventory/product_list.html`) is the redesign's
+  `admin-products.html`, moved here with `git mv`. It is paginated, 20 per page
+  (`PRODUCTS_PER_PAGE` in `inventory/views.py`, using `Paginator.get_page`), with
+  a previous and a next control that stay in place, switched off, where there is
+  no page to go to. `{% querystring %}` keeps `q` and `category` in the links
+  (and drops `page` when the filter changes). A page that is zero, negative or
+  past the end falls back to the last page, and a non-numeric one to the first.
+- The category chips are links to `?category=<id>` and count every product of
+  the category, whatever the search says (`product_count`, an annotation of
+  `categories`); "Todas" counts them all (`total_products`). The chip of the
+  category being filtered carries `aria-current="true"`, and "Todas" does when
+  there is none: that is the `django:active` mark of the chips.
+- `Product.unit_label` says what a price is for: "paquete" for a name that
+  starts with "Paquete " unless it says "por kilo" (the rule of `unidadDe` in the
+  store), "pieza" for the Merch and Otros categories and "kg" for the rest. It is
+  PROVISIONAL, pending Eduardo, and `unit_label_for()` in `inventory/models.py`
+  is the only place to change it; a `unit` column on `products` (backlog) would
+  replace it. Prices over a thousand are grouped (`$1,599.00`).
 - `price_per_lb_for()` in `inventory/models.py` holds the price-per-lb formula
   that `Product.save()` uses. Code that creates products with `bulk_create()`
   skips `save()`, so it has to call the function itself.
@@ -409,9 +423,11 @@ access bridge, the guard of the panel views, the logout and the cookie flags and
 headers, and `config/tests.py` the parsers of the environment variables. The test settings set the panel's
 configuration themselves, with a signing secret that is random on every run.
 
-`inventory/tests.py` covers `price_per_lb_for()`, the pagination, the panel
-views and their routes, the rules in `inventory/services.py`, the read-only
-mirrors and the product admin (through the test client, as a superuser). The
+`inventory/tests.py` covers `price_per_lb_for()`, the unit of a price, the
+pagination and the list page (rows, chips, search, empty state and a query count
+that does not grow with the products), the panel views and their routes, the
+rules in `inventory/services.py`, the read-only mirrors and the product admin
+(through the test client, as a superuser). The
 panel views are tested signed in the way a real admin signs in, through the
 handoff (`sign_in_as_panel_admin` in `panel/tests.py`), so the guard is never
 skipped. Those mirrors refuse writes from Django, so the tests add their rows

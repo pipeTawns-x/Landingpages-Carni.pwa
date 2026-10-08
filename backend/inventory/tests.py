@@ -14,6 +14,7 @@ Their tests sign in the way a real admin does, through the Supabase handoff
 is not the panel: its tests sign in as a superuser.
 """
 
+import re
 import uuid
 from decimal import Decimal
 from unittest import mock
@@ -24,6 +25,7 @@ from django.db import IntegrityError, connection
 from django.test import SimpleTestCase, TestCase
 from django.test.utils import CaptureQueriesContext
 from django.urls import reverse
+from django.utils.html import strip_tags
 
 from inventory import services
 from inventory.forms import CutSpecForm, ProductForm
@@ -35,7 +37,9 @@ from inventory.models import (
     Product,
     ReadOnlyModelError,
     price_per_lb_for,
+    unit_label_for,
 )
+from panel.test_frame import anchors, current_links
 from panel.tests import sign_in_as_panel_admin
 
 
@@ -481,30 +485,30 @@ class ProductListPaginationTests(TestCase):
 
         self.assertRedirects(response, reverse("panel:acceso"), fetch_redirect_response=False)
 
-    def test_first_page_has_25_of_500_products(self):
+    def test_first_page_has_20_of_500_products(self):
         response = self.client.get(self.url)
 
         page = response.context["page_obj"]
-        self.assertEqual(len(response.context["products"]), 25)
+        self.assertEqual(len(response.context["products"]), 20)
         self.assertEqual(page.number, 1)
         self.assertEqual(page.paginator.count, 500)
-        self.assertEqual(page.paginator.num_pages, 20)
+        self.assertEqual(page.paginator.num_pages, 25)
         self.assertContains(response, "Producto 001")
-        self.assertContains(response, "Producto 025")
-        self.assertNotContains(response, "Producto 026")
+        self.assertContains(response, "Producto 020")
+        self.assertNotContains(response, "Producto 021")
 
     def test_shows_the_range_and_the_page_number(self):
         response = self.client.get(self.url, {"page": 2})
 
-        self.assertContains(response, "Mostrando 26–50 de 500 productos")
-        self.assertContains(response, "Página 2 de 20")
+        self.assertContains(response, "Mostrando 21–40 de 500 productos")
+        self.assertContains(response, 'Página <span class="font-semibold text-text">2</span> de 25')
 
     def test_last_page_has_the_remaining_rows(self):
-        response = self.client.get(self.url, {"page": 20})
+        response = self.client.get(self.url, {"page": 25})
 
         page = response.context["page_obj"]
-        self.assertEqual(len(response.context["products"]), 25)
-        self.assertEqual(page.number, 20)
+        self.assertEqual(len(response.context["products"]), 20)
+        self.assertEqual(page.number, 25)
         self.assertContains(response, "Producto 500")
 
     def test_a_page_out_of_range_falls_back_to_the_last_page(self):
@@ -514,7 +518,7 @@ class ProductListPaginationTests(TestCase):
                 response = self.client.get(self.url, {"page": page})
 
                 self.assertEqual(response.status_code, 200)
-                self.assertEqual(response.context["page_obj"].number, 20)
+                self.assertEqual(response.context["page_obj"].number, 25)
 
     def test_a_non_numeric_page_falls_back_to_the_first_page(self):
         response = self.client.get(self.url, {"page": "abc"})
@@ -533,22 +537,24 @@ class ProductListPaginationTests(TestCase):
                 self.assertEqual(response.context["selected_category"], "")
                 self.assertEqual(response.context["page_obj"].paginator.count, 500)
 
-    def test_navigation_links_only_appear_when_they_apply(self):
-        first = self.client.get(self.url)
-        self.assertNotContains(first, "Primera")
-        self.assertNotContains(first, "Anterior")
-        self.assertContains(first, "Siguiente")
-        self.assertContains(first, "Última")
+    def pagination(self, response):
+        """Return the HTML of the pagination nav of a response."""
+        html = response.content.decode()
+        return re.search(r'<nav aria-label="Paginación de productos".*?</nav>', html, re.S).group(0)
 
-        middle = self.client.get(self.url, {"page": 2})
-        for label in ("Primera", "Anterior", "Siguiente", "Última"):
-            self.assertContains(middle, label)
+    def test_a_link_only_appears_where_there_is_a_page_to_go_to(self):
+        # Where there is none the control stays in place, switched off (aria-disabled).
+        first = self.pagination(self.client.get(self.url))
+        self.assertEqual([a["href"] for a in anchors(first)], ["?page=2"])
+        self.assertEqual(first.count('aria-disabled="true"'), 1)
 
-        last = self.client.get(self.url, {"page": 20})
-        self.assertContains(last, "Primera")
-        self.assertContains(last, "Anterior")
-        self.assertNotContains(last, "Siguiente")
-        self.assertNotContains(last, "Última")
+        middle = self.pagination(self.client.get(self.url, {"page": 2}))
+        self.assertEqual([a["href"] for a in anchors(middle)], ["?page=1", "?page=3"])
+        self.assertNotIn("aria-disabled", middle)
+
+        last = self.pagination(self.client.get(self.url, {"page": 25}))
+        self.assertEqual([a["href"] for a in anchors(last)], ["?page=24"])
+        self.assertEqual(last.count('aria-disabled="true"'), 1)
 
     def test_search_and_category_survive_a_page_change(self):
         params = {"q": "Producto", "category": self.category.pk, "page": 2}
@@ -556,26 +562,325 @@ class ProductListPaginationTests(TestCase):
         response = self.client.get(self.url, params)
 
         self.assertEqual(response.context["page_obj"].number, 2)
-        # {% querystring %} keeps q and category and only swaps the page. The
-        # ampersands are HTML-escaped by the template engine.
-        base = f"?q=Producto&amp;category={self.category.pk}&amp;page="
-        for target in (1, 3, 20):
-            self.assertContains(response, f'href="{base}{target}"')
+        # {% querystring %} keeps q and category and only swaps the page.
+        base = f"?q=Producto&category={self.category.pk}&page="
+        hrefs = [a["href"] for a in anchors(self.pagination(response))]
+        self.assertEqual(hrefs, [f"{base}1", f"{base}3"])
 
-    def test_a_short_result_shows_the_summary_without_navigation_links(self):
+    def test_a_short_result_shows_the_summary_with_both_controls_switched_off(self):
         # "Producto 04" matches 040 to 049, so ten products fit on one page.
         response = self.client.get(self.url, {"q": "Producto 04"})
 
         self.assertContains(response, "Mostrando 1–10 de 10 productos")
-        self.assertContains(response, "Página 1 de 1")
-        for label in ("Primera", "Anterior", "Siguiente", "Última"):
-            self.assertNotContains(response, label)
+        self.assertContains(response, 'Página <span class="font-semibold text-text">1</span> de 1')
+        navigation = self.pagination(response)
+        self.assertEqual(anchors(navigation), [])
+        self.assertEqual(navigation.count('aria-disabled="true"'), 2)
 
     def test_no_matches_shows_the_empty_state(self):
         response = self.client.get(self.url, {"q": "no existe"})
 
-        self.assertContains(response, "No se encontraron productos")
+        self.assertContains(response, "Ningún producto coincide con la búsqueda")
         self.assertNotContains(response, "Mostrando")
+
+
+class UnitLabelTests(SimpleTestCase):
+    """What a price is for: the provisional rule that the list and the detail show."""
+
+    def test_a_package_is_priced_per_package(self):
+        self.assertEqual(unit_label_for("Paquete Asador 4 a 6 Personas", "ofertas"), "paquete")
+        self.assertEqual(
+            unit_label_for("Paquete Parrillada Familiar 8 a 10 Personas", "ofertas"), "paquete"
+        )
+
+    def test_a_package_that_says_por_kilo_is_priced_per_kilo(self):
+        # The same rule as unidadDe in the store: the carnitas package is sold by weight.
+        self.assertEqual(unit_label_for("Paquete Carnitas por Kilo", "ofertas"), "kg")
+        self.assertEqual(unit_label_for("Paquete Carnitas POR KILO", "ofertas"), "kg")
+
+    def test_merch_and_otros_are_priced_per_piece(self):
+        self.assertEqual(unit_label_for("Gorra Bordada", "merch"), "pieza")
+        self.assertEqual(unit_label_for("Bolsa de Hielo", "otros"), "pieza")
+
+    def test_everything_else_is_priced_per_kilo(self):
+        for slug in ("carnes-rojas", "cortes-especiales", "cerdo", "pollo", "embutidos"):
+            with self.subTest(slug=slug):
+                self.assertEqual(unit_label_for("Arrachera", slug), "kg")
+
+    def test_the_prefix_is_the_whole_word_and_case_sensitive(self):
+        # "Paquetería" is no package, and the store only reads a capital P.
+        self.assertEqual(unit_label_for("Paquetería de Res", "carnes-rojas"), "kg")
+        self.assertEqual(unit_label_for("paquete asador", "ofertas"), "kg")
+
+    def test_a_package_in_merch_is_still_a_package(self):
+        self.assertEqual(unit_label_for("Paquete de Regalo", "merch"), "paquete")
+
+
+class ProductUnitLabelTests(TestCase):
+    fixtures = ["categories.json"]
+
+    def test_the_property_reads_the_name_and_the_slug_of_the_category(self):
+        merch = Category.objects.get(slug="merch")
+        pollo = Category.objects.get(slug="pollo")
+
+        self.assertEqual(Product(name="Gorra Bordada", category=merch).unit_label, "pieza")
+        self.assertEqual(Product(name="Alas Adobadas", category=pollo).unit_label, "kg")
+        self.assertEqual(Product(name="Paquete Asador", category=pollo).unit_label, "paquete")
+
+
+def html_between(html, start, end):
+    """Return the part of `html` from the first `start` to the next `end`, both included."""
+    first = html.index(start)
+    return html[first : html.index(end, first) + len(end)]
+
+
+def row_text(html, name):
+    """Return the text of the table row of the product `name`, with the whitespace squashed."""
+    for row in re.findall(r'<tr role="row".*?</tr>', html, flags=re.S):
+        if f">{name}</a>" in row:
+            return " ".join(strip_tags(row).split())
+    raise AssertionError(f"No row for {name!r}")
+
+
+class ProductListPageTests(TestCase):
+    """The list as the redesign drew it (admin-products.html), filled with real products."""
+
+    fixtures = ["categories.json"]
+
+    @classmethod
+    def setUpTestData(cls):
+        by_slug = {category.slug: category for category in Category.objects.all()}
+        cls.pollo = by_slug["pollo"]
+        cls.ofertas = by_slug["ofertas"]
+        cls.merch = by_slug["merch"]
+        make = Product.objects.create
+        cls.alas = make(
+            category=cls.pollo, name="Alas Adobadas", price_per_kg=Decimal("129.00"), stock=80
+        )
+        cls.asador = make(
+            category=cls.ofertas,
+            name="Paquete Asador 4 a 6 Personas",
+            price_per_kg=Decimal("1599.00"),
+            stock=12,
+        )
+        cls.carnitas = make(
+            category=cls.ofertas, name="Paquete Carnitas por Kilo", price_per_kg=Decimal("389.00")
+        )
+        cls.gorra = make(
+            category=cls.merch, name="Gorra Bordada", price_per_kg=Decimal("250.00"), stock=40
+        )
+        cls.retirado = make(
+            category=cls.pollo,
+            name="Pechuga Retirada",
+            price_per_kg=Decimal("99.00"),
+            is_active=False,
+        )
+
+    def setUp(self):
+        self.url = reverse("inventory:list")
+        sign_in_as_panel_admin(self.client)
+
+    def get(self, **params):
+        return self.client.get(self.url, params)
+
+    def chips(self, response):
+        return html_between(
+            response.content.decode(), '<nav aria-label="Filtrar por categoría"', "</nav>"
+        )
+
+    def test_the_page_is_served_on_the_panel_frame(self):
+        response = self.get()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "inventory/product_list.html")
+        self.assertTemplateUsed(response, "panel/base.html")
+        self.assertContains(
+            response, "<title>Productos · Panel · Carnicería El Señor de La Misericordia</title>"
+        )
+        html = response.content.decode()
+        self.assertEqual(re.findall(r"<h1[^>]*>\s*(.*?)\s*</h1>", html, flags=re.S), ["Productos"])
+
+    def test_the_productos_entry_of_both_navigations_is_the_current_one(self):
+        html = self.get().content.decode()
+
+        self.assertEqual(
+            current_links(html_between(html, "<aside", "</aside>")), {"/panel/productos/": "page"}
+        )
+
+    def test_the_top_bar_offers_a_new_product(self):
+        html = self.get().content.decode()
+
+        header = html_between(html, "<header", "</header>")
+        self.assertEqual([a["href"] for a in anchors(header)], [reverse("inventory:create")])
+        self.assertIn("Nuevo producto", header)
+
+    def test_every_product_is_a_row_with_its_data(self):
+        html = self.get().content.decode()
+
+        self.assertEqual(
+            row_text(html, "Alas Adobadas"),
+            "Alas Adobadas Pollo $129.00 / kg Existencia 80 Activo "
+            "Ver Alas Adobadas Editar Alas Adobadas",
+        )
+        self.assertEqual(
+            len(re.findall(r'<tr role="row"', html)), 5 + 1
+        )  # the products and the header
+
+    def test_a_price_over_a_thousand_is_grouped_and_every_price_names_its_unit(self):
+        html = self.get().content.decode()
+
+        self.assertIn("$1,599.00 / paquete", row_text(html, "Paquete Asador 4 a 6 Personas"))
+        self.assertIn("$389.00 / kg", row_text(html, "Paquete Carnitas por Kilo"))
+        self.assertIn("$250.00 / pieza", row_text(html, "Gorra Bordada"))
+
+    def test_a_product_that_is_off_says_inactivo(self):
+        html = self.get().content.decode()
+
+        self.assertIn("Inactivo", row_text(html, "Pechuga Retirada"))
+        self.assertNotIn("Activo", row_text(html, "Pechuga Retirada").replace("Inactivo", ""))
+
+    def test_the_links_of_a_row_go_to_the_detail_and_the_edit_page(self):
+        html = self.get().content.decode()
+
+        row = next(
+            row
+            for row in re.findall(r'<tr role="row".*?</tr>', html, flags=re.S)
+            if f">{self.alas.name}</a>" in row
+        )
+        self.assertEqual(
+            [a["href"] for a in anchors(row)],
+            [
+                reverse("inventory:detail", args=[self.alas.pk]),
+                reverse("inventory:detail", args=[self.alas.pk]),
+                reverse("inventory:update", args=[self.alas.pk]),
+            ],
+        )
+
+    def test_the_chips_count_the_products_of_every_category_and_the_total(self):
+        chips = self.chips(self.get())
+
+        pairs = re.findall(
+            r'<span>([^<]+)</span><span class="tabular-nums[^>]*>(\d+)</span>', chips
+        )
+        self.assertEqual(
+            pairs,
+            [
+                ("Todas", "5"),
+                ("Carnes Rojas", "0"),
+                ("Cortes Especiales", "0"),
+                ("Cerdo", "0"),
+                ("Pollo", "2"),
+                ("Embutidos", "0"),
+                ("Preparadas", "0"),
+                ("Ofertas", "2"),
+                ("Merch", "1"),
+                ("Otros", "0"),
+            ],
+        )
+
+    def test_the_counts_do_not_follow_the_search_or_the_filter(self):
+        response = self.get(q="Gorra", category=self.merch.pk)
+
+        self.assertEqual(response.context["total_products"], 5)
+        counts = {
+            category.name: category.product_count for category in response.context["categories"]
+        }
+        self.assertEqual(counts["Pollo"], 2)
+        self.assertEqual(counts["Merch"], 1)
+        self.assertEqual(response.context["page_obj"].paginator.count, 1)
+
+    def test_todas_is_the_current_chip_when_no_category_is_chosen(self):
+        chips = self.chips(self.get(q="Alas"))
+
+        self.assertEqual(current_links(chips), {"/panel/productos/?q=Alas": "true"})
+
+    def test_the_chosen_category_is_the_current_chip(self):
+        chips = self.chips(self.get(category=self.pollo.pk))
+
+        self.assertEqual(current_links(chips), {f"?category={self.pollo.pk}": "true"})
+
+    def test_a_category_that_matches_no_chip_leaves_none_current(self):
+        self.assertEqual(current_links(self.chips(self.get(category=999))), {})
+
+    def test_the_chips_keep_the_search_and_drop_the_page(self):
+        chips = self.chips(self.get(q="a", category=self.pollo.pk, page=2))
+
+        hrefs = [a["href"] for a in anchors(chips)]
+        self.assertEqual(hrefs[0], "/panel/productos/?q=a")
+        self.assertEqual(hrefs[1], f"?q=a&category={Category.objects.order_by('order')[0].pk}")
+        self.assertTrue(all("page=" not in href for href in hrefs))
+        self.assertTrue(all("q=a" in href for href in hrefs))
+
+    def test_the_search_form_keeps_the_text_and_the_chosen_category(self):
+        html = self.get(q="alas", category=self.pollo.pk).content.decode()
+
+        form = html_between(html, '<form method="get"', "</form>")
+        self.assertIn('action="/panel/productos/"', form)
+        self.assertIn('role="search"', form)
+        self.assertIn('name="q" value="alas"', form)
+        self.assertIn(f'<input type="hidden" name="category" value="{self.pollo.pk}" />', form)
+
+    def test_the_search_form_sends_no_category_when_none_is_chosen(self):
+        html = self.get().content.decode()
+
+        form = html_between(html, '<form method="get"', "</form>")
+        self.assertNotIn('name="category"', form)
+        self.assertIn('name="q" value=""', form)
+
+    def test_what_is_typed_in_the_search_is_escaped(self):
+        html = self.get(q='"><script>alert(1)</script>').content.decode()
+
+        self.assertNotIn("<script>alert", html)
+        self.assertIn('value="&quot;&gt;&lt;script&gt;alert(1)&lt;/script&gt;"', html)
+
+    def test_a_product_name_is_escaped(self):
+        Product.objects.create(
+            category=self.pollo, name="<img src=x onerror=alert(1)>", price_per_kg=Decimal("1.00")
+        )
+
+        html = self.get().content.decode()
+
+        self.assertNotIn("<img src=x", html)
+        self.assertIn("&lt;img src=x onerror=alert(1)&gt;", html)
+
+    def test_no_match_shows_the_empty_state_with_its_two_ways_out(self):
+        response = self.get(q="nada de esto")
+
+        self.assertContains(response, "Ningún producto coincide con la búsqueda")
+        html = response.content.decode()
+        self.assertNotIn("<table", html)
+        empty = html_between(html, '<section aria-labelledby="vacio-titulo"', "</section>")
+        self.assertEqual(
+            [(a["href"], a.get("class") is not None) for a in anchors(empty)],
+            [("/panel/productos/", True), ("/panel/productos/nuevo/", True)],
+        )
+
+    def test_the_example_rows_of_the_design_are_not_there(self):
+        # The redesign drew the first 20 real products; none of them is in this database.
+        html = self.get().content.decode()
+
+        for name in ("Alas Naturales", "Arrachera", "Tomahawk"):
+            with self.subTest(name=name):
+                self.assertNotIn(name, html)
+
+    def test_the_list_runs_the_same_queries_whatever_the_number_of_products(self):
+        with CaptureQueriesContext(connection) as few:
+            self.get()
+        Product.objects.bulk_create(
+            Product(
+                category=self.merch if i % 2 else self.pollo,
+                name=f"Extra {i:02d}",
+                price_per_kg=Decimal("10.00"),
+                price_per_lb=price_per_lb_for(Decimal("10.00")),
+            )
+            for i in range(15)
+        )
+
+        with CaptureQueriesContext(connection) as many:
+            response = self.get()
+
+        self.assertEqual(len(response.context["page_obj"]), 20)
+        self.assertEqual(len(many), len(few))
 
 
 class ProductRoutesTests(SimpleTestCase):

@@ -1,92 +1,132 @@
-{% extends "base.html" %}
+{% extends "panel/base.html" %}
+{% comment %}
+  Products, list (/panel/productos/, inventory:list). It is admin-products.html as the redesign
+  delivered it (pruebas 518c99a4, sync point S3), moved here with git mv over the light template of
+  the M13. The frame is panel/base.html and the 19 example rows are gone.
 
-{% block title %}Productos · Carni MVP{% endblock %}
+  Context of the view: page_obj (the products of the page, 20 per page), categories (each one with
+  product_count), total_products (every product, whatever the search), query and selected_category
+  (the id as text, "" when there is none). Each product answers unit_label ("kg", "pieza" or
+  "paquete"), the unit its price is for.
 
-{% block content %}
-  <div class="card">
-    <form method="get">
-      <div class="field">
-        <label for="q">Buscar por nombre o descripción</label>
-        <input
-          type="search"
-          id="q"
-          name="q"
-          value="{{ query }}"
-          placeholder="Ej. arrachera"
-        />
+  The category chips are links to ?category=<id>; the search is a GET form. The chip of the category
+  being filtered carries aria-current="true", and "Todas" does when no category is: that is the
+  django:active mark of the chips. {% querystring %} keeps q and category in every link and drops the
+  page when the filter changes.
+{% endcomment %}
+{% block title %}<title>Productos · Panel · Carnicería El Señor de La Misericordia</title>{% endblock %}
+{% block titulo %}Productos{% endblock %}
+{% block accion %}
+<a href="{% url 'inventory:create' %}" class="inline-flex min-h-12 items-center justify-center gap-2 rounded-pill bg-red px-6 text-ui font-semibold text-white transition-[background-color,scale] duration-160 ease-out-strong hover:bg-red-hover active:scale-[0.97] motion-reduce:transition-none shrink-0"><svg class="size-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 5v14M5 12h14" /></svg><span>Nuevo producto</span></a>
+{% endblock %}
+{% block contenido %}
+<div class="flex flex-col gap-5 lg:gap-6">
+  {# Search and filter: a GET form (q) and chips that are links with ?category=<id>. No JavaScript. #}
+  <div class="flex flex-col gap-4">
+    <form method="get" action="{% url 'inventory:list' %}" role="search" class="flex gap-2">
+      <div class="relative min-w-0 flex-1 lg:max-w-md">
+        <label for="q" class="sr-only">Buscar por nombre o descripción</label>
+        <svg class="pointer-events-none absolute top-1/2 left-4 size-5 -translate-y-1/2 text-text-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14ZM16.5 16.5 21 21" /></svg>
+        <input type="search" id="q" name="q" value="{{ query }}" placeholder="Ej. arrachera" autocomplete="off" enterkeyhint="search" class="h-12 w-full rounded-control border border-border-control bg-surface-1 pr-4 pl-12 text-lead text-text placeholder:text-text-muted lg:text-ui" />
       </div>
-      <div class="field">
-        <label for="category">Categoría</label>
-        <select id="category" name="category">
-          <option value="">Todas las categorías</option>
-          {% for category in categories %}
-            <option
-              value="{{ category.id }}"
-              {% if selected_category == category.id|stringformat:"s" %}selected{% endif %}
-            >
-              {{ category.name }}
-            </option>
-          {% endfor %}
-        </select>
-      </div>
-      <button type="submit" class="btn">Buscar</button>
+      {% if selected_category %}<input type="hidden" name="category" value="{{ selected_category }}" />{% endif %}
+      <button type="submit" class="inline-flex min-h-12 items-center justify-center gap-2 rounded-pill border border-sand px-6 text-ui font-semibold text-text transition-[background-color,scale] duration-160 ease-out-strong hover:bg-surface-2 active:scale-[0.97] motion-reduce:transition-none">Buscar</button>
     </form>
+
+    <nav aria-label="Filtrar por categoría">
+      <ul role="list" class="-mx-4 -my-1 flex gap-2 overflow-x-auto px-4 py-1 lg:mx-0 lg:flex-wrap lg:overflow-visible lg:px-0">
+        <li class="shrink-0">
+          <a href="{% url 'inventory:list' %}{% querystring category=None page=None %}"{% if not selected_category %} aria-current="true"{% endif %} class="group inline-flex min-h-11 items-center gap-2 whitespace-nowrap rounded-control border border-border-control bg-surface-2 px-3 text-ui text-text transition-[background-color,scale] duration-160 ease-out-strong hover:bg-surface-3 active:scale-[0.97] motion-reduce:transition-none aria-[current]:border-red aria-[current]:bg-red aria-[current]:font-semibold aria-[current]:text-white aria-[current]:hover:bg-red-hover">
+            <span>Todas</span><span class="tabular-nums text-text-muted group-aria-[current]:text-white">{{ total_products }}</span>
+          </a>
+        </li>
+        {% for category in categories %}
+        <li class="shrink-0">
+          <a href="{% querystring category=category.id page=None %}"{% if selected_category == category.id|stringformat:"s" %} aria-current="true"{% endif %} class="group inline-flex min-h-11 items-center gap-2 whitespace-nowrap rounded-control border border-border-control bg-surface-2 px-3 text-ui text-text transition-[background-color,scale] duration-160 ease-out-strong hover:bg-surface-3 active:scale-[0.97] motion-reduce:transition-none aria-[current]:border-red aria-[current]:bg-red aria-[current]:font-semibold aria-[current]:text-white aria-[current]:hover:bg-red-hover">
+            <span>{{ category.name }}</span><span class="tabular-nums text-text-muted group-aria-[current]:text-white">{{ category.product_count }}</span>
+          </a>
+        </li>
+        {% endfor %}
+      </ul>
+    </nav>
   </div>
 
-  <div class="actions" style="margin-bottom: 1.25rem;">
-    <a href="{% url 'inventory:create' %}" class="btn">+ Nuevo producto</a>
-  </div>
+  {% if page_obj %}
+  <section aria-labelledby="lista-titulo" class="flex flex-col gap-3">
+    <h2 id="lista-titulo" class="sr-only">Lista de productos</h2>
+    <p class="text-meta text-text-muted tabular-nums">Mostrando {{ page_obj.start_index }}–{{ page_obj.end_index }} de {{ page_obj.paginator.count }} productos</p>
 
-  {% if products %}
-    <div class="card">
-      <table>
-        <thead>
-          <tr>
-            <th>Nombre</th>
-            <th>Categoría</th>
-            <th>Precio por kg</th>
-            <th>Inventario</th>
-            <th>Estado</th>
-            <th>Acciones</th>
+    {# A table from 1024 px; below that each row becomes a card. The roles keep the table semantics. #}
+    <div class="lg:overflow-hidden lg:rounded-card lg:border lg:border-border lg:bg-surface-1">
+      <table role="table" aria-label="Productos" class="block w-full text-left text-ui lg:table lg:border-collapse">
+        <thead role="rowgroup" class="hidden lg:table-header-group">
+          <tr role="row" class="text-meta text-text-muted">
+            <th role="columnheader" scope="col" class="px-5 py-3 font-medium">Producto</th>
+            <th role="columnheader" scope="col" class="px-5 py-3 font-medium">Categoría</th>
+            <th role="columnheader" scope="col" class="px-5 py-3 text-right font-medium">Precio</th>
+            <th role="columnheader" scope="col" class="px-5 py-3 text-right font-medium">Existencia</th>
+            <th role="columnheader" scope="col" class="px-5 py-3 font-medium">Estado</th>
+            <th role="columnheader" scope="col" class="px-5 py-3 font-medium"><span class="sr-only">Acciones</span></th>
           </tr>
         </thead>
-        <tbody>
-          {% for product in products %}
-            <tr>
-              <td><a href="{% url 'inventory:detail' product.id %}">{{ product.name }}</a></td>
-              <td>{{ product.category.name }}</td>
-              <td>${{ product.price_per_kg }}</td>
-              <td>{{ product.stock }}</td>
-              <td>{% if product.is_active %}Activo{% else %}Inactivo{% endif %}</td>
-              <td class="actions">
-                <a href="{% url 'inventory:detail' product.id %}" class="btn btn-secondary">Ver</a>
-                <a href="{% url 'inventory:update' product.id %}" class="btn btn-secondary">Editar</a>
-                <a href="{% url 'inventory:delete' product.id %}" class="btn btn-danger">Eliminar</a>
-              </td>
-            </tr>
+        <tbody role="rowgroup" class="flex flex-col gap-3 lg:table-row-group">
+          {% for product in page_obj %}
+          <tr role="row" class="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-x-3 gap-y-1 rounded-card border border-border bg-surface-1 p-4 lg:table-row lg:rounded-none lg:border-0 lg:border-t lg:bg-transparent lg:p-0 lg:hover:bg-surface-2">
+            <td role="cell" class="col-start-1 row-start-1 min-w-0 lg:table-cell lg:px-5 lg:py-2">
+              <a href="{% url 'inventory:detail' product.id %}" class="inline-flex min-h-11 items-center font-semibold text-text underline decoration-transparent underline-offset-4 transition-colors duration-160 hover:decoration-sand">{{ product.name }}</a>
+            </td>
+            <td role="cell" class="col-span-2 row-start-2 text-meta text-text-muted lg:table-cell lg:px-5 lg:py-2 lg:text-ui">{{ product.category.name }}</td>
+            <td role="cell" class="col-start-1 row-start-3 text-ui font-semibold tabular-nums lg:table-cell lg:px-5 lg:py-2 lg:text-right">
+              <span>${{ product.price_per_kg|floatformat:"2g" }}</span> <span class="font-normal text-text-muted">/ {{ product.unit_label }}</span>
+            </td>
+            <td role="cell" class="col-start-2 row-start-3 text-right text-ui tabular-nums lg:table-cell lg:px-5 lg:py-2">
+              <span class="text-text-muted lg:hidden">Existencia </span><span class="font-semibold">{{ product.stock }}</span>
+            </td>
+            <td role="cell" class="col-start-2 row-start-1 self-center lg:table-cell lg:px-5 lg:py-2">
+              {% if product.is_active %}
+              <span class="inline-flex h-6 items-center gap-1.5 rounded-control border border-border bg-surface-2 px-2 text-meta font-semibold"><svg class="size-3.5 shrink-0 text-success" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0ZM8 12.5l3 3 5-6" /></svg><span>Activo</span></span>
+              {% else %}
+              <span class="inline-flex h-6 items-center gap-1.5 rounded-control border border-border bg-surface-2 px-2 text-meta font-semibold"><svg class="size-3.5 shrink-0 text-text-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0ZM8.5 12h7" /></svg><span>Inactivo</span></span>
+              {% endif %}
+            </td>
+            <td role="cell" class="col-span-2 row-start-4 lg:table-cell lg:px-5 lg:py-2">
+              <div class="mt-2 flex gap-2 border-t border-border pt-3 lg:mt-0 lg:justify-end lg:border-0 lg:pt-0">
+                <a href="{% url 'inventory:detail' product.id %}" class="inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-pill px-4 text-ui text-text-muted transition-[background-color,scale] duration-160 ease-out-strong hover:bg-surface-2 hover:text-text active:scale-[0.97] motion-reduce:transition-none lg:flex-none"><svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12ZM12 14.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z" /></svg><span>Ver<span class="sr-only"> {{ product.name }}</span></span></a>
+                <a href="{% url 'inventory:update' product.id %}" class="inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-pill border border-sand px-5 text-ui font-semibold text-text transition-[background-color,scale] duration-160 ease-out-strong hover:bg-surface-2 active:scale-[0.97] motion-reduce:transition-none lg:flex-none"><svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 20h4L19 9l-4-4L4 16Z" /></svg><span>Editar<span class="sr-only"> {{ product.name }}</span></span></a>
+              </div>
+            </td>
+          </tr>
           {% endfor %}
         </tbody>
       </table>
     </div>
 
-    {# {% querystring %} copies the current query string, so q and category survive a page change. #}
-    <nav class="card" aria-label="Paginación de productos">
-      <p>Mostrando {{ page_obj.start_index }}–{{ page_obj.end_index }} de {{ page_obj.paginator.count }} productos</p>
-      <div class="actions">
-        {% if page_obj.has_previous %}
-          <a href="{% querystring page=1 %}" class="btn btn-secondary">&laquo; Primera</a>
-          <a href="{% querystring page=page_obj.previous_page_number %}" class="btn btn-secondary">&lsaquo; Anterior</a>
-        {% endif %}
-        <span aria-current="page">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
-        {% if page_obj.has_next %}
-          <a href="{% querystring page=page_obj.next_page_number %}" class="btn btn-secondary">Siguiente &rsaquo;</a>
-          <a href="{% querystring page=page_obj.paginator.num_pages %}" class="btn btn-secondary">Última &raquo;</a>
-        {% endif %}
-      </div>
+    <nav aria-label="Paginación de productos" class="mt-2 flex items-center justify-between gap-3">
+      {% if page_obj.has_previous %}
+      <a href="{% querystring page=page_obj.previous_page_number %}" class="inline-flex size-11 items-center justify-center gap-1 rounded-pill border border-sand text-ui font-semibold text-text transition-[background-color,scale] duration-160 ease-out-strong hover:bg-surface-2 active:scale-[0.97] motion-reduce:transition-none lg:w-auto lg:px-4"><svg class="size-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m15 5-7 7 7 7" /></svg><span class="sr-only lg:not-sr-only">Anterior</span></a>
+      {% else %}
+      <span aria-disabled="true" class="inline-flex size-11 select-none items-center justify-center gap-1 rounded-pill border border-border text-ui text-text-muted lg:w-auto lg:px-4"><svg class="size-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m15 5-7 7 7 7" /></svg><span class="sr-only lg:not-sr-only">Anterior</span></span>
+      {% endif %}
+
+      <p class="text-ui text-text-muted tabular-nums" aria-current="page">Página <span class="font-semibold text-text">{{ page_obj.number }}</span> de {{ page_obj.paginator.num_pages }}</p>
+
+      {% if page_obj.has_next %}
+      <a href="{% querystring page=page_obj.next_page_number %}" class="inline-flex size-11 items-center justify-center gap-1 rounded-pill border border-sand text-ui font-semibold text-text transition-[background-color,scale] duration-160 ease-out-strong hover:bg-surface-2 active:scale-[0.97] motion-reduce:transition-none lg:w-auto lg:px-4"><span class="sr-only lg:not-sr-only">Siguiente</span><svg class="size-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m9 5 7 7-7 7" /></svg></a>
+      {% else %}
+      <span aria-disabled="true" class="inline-flex size-11 select-none items-center justify-center gap-1 rounded-pill border border-border text-ui text-text-muted lg:w-auto lg:px-4"><span class="sr-only lg:not-sr-only">Siguiente</span><svg class="size-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m9 5 7 7-7 7" /></svg></span>
+      {% endif %}
     </nav>
+  </section>
   {% else %}
-    <div class="empty-state">
-      <p>No se encontraron productos con esos filtros.</p>
+  <section aria-labelledby="vacio-titulo" class="flex flex-col items-center gap-3 rounded-card border border-border bg-surface-1 px-4 py-12 text-center">
+    <span class="grid size-12 place-items-center rounded-control bg-surface-2 text-sand"><svg class="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14ZM16.5 16.5 21 21" /></svg></span>
+    <h2 id="vacio-titulo" class="font-sans text-ui font-semibold">Ningún producto coincide con la búsqueda</h2>
+    <p class="max-w-prose text-meta text-text-muted">Revisa cómo está escrito el nombre o elige otra categoría. También puedes dar de alta el producto.</p>
+    <div class="mt-2 flex flex-col gap-3 sm:flex-row">
+      <a href="{% url 'inventory:list' %}" class="inline-flex min-h-12 items-center justify-center gap-2 rounded-pill bg-red px-6 text-ui font-semibold text-white transition-[background-color,scale] duration-160 ease-out-strong hover:bg-red-hover active:scale-[0.97] motion-reduce:transition-none">Ver todos</a>
+      <a href="{% url 'inventory:create' %}" class="inline-flex min-h-12 items-center justify-center gap-2 rounded-pill border border-sand px-6 text-ui font-semibold text-text transition-[background-color,scale] duration-160 ease-out-strong hover:bg-surface-2 active:scale-[0.97] motion-reduce:transition-none">Nuevo producto</a>
     </div>
+  </section>
   {% endif %}
+</div>
 {% endblock %}

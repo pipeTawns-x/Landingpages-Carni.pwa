@@ -5,7 +5,6 @@
 - `index.html`
 - `products.html`
 - `accessweb.html`
-- `admin-products.html`
 - `admin-customers.html`
 - `admin-orders.html`
 - `offline.html`

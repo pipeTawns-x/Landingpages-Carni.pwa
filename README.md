@@ -100,7 +100,6 @@ Carni-mvp/
 ├── index.html
 ├── products.html
 ├── accessweb.html
-├── admin-products.html
 ├── admin-customers.html
 ├── admin-orders.html
 ├── offline.html
@@ -525,7 +524,7 @@ Este proyecto hoy es un frontend estático con tooling Node definido para ejecut
 | Catálogo        | `/products.html`        |
 | Auth            | `/accessweb.html`       |
 | Dashboard admin | `/panel/` (lo sirve Django) |
-| Admin productos | `/admin-products.html`  |
+| Admin productos | `/panel/productos/` (lo sirve Django) |
 | Admin clientes  | `/admin-customers.html` |
 | Admin pedidos   | `/admin-orders.html`    |
 | Offline         | `/offline.html`         |

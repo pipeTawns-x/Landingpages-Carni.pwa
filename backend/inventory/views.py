@@ -13,7 +13,7 @@ Supabase handoff opened gets in, not just any Django user.
 
 from django.contrib import messages
 from django.core.paginator import Paginator
-from django.db.models import Q
+from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404, redirect, render
 
 from inventory import services
@@ -21,7 +21,7 @@ from inventory.forms import CutSpecForm, ProductForm
 from inventory.models import Category, CutSpec, Product
 from panel.access import panel_admin_required
 
-PRODUCTS_PER_PAGE = 25
+PRODUCTS_PER_PAGE = 20
 
 
 @panel_admin_required
@@ -54,7 +54,9 @@ def product_list(request):
     context = {
         "products": page_obj,
         "page_obj": page_obj,
-        "categories": Category.objects.all(),
+        # The chips count every product of a category, whatever the search says.
+        "categories": Category.objects.annotate(product_count=Count("products")),
+        "total_products": Product.objects.count(),
         "query": query,
         "selected_category": category_id,
     }

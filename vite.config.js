@@ -27,7 +27,6 @@ export default defineConfig({
         home: resolve(__dirname, 'index.html'),
         products: resolve(__dirname, 'products.html'),
         accessweb: resolve(__dirname, 'accessweb.html'),
-        adminProducts: resolve(__dirname, 'admin-products.html'),
         adminCustomers: resolve(__dirname, 'admin-customers.html'),
         adminOrders: resolve(__dirname, 'admin-orders.html'),
         offline: resolve(__dirname, 'offline.html')

@@ -27,6 +27,30 @@ def price_per_lb_for(price_per_kg: Decimal) -> Decimal:
     return (price_per_kg * KG_TO_LB_PRICE_FACTOR).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
 
 
+# What a product's price is for. `price_per_kg` holds the price per kilo of most products, but a
+# "Paquete ..." is priced per package and the merchandise and miscellaneous categories per piece.
+# PROVISIONAL: Eduardo has not confirmed the unit of Merch and Otros, and a `unit` column on
+# `products` (backlog) would make this rule unnecessary. The rule is here and nowhere else.
+PACKAGE_PREFIX = "Paquete "
+PER_KILO_MARK = "por kilo"
+PIECE_CATEGORY_SLUGS = frozenset({"merch", "otros"})
+
+
+def unit_label_for(name: str, category_slug: str) -> str:
+    """Say what the price of a product is for: "paquete", "pieza" or "kg".
+
+    A name that starts with "Paquete " is a package, unless it says "por kilo": the carnitas
+    package is sold by weight. That is the rule of `unidadDe` in the store
+    (src/ui/presentacionProducto.ts). The Merch and Otros categories are sold by the piece, and
+    everything else by the kilo.
+    """
+    if name.startswith(PACKAGE_PREFIX) and PER_KILO_MARK not in name.lower():
+        return "paquete"
+    if category_slug in PIECE_CATEGORY_SLUGS:
+        return "pieza"
+    return "kg"
+
+
 class Category(models.Model):
     """Product category. Owned by Supabase; Django only reads/writes rows."""
 
@@ -111,6 +135,11 @@ class Product(models.Model):
         """Keep price_per_lb consistent with price_per_kg on every save."""
         self.price_per_lb = price_per_lb_for(self.price_per_kg)
         super().save(*args, **kwargs)
+
+    @property
+    def unit_label(self) -> str:
+        """The unit the price is for ("kg", "pieza" or "paquete"); see `unit_label_for`."""
+        return unit_label_for(self.name, self.category.slug)
 
 
 class ReadOnlyModelError(Exception):
