@@ -13,7 +13,8 @@ Se actualiza en cada slice. Se retoma en la primera que no esté HECHA.
 | B9 | Salida, permisos y endurecimiento | HECHO | `c3095506` | — |
 | B6 | Tokens y Tailwind | HECHO | `0720d60b` | — |
 | B7 | `panel/base.html` desde `dashboar.html` | HECHO | `df645294` | — |
-| B10–B13 | Productos en el panel | ESPERA | | S3 |
+| B10 | Lista de productos (`admin-products.html` → `inventory/product_list.html`) | HECHO | `1691c3aa` | — |
+| B11–B13 | Detalle, formulario y confirmaciones | PENDIENTE | | — |
 | B14 | Rutas `/panel/productos/` | HECHO (se adelantó a B10–B13) | `6dc3429e` | — |
 | B15 | Reemplazar el `base.html` claro de la M13 | PENDIENTE | | B7 y B10–B13 (el HTML rediseñado) |
 | B3 | Historial de cambios (opcional) | PENDIENTE | | — |
@@ -60,3 +61,9 @@ Se actualiza en cada slice. Se retoma en la primera que no esté HECHA.
     - `assets/panel.css` lleva la capa base de `src/styles/panel.css` de `pruebas` (fondo, tipografía, foco de arena) y `static/panel/panel.css` se reconstruyó. Ya hay una plantilla que enlaza la hoja.
     - `dashboar.html` ya no existe en la raíz. Referencias cambiadas en el mismo commit: entrada de Vite, `dist/dashboar.html` del CI, tres redirecciones de `js/modules/core/auth.js` y una de `js/modules/utils/admin-auth.js` (un admin entra por `index.html` hasta que el traspaso a Django se conecte en la tienda, F4), el enlace Dashboard de las tres páginas admin viejas, y las listas de `AGENTS.md`, `README.md`, la skill y el agente de frontend y `docs/MIGRACION_TAILWIND.md`. Los documentos históricos conservan su texto. Quedan sin uso `src/entry/dashboard.tsx` y `js/modules/pages/dashboard.js` (retiro en S6).
     - El build de la tienda pasa en Docker antes y después (solo desaparece `dist/dashboar.html`). Pasan 273 pruebas, ruff limpio y `--check` en verde.
+  - B10 hecho (`1691c3aa`): llegó S3 (`pruebas` `e29b05e0`). `admin-products.html` rediseñado pasó con `git mv` a `backend/templates/inventory/product_list.html`, sobre la plantilla clara de la M13, y extiende `panel/base.html`. La raíz ya no tiene `admin-products.html`.
+    - Los 19 renglones de ejemplo son un ciclo sobre la página del paginador. `PRODUCTS_PER_PAGE` pasó de 25 a 20. `categories` lleva `product_count` y `total_products` cuenta todo, sin importar la búsqueda. Anterior y Siguiente se quedan en su lugar, apagados, donde no hay página; ya no hay enlaces a primera y última.
+    - Marca `django:active` de los chips: `aria-current="true"` en el chip de la categoría filtrada, y en "Todas" cuando no hay ninguna. `{% querystring %}` conserva `q` y `category` y quita `page` al cambiar el filtro.
+    - `Product.unit_label` (la regla vive solo en `unit_label_for()`, `inventory/models.py`) es PROVISIONAL, pendiente de Eduardo: "paquete" si el nombre empieza con "Paquete " y no dice "por kilo" (regla de `unidadDe` en la tienda), "pieza" en Merch y Otros, "kg" en el resto. Los precios de más de mil se agrupan (`$1,599.00`).
+    - Referencias a `admin-products.html` cambiadas en el mismo commit: entrada de Vite, enlace Productos de `admin-orders.html` y `admin-customers.html`, `README.md` y la skill de frontend. Queda sin uso `src/entry/admin-products.tsx` (retiro en S6). El build de la tienda pasa antes y después.
+    - Comparado con las capturas `f3-productos-390` y `f3-productos-1440` del rediseño: mismo diseño; 0 desbordes y 0 controles menores de 44 px a 390. Pasan 300 pruebas, ruff limpio y `--check` en verde.
