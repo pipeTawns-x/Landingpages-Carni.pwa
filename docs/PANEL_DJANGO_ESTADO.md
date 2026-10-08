@@ -14,7 +14,8 @@ Se actualiza en cada slice. Se retoma en la primera que no esté HECHA.
 | B6 | Tokens y Tailwind | HECHO | `0720d60b` | — |
 | B7 | `panel/base.html` desde `dashboar.html` | HECHO | `df645294` | — |
 | B10 | Lista de productos (`admin-products.html` → `inventory/product_list.html`) | HECHO | `1691c3aa` | — |
-| B11–B13 | Detalle, formulario y confirmaciones | PENDIENTE | | — |
+| B11 | Detalle del producto | HECHO | `ca2478b6` | — |
+| B12–B13 | Formulario y confirmaciones | PENDIENTE | | — |
 | B14 | Rutas `/panel/productos/` | HECHO (se adelantó a B10–B13) | `6dc3429e` | — |
 | B15 | Reemplazar el `base.html` claro de la M13 | PENDIENTE | | B7 y B10–B13 (el HTML rediseñado) |
 | B3 | Historial de cambios (opcional) | PENDIENTE | | — |
@@ -67,3 +68,7 @@ Se actualiza en cada slice. Se retoma en la primera que no esté HECHA.
     - `Product.unit_label` (la regla vive solo en `unit_label_for()`, `inventory/models.py`) es PROVISIONAL, pendiente de Eduardo: "paquete" si el nombre empieza con "Paquete " y no dice "por kilo" (regla de `unidadDe` en la tienda), "pieza" en Merch y Otros, "kg" en el resto. Los precios de más de mil se agrupan (`$1,599.00`).
     - Referencias a `admin-products.html` cambiadas en el mismo commit: entrada de Vite, enlace Productos de `admin-orders.html` y `admin-customers.html`, `README.md` y la skill de frontend. Queda sin uso `src/entry/admin-products.tsx` (retiro en S6). El build de la tienda pasa antes y después.
     - Comparado con las capturas `f3-productos-390` y `f3-productos-1440` del rediseño: mismo diseño; 0 desbordes y 0 controles menores de 44 px a 390. Pasan 300 pruebas, ruff limpio y `--check` en verde.
+  - B11 hecho (`ca2478b6`): `kit/productos/detalle.html` (`pruebas` `ab47cbb8`) es `inventory/product_detail.html` y extiende `panel/base.html`.
+    - El precio por libra solo se dibuja cuando el precio es por kilo (un paquete o una pieza no la tienen). En la especificación, un campo vacío muestra un guion y un cero muestra el cero. Eliminar y desactivar siguen siendo una sola ruta (`inventory:delete`) y el botón nombra las dos.
+    - `Product.image_src` une la ruta de la foto (`/img/products/...`) a `STORE_ORIGIN` con `store_image_url()`: una dirección http(s) absoluta se conserva y cualquier otra cosa (`javascript:`, `data:`) no se apunta con un `<img>`. En Chrome, la foto carga desde la tienda.
+    - Pasan 326 pruebas, ruff limpio y `--check` en verde; 0 desbordes y 0 controles menores de 44 px a 390.
