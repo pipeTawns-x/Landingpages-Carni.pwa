@@ -178,13 +178,7 @@ Fuente de verdad: `origin/practicas-ebac:docs/LOOP_REDISENO_TOTAL.md` y `docs/CO
 | F0 | Enmienda de `AGENTS.md`, `.gga` gratis, corrección del traspaso (M14: código existe, entrega al LMS pendiente en B5) | HECHO | `1bfb1d8f`, `4d4abf3f`, `d778b84d` |
 | F1 | `tokens.css` exportable (S1); hash del CSS de la tienda intacto (`tailwind-B8PZhvSI.css`); `DESIGN.md` conciliado | HECHO | `3e471379`, `7991d6af`, DESIGN.md |
 | F2 | `dashboar.html` rediseñado en el lugar (S2) | HECHO (revisor fresco: 0 CRITICAL; 2 de 8 WARNING corregidos) | `3254d3b4`, `62a52980`, `15d5a63b`, `2d3d89bf`, `399fac11` |
-| F3 | `admin-products.html` y kit de Productos (S3, prioridad M14) | HECHO (1 CRITICAL de la revisión corregido: `@source` del kit; marcas `django:url` completadas) | `[0m
-518c99a4`, `[0m
-ab47cbb8`, `[0m
-2d7cf5d3`, `[0m
-9d32a6cd`, `[0m
-0f7ed9ca`, `[0m
-04a6ce34`, capturas `63c9472d` |
+| F3 | `admin-products.html` y kit de Productos (S3, prioridad M14) | HECHO (1 CRITICAL de la revisión corregido: `@source` del kit; marcas `django:url` completadas) | `518c99a4` lista, `ab47cbb8` detalle, `2d7cf5d3` formulario, `9d32a6cd` confirmar precio, `0f7ed9ca` confirmar desactivar, `04a6ce34` panel.css, `63c9472d` capturas |
 | F4 a F10 | Tienda, perfil, islas, resto del panel, PWA, auditoría | PENDIENTE ← siguiente: F4 | |
 
 **Trabajo sin commit heredado (OpenCode, verificado verde: tipos OK y 64 pruebas):** `jest.config.js`, `src/components/Lupa/*`, `src/components/__tests__/*`, `src/data/supabase.ts`, `src/entry/products.tsx`, `src/redux/slices/busquedaSlice.ts`, `src/ui/{Carcasa,Encabezado,Hoja}.tsx`, `src/ui/Hoja.css`, `src/ui/LupaHoja.tsx` y sus pruebas. Se commitea por componente cuando se toque la Lupa o la Hoja (F4); mientras tanto no se pierde nada. También quedan sin commit `docs/design/loop-final.md` y `loop-v3.md` (ajenos).
