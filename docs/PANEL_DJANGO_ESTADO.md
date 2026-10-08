@@ -20,7 +20,7 @@ Se actualiza en cada slice. Se retoma en la primera que no esté HECHA.
 | B14 | Rutas `/panel/productos/` | HECHO (se adelantó a B10–B13) | `6dc3429e` | — |
 | B15 | Reemplazar el `base.html` claro de la M13 | PENDIENTE | | — |
 | B3 | Historial de cambios (opcional) | PENDIENTE | | — |
-| B5 | Entrega M14 | PENDIENTE | | B10 |
+| B5 | Entrega M14 | LISTO PARA SUBIR | | Eduardo sube el Word y el mensaje al LMS |
 | B17 | M15 Django Templates | PENDIENTE | | Fase 2 |
 
 ## Bitácora
@@ -83,3 +83,4 @@ Se actualiza en cada slice. Se retoma en la primera que no esté HECHA.
   - B13 hecho (`814f9b1d`): las confirmaciones de precio y de borrar o desactivar son `kit/productos/confirm-precio.html` (`9d32a6cd`) y `confirm-desactivar.html` (`0f7ed9ca`), sobre el marco del panel y con datos reales. El escritor las dejó listas antes del corte por el límite de uso; el orquestador verificó que no quedan marcas ni datos de ejemplo y commiteó. Pasan 371 pruebas.
   - Prueba de punta a punta con un usuario de prueba del Supabase local (creado y borrado al terminar). El token real trae `iss` `http://127.0.0.1:54321/auth/v1` (el esperado) y firma ES256. Con `SUPABASE_JWKS_URL`: `POST /panel/sesion/` responde 302, abre la sesión y `/panel/productos/` sirve las 20 filas de 53 productos. Con el secreto HS256 lo rechazaba con `algorithm`. Falta agregar `SUPABASE_JWKS_URL` a `backend/.env` (Eduardo); README y contrato corregidos.
   - Migraciones de solo estado aplicadas en local con su etiqueta (`inventory 0002`, `panel 0001`): `sqlmigrate` dio `no-op`.
+  - B5: Word de la M14 (14 páginas) y mensaje del LMS listos. La evidencia es real y de hoy: la secuencia `create_test_products` → `dumpdata` → `.all().delete()` → `loaddata` corrida en la base local, las capturas del admin con 500 productos y las del panel rediseñado con sesión real de Supabase, con Brave. Las pruebas: 22 de `ecommerce` y 371 en total. El Word y el mensaje son solo del curso: no entran al repo.
