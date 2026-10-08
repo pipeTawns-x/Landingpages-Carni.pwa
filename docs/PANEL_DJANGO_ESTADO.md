@@ -12,7 +12,7 @@ Se actualiza en cada slice. Se retoma en la primera que no esté HECHA.
 | B8 | Traspaso Supabase → Django | HECHO | `877d2510`, migración `4e5d6137` | Variables nuevas en `backend/.env` (Eduardo) |
 | B9 | Salida, permisos y endurecimiento | HECHO | `c3095506` | — |
 | B6 | Tokens y Tailwind | HECHO | `0720d60b` | — |
-| B7 | `panel/base.html` desde `dashboar.html` | ESPERA | | S2 |
+| B7 | `panel/base.html` desde `dashboar.html` | HECHO | `df645294` | — |
 | B10–B13 | Productos en el panel | ESPERA | | S3 |
 | B14 | Rutas `/panel/productos/` | HECHO (se adelantó a B10–B13) | `6dc3429e` | — |
 | B15 | Reemplazar el `base.html` claro de la M13 | PENDIENTE | | B7 y B10–B13 (el HTML rediseñado) |
@@ -53,3 +53,10 @@ Se actualiza en cada slice. Se retoma en la primera que no esté HECHA.
     - Geist y Fraunces van autoalojadas (solo `latin`, con su licencia OFL junto a cada archivo), de los mismos paquetes y versiones que la tienda. La salida es idéntica byte a byte entre ejecuciones y entre `linux/arm64` y `linux/amd64`.
     - Pasan 247 pruebas, ruff limpio y `--check` en verde. En Chrome, las dos fuentes cargan desde el `staticfiles` de Django.
     - Ninguna plantilla la enlaza todavía: eso es B7 (espera a S2). Cuando el rediseño cambie `tokens.css` o suba una de esas versiones, el script falla hasta que el backend resincronice (`--sync-tokens`).
+  - B7 hecho (`df645294`): llegó S2 (`dashboar.html` rediseñado, `pruebas` `3254d3b4`, marco del panel).
+    - Pasó con `git mv` a `backend/templates/panel/base.html` y es el marco de toda página del panel (bloques `title`, `titulo`, `accion` y `contenido`). El contenido de Inicio de ese archivo no se sirve todavía: vuelve como `panel/inicio.html` en su propia slice.
+    - `aria-current` sale de `request.resolver_match`: el espacio `inventory` marca Productos; Más es `page` en `panel:mas` y `true` en `panel:ads` y `settings:index`. Pedidos, Clientes, Publicidad y Ajustes no tienen ruta (backlog): el marco los enlaza con su ruta literal del contrato y hoy dan 404. `PENDING_PATHS` en `panel/test_frame.py` los lista y la prueba falla el día que una ruta exista.
+    - `panel:mas` (`/panel/mas/`, solo GET, con guardia) sirve `panel/mas.html`, de `kit/mas.html`. `panel/messages.html` dibuja los mensajes. `store_origin` (procesador de contexto) expone `STORE_ORIGIN`: el logo y las fotos de los productos son de la tienda.
+    - `assets/panel.css` lleva la capa base de `src/styles/panel.css` de `pruebas` (fondo, tipografía, foco de arena) y `static/panel/panel.css` se reconstruyó. Ya hay una plantilla que enlaza la hoja.
+    - `dashboar.html` ya no existe en la raíz. Referencias cambiadas en el mismo commit: entrada de Vite, `dist/dashboar.html` del CI, tres redirecciones de `js/modules/core/auth.js` y una de `js/modules/utils/admin-auth.js` (un admin entra por `index.html` hasta que el traspaso a Django se conecte en la tienda, F4), el enlace Dashboard de las tres páginas admin viejas, y las listas de `AGENTS.md`, `README.md`, la skill y el agente de frontend y `docs/MIGRACION_TAILWIND.md`. Los documentos históricos conservan su texto. Quedan sin uso `src/entry/dashboard.tsx` y `js/modules/pages/dashboard.js` (retiro en S6).
+    - El build de la tienda pasa en Docker antes y después (solo desaparece `dist/dashboar.html`). Pasan 273 pruebas, ruff limpio y `--check` en verde.
