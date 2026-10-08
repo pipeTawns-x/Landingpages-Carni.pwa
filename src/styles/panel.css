@@ -22,11 +22,11 @@
 /*
  * Dónde buscar clases. Sin `source(none)` Tailwind lee todo el repositorio,
  * incluidos los documentos de diseño; aquí solo cuentan las páginas del panel
- * y la carpeta del kit.
+ * y la carpeta del kit con sus subcarpetas por sección (kit/productos/, ...).
  */
 @source "../../dashboar.html";
 @source "../../admin-*.html";
-@source "../../docs/design/rediseno/panel/kit/*.html";
+@source "../../docs/design/rediseno/panel/kit/**/*.html";
 
 @layer base {
   html {
