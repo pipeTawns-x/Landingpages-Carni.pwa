@@ -178,8 +178,14 @@ Fuente de verdad: `origin/practicas-ebac:docs/LOOP_REDISENO_TOTAL.md` y `docs/CO
 | F0 | Enmienda de `AGENTS.md`, `.gga` gratis, corrección del traspaso (M14: código existe, entrega al LMS pendiente en B5) | HECHO | `1bfb1d8f`, `4d4abf3f`, `d778b84d` |
 | F1 | `tokens.css` exportable (S1); hash del CSS de la tienda intacto (`tailwind-B8PZhvSI.css`); `DESIGN.md` conciliado | HECHO | `3e471379`, `7991d6af`, DESIGN.md |
 | F2 | `dashboar.html` rediseñado en el lugar (S2) | HECHO (revisor fresco: 0 CRITICAL; 2 de 8 WARNING corregidos) | `3254d3b4`, `62a52980`, `15d5a63b`, `2d3d89bf`, `399fac11` |
-| F3 | `admin-products.html` y kit de Productos (S3, prioridad M14) | escrito, EN REVISIÓN (workflow `wf_9e86359c-e35`, reanudado como `w8pmuj62s`) | |
-| F4 a F10 | Tienda, perfil, islas, resto del panel, PWA, auditoría | PENDIENTE | |
+| F3 | `admin-products.html` y kit de Productos (S3, prioridad M14) | HECHO (1 CRITICAL de la revisión corregido: `@source` del kit; marcas `django:url` completadas) | `[0m
+518c99a4`, `[0m
+ab47cbb8`, `[0m
+2d7cf5d3`, `[0m
+9d32a6cd`, `[0m
+0f7ed9ca`, `[0m
+04a6ce34`, capturas `63c9472d` |
+| F4 a F10 | Tienda, perfil, islas, resto del panel, PWA, auditoría | PENDIENTE ← siguiente: F4 | |
 
 **Trabajo sin commit heredado (OpenCode, verificado verde: tipos OK y 64 pruebas):** `jest.config.js`, `src/components/Lupa/*`, `src/components/__tests__/*`, `src/data/supabase.ts`, `src/entry/products.tsx`, `src/redux/slices/busquedaSlice.ts`, `src/ui/{Carcasa,Encabezado,Hoja}.tsx`, `src/ui/Hoja.css`, `src/ui/LupaHoja.tsx` y sus pruebas. Se commitea por componente cuando se toque la Lupa o la Hoja (F4); mientras tanto no se pierde nada. También quedan sin commit `docs/design/loop-final.md` y `loop-v3.md` (ajenos).
 
@@ -190,3 +196,4 @@ Componentes · Encabezado · Pie · Tarjeta · Cierre · Landing (`index.html`) 
 - 2026-10-07 · F0 y F1 HECHOS. 5 h ~33 % · semanal ~42 % · contexto del chat 83 % (conviene una sesión nueva con el prompt de la etapa 2 para F2 y F3).
 - 2026-10-07 · S1 entregado al backend (nota en Engram `frontend/entrega/tokens`, sha256 de tokens.css 6847e086…cd05). F2 y F3 lanzados en un solo Workflow (`wf_9e86359c-e35`: escritor Sonnet → revisor fresco → corrección → siguiente). Si se corta: `Workflow({scriptPath: "…/workflows/scripts/rediseno-f2-f3-panel-wf_9e86359c-e35.js", resumeFromRunId: "wf_9e86359c-e35"})`. Al volver: verificar con capturas a 390 y 1440, reconfirmar el hash `tailwind-B8PZhvSI.css`, commitear un archivo por commit (panel.css, dashboar.html, kit/mas.html, admin-products.html, cada bloque del kit), push y nota `frontend/entrega/<pagina>`.
 - 2026-10-07 · F2 HECHO y empujado; S2 entregado (nota Engram `frontend/entrega/dashboar`). Pendiente de pulido (WARNING sin corregir, se anotan para F7): pestañas del móvil con huecos de 0 a 1 px (fiel al diseño), etiqueta que se parte en dos líneas, aire de Canva en las 7 cajas de Inicio, falta enlace de salto, `tracking-[0.22em]` fuera de tokens y KPI con `rounded-card` (DESIGN.md dice 12 px). F3: escritor listo (admin-products.html + kit/productos/*), revisor fresco en curso; al terminar: commits de un archivo cada uno, hash `tailwind-B8PZhvSI.css` y nota `frontend/entrega/admin-products`. 5 h ~25 % · semanal 50 %.
+- 2026-10-07 · F3 HECHO y empujado; S3 entregado (nota Engram `frontend/entrega/admin-products`). Verificado por el orquestador en Docker: `ts:check` OK, 64 pruebas, `build` OK, hash `tailwind-B8PZhvSI.css` intacto, `admin-products.html` 200, 0 cadenas prohibidas. WARNING sin corregir (pulido en F7): contextos que el backend no tiene (`product.unit_label`, `category.product_count`, `total_products`), `unit_label` con `/ kg` por defecto, estado activo de los chips sin marca, la rama "aparece en N pedidos" dibuja una cifra de ejemplo (orders tiene 0 filas) y 20 tarjetas con borde a 390 (aire de Canva). **Siguiente: F4** (index → products → accessweb y `handoffToPanel()`, S4 ya listo), con una sesión nueva: este chat llegó al 93 % de contexto.
