@@ -1,281 +1,354 @@
 <!DOCTYPE html>
-<html lang="es">
-
+<html lang="es-MX">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#363432" />
-  <title>Admin - Carnicería El Señor de La Misericordia</title>
-  
-  <link rel="manifest" href="manifest.json">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/css/all.min.css">
-  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
-  <link rel="stylesheet" href="css/styles.css">
-  <link rel="icon" href="img/recursos_web/logo-user.png" type="image/png">
-  <link rel="apple-touch-icon" href="img/recursos_web/logo-user.png">
-  <script type="module">
-    import { verifyAdminSession } from './js/modules/utils/admin-auth.js';
-
-    void verifyAdminSession();
-  </script>
+  <!--
+    Panel · marco + Inicio. HTML y CSS planos, sin JavaScript.
+    Este archivo pasa a ser backend/templates/panel/base.html (marco) y panel/inicio.html (Inicio).
+    Las marcas django:* y data-dj="..." dicen qué llena Django; se definen en
+    docs/design/rediseno/panel/kit/README.md. Lo que la base de datos no puede dar no se dibuja.
+  -->
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0B0B0C" />
+  <meta name="color-scheme" content="dark" />
+  <meta name="robots" content="noindex" />
+  <!-- django:block title -->
+  <title>Hoy en la tienda · Panel · Carnicería El Señor de La Misericordia</title>
+  <!-- django:endblock -->
+  <!-- django:static img/recursos_web/logo-user.png -->
+  <link rel="icon" href="img/recursos_web/logo-user.png" type="image/png" />
+  <!-- django:static panel.css -->
+  <link rel="stylesheet" href="/src/styles/panel.css" />
 </head>
+<body class="min-h-dvh bg-bg text-text lg:pl-62">
+  <!-- Barra lateral · desde 1024 px de ancho. Fija, de 248 px. -->
+  <aside class="fixed inset-y-0 left-0 z-20 hidden w-62 flex-col border-r border-border bg-surface-1 lg:flex">
+    <div class="flex h-18 shrink-0 items-center border-b border-border px-5">
+      <span class="flex flex-col gap-1 leading-none">
+        <span class="font-sans text-ui font-semibold tracking-[0.22em]">CARNICERÍA</span>
+        <span class="text-meta text-text-muted">Panel de la tienda</span>
+      </span>
+    </div>
 
-<body class="admin-dashboard dark-premium">
-  <h1 class="visually-hidden">Panel de Administración - Carnicería El Señor de La Misericordia</h1>
-  <div class="d-flex">
-    <!-- Sidebar -->
-    <div class="admin-sidebar bg-dark text-white">
-      <div class="sidebar-header p-3 text-center">
-        <img src="img/recursos_web/logo-user.png" alt="Admin Logo" class="mb-2" style="height: 50px; object-fit: contain;">
-        <div class="mb-0 h4">Panel de Administración</div>
-      </div>
-      <ul class="nav flex-column">
-        <li class="nav-item">
-          <a class="nav-link active" href="dashboar.html">
-            <i class="bi bi-speedometer2 me-2"></i> Dashboard
+    <nav aria-label="Secciones del panel" class="flex-1 overflow-y-auto p-3">
+      <ul role="list" class="flex flex-col gap-2">
+        <li>
+          <!-- django:url panel:inicio -->
+          <!-- django:active panel:inicio -->
+          <a href="/panel/" aria-current="page" class="group flex min-h-11 items-center gap-3 rounded-control px-3 text-ui text-text-muted transition-transform duration-160 ease-out-strong hover:bg-surface-2 hover:text-text active:scale-[0.97] motion-reduce:transition-none aria-[current]:bg-surface-2 aria-[current]:font-semibold aria-[current]:text-text">
+            <svg class="size-5 shrink-0 group-aria-[current]:text-red-text" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 11.5 12 5l8 6.5V19a1 1 0 0 1-1 1h-4.5v-5h-5v5H5a1 1 0 0 1-1-1Z" /></svg>
+            <span>Inicio</span>
           </a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link" href="admin-products.html">
-            <i class="bi bi-box-seam me-2"></i> Productos
+        <li>
+          <!-- django:url orders:board -->
+          <!-- django:active orders:board -->
+          <a href="/panel/pedidos/" class="group flex min-h-11 items-center gap-3 rounded-control px-3 text-ui text-text-muted transition-transform duration-160 ease-out-strong hover:bg-surface-2 hover:text-text active:scale-[0.97] motion-reduce:transition-none aria-[current]:bg-surface-2 aria-[current]:font-semibold aria-[current]:text-text">
+            <svg class="size-5 shrink-0 group-aria-[current]:text-red-text" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 5h4.5v14H4zM9.75 5h4.5v9h-4.5zM15.5 5H20v11h-4.5z" /></svg>
+            <span>Pedidos</span>
           </a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link" href="admin-customers.html">
-            <i class="bi bi-people me-2"></i> Clientes
+        <li>
+          <!-- django:url inventory:list -->
+          <!-- django:active inventory:* (activo en las cinco rutas de productos) -->
+          <a href="/panel/productos/" class="group flex min-h-11 items-center gap-3 rounded-control px-3 text-ui text-text-muted transition-transform duration-160 ease-out-strong hover:bg-surface-2 hover:text-text active:scale-[0.97] motion-reduce:transition-none aria-[current]:bg-surface-2 aria-[current]:font-semibold aria-[current]:text-text">
+            <svg class="size-5 shrink-0 group-aria-[current]:text-red-text" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M20 13.5 13.5 20a1.5 1.5 0 0 1-2.1 0L4 12.6V4h8.6l7.4 7.4a1.5 1.5 0 0 1 0 2.1ZM8.5 8.5h.01" /></svg>
+            <span>Productos</span>
           </a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link" href="admin-orders.html">
-            <i class="bi bi-cart-check me-2"></i> Pedidos
+        <li>
+          <!-- django:url customers:list -->
+          <!-- django:active customers:list -->
+          <a href="/panel/clientes/" class="group flex min-h-11 items-center gap-3 rounded-control px-3 text-ui text-text-muted transition-transform duration-160 ease-out-strong hover:bg-surface-2 hover:text-text active:scale-[0.97] motion-reduce:transition-none aria-[current]:bg-surface-2 aria-[current]:font-semibold aria-[current]:text-text">
+            <svg class="size-5 shrink-0 group-aria-[current]:text-red-text" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7ZM3 20a6 6 0 0 1 12 0M16 4.3a3.5 3.5 0 0 1 0 6.4M21 20a6 6 0 0 0-3.5-5.4" /></svg>
+            <span>Clientes</span>
           </a>
         </li>
-        <li class="nav-item mt-auto">
-          <a class="nav-link text-danger" href="index.html">
-            <i class="bi bi-box-arrow-left me-2"></i> Salir
+        <li>
+          <!-- django:url panel:ads -->
+          <!-- django:active panel:ads -->
+          <a href="/panel/publicidad/" class="group flex min-h-11 items-center gap-3 rounded-control px-3 text-ui text-text-muted transition-transform duration-160 ease-out-strong hover:bg-surface-2 hover:text-text active:scale-[0.97] motion-reduce:transition-none aria-[current]:bg-surface-2 aria-[current]:font-semibold aria-[current]:text-text">
+            <svg class="size-5 shrink-0 group-aria-[current]:text-red-text" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 10v4a1 1 0 0 0 1 1h2l6 4V5L7 9H5a1 1 0 0 0-1 1ZM17 9a4 4 0 0 1 0 6" /></svg>
+            <span>Publicidad</span>
+          </a>
+        </li>
+        <li>
+          <!-- django:url settings:index -->
+          <!-- django:active settings:index -->
+          <a href="/panel/ajustes/" class="group flex min-h-11 items-center gap-3 rounded-control px-3 text-ui text-text-muted transition-transform duration-160 ease-out-strong hover:bg-surface-2 hover:text-text active:scale-[0.97] motion-reduce:transition-none aria-[current]:bg-surface-2 aria-[current]:font-semibold aria-[current]:text-text">
+            <svg class="size-5 shrink-0 group-aria-[current]:text-red-text" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 7h10M18 7h2M4 17h4M12 17h8M16 5v4M10 15v4" /></svg>
+            <span>Ajustes</span>
           </a>
         </li>
       </ul>
-    </div>
+    </nav>
 
-    <!-- Main Content -->
-    <div class="admin-content w-100">
-      <!-- Top Navbar -->
-      <nav class="admin-navbar navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container-fluid">
-          <button class="btn btn-primary" id="sidebarToggle" aria-label="Alternar barra lateral">
-            <i class="bi bi-list" aria-hidden="true"></i>
-          </button>
-          
-          <div class="d-flex align-items-center ms-auto">
-            <div class="dropdown me-3">
-              <button class="btn btn-primary dropdown-toggle" type="button" id="notificationsDropdown" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Notificaciones: 3 nuevas">
-                <i class="bi bi-bell-fill" aria-hidden="true"></i>
-                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" aria-hidden="true">
-                  3
+    <div class="flex flex-col gap-2 border-t border-border p-3">
+      <p class="flex items-center gap-3 px-3 py-1">
+        <span class="grid size-9 shrink-0 place-items-center rounded-control bg-surface-3 text-sand">
+          <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM4.5 20a7.5 7.5 0 0 1 15 0" /></svg>
+        </span>
+        <span class="flex min-w-0 flex-col">
+          <span class="truncate text-meta font-semibold" data-dj="user.email">admin@ejemplo.com</span>
+          <span class="text-meta text-text-muted">Administrador</span>
+        </span>
+      </p>
+      <!-- django:url panel:salir -->
+      <form method="post" action="/panel/salir/">
+        <!-- django:csrf -->
+        <button type="submit" class="flex min-h-11 w-full items-center gap-3 rounded-control px-3 text-left text-ui text-text-muted transition-transform duration-160 ease-out-strong hover:bg-surface-2 hover:text-text active:scale-[0.97] motion-reduce:transition-none">
+          <svg class="size-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4M9 16l-4-4 4-4M5 12h10" /></svg>
+          <span>Cerrar sesión</span>
+        </button>
+      </form>
+    </div>
+  </aside>
+
+  <!-- Barra superior · título de la página y, si la hay, su acción. -->
+  <header class="sticky top-0 z-10 flex h-14 items-center gap-3 border-b border-border bg-bg px-4 lg:h-18 lg:px-8">
+    <h1 class="min-w-0 flex-1 truncate font-display text-titulo font-medium">
+      <!-- django:block titulo -->Hoy en la tienda<!-- django:endblock -->
+    </h1>
+    <!-- django:block accion -->
+    <!-- django:endblock -->
+  </header>
+
+  <main class="px-4 pt-5 pb-28 lg:px-8 lg:pt-7 lg:pb-12">
+    <!-- django:include messages.html -->
+    <!-- Diseño de messages.html. Sin mensajes no se dibuja nada; Django lo desenvuelve en su parcial. -->
+    <template data-dj-rama="messages.html">
+      <!-- django:if messages -->
+      <ul role="list" class="mb-5 flex flex-col gap-2 lg:mb-6">
+        <!-- django:for message in messages -->
+        <!--
+          Según message.tags, el ícono y su color cambian y el resto queda igual:
+          success: este ícono con text-success.
+          warning: triángulo (M12 9v4M12 16.5h.01M10.3 4.2 2.8 17.5A2 2 0 0 0 4.5 20.5h15a2 2 0 0 0 1.7-3L13.7 4.2a2 2 0 0 0-3.4 0Z) con text-sand.
+          error: el mismo triángulo con text-danger.
+        -->
+        <li class="flex items-start gap-3 rounded-control border border-border bg-surface-2 px-4 py-3 text-ui">
+          <svg class="mt-0.5 size-5 shrink-0 text-success" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12.5 9.5 17 19 7.5" /></svg>
+          <span data-dj="message">Producto "Tomahawk" actualizado correctamente.</span>
+        </li>
+        <!-- django:endfor -->
+      </ul>
+      <!-- django:endif -->
+    </template>
+
+    <!-- django:block contenido -->
+    <div class="flex flex-col gap-5 lg:gap-6">
+      <p class="text-ui text-text-muted" data-dj="today">Miércoles 7 de octubre</p>
+
+      <!-- Resumen del día -->
+      <section aria-labelledby="resumen-titulo">
+        <h2 id="resumen-titulo" class="sr-only">Resumen del día</h2>
+        <dl class="grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-4">
+          <div class="flex flex-col gap-1 rounded-card border border-border bg-surface-1 p-4 lg:p-5">
+            <dt class="text-meta text-text-muted">Ventas de hoy</dt>
+            <dd class="text-titulo font-semibold tabular-nums" data-dj="kpis.sales_today">$0.00</dd>
+            <dd class="text-meta text-text-muted">Todavía sin pedidos</dd>
+          </div>
+          <div class="flex flex-col gap-1 rounded-card border border-border bg-surface-1 p-4 lg:p-5">
+            <dt class="text-meta text-text-muted">Pedidos de hoy</dt>
+            <dd class="text-titulo font-semibold tabular-nums" data-dj="kpis.orders_today">0</dd>
+            <dd class="text-meta text-text-muted">Nada por preparar</dd>
+          </div>
+          <div class="flex flex-col gap-1 rounded-card border border-border bg-surface-1 p-4 lg:p-5">
+            <dt class="text-meta text-text-muted">Ticket promedio</dt>
+            <dd class="text-titulo font-semibold text-text-muted" data-dj="kpis.average_ticket">Sin datos</dd>
+            <dd class="text-meta text-text-muted">Se calcula con el primer pedido</dd>
+          </div>
+          <div class="flex flex-col gap-1 rounded-card border border-border bg-surface-1 p-4 lg:p-5">
+            <dt class="text-meta text-text-muted">Productos activos</dt>
+            <dd class="text-titulo font-semibold tabular-nums" data-dj="kpis.active_products">53</dd>
+            <dd class="text-meta text-text-muted tabular-nums">de <span data-dj="kpis.total_products">53</span> en total · <span data-dj="kpis.categories">9</span> categorías</dd>
+          </div>
+        </dl>
+      </section>
+
+      <div class="grid gap-5 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] lg:gap-6">
+        <!-- Ventas por día: la tabla orders tiene 0 filas, así que solo se dibuja el estado vacío. -->
+        <section aria-labelledby="ventas-titulo" class="flex flex-col gap-4 rounded-card border border-border bg-surface-1 p-4 lg:px-6 lg:py-5">
+          <div class="flex items-baseline justify-between gap-3">
+            <h2 id="ventas-titulo" class="font-sans text-ui font-semibold">Ventas por día</h2>
+            <span class="text-meta text-text-muted">últimos 14 días</span>
+          </div>
+          <!-- django:if not sales_by_day -->
+          <div class="flex flex-1 flex-col items-center justify-center gap-3 px-2 py-8 text-center">
+            <span class="grid size-12 place-items-center rounded-control bg-surface-2 text-sand">
+              <svg class="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 5h4.5v14H4zM9.75 5h4.5v9h-4.5zM15.5 5H20v11h-4.5z" /></svg>
+            </span>
+            <p class="text-ui font-semibold">Aún no hay ventas que mostrar</p>
+            <p class="max-w-prose text-meta text-text-muted">Cuando la tienda reciba su primer pedido, aquí verás lo vendido día por día.</p>
+          </div>
+          <!-- django:endif -->
+        </section>
+
+        <!-- Stock bajo: productos reales del catálogo con 15 piezas o menos. -->
+        <section aria-labelledby="stock-titulo" class="flex flex-col gap-1 rounded-card border border-border bg-surface-1 p-4 lg:px-6 lg:py-5">
+          <div class="flex items-center justify-between gap-3">
+            <h2 id="stock-titulo" class="font-sans text-ui font-semibold">Stock bajo</h2>
+            <!-- django:url inventory:list -->
+            <a href="/panel/productos/" class="flex min-h-11 items-center text-ui font-semibold text-text underline decoration-sand underline-offset-4">Ver productos</a>
+          </div>
+          <p class="text-meta text-text-muted tabular-nums"><span data-dj="low_stock_count">5</span> productos con <span data-dj="low_stock_threshold">15</span> o menos en existencia</p>
+          <ul role="list" class="mt-2 flex flex-col">
+            <!-- django:for product in low_stock_products -->
+            <li class="border-t border-border">
+              <!-- django:url inventory:detail product.id -->
+              <a href="/panel/productos/42/" class="flex min-h-14 items-center justify-between gap-3 rounded-control px-2 py-2 hover:bg-surface-2">
+                <span class="flex min-w-0 flex-col">
+                  <span class="text-ui" data-dj="product.name">Paquete Parrillada Familiar 8 a 10 Personas</span>
+                  <span class="text-meta text-text-muted" data-dj="product.category.name">Ofertas</span>
                 </span>
-              </button>
-              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationsDropdown">
-                <li><h6 class="dropdown-header">Notificaciones</h6></li>
-                <li><a class="dropdown-item" href="#">Nuevo pedido recibido</a></li>
-                <li><a class="dropdown-item" href="#">Cliente registrado</a></li>
-                <li><a class="dropdown-item" href="#">Producto agotado</a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" href="#">Ver todas</a></li>
-              </ul>
-            </div>
-            
-            <div class="dropdown">
-              <button class="btn btn-primary dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="bi bi-person-circle me-1"></i> Admin
-              </button>
-              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                <li><a class="dropdown-item" href="#"><i class="bi bi-person me-2"></i>Perfil</a></li>
-                <li><a class="dropdown-item" href="#"><i class="bi bi-gear me-2"></i>Configuración</a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" href="index.html"><i class="bi bi-box-arrow-left me-2"></i>Cerrar sesión</a></li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </nav>
-
-      <!-- Main Content Area -->
-      <div class="container-fluid py-4">
-        <div id="buildAdsReactRoot" class="mb-4"></div>
-        <div class="row mb-4">
-          <div class="col-12">
-            <h2 class="mb-0">Dashboard</h2>
-            <nav aria-label="breadcrumb">
-              <ol class="breadcrumb">
-                <li class="breadcrumb-item active" aria-current="page">Inicio</li>
-              </ol>
-            </nav>
-          </div>
-        </div>
-
-        <!-- Stats Cards (populated by admin.js) -->
-        <div id="adminStats">
-          <div class="text-center py-4">
-            <div class="spinner-border text-primary" role="status">
-              <span class="visually-hidden">Cargando...</span>
-            </div>
-            <p class="text-muted mt-2">Cargando estadísticas...</p>
-          </div>
-        </div>
-
-        <!-- Charts Row -->
-        <div class="row">
-          <div class="col-xl-8 col-lg-7">
-            <div class="card shadow mb-4">
-              <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                <h3 class="m-0 font-weight-bold text-primary h6">Ventas Mensuales</h3>
-              </div>
-              <div class="card-body">
-                <div class="chart-area">
-                  <canvas id="salesChart"></canvas>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-xl-4 col-lg-5">
-            <div class="card shadow mb-4">
-              <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                <h3 class="m-0 font-weight-bold text-primary h6">Productos Más Vendidos</h3>
-              </div>
-              <div class="card-body">
-                <div class="chart-pie pt-4 pb-2">
-                  <canvas id="productsChart"></canvas>
-                </div>
-                <div class="mt-4 text-center small">
-                  <span class="mr-2">
-                    <i class="fas fa-circle text-primary"></i> Rib Eye
-                  </span>
-                  <span class="mr-2">
-                    <i class="fas fa-circle text-success"></i> Filet Mignon
-                  </span>
-                  <span class="mr-2">
-                    <i class="fas fa-circle text-info"></i> Tomahawk
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Recent Orders -->
-        <div class="row mt-4">
-          <div class="col-12">
-            <div class="card shadow">
-              <div class="card-header py-3">
-                <h3 class="m-0 font-weight-bold text-primary h6">Pedidos Recientes</h3>
-              </div>
-              <div class="card-body">
-                <div class="table-responsive">
-                  <table class="table table-bordered" id="recentOrdersTable" width="100%" cellspacing="0">
-                    <thead>
-                      <tr>
-                        <th>ID Pedido</th>
-                        <th>Cliente</th>
-                        <th>Fecha</th>
-                        <th>Total</th>
-                        <th>Estado</th>
-                        <th>Acciones</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>ORD-1001</td>
-                        <td>Juan Pérez</td>
-                        <td>2023-10-15</td>
-                        <td>$1,250.00</td>
-                        <td><span class="badge bg-success">Completado</span></td>
-                        <td>
-                          <button class="btn btn-sm btn-primary" aria-label="Ver pedido ORD-1001"><i class="bi bi-eye" aria-hidden="true"></i></button>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>ORD-1002</td>
-                        <td>María González</td>
-                        <td>2023-10-14</td>
-                        <td>$850.00</td>
-                        <td><span class="badge bg-warning">En proceso</span></td>
-                        <td>
-                          <button class="btn btn-sm btn-primary" aria-label="Ver pedido ORD-1002"><i class="bi bi-eye" aria-hidden="true"></i></button>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>ORD-1003</td>
-                        <td>Carlos López</td>
-                        <td>2023-10-14</td>
-                        <td>$1,750.00</td>
-                        <td><span class="badge bg-danger">Cancelado</span></td>
-                        <td>
-                          <button class="btn btn-sm btn-primary" aria-label="Ver pedido ORD-1003"><i class="bi bi-eye" aria-hidden="true"></i></button>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>ORD-1004</td>
-                        <td>Ana Martínez</td>
-                        <td>2023-10-13</td>
-                        <td>$950.00</td>
-                        <td><span class="badge bg-success">Completado</span></td>
-                        <td>
-                          <button class="btn btn-sm btn-primary" aria-label="Ver pedido ORD-1004"><i class="bi bi-eye" aria-hidden="true"></i></button>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>ORD-1005</td>
-                        <td>Luis Rodríguez</td>
-                        <td>2023-10-12</td>
-                        <td>$2,150.00</td>
-                        <td><span class="badge bg-success">Completado</span></td>
-                        <td>
-                          <button class="btn btn-sm btn-primary" aria-label="Ver pedido ORD-1005"><i class="bi bi-eye" aria-hidden="true"></i></button>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+                <span class="text-ui font-semibold tabular-nums" data-dj="product.stock">8</span>
+              </a>
+            </li>
+            <li data-dj-ejemplo class="border-t border-border">
+              <a href="/panel/productos/45/" class="flex min-h-14 items-center justify-between gap-3 rounded-control px-2 py-2 hover:bg-surface-2">
+                <span class="flex min-w-0 flex-col">
+                  <span class="text-ui">Hielera Rígida</span>
+                  <span class="text-meta text-text-muted">Merch</span>
+                </span>
+                <span class="text-ui font-semibold tabular-nums">10</span>
+              </a>
+            </li>
+            <li data-dj-ejemplo class="border-t border-border">
+              <a href="/panel/productos/41/" class="flex min-h-14 items-center justify-between gap-3 rounded-control px-2 py-2 hover:bg-surface-2">
+                <span class="flex min-w-0 flex-col">
+                  <span class="text-ui">Paquete Asador 4 a 6 Personas</span>
+                  <span class="text-meta text-text-muted">Ofertas</span>
+                </span>
+                <span class="text-ui font-semibold tabular-nums">12</span>
+              </a>
+            </li>
+            <li data-dj-ejemplo class="border-t border-border">
+              <a href="/panel/productos/43/" class="flex min-h-14 items-center justify-between gap-3 rounded-control px-2 py-2 hover:bg-surface-2">
+                <span class="flex min-w-0 flex-col">
+                  <span class="text-ui">Paquete Carnitas por Kilo</span>
+                  <span class="text-meta text-text-muted">Ofertas</span>
+                </span>
+                <span class="text-ui font-semibold tabular-nums">15</span>
+              </a>
+            </li>
+            <li data-dj-ejemplo class="border-t border-border">
+              <a href="/panel/productos/7/" class="flex min-h-14 items-center justify-between gap-3 rounded-control px-2 py-2 hover:bg-surface-2">
+                <span class="flex min-w-0 flex-col">
+                  <span class="text-ui">Tomahawk</span>
+                  <span class="text-meta text-text-muted">Cortes Especiales</span>
+                </span>
+                <span class="text-ui font-semibold tabular-nums">15</span>
+              </a>
+            </li>
+            <!-- django:empty -->
+            <template data-dj-rama="vacio">
+              <li class="border-t border-border px-2 py-4 text-meta text-text-muted">Ningún producto con poco stock.</li>
+            </template>
+            <!-- django:endfor -->
+          </ul>
+        </section>
       </div>
+
+      <!-- Últimos pedidos: la tabla orders tiene 0 filas, así que se dibuja el estado vacío. -->
+      <section aria-labelledby="pedidos-titulo" class="flex flex-col gap-1 rounded-card border border-border bg-surface-1 p-4 lg:px-6 lg:py-5">
+        <div class="flex items-center justify-between gap-3">
+          <h2 id="pedidos-titulo" class="font-sans text-ui font-semibold">Últimos pedidos</h2>
+          <!-- django:url orders:board -->
+          <a href="/panel/pedidos/" class="flex min-h-11 items-center text-ui font-semibold text-text underline decoration-sand underline-offset-4">Ver pedidos</a>
+        </div>
+        <!-- django:if recent_orders -->
+        <template data-dj-rama="filas">
+          <table class="w-full text-left text-ui tabular-nums">
+            <thead>
+              <tr class="text-meta text-text-muted">
+                <th scope="col" class="hidden py-2 pr-4 font-medium lg:table-cell">Folio</th>
+                <th scope="col" class="py-2 pr-4 font-medium">Cliente</th>
+                <th scope="col" class="hidden py-2 pr-4 font-medium lg:table-cell">Hora</th>
+                <th scope="col" class="hidden py-2 pr-4 font-medium lg:table-cell">Entrega</th>
+                <th scope="col" class="py-2 pr-4 text-right font-medium">Total</th>
+                <th scope="col" class="py-2 font-medium">Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- django:for order in recent_orders -->
+              <tr class="border-t border-border">
+                <td class="hidden py-3 pr-4 text-text-muted lg:table-cell" data-dj="order.folio">1047</td>
+                <td class="py-3 pr-4 font-semibold">
+                  <span data-dj="order.customer_name">Nombre del cliente</span>
+                  <span class="block text-meta font-normal text-text-muted lg:hidden"><span data-dj="order.folio">1047</span> · <span data-dj="order.time">12:41</span> · <span data-dj="order.delivery_label">A domicilio</span></span>
+                </td>
+                <td class="hidden py-3 pr-4 text-text-muted lg:table-cell" data-dj="order.time">12:41</td>
+                <td class="hidden py-3 pr-4 text-text-muted lg:table-cell" data-dj="order.delivery_label">A domicilio</td>
+                <td class="py-3 pr-4 text-right font-semibold" data-dj="order.total">$449.40</td>
+                <td class="py-3">
+                  <span class="inline-flex h-6 items-center gap-1.5 rounded-control border border-border bg-surface-2 px-2 text-meta font-semibold">
+                    <svg class="size-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 7v5l3 2M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
+                    <span data-dj="order.status_label">Pendiente</span>
+                  </span>
+                </td>
+              </tr>
+              <!-- django:endfor -->
+            </tbody>
+          </table>
+        </template>
+        <!-- django:else -->
+        <div class="flex flex-col items-center gap-3 px-2 py-8 text-center">
+          <span class="grid size-12 place-items-center rounded-control bg-surface-2 text-sand">
+            <svg class="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 5h4.5v14H4zM9.75 5h4.5v9h-4.5zM15.5 5H20v11h-4.5z" /></svg>
+          </span>
+          <p class="text-ui font-semibold">Todavía no hay pedidos</p>
+          <p class="max-w-prose text-meta text-text-muted">Los pedidos que lleguen de la tienda aparecen aquí, del más reciente al más antiguo.</p>
+        </div>
+        <!-- django:endif -->
+      </section>
     </div>
-  </div>
+    <!-- django:endblock -->
+  </main>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
-  <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-  <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
-  <script src="js/modules/pages/admin.js" type="module"></script>
-  
-  <script>
-    // Activar DataTable
-    $(document).ready(function() {
-      $('#recentOrdersTable').DataTable({
-        language: {
-          url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json'
-        }
-      });
-    });
-  </script>
-  <script type="module">
-    import { initializeDashboardCharts } from './js/modules/pages/chart-config.js';
-
-    document.addEventListener('DOMContentLoaded', () => {
-      initializeDashboardCharts();
-
-      document.getElementById('sidebarToggle')?.addEventListener('click', () => {
-        document.querySelector('.admin-sidebar')?.classList.toggle('show');
-      });
-    });
-  </script>
-  <script type="module" src="/src/entry/dashboard.tsx"></script>
+  <!-- Pestañas · debajo de 1024 px de ancho. La quinta, "Más", es una página: /panel/mas/. -->
+  <nav aria-label="Secciones del panel" class="fixed inset-x-0 bottom-0 z-20 border-t border-border bg-surface-1 px-1 pt-1 pb-[max(0.5rem,env(safe-area-inset-bottom))] lg:hidden">
+    <ul role="list" class="grid grid-cols-5">
+      <li>
+        <!-- django:url panel:inicio -->
+        <!-- django:active panel:inicio -->
+        <a href="/panel/" aria-current="page" class="flex min-h-14 flex-col items-center justify-center gap-1 rounded-control text-meta text-text-muted transition-transform duration-160 ease-out-strong hover:text-text active:scale-[0.97] motion-reduce:transition-none aria-[current]:font-semibold aria-[current]:text-red-text">
+          <svg class="size-5.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 11.5 12 5l8 6.5V19a1 1 0 0 1-1 1h-4.5v-5h-5v5H5a1 1 0 0 1-1-1Z" /></svg>
+          <span>Inicio</span>
+        </a>
+      </li>
+      <li>
+        <!-- django:url orders:board -->
+        <!-- django:active orders:board -->
+        <a href="/panel/pedidos/" class="flex min-h-14 flex-col items-center justify-center gap-1 rounded-control text-meta text-text-muted transition-transform duration-160 ease-out-strong hover:text-text active:scale-[0.97] motion-reduce:transition-none aria-[current]:font-semibold aria-[current]:text-red-text">
+          <svg class="size-5.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 5h4.5v14H4zM9.75 5h4.5v9h-4.5zM15.5 5H20v11h-4.5z" /></svg>
+          <span>Pedidos</span>
+        </a>
+      </li>
+      <li>
+        <!-- django:url inventory:list -->
+        <!-- django:active inventory:* (activo en las cinco rutas de productos) -->
+        <a href="/panel/productos/" class="flex min-h-14 flex-col items-center justify-center gap-1 rounded-control text-meta text-text-muted transition-transform duration-160 ease-out-strong hover:text-text active:scale-[0.97] motion-reduce:transition-none aria-[current]:font-semibold aria-[current]:text-red-text">
+          <svg class="size-5.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M20 13.5 13.5 20a1.5 1.5 0 0 1-2.1 0L4 12.6V4h8.6l7.4 7.4a1.5 1.5 0 0 1 0 2.1ZM8.5 8.5h.01" /></svg>
+          <span>Productos</span>
+        </a>
+      </li>
+      <li>
+        <!-- django:url customers:list -->
+        <!-- django:active customers:list -->
+        <a href="/panel/clientes/" class="flex min-h-14 flex-col items-center justify-center gap-1 rounded-control text-meta text-text-muted transition-transform duration-160 ease-out-strong hover:text-text active:scale-[0.97] motion-reduce:transition-none aria-[current]:font-semibold aria-[current]:text-red-text">
+          <svg class="size-5.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7ZM3 20a6 6 0 0 1 12 0M16 4.3a3.5 3.5 0 0 1 0 6.4M21 20a6 6 0 0 0-3.5-5.4" /></svg>
+          <span>Clientes</span>
+        </a>
+      </li>
+      <li>
+        <!-- django:url panel:mas -->
+        <!-- django:active panel:mas (aria-current="page" en /panel/mas/; aria-current="true" en panel:ads y settings:index, que viven dentro de Más) -->
+        <a href="/panel/mas/" class="flex min-h-14 flex-col items-center justify-center gap-1 rounded-control text-meta text-text-muted transition-transform duration-160 ease-out-strong hover:text-text active:scale-[0.97] motion-reduce:transition-none aria-[current]:font-semibold aria-[current]:text-red-text">
+          <svg class="size-5.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h.01M12 12h.01M19 12h.01" /></svg>
+          <span>Más</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
 </body>
 </html>
