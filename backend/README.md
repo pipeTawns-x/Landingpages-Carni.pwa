@@ -139,6 +139,16 @@ Behaviour worth knowing before touching it:
   PROVISIONAL, pending Eduardo, and `unit_label_for()` in `inventory/models.py`
   is the only place to change it; a `unit` column on `products` (backlog) would
   replace it. Prices over a thousand are grouped (`$1,599.00`).
+- The detail (`templates/inventory/product_detail.html`) is the redesign's
+  `kit/productos/detalle.html` (`pruebas` `ab47cbb8`). The price shows with its
+  unit and the price per pound only when the price is by the kilo. Eliminar and
+  desactivar are one route (`inventory:delete`): that page says which of the two
+  will happen, and the button of the detail names both.
+- `Product.image_src` is the picture as an address the panel can load.
+  `image_url` is a path of the store (`/img/products/tomahawk.webp`), which Django
+  does not serve, so `store_image_url()` joins it to `STORE_ORIGIN`. An absolute
+  http(s) address is kept and anything else (`javascript:`, `data:`) is no
+  picture at all.
 - `price_per_lb_for()` in `inventory/models.py` holds the price-per-lb formula
   that `Product.save()` uses. Code that creates products with `bulk_create()`
   skips `save()`, so it has to call the function itself.
@@ -425,7 +435,8 @@ configuration themselves, with a signing secret that is random on every run.
 
 `inventory/tests.py` covers `price_per_lb_for()`, the unit of a price, the
 pagination and the list page (rows, chips, search, empty state and a query count
-that does not grow with the products), the panel views and their routes, the
+that does not grow with the products), the detail page, the picture address, the
+panel views and their routes, the
 rules in `inventory/services.py`, the read-only mirrors and the product admin
 (through the test client, as a superuser). The
 panel views are tested signed in the way a real admin signs in, through the

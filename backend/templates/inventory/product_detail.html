@@ -1,37 +1,121 @@
-{% extends "base.html" %}
+{% extends "panel/base.html" %}
+{% comment %}
+  Products, detail (/panel/productos/<id>/, inventory:detail). It is kit/productos/detalle.html as
+  the redesign delivered it (pruebas ab47cbb8, sync point S3), applied over the light template of
+  the M13. The frame is panel/base.html.
 
-{% block title %}{{ product.name }} · Carni MVP{% endblock %}
+  Context of the view: product (with its category) and spec (the CutSpec, or None). The price is
+  the price per kilo, per piece or per package: product.unit_label says which, and the price per
+  pound only means something when it is by the kilo. product.image_src is the picture as an
+  address the panel can load: image_url is a path of the store, which Django does not serve.
 
-{% block content %}
-  <div class="card">
-    <h1>{{ product.name }}</h1>
-    <p><strong>Categoría:</strong> {{ product.category.name }}</p>
-    <p><strong>Descripción:</strong> {{ product.description|default:"Sin descripción" }}</p>
-    <p><strong>Precio por kg:</strong> ${{ product.price_per_kg }}</p>
-    <p><strong>Precio por lb:</strong> ${{ product.price_per_lb }}</p>
-    <p><strong>Cantidad mínima (kg):</strong> {{ product.min_quantity_kg }}</p>
-    <p><strong>Inventario:</strong> {{ product.stock }}</p>
-    <p><strong>Estado:</strong> {% if product.is_active %}Activo{% else %}Inactivo{% endif %}</p>
+  Eliminar and desactivar are the same route (inventory:delete): a product with orders is
+  deactivated and any other one is deleted, and that page says which one will happen, which is why
+  the button names both.
+{% endcomment %}
+{% block title %}<title>{{ product.name }} · Productos · Panel · Carnicería El Señor de La Misericordia</title>{% endblock %}
+{% block titulo %}{{ product.name }}{% endblock %}
+{% block contenido %}
+<div class="flex flex-col gap-5 lg:gap-6">
+  <nav aria-label="Ruta" class="flex flex-wrap items-center gap-x-2 text-ui">
+    <a href="{% url 'inventory:list' %}" class="inline-flex min-h-11 items-center text-text-muted underline decoration-border-control underline-offset-4 transition-colors duration-160 hover:text-text">Productos</a>
+    <span aria-hidden="true" class="text-text-muted">/</span>
+    <span aria-current="page" class="min-w-0 text-text">{{ product.name }}</span>
+  </nav>
+
+  <div class="grid gap-5 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-6">
+    <section aria-label="Imagen del producto" class="flex flex-col gap-3">
+      {% if product.image_src %}
+      <div class="aspect-4/3 overflow-hidden rounded-card border border-border bg-surface-2">
+        <img src="{{ product.image_src }}" alt="" width="640" height="480" loading="lazy" class="size-full object-cover" />
+      </div>
+      <p class="text-meta text-text-muted">Imagen registrada: <span class="break-all text-text">{{ product.image_url }}</span></p>
+      {% else %}
+      <div class="grid aspect-4/3 place-items-center rounded-card border border-border bg-surface-2 text-text-muted"><svg class="size-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 5h16v14H4zM4 16l5-5 4 4 3-3 4 4M9 9.5h.01" /></svg></div>
+      <p class="text-meta text-text-muted">Este producto no tiene imagen registrada.</p>
+      {% endif %}
+    </section>
+
+    <section aria-labelledby="datos-titulo" class="flex flex-col gap-2 rounded-card border border-border bg-surface-1 p-4 lg:p-6">
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <h2 id="datos-titulo" class="font-sans text-ui font-semibold">Datos del producto</h2>
+        <span>
+          {% if product.is_active %}
+          <span class="inline-flex h-6 items-center gap-1.5 rounded-control border border-border bg-surface-2 px-2 text-meta font-semibold"><svg class="size-3.5 shrink-0 text-success" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0ZM8 12.5l3 3 5-6" /></svg><span>Activo</span></span>
+          {% else %}
+          <span class="inline-flex h-6 items-center gap-1.5 rounded-control border border-border bg-surface-2 px-2 text-meta font-semibold"><svg class="size-3.5 shrink-0 text-text-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0ZM8.5 12h7" /></svg><span>Inactivo</span></span>
+          {% endif %}
+        </span>
+      </div>
+      <p class="flex flex-wrap items-baseline gap-x-2 tabular-nums">
+        <span class="text-seccion font-semibold">${{ product.price_per_kg|floatformat:"2g" }}</span>
+        <span class="text-ui text-text-muted">/ {{ product.unit_label }}{% if product.unit_label == "kg" %} · ${{ product.price_per_lb|floatformat:"2g" }} / lb{% endif %}</span>
+      </p>
+      <dl class="mt-2 divide-y divide-border border-t border-border">
+        <div class="grid gap-1 py-3 sm:grid-cols-[11rem_minmax(0,1fr)] sm:gap-4">
+          <dt class="text-ui text-text-muted">Categoría</dt>
+          <dd class="min-w-0 text-ui"><span>{{ product.category.name }}</span></dd>
+        </div>
+        <div class="grid gap-1 py-3 sm:grid-cols-[11rem_minmax(0,1fr)] sm:gap-4">
+          <dt class="text-ui text-text-muted">Descripción</dt>
+          <dd class="min-w-0 text-ui"><span class="text-pretty">{{ product.description|default:"Sin descripción" }}</span></dd>
+        </div>
+        <div class="grid gap-1 py-3 sm:grid-cols-[11rem_minmax(0,1fr)] sm:gap-4">
+          <dt class="text-ui text-text-muted">Cantidad mínima</dt>
+          <dd class="min-w-0 text-ui"><span class="tabular-nums">{{ product.min_quantity_kg|floatformat:"3" }} kg</span></dd>
+        </div>
+        <div class="grid gap-1 py-3 sm:grid-cols-[11rem_minmax(0,1fr)] sm:gap-4">
+          <dt class="text-ui text-text-muted">Existencia</dt>
+          <dd class="min-w-0 text-ui"><span class="font-semibold tabular-nums">{{ product.stock }}</span><span class="mt-1 block text-meta text-text-muted">El número solo se ve aquí. La tienda muestra Disponible, Pocas piezas o Agotado.</span></dd>
+        </div>
+      </dl>
+    </section>
   </div>
 
-  <div class="card">
-    <h2>Especificación de corte</h2>
+  <section aria-labelledby="spec-titulo" class="flex flex-col gap-2 rounded-card border border-border bg-surface-1 p-4 lg:p-6">
+    <h2 id="spec-titulo" class="font-sans text-ui font-semibold">Especificación de corte</h2>
     {% if spec %}
-      <p><strong>Peso promedio por pieza (kg):</strong> {{ spec.avg_piece_weight_kg|default:"—" }}</p>
-      <p><strong>Grosor mínimo (in):</strong> {{ spec.thickness_min_in|default:"—" }}</p>
-      <p><strong>Grosor máximo (in):</strong> {{ spec.thickness_max_in|default:"—" }}</p>
-      <p><strong>Grosor por defecto (in):</strong> {{ spec.thickness_default_in|default:"—" }}</p>
-      <p><strong>Proveedor:</strong> {{ spec.supplier|default:"—" }}</p>
-      <p><strong>Presentación:</strong> {{ spec.get_presentation_display|default:"—" }}</p>
-      <p><strong>Notas:</strong> {{ spec.notes|default:"—" }}</p>
+    <dl class="divide-y divide-border border-t border-border lg:grid lg:grid-cols-2 lg:gap-x-8 lg:divide-y-0">
+      <div class="grid gap-1 py-3 sm:grid-cols-[11rem_minmax(0,1fr)] sm:gap-4">
+        <dt class="text-ui text-text-muted">Peso promedio por pieza (kg)</dt>
+        <dd class="min-w-0 text-ui"><span class="tabular-nums">{{ spec.avg_piece_weight_kg|floatformat:"3"|default:"—" }}</span></dd>
+      </div>
+      <div class="grid gap-1 py-3 sm:grid-cols-[11rem_minmax(0,1fr)] sm:gap-4">
+        <dt class="text-ui text-text-muted">Grosor mínimo (in)</dt>
+        <dd class="min-w-0 text-ui"><span class="tabular-nums">{{ spec.thickness_min_in|floatformat:"2"|default:"—" }}</span></dd>
+      </div>
+      <div class="grid gap-1 py-3 sm:grid-cols-[11rem_minmax(0,1fr)] sm:gap-4">
+        <dt class="text-ui text-text-muted">Grosor máximo (in)</dt>
+        <dd class="min-w-0 text-ui"><span class="tabular-nums">{{ spec.thickness_max_in|floatformat:"2"|default:"—" }}</span></dd>
+      </div>
+      <div class="grid gap-1 py-3 sm:grid-cols-[11rem_minmax(0,1fr)] sm:gap-4">
+        <dt class="text-ui text-text-muted">Grosor por defecto (in)</dt>
+        <dd class="min-w-0 text-ui"><span class="tabular-nums">{{ spec.thickness_default_in|floatformat:"2"|default:"—" }}</span></dd>
+      </div>
+      <div class="grid gap-1 py-3 sm:grid-cols-[11rem_minmax(0,1fr)] sm:gap-4">
+        <dt class="text-ui text-text-muted">Proveedor</dt>
+        <dd class="min-w-0 text-ui"><span>{{ spec.supplier|default:"—" }}</span></dd>
+      </div>
+      <div class="grid gap-1 py-3 sm:grid-cols-[11rem_minmax(0,1fr)] sm:gap-4">
+        <dt class="text-ui text-text-muted">Presentación</dt>
+        <dd class="min-w-0 text-ui"><span>{{ spec.get_presentation_display|default:"—" }}</span></dd>
+      </div>
+      <div class="grid gap-1 py-3 sm:grid-cols-[11rem_minmax(0,1fr)] sm:gap-4">
+        <dt class="text-ui text-text-muted">Notas</dt>
+        <dd class="min-w-0 text-ui"><span>{{ spec.notes|default:"—" }}</span></dd>
+      </div>
+    </dl>
     {% else %}
-      <p>Este producto no tiene especificación de corte.</p>
+    <div class="flex flex-col items-start gap-3 py-2">
+      <p class="text-ui text-text-muted">Este producto no tiene especificación de corte.</p>
+      <a href="{% url 'inventory:update' product.id %}" class="inline-flex min-h-11 items-center text-ui font-semibold text-text underline decoration-sand underline-offset-4">Agregar especificación</a>
+    </div>
     {% endif %}
-  </div>
+  </section>
 
-  <div class="actions">
-    <a href="{% url 'inventory:list' %}" class="btn btn-secondary">← Volver al listado</a>
-    <a href="{% url 'inventory:update' product.id %}" class="btn">Editar</a>
-    <a href="{% url 'inventory:delete' product.id %}" class="btn btn-danger">Eliminar</a>
+  <div class="flex flex-col gap-3 sm:flex-row">
+    <a href="{% url 'inventory:update' product.id %}" class="inline-flex min-h-12 items-center justify-center gap-2 rounded-pill bg-red px-6 text-ui font-semibold text-white transition-[background-color,scale] duration-160 ease-out-strong hover:bg-red-hover active:scale-[0.97] motion-reduce:transition-none"><svg class="size-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 20h4L19 9l-4-4L4 16Z" /></svg><span>Editar</span></a>
+    <a href="{% url 'inventory:delete' product.id %}" class="inline-flex min-h-12 items-center justify-center gap-2 rounded-pill border border-border-control px-6 text-ui font-semibold text-red-text transition-[background-color,scale] duration-160 ease-out-strong hover:bg-surface-2 active:scale-[0.97] motion-reduce:transition-none"><svg class="size-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 7h14M10 7V5h4v2M7 7l1 13h8l1-13" /></svg><span>Eliminar o desactivar</span></a>
   </div>
+</div>
 {% endblock %}

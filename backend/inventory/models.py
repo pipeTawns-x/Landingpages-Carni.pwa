@@ -12,7 +12,9 @@ table.
 
 from decimal import ROUND_HALF_UP, Decimal
 from typing import NoReturn
+from urllib.parse import urljoin, urlsplit
 
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from django.db import models
@@ -49,6 +51,19 @@ def unit_label_for(name: str, category_slug: str) -> str:
     if category_slug in PIECE_CATEGORY_SLUGS:
         return "pieza"
     return "kg"
+
+
+def store_image_url(image_url: str | None) -> str:
+    """Return the address the panel can load a product picture from, or "" when it has none.
+
+    `image_url` is a path of the store (`/img/products/tomahawk.webp`) and Django does not serve
+    those files, so it is joined to STORE_ORIGIN. An absolute http(s) address is kept as it is.
+    Anything else (`javascript:`, `data:`...) is not a picture the panel will point an <img> at.
+    """
+    if not image_url or not image_url.strip():
+        return ""
+    address = urljoin(f"{settings.STORE_ORIGIN}/", image_url.strip())
+    return address if urlsplit(address).scheme in {"http", "https"} else ""
 
 
 class Category(models.Model):
@@ -140,6 +155,11 @@ class Product(models.Model):
     def unit_label(self) -> str:
         """The unit the price is for ("kg", "pieza" or "paquete"); see `unit_label_for`."""
         return unit_label_for(self.name, self.category.slug)
+
+    @property
+    def image_src(self) -> str:
+        """The picture as an address the panel can load, or "" when there is none."""
+        return store_image_url(self.image_url)
 
 
 class ReadOnlyModelError(Exception):

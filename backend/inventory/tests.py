@@ -17,12 +17,13 @@ is not the panel: its tests sign in as a superuser.
 import re
 import uuid
 from decimal import Decimal
+from html import unescape
 from unittest import mock
 
 from django.contrib.auth import get_user_model
 from django.contrib.messages import get_messages
 from django.db import IntegrityError, connection
-from django.test import SimpleTestCase, TestCase
+from django.test import SimpleTestCase, TestCase, override_settings
 from django.test.utils import CaptureQueriesContext
 from django.urls import reverse
 from django.utils.html import strip_tags
@@ -37,6 +38,7 @@ from inventory.models import (
     Product,
     ReadOnlyModelError,
     price_per_lb_for,
+    store_image_url,
     unit_label_for,
 )
 from panel.test_frame import anchors, current_links
@@ -881,6 +883,288 @@ class ProductListPageTests(TestCase):
 
         self.assertEqual(len(response.context["page_obj"]), 20)
         self.assertEqual(len(many), len(few))
+
+
+class StoreImageUrlTests(SimpleTestCase):
+    """The panel loads the pictures from the store: `store.test` is STORE_ORIGIN under test."""
+
+    def test_a_path_of_the_store_is_joined_to_its_origin(self):
+        self.assertEqual(
+            store_image_url("/img/products/tomahawk.webp"),
+            "http://store.test/img/products/tomahawk.webp",
+        )
+
+    def test_a_path_without_the_leading_slash_is_joined_too(self):
+        self.assertEqual(
+            store_image_url("img/products/res.webp"), "http://store.test/img/products/res.webp"
+        )
+
+    def test_whitespace_around_the_path_is_ignored(self):
+        self.assertEqual(store_image_url("  /img/a.webp \n"), "http://store.test/img/a.webp")
+
+    def test_an_absolute_http_address_is_kept(self):
+        self.assertEqual(store_image_url("https://cdn.example/a.png"), "https://cdn.example/a.png")
+
+    def test_nothing_gives_nothing(self):
+        for empty in (None, "", "   "):
+            with self.subTest(empty=empty):
+                self.assertEqual(store_image_url(empty), "")
+
+    def test_an_address_that_is_not_http_is_not_a_picture(self):
+        for address in (
+            "javascript:alert(1)",
+            "data:image/png;base64,AAAA",
+            "ftp://x.example/a.png",
+        ):
+            with self.subTest(address=address):
+                self.assertEqual(store_image_url(address), "")
+
+    @override_settings(STORE_ORIGIN="https://tienda.example")
+    def test_it_follows_the_origin_of_the_store(self):
+        self.assertEqual(store_image_url("/img/a.webp"), "https://tienda.example/img/a.webp")
+
+    def test_the_product_exposes_it_as_image_src(self):
+        self.assertEqual(Product(image_url="/img/a.webp").image_src, "http://store.test/img/a.webp")
+        self.assertEqual(Product(image_url=None).image_src, "")
+
+
+class ProductDetailPageTests(TestCase):
+    """The detail as the redesign drew it (kit/productos/detalle.html), with a real product."""
+
+    fixtures = ["categories.json"]
+
+    @classmethod
+    def setUpTestData(cls):
+        by_slug = {category.slug: category for category in Category.objects.all()}
+        cls.cortes = by_slug["cortes-especiales"]
+        cls.ofertas = by_slug["ofertas"]
+        cls.merch = by_slug["merch"]
+        cls.tomahawk = Product.objects.create(
+            category=cls.cortes,
+            name="Tomahawk",
+            description="Rib eye con el hueso largo entero.",
+            price_per_kg=Decimal("649.00"),
+            stock=15,
+            min_quantity_kg=Decimal("0.800"),
+            image_url="/img/products/tomahawk.webp",
+        )
+
+    def setUp(self):
+        sign_in_as_panel_admin(self.client)
+
+    def page(self, product=None):
+        product = product or self.tomahawk
+        return self.client.get(reverse("inventory:detail", args=[product.pk]))
+
+    def text(self, response):
+        """The text of the page, with the tags and the extra whitespace gone."""
+        main = html_between(response.content.decode(), "<main", "</main>")
+        return " ".join(unescape(strip_tags(main)).split())
+
+    def test_the_page_is_served_on_the_panel_frame(self):
+        response = self.page()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "inventory/product_detail.html")
+        self.assertTemplateUsed(response, "panel/base.html")
+        self.assertContains(
+            response,
+            "<title>Tomahawk · Productos · Panel · Carnicería El Señor de La Misericordia</title>",
+        )
+        html = response.content.decode()
+        self.assertEqual(re.findall(r"<h1[^>]*>\s*(.*?)\s*</h1>", html, flags=re.S), ["Tomahawk"])
+        self.assertEqual(
+            current_links(html_between(html, "<aside", "</aside>")), {"/panel/productos/": "page"}
+        )
+
+    def test_the_breadcrumb_goes_back_to_the_list(self):
+        html = self.page().content.decode()
+
+        crumbs = html_between(html, '<nav aria-label="Ruta"', "</nav>")
+        self.assertEqual([a["href"] for a in anchors(crumbs)], ["/panel/productos/"])
+        self.assertIn('<span aria-current="page" class="min-w-0 text-text">Tomahawk</span>', crumbs)
+
+    def test_the_data_of_the_product_are_shown(self):
+        text = self.text(self.page())
+
+        self.assertIn("$649.00 / kg · $294.39 / lb", text)
+        self.assertIn("Categoría Cortes Especiales", text)
+        self.assertIn("Descripción Rib eye con el hueso largo entero.", text)
+        self.assertIn("Cantidad mínima 0.800 kg", text)
+        self.assertIn("Existencia 15", text)
+        self.assertIn("Activo", text)
+
+    def test_a_package_has_no_price_per_pound(self):
+        paquete = Product.objects.create(
+            category=self.ofertas,
+            name="Paquete Asador 4 a 6 Personas",
+            price_per_kg=Decimal("1599.00"),
+        )
+
+        text = self.text(self.page(paquete))
+
+        self.assertIn("$1,599.00 / paquete", text)
+        self.assertNotIn("/ lb", text)
+
+    def test_a_piece_has_no_price_per_pound(self):
+        gorra = Product.objects.create(
+            category=self.merch, name="Gorra Bordada", price_per_kg=Decimal("250.00")
+        )
+
+        text = self.text(self.page(gorra))
+
+        self.assertIn("$250.00 / pieza", text)
+        self.assertNotIn("/ lb", text)
+
+    def test_a_package_priced_by_weight_keeps_the_price_per_pound(self):
+        carnitas = Product.objects.create(
+            category=self.ofertas, name="Paquete Carnitas por Kilo", price_per_kg=Decimal("389.00")
+        )
+
+        self.assertIn("$389.00 / kg · $176.45 / lb", self.text(self.page(carnitas)))
+
+    def test_the_picture_comes_from_the_store(self):
+        response = self.page()
+
+        self.assertContains(response, '<img src="http://store.test/img/products/tomahawk.webp"')
+        self.assertIn("Imagen registrada: /img/products/tomahawk.webp", self.text(response))
+
+    def test_a_product_without_a_picture_says_so_and_draws_no_img(self):
+        sin_foto = Product.objects.create(
+            category=self.cortes, name="Sin Foto", price_per_kg=Decimal("10.00")
+        )
+
+        response = self.page(sin_foto)
+
+        self.assertNotContains(response, "<img")
+        self.assertIn("Este producto no tiene imagen registrada.", self.text(response))
+
+    def test_a_picture_that_is_not_an_address_is_not_pointed_at(self):
+        raro = Product.objects.create(
+            category=self.cortes,
+            name="Raro",
+            price_per_kg=Decimal("10.00"),
+            image_url="javascript:alert(1)",
+        )
+
+        response = self.page(raro)
+
+        self.assertNotContains(response, "<img")
+        self.assertNotContains(response, 'src="javascript:')
+
+    def test_an_inactive_product_says_inactivo(self):
+        retirado = Product.objects.create(
+            category=self.cortes, name="Retirado", price_per_kg=Decimal("10.00"), is_active=False
+        )
+
+        self.assertIn("Inactivo", self.text(self.page(retirado)))
+
+    def test_a_product_without_a_description_says_so(self):
+        text = self.text(
+            self.page(
+                Product.objects.create(
+                    category=self.cortes, name="Sin Texto", price_per_kg=Decimal("10.00")
+                )
+            )
+        )
+
+        self.assertIn("Descripción Sin descripción", text)
+
+    def test_the_cut_spec_is_listed_field_by_field(self):
+        CutSpec.objects.create(
+            product=self.tomahawk,
+            avg_piece_weight_kg=Decimal("1.350"),
+            thickness_min_in=Decimal("1.00"),
+            thickness_max_in=Decimal("2.00"),
+            thickness_default_in=Decimal("1.50"),
+            supplier="Rancho Sur",
+            presentation=CutSpec.Presentation.PIECE,
+            notes="Madurada 21 días.",
+        )
+
+        text = self.text(self.page())
+
+        self.assertIn("Peso promedio por pieza (kg) 1.350", text)
+        self.assertIn("Grosor mínimo (in) 1.00", text)
+        self.assertIn("Grosor máximo (in) 2.00", text)
+        self.assertIn("Grosor por defecto (in) 1.50", text)
+        self.assertIn("Proveedor Rancho Sur", text)
+        self.assertIn("Presentación Pieza", text)
+        self.assertIn("Notas Madurada 21 días.", text)
+        self.assertNotIn("Este producto no tiene especificación de corte.", text)
+
+    def test_a_spec_field_left_empty_shows_a_dash_and_a_zero_shows_zero(self):
+        CutSpec.objects.create(product=self.tomahawk, avg_piece_weight_kg=Decimal("0"))
+
+        text = self.text(self.page())
+
+        self.assertIn("Peso promedio por pieza (kg) 0.000", text)
+        self.assertIn("Grosor mínimo (in) —", text)
+        self.assertIn("Proveedor —", text)
+        self.assertIn("Presentación —", text)
+        self.assertIn("Notas —", text)
+
+    def test_a_product_without_a_spec_offers_to_add_one(self):
+        response = self.page()
+
+        self.assertIn("Este producto no tiene especificación de corte.", self.text(response))
+        html = response.content.decode()
+        section = html_between(html, '<section aria-labelledby="spec-titulo"', "</section>")
+        self.assertEqual(
+            [a["href"] for a in anchors(section)],
+            [reverse("inventory:update", args=[self.tomahawk.pk])],
+        )
+
+    def test_the_two_actions_go_to_the_edit_and_the_delete_pages(self):
+        html = self.page().content.decode()
+
+        actions = html[
+            html.rindex('<div class="flex flex-col gap-3 sm:flex-row">') : html.index("</main>")
+        ]
+        self.assertEqual(
+            [a["href"] for a in anchors(actions)],
+            [
+                reverse("inventory:update", args=[self.tomahawk.pk]),
+                reverse("inventory:delete", args=[self.tomahawk.pk]),
+            ],
+        )
+        self.assertIn("Eliminar o desactivar", actions)
+
+    def test_the_name_and_the_description_are_escaped(self):
+        raro = Product.objects.create(
+            category=self.cortes,
+            name="<b>Negrita</b>",
+            description='<script>alert("x")</script>',
+            price_per_kg=Decimal("10.00"),
+        )
+
+        html = self.page(raro).content.decode()
+
+        self.assertNotIn("<b>Negrita", html)
+        self.assertNotIn("<script>alert", html)
+        self.assertIn("&lt;b&gt;Negrita&lt;/b&gt;", html)
+
+    def test_the_message_of_a_save_shows_on_the_page_it_lands_on(self):
+        data = {
+            "name": "Tomahawk",
+            "category": self.cortes.pk,
+            "price_per_kg": "649.00",
+            "min_quantity_kg": "0.800",
+            "stock": "20",
+            "is_active": "on",
+        }
+
+        response = self.client.post(
+            reverse("inventory:update", args=[self.tomahawk.pk]), data, follow=True
+        )
+
+        self.assertTemplateUsed(response, "inventory/product_detail.html")
+        self.assertIn('Producto "Tomahawk" actualizado correctamente.', self.text(response))
+
+    def test_an_unknown_product_is_a_404(self):
+        self.assertEqual(
+            self.client.get(reverse("inventory:detail", args=[999999])).status_code, 404
+        )
 
 
 class ProductRoutesTests(SimpleTestCase):
