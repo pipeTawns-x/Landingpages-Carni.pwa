@@ -1,51 +1,83 @@
-{% extends "base.html" %}
+{% extends "panel/base.html" %}
+{% comment %}
+  Products, confirm a change of the price or of the minimum quantity. It is
+  kit/productos/confirm-precio.html as the redesign delivered it (pruebas 9d32a6cd, sync point S3),
+  applied over the light template of the M13. It is the answer of /panel/productos/<id>/editar/ to
+  a save that changes either value without the "Confirmar" checkbox ticked, so nothing has been
+  saved yet.
 
-{% block title %}Confirmar cambio de precio · Carni MVP{% endblock %}
+  Context of the view: product, price_changed, min_quantity_changed, old_price_per_kg,
+  new_price_per_kg, old_min_quantity_kg, new_min_quantity_kg and hidden_fields (every field the form
+  posted, to send them again). Confirming posts them back with confirm=1. Only what changed is
+  listed. The cross closes and goes back to the list, "Cancelar" goes back to the detail. Orders
+  already placed keep their price: order_items stores unit_price per line.
+{% endcomment %}
+{% block title %}<title>Confirmar cambio de precio · Productos · Panel · Carnicería El Señor de La Misericordia</title>{% endblock %}
+{% block titulo %}Confirmar cambio de precio{% endblock %}
+{% block contenido %}
+<div class="mx-auto flex w-full max-w-2xl flex-col gap-5 lg:gap-6">
+  <nav aria-label="Ruta" class="flex flex-wrap items-center gap-x-2 text-ui">
+    <a href="{% url 'inventory:list' %}" class="inline-flex min-h-11 items-center text-text-muted underline decoration-border-control underline-offset-4 transition-colors duration-160 hover:text-text">Productos</a>
+    <span aria-hidden="true" class="text-text-muted">/</span>
+    <a href="{% url 'inventory:detail' product.id %}" class="inline-flex min-h-11 items-center text-text-muted underline decoration-border-control underline-offset-4 transition-colors duration-160 hover:text-text">{{ product.name }}</a>
+    <span aria-hidden="true" class="text-text-muted">/</span>
+    <span aria-current="page" class="min-w-0 text-text">Confirmar cambio</span>
+  </nav>
 
-{% block content %}
-  <div class="card">
-    <h1>Confirmar cambios en "{{ product.name }}"</h1>
-    <p>
-      Estás por cambiar datos sensibles de este producto. Revisa el cambio
-      antes de confirmarlo.
-    </p>
+  <section aria-labelledby="confirmar-titulo" class="relative flex flex-col gap-5 rounded-dialog border border-border bg-surface-1 p-5 lg:p-8">
+    <a href="{% url 'inventory:list' %}" aria-label="Cerrar y volver a la lista de productos" class="absolute top-3 right-3 grid size-11 place-items-center rounded-pill text-text-muted transition-[background-color,scale] duration-160 ease-out-strong hover:bg-surface-2 hover:text-text active:scale-[0.97] motion-reduce:transition-none"><svg class="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6 6 18" /></svg></a>
+    <h2 id="confirmar-titulo" class="pr-12 font-display text-titulo font-medium">Confirmar cambios en “{{ product.name }}”</h2>
+    <p class="text-ui text-text-muted text-pretty">Estás por cambiar datos sensibles de este producto. Un precio o una cantidad mínima que cambia sin aviso termina en los carritos de los clientes: revisa el cambio antes de guardarlo.</p>
 
-    <table class="before-after">
-      <thead>
-        <tr>
-          <th>Campo</th>
-          <th>Antes</th>
-          <th>Después</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% if price_changed %}
-          <tr>
-            <td>Precio por kg</td>
-            <td class="before">${{ old_price_per_kg }}</td>
-            <td class="after">${{ new_price_per_kg }}</td>
-          </tr>
-        {% endif %}
-        {% if min_quantity_changed %}
-          <tr>
-            <td>Cantidad mínima (kg)</td>
-            <td class="before">{{ old_min_quantity_kg }}</td>
-            <td class="after">{{ new_min_quantity_kg }}</td>
-          </tr>
-        {% endif %}
-      </tbody>
-    </table>
+    <ul role="list" class="flex flex-col gap-5">
+      {% if price_changed %}
+      <li class="flex flex-col gap-2">
+        <p class="text-ui font-semibold">Precio por kg</p>
+        <div class="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-3">
+          <div class="flex min-w-0 flex-col gap-1 rounded-control border border-border bg-bg p-4">
+            <span class="text-meta text-text-muted">Antes</span>
+            <span class="text-lead text-text-muted tabular-nums line-through">${{ old_price_per_kg|floatformat:"2g" }}</span>
+          </div>
+          <svg class="size-5 shrink-0 text-sand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+          <div class="flex min-w-0 flex-col gap-1 rounded-control border border-sand bg-bg p-4">
+            <span class="text-meta text-text-muted">Después</span>
+            <span class="text-lead font-semibold tabular-nums">${{ new_price_per_kg|floatformat:"2g" }}</span>
+          </div>
+        </div>
+      </li>
+      {% endif %}
+      {% if min_quantity_changed %}
+      <li class="flex flex-col gap-2">
+        <p class="text-ui font-semibold">Cantidad mínima</p>
+        <div class="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-3">
+          <div class="flex min-w-0 flex-col gap-1 rounded-control border border-border bg-bg p-4">
+            <span class="text-meta text-text-muted">Antes</span>
+            <span class="text-lead text-text-muted tabular-nums line-through">{{ old_min_quantity_kg|floatformat:"3" }} kg</span>
+          </div>
+          <svg class="size-5 shrink-0 text-sand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+          <div class="flex min-w-0 flex-col gap-1 rounded-control border border-sand bg-bg p-4">
+            <span class="text-meta text-text-muted">Después</span>
+            <span class="text-lead font-semibold tabular-nums">{{ new_min_quantity_kg|floatformat:"3" }} kg</span>
+          </div>
+        </div>
+      </li>
+      {% endif %}
+    </ul>
 
-    <form method="post">
+    <ul role="list" class="flex flex-col gap-2 border-t border-border pt-5 text-ui text-text-muted">
+      <li class="flex items-start gap-3"><svg class="mt-0.5 size-5 shrink-0 text-sand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12.5 9.5 17 19 7.5" /></svg><span>El cambio se ve en la tienda en cuanto lo confirmas.</span></li>
+      <li class="flex items-start gap-3"><svg class="mt-0.5 size-5 shrink-0 text-sand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12.5 9.5 17 19 7.5" /></svg><span>Los pedidos ya hechos conservan el precio con el que se pidieron.</span></li>
+    </ul>
+
+    <form method="post" class="flex flex-col gap-3 sm:flex-row">
       {% csrf_token %}
       {% for key, value in hidden_fields.items %}
-        <input type="hidden" name="{{ key }}" value="{{ value }}" />
+      <input type="hidden" name="{{ key }}" value="{{ value }}" />
       {% endfor %}
       <input type="hidden" name="confirm" value="1" />
-      <div class="actions">
-        <button type="submit" class="btn">Confirmar cambio</button>
-        <a href="{% url 'inventory:detail' product.id %}" class="btn btn-secondary">Cancelar</a>
-      </div>
+      <button type="submit" class="inline-flex min-h-12 items-center justify-center gap-2 rounded-pill bg-red px-6 text-ui font-semibold text-white transition-[background-color,scale] duration-160 ease-out-strong hover:bg-red-hover active:scale-[0.97] motion-reduce:transition-none">Confirmar cambio</button>
+      <a href="{% url 'inventory:detail' product.id %}" class="inline-flex min-h-12 items-center justify-center gap-2 rounded-pill border border-sand px-6 text-ui font-semibold text-text transition-[background-color,scale] duration-160 ease-out-strong hover:bg-surface-2 active:scale-[0.97] motion-reduce:transition-none">Cancelar</a>
     </form>
-  </div>
+  </section>
+</div>
 {% endblock %}

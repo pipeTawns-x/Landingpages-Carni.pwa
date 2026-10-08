@@ -169,7 +169,7 @@ def product_delete(request, product_id):
     `services.delete_or_deactivate` decides which of the two happens; this
     view only words the result.
     """
-    product = get_object_or_404(Product, pk=product_id)
+    product = get_object_or_404(Product.objects.select_related("category"), pk=product_id)
 
     if request.method == "POST":
         outcome = services.delete_or_deactivate(product)

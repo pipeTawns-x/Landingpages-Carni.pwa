@@ -366,9 +366,10 @@ class ProductDeleteViewTests(TestCase):
         response = self.client.get(self.url)
 
         self.assertEqual(response.context["order_count"], 0)
-        # The template wraps the line right after "lista", so match up to there.
-        self.assertContains(response, "saldrá de 1 lista")
-        self.assertNotContains(response, "listas")
+        # The number sits in its own <span>, so the text is read without the tags.
+        text = " ".join(strip_tags(response.content.decode()).split())
+        self.assertIn("saldrá de 1 lista", text)
+        self.assertNotIn("listas", text)
 
     def test_a_product_without_orders_is_deleted(self):
         response = self.client.post(self.url)
@@ -1488,6 +1489,308 @@ class ProductFormPageTests(TestCase):
 
         self.assertRedirects(response, reverse("inventory:detail", args=[self.tomahawk.pk]))
         self.assertEqual(Product.objects.get(pk=self.tomahawk.pk).stock, 20)
+
+
+def page_text(html):
+    """The text of the <main> of a page, with the tags gone and the whitespace squashed."""
+    return " ".join(unescape(strip_tags(html_between(html, "<main", "</main>"))).split())
+
+
+def main_form(html):
+    """The form of the page itself: the first form of the page is the sign-out of the sidebar."""
+    return html_between(html_between(html, "<main", "</main>"), "<form", "</form>")
+
+
+class ProductConfirmPricePageTests(TestCase):
+    """The page that asks to confirm a new price or minimum (kit/productos/confirm-precio)."""
+
+    fixtures = ["categories.json"]
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.product = Product.objects.create(
+            category=Category.objects.get(slug="cortes-especiales"),
+            name="Tomahawk",
+            price_per_kg=Decimal("649.00"),
+            stock=15,
+            min_quantity_kg=Decimal("0.800"),
+        )
+
+    def setUp(self):
+        self.url = reverse("inventory:update", args=[self.product.pk])
+        self.detail_url = reverse("inventory:detail", args=[self.product.pk])
+        sign_in_as_panel_admin(self.client)
+
+    def post(self, **overrides):
+        data = {
+            "name": "Tomahawk",
+            "category": self.product.category_id,
+            "price_per_kg": "649.00",
+            "min_quantity_kg": "0.800",
+            "stock": "15",
+            "is_active": "on",
+            **overrides,
+        }
+        return self.client.post(self.url, data)
+
+    def test_the_page_is_served_on_the_frame_with_its_own_title(self):
+        response = self.post(price_per_kg="679.00")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "inventory/product_confirm_price_change.html")
+        self.assertTemplateUsed(response, "panel/base.html")
+        self.assertContains(
+            response, f"<title>Confirmar cambio de precio · Productos · {PANEL_TITLE}</title>"
+        )
+        html = response.content.decode()
+        self.assertEqual(
+            re.findall(r"<h1[^>]*>\s*(.*?)\s*</h1>", html, flags=re.S),
+            ["Confirmar cambio de precio"],
+        )
+        self.assertEqual(
+            current_links(html_between(html, "<aside", "</aside>")), {"/panel/productos/": "page"}
+        )
+
+    def test_a_new_price_shows_before_and_after_and_nothing_about_the_minimum(self):
+        text = page_text(self.post(price_per_kg="679.00").content.decode())
+
+        self.assertIn("Confirmar cambios en “Tomahawk”", text)
+        self.assertIn("Precio por kg Antes $649.00 Después $679.00", text)
+        self.assertNotIn("Cantidad mínima", text)
+
+    def test_a_new_minimum_shows_before_and_after_and_nothing_about_the_price(self):
+        text = page_text(self.post(min_quantity_kg="1.2").content.decode())
+
+        self.assertIn("Cantidad mínima Antes 0.800 kg Después 1.200 kg", text)
+        self.assertNotIn("Precio por kg", text)
+
+    def test_both_changes_are_listed_price_first(self):
+        text = page_text(self.post(price_per_kg="679", min_quantity_kg="0.25").content.decode())
+
+        self.assertIn("Precio por kg Antes $649.00 Después $679.00", text)
+        self.assertIn("Cantidad mínima Antes 0.800 kg Después 0.250 kg", text)
+        self.assertLess(text.index("Precio por kg"), text.index("Cantidad mínima"))
+
+    def test_amounts_are_grouped_and_the_minimum_always_has_three_decimals(self):
+        text = page_text(self.post(price_per_kg="1599", min_quantity_kg="2").content.decode())
+
+        self.assertIn("Después $1,599.00", text)
+        self.assertIn("Después 2.000 kg", text)
+
+    def test_the_page_says_what_confirming_does_not_touch(self):
+        text = page_text(self.post(price_per_kg="679.00").content.decode())
+
+        self.assertIn("El cambio se ve en la tienda en cuanto lo confirmas.", text)
+        self.assertIn("Los pedidos ya hechos conservan el precio con el que se pidieron.", text)
+
+    def test_nothing_is_saved_until_the_change_is_confirmed(self):
+        self.post(price_per_kg="679.00")
+
+        self.assertEqual(Product.objects.get(pk=self.product.pk).price_per_kg, Decimal("649.00"))
+
+    def test_the_form_sends_every_field_again_with_confirm_and_the_csrf_token(self):
+        html = self.post(price_per_kg="679.00", description='Con <hueso> y "sal"').content.decode()
+
+        parser = form_controls(html)
+        form = main_form(html)
+        self.assertIn('method="post"', form)
+        self.assertIn("csrfmiddlewaretoken", form)
+        hidden = {
+            name: attrs["value"]
+            for name, attrs in parser.controls.items()
+            if attrs.get("type") == "hidden" and name != "csrfmiddlewaretoken"
+        }
+        self.assertEqual(
+            hidden,
+            {
+                "name": "Tomahawk",
+                "category": str(self.product.category_id),
+                "price_per_kg": "679.00",
+                "min_quantity_kg": "0.800",
+                "stock": "15",
+                "is_active": "on",
+                "description": 'Con <hueso> y "sal"',
+                "confirm": "1",
+            },
+        )
+
+    def test_a_value_sent_again_is_escaped(self):
+        html = self.post(price_per_kg="679.00", name='"><script>alert(1)</script>').content.decode()
+
+        self.assertNotIn("<script>alert", html)
+        self.assertIn('value="&quot;&gt;&lt;script&gt;alert(1)&lt;/script&gt;"', html)
+
+    def test_sending_the_page_again_saves_the_change(self):
+        html = self.post(price_per_kg="679.00", stock="20").content.decode()
+        parser = form_controls(html)
+        resent = {
+            name: attrs["value"]
+            for name, attrs in parser.controls.items()
+            if attrs.get("type") == "hidden" and name != "csrfmiddlewaretoken"
+        }
+
+        response = self.client.post(self.url, resent)
+
+        self.assertRedirects(response, self.detail_url)
+        saved = Product.objects.get(pk=self.product.pk)
+        self.assertEqual((saved.price_per_kg, saved.stock), (Decimal("679.00"), 20))
+
+    def test_the_two_ways_out_go_to_the_list_and_to_the_detail(self):
+        html = self.post(price_per_kg="679.00").content.decode()
+
+        section = html_between(html, '<section aria-labelledby="confirmar-titulo"', "</section>")
+        close = anchors(section)[0]
+        self.assertEqual(close["href"], "/panel/productos/")
+        self.assertEqual(close["aria-label"], "Cerrar y volver a la lista de productos")
+        self.assertEqual(anchors(main_form(html))[0]["href"], self.detail_url)
+        crumbs = html_between(html, '<nav aria-label="Ruta"', "</nav>")
+        self.assertEqual(
+            [a["href"] for a in anchors(crumbs)], ["/panel/productos/", self.detail_url]
+        )
+
+    def test_the_page_has_no_script_and_no_inline_style(self):
+        html = self.post(price_per_kg="679.00").content.decode()
+
+        for forbidden in ("<script", "<style", " style=", " onclick="):
+            with self.subTest(forbidden=forbidden):
+                self.assertNotIn(forbidden, html)
+
+
+class ProductConfirmDeletePageTests(TestCase):
+    """The page that asks to delete a product, or to deactivate it when it has orders."""
+
+    fixtures = ["categories.json"]
+
+    def setUp(self):
+        self.product = make_product(name="Tomahawk", price_per_kg=Decimal("1649.00"), stock=15)
+        self.url = reverse("inventory:delete", args=[self.product.pk])
+        self.detail_url = reverse("inventory:detail", args=[self.product.pk])
+        sign_in_as_panel_admin(self.client)
+
+    def get(self):
+        return self.client.get(self.url)
+
+    def test_a_product_without_orders_is_offered_for_deletion(self):
+        response = self.get()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "inventory/product_confirm_delete.html")
+        self.assertTemplateUsed(response, "panel/base.html")
+        self.assertContains(
+            response, f"<title>Eliminar producto · Productos · {PANEL_TITLE}</title>"
+        )
+        html = response.content.decode()
+        self.assertEqual(
+            re.findall(r"<h1[^>]*>\s*(.*?)\s*</h1>", html, flags=re.S), ["Eliminar producto"]
+        )
+        text = page_text(html)
+        self.assertIn("¿Eliminar “Tomahawk”?", text)
+        self.assertIn("Esta acción no se puede deshacer.", text)
+        self.assertIn("Sí, eliminar", text)
+        self.assertNotIn("esactivar", text)
+        self.assertNotIn("favoritos", text)
+
+    def test_a_product_with_orders_is_offered_for_deactivation(self):
+        insert_order_item(self.product)
+        insert_order_item(self.product)
+
+        response = self.get()
+
+        self.assertContains(
+            response, f"<title>Desactivar producto · Productos · {PANEL_TITLE}</title>"
+        )
+        html = response.content.decode()
+        self.assertEqual(
+            re.findall(r"<h1[^>]*>\s*(.*?)\s*</h1>", html, flags=re.S), ["Desactivar producto"]
+        )
+        text = page_text(html)
+        self.assertIn("¿Desactivar “Tomahawk”?", text)
+        self.assertIn(
+            "Este producto aparece en 2 pedidos, así que no se va a eliminar: se desactivará "
+            "para conservar el historial. Dejará de verse en la tienda.",
+            text,
+        )
+        self.assertIn("Sí, desactivar", text)
+        self.assertNotIn("Sí, eliminar", text)
+        self.assertNotIn("Esta acción no se puede deshacer.", text)
+
+    def test_a_single_order_is_in_the_singular(self):
+        insert_order_item(self.product)
+
+        self.assertIn("aparece en 1 pedido, así que", page_text(self.get().content.decode()))
+
+    def test_the_favorites_that_will_go_are_counted_and_pluralised(self):
+        insert_favorite(self.product)
+        self.assertIn(
+            "saldrá de 1 lista de favoritos de tus clientes.",
+            page_text(self.get().content.decode()),
+        )
+
+        insert_favorite(self.product)
+        self.assertIn(
+            "saldrá de 2 listas de favoritos de tus clientes.",
+            page_text(self.get().content.decode()),
+        )
+
+    def test_orders_win_over_favorites_on_the_page(self):
+        insert_order_item(self.product)
+        insert_favorite(self.product)
+
+        text = page_text(self.get().content.decode())
+
+        self.assertIn("no se va a eliminar", text)
+        self.assertNotIn("favoritos", text)
+
+    def test_the_page_shows_the_category_the_price_and_the_stock(self):
+        text = page_text(self.get().content.decode())
+
+        self.assertIn("Categoría Carnes Rojas", text)
+        self.assertIn("Precio por kg $1,649.00", text)
+        self.assertIn("Existencia 15", text)
+
+    def test_the_form_posts_with_the_csrf_token_and_both_ways_out_are_links(self):
+        html = self.get().content.decode()
+
+        form = main_form(html)
+        self.assertIn('method="post"', form)
+        self.assertIn("csrfmiddlewaretoken", form)
+        self.assertEqual([a["href"] for a in anchors(form)], [self.detail_url])
+        section = html_between(html, '<section aria-labelledby="eliminar-titulo"', "</section>")
+        close = anchors(section)[0]
+        self.assertEqual(close["href"], "/panel/productos/")
+        self.assertEqual(close["aria-label"], "Cerrar y volver a la lista de productos")
+
+    def test_the_breadcrumb_goes_back_to_the_list_and_the_detail(self):
+        html = self.get().content.decode()
+
+        crumbs = html_between(html, '<nav aria-label="Ruta"', "</nav>")
+        self.assertEqual(
+            [a["href"] for a in anchors(crumbs)], ["/panel/productos/", self.detail_url]
+        )
+        self.assertIn("Confirmar", crumbs)
+
+    def test_the_name_is_escaped(self):
+        raro = make_product(name='<img src=x onerror="alert(1)">')
+
+        html = self.client.get(reverse("inventory:delete", args=[raro.pk])).content.decode()
+
+        self.assertNotIn("<img src=x", html)
+        self.assertIn("&lt;img src=x onerror=&quot;alert(1)&quot;&gt;", html)
+
+    def test_the_page_does_not_query_the_category_apart(self):
+        # The category is joined in the same query as the product, so the page costs no extra one.
+        with CaptureQueriesContext(connection) as queries:
+            self.get()
+
+        category_queries = [q for q in queries.captured_queries if 'FROM "categories"' in q["sql"]]
+        self.assertEqual(category_queries, [])
+
+    def test_the_page_has_no_script_and_no_inline_style(self):
+        html = self.get().content.decode()
+
+        for forbidden in ("<script", "<style", " style=", " onclick="):
+            with self.subTest(forbidden=forbidden):
+                self.assertNotIn(forbidden, html)
 
 
 class ProductRoutesTests(SimpleTestCase):

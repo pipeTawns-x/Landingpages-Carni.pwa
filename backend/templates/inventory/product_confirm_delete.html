@@ -1,32 +1,61 @@
-{% extends "base.html" %}
+{% extends "panel/base.html" %}
+{% comment %}
+  Products, confirm that a product is deleted or deactivated (/panel/productos/<id>/eliminar/,
+  inventory:delete). It is kit/productos/confirm-desactivar.html as the redesign delivered it
+  (pruebas 0f7ed9ca, sync point S3), applied over the light template of the M13.
 
-{% block title %}Eliminar producto · Carni MVP{% endblock %}
+  Context of the view: product, order_count and favorite_count. The rule lives in
+  inventory.services.delete_or_deactivate: order_items.product_id is ON DELETE RESTRICT, so a
+  product with orders is deactivated and any other one is deleted, and its favorites go with it. The
+  title, the breadcrumb and the button say "desactivar" or "eliminar" according to the branch, so
+  that the page never says one thing and does another. The cross closes and goes back to the list,
+  "Cancelar" goes back to the detail.
+{% endcomment %}
+{% block title %}<title>{% if order_count %}Desactivar{% else %}Eliminar{% endif %} producto · Productos · Panel · Carnicería El Señor de La Misericordia</title>{% endblock %}
+{% block titulo %}{% if order_count %}Desactivar{% else %}Eliminar{% endif %} producto{% endblock %}
+{% block contenido %}
+<div class="mx-auto flex w-full max-w-2xl flex-col gap-5 lg:gap-6">
+  <nav aria-label="Ruta" class="flex flex-wrap items-center gap-x-2 text-ui">
+    <a href="{% url 'inventory:list' %}" class="inline-flex min-h-11 items-center text-text-muted underline decoration-border-control underline-offset-4 transition-colors duration-160 hover:text-text">Productos</a>
+    <span aria-hidden="true" class="text-text-muted">/</span>
+    <a href="{% url 'inventory:detail' product.id %}" class="inline-flex min-h-11 items-center text-text-muted underline decoration-border-control underline-offset-4 transition-colors duration-160 hover:text-text">{{ product.name }}</a>
+    <span aria-hidden="true" class="text-text-muted">/</span>
+    <span aria-current="page" class="min-w-0 text-text">Confirmar</span>
+  </nav>
 
-{% block content %}
-  <div class="card">
-    <h1>¿Eliminar "{{ product.name }}"?</h1>
+  <section aria-labelledby="eliminar-titulo" class="relative flex flex-col gap-5 rounded-dialog border border-border bg-surface-1 p-5 lg:p-8">
+    <a href="{% url 'inventory:list' %}" aria-label="Cerrar y volver a la lista de productos" class="absolute top-3 right-3 grid size-11 place-items-center rounded-pill text-text-muted transition-[background-color,scale] duration-160 ease-out-strong hover:bg-surface-2 hover:text-text active:scale-[0.97] motion-reduce:transition-none"><svg class="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6 6 18" /></svg></a>
+    <h2 id="eliminar-titulo" class="pr-12 font-display text-titulo font-medium">{% if order_count %}¿Desactivar{% else %}¿Eliminar{% endif %} “{{ product.name }}”?</h2>
+
     {% if order_count %}
-      <p class="message message-warning">
-        Este producto aparece en {{ order_count }} pedido{{ order_count|pluralize }}, así que
-        <strong>no se va a eliminar</strong>: se desactivará para conservar el historial.
-        Dejará de verse en la tienda.
-      </p>
+    <p class="flex items-start gap-3 rounded-control border border-border bg-surface-2 px-4 py-3 text-ui">
+      <svg class="mt-0.5 size-5 shrink-0 text-sand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 9v4M12 16.5h.01M10.3 4.2 2.8 17.5A2 2 0 0 0 4.5 20.5h15a2 2 0 0 0 1.7-3L13.7 4.2a2 2 0 0 0-3.4 0Z" /></svg>
+      <span>Este producto aparece en <span class="font-semibold tabular-nums">{{ order_count }}</span> pedido{{ order_count|pluralize }}, así que <strong class="font-semibold">no se va a eliminar</strong>: se desactivará para conservar el historial. Dejará de verse en la tienda.</span>
+    </p>
     {% else %}
-      <p>
-        Esta acción no se puede deshacer.
-        {% if favorite_count %}
-          El producto también saldrá de {{ favorite_count }} lista{{ favorite_count|pluralize }}
-          de favoritos de tus clientes.
-        {% endif %}
-      </p>
+    <p class="text-ui text-text-muted">Esta acción no se puede deshacer.{% if favorite_count %} El producto también saldrá de <span class="tabular-nums">{{ favorite_count }}</span> lista{{ favorite_count|pluralize }} de favoritos de tus clientes.{% endif %}</p>
     {% endif %}
 
-    <form method="post">
-      {% csrf_token %}
-      <div class="actions">
-        <button type="submit" class="btn btn-danger">Sí, eliminar</button>
-        <a href="{% url 'inventory:detail' product.id %}" class="btn btn-secondary">Cancelar</a>
+    <dl class="divide-y divide-border border-y border-border">
+      <div class="grid gap-1 py-3 sm:grid-cols-[11rem_minmax(0,1fr)] sm:gap-4">
+        <dt class="text-ui text-text-muted">Categoría</dt>
+        <dd class="min-w-0 text-ui"><span>{{ product.category.name }}</span></dd>
       </div>
+      <div class="grid gap-1 py-3 sm:grid-cols-[11rem_minmax(0,1fr)] sm:gap-4">
+        <dt class="text-ui text-text-muted">Precio por kg</dt>
+        <dd class="min-w-0 text-ui"><span class="tabular-nums">${{ product.price_per_kg|floatformat:"2g" }}</span></dd>
+      </div>
+      <div class="grid gap-1 py-3 sm:grid-cols-[11rem_minmax(0,1fr)] sm:gap-4">
+        <dt class="text-ui text-text-muted">Existencia</dt>
+        <dd class="min-w-0 text-ui"><span class="tabular-nums">{{ product.stock }}</span></dd>
+      </div>
+    </dl>
+
+    <form method="post" class="flex flex-col gap-3 sm:flex-row">
+      {% csrf_token %}
+      <button type="submit" class="inline-flex min-h-12 items-center justify-center gap-2 rounded-pill bg-red px-6 text-ui font-semibold text-white transition-[background-color,scale] duration-160 ease-out-strong hover:bg-red-hover active:scale-[0.97] motion-reduce:transition-none">{% if order_count %}Sí, desactivar{% else %}Sí, eliminar{% endif %}</button>
+      <a href="{% url 'inventory:detail' product.id %}" class="inline-flex min-h-12 items-center justify-center gap-2 rounded-pill border border-sand px-6 text-ui font-semibold text-text transition-[background-color,scale] duration-160 ease-out-strong hover:bg-surface-2 active:scale-[0.97] motion-reduce:transition-none">Cancelar</a>
     </form>
-  </div>
+  </section>
+</div>
 {% endblock %}
