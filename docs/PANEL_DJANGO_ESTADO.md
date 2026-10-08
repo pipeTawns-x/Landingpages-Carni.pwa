@@ -15,7 +15,8 @@ Se actualiza en cada slice. Se retoma en la primera que no esté HECHA.
 | B7 | `panel/base.html` desde `dashboar.html` | HECHO | `df645294` | — |
 | B10 | Lista de productos (`admin-products.html` → `inventory/product_list.html`) | HECHO | `1691c3aa` | — |
 | B11 | Detalle del producto | HECHO | `ca2478b6` | — |
-| B12–B13 | Formulario y confirmaciones | PENDIENTE | | — |
+| B12 | Formulario de producto (alta y edición) | HECHO | `6c5b9741` | — |
+| B13 | Confirmaciones (precio y desactivar o borrar) | PENDIENTE | | — |
 | B14 | Rutas `/panel/productos/` | HECHO (se adelantó a B10–B13) | `6dc3429e` | — |
 | B15 | Reemplazar el `base.html` claro de la M13 | PENDIENTE | | B7 y B10–B13 (el HTML rediseñado) |
 | B3 | Historial de cambios (opcional) | PENDIENTE | | — |
@@ -72,3 +73,9 @@ Se actualiza en cada slice. Se retoma en la primera que no esté HECHA.
     - El precio por libra solo se dibuja cuando el precio es por kilo (un paquete o una pieza no la tienen). En la especificación, un campo vacío muestra un guion y un cero muestra el cero. Eliminar y desactivar siguen siendo una sola ruta (`inventory:delete`) y el botón nombra las dos.
     - `Product.image_src` une la ruta de la foto (`/img/products/...`) a `STORE_ORIGIN` con `store_image_url()`: una dirección http(s) absoluta se conserva y cualquier otra cosa (`javascript:`, `data:`) no se apunta con un `<img>`. En Chrome, la foto carga desde la tienda.
     - Pasan 326 pruebas, ruff limpio y `--check` en verde; 0 desbordes y 0 controles menores de 44 px a 390.
+  - B12 hecho (`6c5b9741`): `kit/productos/form.html` (`pruebas` `2d7cf5d3`) es `inventory/product_form.html`, para el alta y la edición, y extiende `panel/base.html`.
+    - Django sigue dibujando los controles, ahora con las clases del diseño: `inventory/forms.py` da a cada widget sus clases de Tailwind y sus atributos (`min`, `step`, `aria-describedby`, `inputmode`), y `assets/panel.css` lista ese archivo con `@source`. Toda clase de la plantilla y de `forms.py` se comprobó contra el kit.
+    - `name` e `image_url` son `TextInput` (son `TextField`: Django los dibujaría como `<textarea>`; `image_url` no puede ser `URLInput` porque guarda una ruta relativa). El select de categorías empieza con "Elige una categoría" y el de presentación con "Sin definir".
+    - "Confirmar cambio de precio o cantidad mínima" no es un campo del formulario: es el `confirm=1` que la vista ya lee, solo al editar, y se queda marcada si el formulario vuelve con errores. El precio por libra es texto.
+    - Los errores de cada campo los dibuja `inventory/_field_error.html`. La alerta de arriba dice además los errores que no son de ningún campo, para que nunca apunte a nada.
+    - Comparado con las capturas `f3-form-1440` y `f3-form-errores-390` del rediseño: mismo diseño; 0 desbordes y 0 controles menores de 44 px a 390. Pasan 348 pruebas, ruff limpio y `--check` en verde.
