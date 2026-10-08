@@ -16,9 +16,9 @@ Se actualiza en cada slice. Se retoma en la primera que no esté HECHA.
 | B10 | Lista de productos (`admin-products.html` → `inventory/product_list.html`) | HECHO | `1691c3aa` | — |
 | B11 | Detalle del producto | HECHO | `ca2478b6` | — |
 | B12 | Formulario de producto (alta y edición) | HECHO | `6c5b9741` | — |
-| B13 | Confirmaciones (precio y desactivar o borrar) | PENDIENTE | | — |
+| B13 | Confirmaciones (precio y desactivar o borrar) | HECHO | `814f9b1d` | — |
 | B14 | Rutas `/panel/productos/` | HECHO (se adelantó a B10–B13) | `6dc3429e` | — |
-| B15 | Reemplazar el `base.html` claro de la M13 | PENDIENTE | | B7 y B10–B13 (el HTML rediseñado) |
+| B15 | Reemplazar el `base.html` claro de la M13 | PENDIENTE | | — |
 | B3 | Historial de cambios (opcional) | PENDIENTE | | — |
 | B5 | Entrega M14 | PENDIENTE | | B10 |
 | B17 | M15 Django Templates | PENDIENTE | | Fase 2 |
@@ -79,3 +79,5 @@ Se actualiza en cada slice. Se retoma en la primera que no esté HECHA.
     - "Confirmar cambio de precio o cantidad mínima" no es un campo del formulario: es el `confirm=1` que la vista ya lee, solo al editar, y se queda marcada si el formulario vuelve con errores. El precio por libra es texto.
     - Los errores de cada campo los dibuja `inventory/_field_error.html`. La alerta de arriba dice además los errores que no son de ningún campo, para que nunca apunte a nada.
     - Comparado con las capturas `f3-form-1440` y `f3-form-errores-390` del rediseño: mismo diseño; 0 desbordes y 0 controles menores de 44 px a 390. Pasan 348 pruebas, ruff limpio y `--check` en verde.
+- 2026-10-08:
+  - B13 hecho (`814f9b1d`): las confirmaciones de precio y de borrar o desactivar son `kit/productos/confirm-precio.html` (`9d32a6cd`) y `confirm-desactivar.html` (`0f7ed9ca`), sobre el marco del panel y con datos reales. El escritor las dejó listas antes del corte por el límite de uso; el orquestador verificó que no quedan marcas ni datos de ejemplo y commiteó. Pasan 371 pruebas.
