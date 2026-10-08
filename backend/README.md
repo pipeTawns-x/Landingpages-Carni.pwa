@@ -41,8 +41,8 @@ uv run python -c "from django.core.management.utils import get_random_secret_key
 | `POSTGRES_HOST` | Database host. |
 | `POSTGRES_PORT` | Database port. |
 | `SUPABASE_URL` | URL of the Supabase project (`http://127.0.0.1:54321` locally). `<SUPABASE_URL>/auth/v1` is the issuer a panel token must carry. Required. |
-| `SUPABASE_JWKS_URL` | Production: where the project publishes its signing keys, `<SUPABASE_URL>/auth/v1/.well-known/jwks.json`. When it is set, tokens are checked against those keys and `SUPABASE_JWT_SECRET` is ignored. |
-| `SUPABASE_JWT_SECRET` | The local Supabase signs with this shared secret (HS256); `supabase status -o env` prints it as `JWT_SECRET`. Used only when `SUPABASE_JWKS_URL` is empty. One of the two is required. |
+| `SUPABASE_JWKS_URL` | Where the project publishes its signing keys, `<SUPABASE_URL>/auth/v1/.well-known/jwks.json`, locally and in production. When it is set, tokens are checked against those keys and `SUPABASE_JWT_SECRET` is ignored. The local Supabase CLI (v2.84) signs user tokens with ES256 and publishes the key there, so local needs it too. |
+| `SUPABASE_JWT_SECRET` | Shared HS256 secret, for a Supabase project that still signs with it; `supabase status -o env` prints it as `JWT_SECRET`. Used only when `SUPABASE_JWKS_URL` is empty: a real local token is refused with `algorithm` in that mode. One of the two is required. |
 | `STORE_ORIGIN` | Origin of the store (`http://localhost:3002` locally). The panel sends people there to sign in and after signing out. Required. |
 | `PANEL_ALLOWED_ORIGINS` | Comma-separated origins that may post a token to `/panel/sesion/` (`http://localhost:3002` locally). Required. |
 | `PANEL_TOKEN_MAX_AGE_SECONDS` | The oldest a token may be, counted from when Supabase issued it, when it is handed over (`300` is five minutes). Required. |
@@ -261,7 +261,7 @@ Behaviour worth knowing before touching it:
   also hides every non-admin row from that role). Apply the migration with
   `supabase migration up`; never with `db reset`, which wipes the local data.
 - Local values for `backend/.env`: `SUPABASE_URL=http://127.0.0.1:54321`,
-  `SUPABASE_JWT_SECRET=<JWT_SECRET from supabase status -o env>`,
+  `SUPABASE_JWKS_URL=http://127.0.0.1:54321/auth/v1/.well-known/jwks.json`,
   `STORE_ORIGIN=http://localhost:3002`,
   `PANEL_ALLOWED_ORIGINS=http://localhost:3002` and
   `PANEL_TOKEN_MAX_AGE_SECONDS=300`.
