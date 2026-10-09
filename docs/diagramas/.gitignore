@@ -1,0 +1,3 @@
+# Local provenance receipts from `archify finalize`: they hold the absolute path
+# of the machine that generated them, and every run recreates them.
+*.delivery.json
