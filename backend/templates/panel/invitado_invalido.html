@@ -1,0 +1,14 @@
+{% extends "panel/invitado_base.html" %}
+{% comment %}
+  What every review invite link that does not work gets, answered with a 404: one that was never
+  issued, one that expired, one that was revoked and one that is used up all look the same, so the
+  page tells nothing about which case it was. It has no form and no token on purpose.
+{% endcomment %}
+{% block title %}<title>Enlace no válido · Carnicería El Señor de La Misericordia</title>{% endblock %}
+{% block contenido %}
+<section aria-labelledby="invalido-titulo" class="flex flex-col items-center gap-3 rounded-card border border-border bg-surface-1 px-4 py-12 text-center">
+  <span class="grid size-12 place-items-center rounded-control bg-surface-2 text-sand"><svg class="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 9v4M12 16.5h.01M10.3 4.2 2.8 17.5A2 2 0 0 0 4.5 20.5h15a2 2 0 0 0 1.7-3L13.7 4.2a2 2 0 0 0-3.4 0Z" /></svg></span>
+  <h1 id="invalido-titulo" class="font-sans text-ui font-semibold">Enlace no válido o vencido</h1>
+  <p class="max-w-prose text-meta text-text-muted">Este enlace no se puede usar. Pídele a quien te lo envió uno nuevo.</p>
+</section>
+{% endblock %}

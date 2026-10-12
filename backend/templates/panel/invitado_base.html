@@ -1,0 +1,26 @@
+{% load static %}<!DOCTYPE html>
+{% comment %}
+  Shell of the two pages of a review invite link: panel/invitado.html (the button) and
+  panel/invitado_invalido.html (the link does not work). It is not the frame of the panel
+  (panel/base.html): whoever opens a link has no session yet, so there is no navigation to show.
+  The stylesheet is the one of the panel and every class is one it already defines. Plain HTML, no
+  JavaScript and no inline styles. Pages fill the blocks: title (the whole <title> element) and
+  contenido.
+{% endcomment %}
+<html lang="es-MX">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0B0B0C" />
+  <meta name="color-scheme" content="dark" />
+  <meta name="robots" content="noindex, nofollow" />
+  {% block title %}<title>Revisión del panel · Carnicería El Señor de La Misericordia</title>{% endblock %}
+  <link rel="icon" href="{{ store_origin }}/img/recursos_web/logo-user.png" type="image/png" />
+  <link rel="stylesheet" href="{% static 'panel/panel.css' %}" />
+</head>
+<body class="min-h-dvh bg-bg text-text">
+  <main class="mx-auto flex min-h-dvh max-w-prose flex-col justify-center gap-5 px-4 py-12">
+    {% block contenido %}{% endblock %}
+  </main>
+</body>
+</html>

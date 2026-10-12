@@ -49,11 +49,13 @@ uv run python -c "from django.core.management.utils import get_random_secret_key
 | `DJANGO_COOKIE_SECURE` | `True`/`False`. Marks the session and CSRF cookies `Secure`. Optional: on whenever `DJANGO_DEBUG` is off. |
 | `DJANGO_COOKIE_HTTPONLY` | `True`/`False`. Hides the session cookie from JavaScript. Optional: `True`. |
 | `DJANGO_COOKIE_SAMESITE` | `Lax` or `None` (which needs `Secure`). Optional: `Lax`. `Strict` is refused because it would break the panel handoff. |
+| `REVIEW_INVITES_ENABLED` | `True`/`False`. Turns on the review invite links (`/panel/invitado/<token>/`), which open the panel without signing in at the store. Optional: off, and the route answers 404. Only for a deployment with fake data: see "Enlaces de invitado para revisión". |
 
 Django refuses to start when a required variable is missing or has a value it
 cannot use, naming it. The test settings supply their own values for the
-`SUPABASE_*`, `STORE_ORIGIN`, `PANEL_*` and `DJANGO_COOKIE_*` variables, so the
-tests never depend on what `backend/.env` holds.
+`SUPABASE_*`, `STORE_ORIGIN`, `PANEL_*` and `DJANGO_COOKIE_*` variables and leave
+`REVIEW_INVITES_ENABLED` unset, so the tests never depend on what `backend/.env`
+holds.
 
 ## Common commands
 
@@ -213,6 +215,7 @@ to Supabase at the store and the store hands the session over (see
 | `POST /panel/salir/` | `panel:salir` | Ends the session and sends the person to the store login. Works for any session, behind Django's CSRF check. |
 | `GET /panel/` | `panel:inicio` | Landing page, admins only. Until the dashboard exists it forwards to the products. |
 | `GET /panel/mas/` | `panel:mas` | The "Más" page of the phone layout: Clientes, Publicidad, Ajustes and the sign-out. Admins only. |
+| `GET`, `POST /panel/invitado/<token>/` | `panel:invitado` | A review invite link: the GET shows a button and the POST opens the session. A 404 unless `REVIEW_INVITES_ENABLED` is on. See "Enlaces de invitado para revisión". |
 
 `/panel/sesion/` checks the following, in this order. Whatever fails, the
 browser gets the same plain 403 and the reason (never the token) goes to the
@@ -275,6 +278,120 @@ Behaviour worth knowing before touching it:
   `STORE_ORIGIN=http://localhost:3002`,
   `PANEL_ALLOWED_ORIGINS=http://localhost:3002` and
   `PANEL_TOKEN_MAX_AGE_SECONDS=300`.
+
+## Enlaces de invitado para revisión
+
+Un profesor de EBAC tiene que poder revisar el panel desplegado, y el panel solo se abre
+con el traspaso: alguien inicia sesión como administrador en la tienda. Darle a un
+revisor esa contraseña es dar la llave de todo. Un enlace de invitado resuelve otra cosa:
+abre **la misma sesión de panel que abre el traspaso**, para un usuario de Supabase
+concreto, sin contraseña y sin tocar datos reales, porque se usa en un entorno de
+demostración aparte (un proyecto de Supabase con datos falsos).
+
+Está **apagado** salvo que `REVIEW_INVITES_ENABLED` lo encienda. Apagado, la ruta
+`/panel/invitado/<token>/` responde 404 como si no existiera. Se enciende solo en el
+entorno de demostración: una invitación da permisos de administrador del panel, y en un
+entorno con datos reales eso sería abrir una puerta que nadie pidió.
+
+### El riesgo: un enlace es una llave al portador
+
+Quien tiene el enlace entra, y no hay una segunda comprobación. Todo el diseño sale de
+aceptar eso y de reducir lo que se puede perder con un enlace filtrado:
+
+| Decisión | Por qué |
+| --- | --- |
+| El token son 32 bytes aleatorios (`secrets.token_urlsafe(32)`, 256 bits) | No se puede adivinar ni probar uno por uno. |
+| La base guarda solo su SHA-256 (`token_hash`, único) | Quien lea la tabla (una copia de seguridad, un volcado de SQL, el admin) no puede reconstruir un enlace que funcione. Un hash simple basta porque el token ya es aleatorio: un hash lento sirve contra contraseñas que una persona eligió, y aquí no hay nada que adivinar. |
+| El token se muestra una sola vez | El comando lo imprime al emitirlo y no hay forma de recuperarlo. Si se pierde, se emite otro. |
+| Vence (`expires_at`, de 1 a 90 días) | Un enlace que se filtra deja de servir por sí solo. |
+| Se revoca (`revoked_at`) | Un enlace filtrado se mata sin esperar a que venza: acción «Revocar» del admin. |
+| Puede tener un límite de usos (`max_uses`) | Un enlace de un solo uso no sirve a quien lo encuentre después. |
+| La sesión dura lo de siempre (8 horas) y el panel lee el rol del usuario en cada petición | Quitarle el rol de administrador en Supabase corta el acceso aunque el enlace siga vivo. `panel_admin_required` no se tocó. |
+
+### Por qué la página usa POST
+
+Un GET tiene que ser seguro, es decir, no cambiar nada: los chats, los clientes de correo
+y los antivirus abren los enlaces por su cuenta para hacer una vista previa. Si el GET
+abriera la sesión, un bot la gastaría antes que la persona, y con `--max-uses 1` el
+profesor se encontraría un enlace usado. Por eso `GET /panel/invitado/<token>/` solo
+muestra una página con un botón («Entrar al panel»), sin abrir sesión ni contar nada, y
+es el `POST` que manda el botón, con el token CSRF de Django, el que entra.
+
+Ese POST, en este orden y dentro de una transacción con la fila de la invitación
+bloqueada (`select_for_update`, para que dos clics a la vez no se lleven el mismo último
+uso):
+
+1. Vuelve a validar el enlace: que exista, que no haya vencido, que no esté revocado y
+   que le queden usos.
+2. Obtiene o crea el usuario de Django con la misma regla del traspaso
+   (`get_or_create_panel_user_by_id`: el `username` es el id de Supabase, la contraseña
+   es inutilizable y no es staff). Si ese usuario está desactivado en Django, se rechaza.
+3. Cuenta el uso (`use_count`, `last_used_at`).
+4. Vacía la sesión que traía el navegador (`session.flush()`) y abre la del panel
+   (`open_panel_session`). Así la clave de sesión siempre es nueva, también cuando el
+   navegador ya traía una sesión de ese mismo usuario, que `login()` por sí solo
+   conservaría: quien haya plantado esa clave no la conserva (fijación de sesión).
+5. Redirige a `landing_path`, que se vuelve a validar (debe ser una ruta de este sitio:
+   empezar con una sola `/` y no llevar `\`, espacios ni caracteres de control, de modo
+   que `//evil.example` y `https://evil.example` no se aceptan nunca).
+
+Si algo falla al abrir la sesión, la transacción se deshace y no se gasta el uso.
+
+### Una sola respuesta para todo lo que no sirve
+
+Un token desconocido, vencido, revocado, agotado o de un usuario desactivado reciben la
+misma página («Enlace no válido o vencido»), con el mismo estado (404), el mismo cuerpo y
+las mismas cabeceras, tanto en el GET como en el POST. La razón concreta se escribe en el
+log del logger `panel` (nunca el token) y el navegador no la ve, así que la respuesta no
+sirve para averiguar si un token existió alguna vez.
+
+### Cabeceras
+
+La página lleva `Cache-Control: no-store`, `X-Robots-Tag: noindex, nofollow` (más el
+`<meta name="robots">`) y `Referrer-Policy: strict-origin`. No es `no-referrer`, aunque
+sea lo que se esperaría para una página con un secreto en la dirección: con `no-referrer`
+el navegador manda `Origin: null` en el POST del formulario, la comprobación CSRF de
+Django rechaza un origen nulo (ver "Panel session handoff") y el botón nunca
+funcionaría. Una prueba fija las dos cosas. `strict-origin` cumple el mismo propósito:
+manda solo el origen y nunca la ruta, así que el token no viaja en `Referer` a la página
+que sigue ni a nada que esta cargue.
+
+### Cómo se usa
+
+Desde `backend/`, en el entorno donde corre el panel y con `REVIEW_INVITES_ENABLED=true`:
+
+```bash
+uv run python manage.py issue_review_invite \
+  --supabase-user <uuid> --label "Profesora M15" --days 7 \
+  --max-uses 5 --landing /my-products/ --base-url https://carni-demo.onrender.com
+```
+
+| Opción | Qué hace |
+| --- | --- |
+| `--supabase-user` | UUID del usuario de Supabase con el que entra la persona. Debe ser administrador en esa base (`profiles.role = 'admin'`): si no, el comando se niega, porque el panel cerraría la sesión en el acto. |
+| `--label` | Para quién es el enlace. Se ve en el admin y en la página de confirmación. |
+| `--days` | Vigencia, de 1 a 90 días. |
+| `--max-uses` | Opcional. Cuántas veces se puede usar; sin ella, sin límite. |
+| `--landing` | Opcional. A dónde va la persona al entrar (`/panel/` por defecto). Una ruta de este sitio. |
+| `--base-url` | Origen público del panel. Debe ser `https`; `http` solo para `localhost`, porque el enlace es una llave y no debe viajar sin cifrar. |
+
+El comando imprime el enlace completo **una vez** (y avisa si `REVIEW_INVITES_ENABLED`
+está apagado, porque entonces el enlace respondería 404). Para revocarlo: `/admin/` →
+«Invitaciones de revisión» → seleccionar → «Revocar las invitaciones seleccionadas». El
+admin lista la etiqueta, el usuario, el vencimiento, si está revocada, los usos y el
+último uso; nunca muestra el token ni su huella, y no permite crear invitaciones desde
+ahí, porque un formulario no puede mostrar el enlace una sola vez.
+
+### Lo que este diseño no resuelve
+
+- El token va en la dirección. Queda en el historial del navegador de quien lo abre y, si
+  el servidor o un proxy guardan las rutas de cada petición, en esos registros. Por eso
+  `gunicorn` no se arranca con registro de accesos en la demostración. Lo que limita el
+  daño es el vencimiento, la revocación y el límite de usos.
+- Quien reenvía el enlace da acceso: es una llave al portador.
+- No hay límite de intentos por IP. Con 256 bits de token no hace falta.
+- `/my-products/` (práctica M15) solo pide haber iniciado sesión, y la sesión de una
+  invitación lo cumple, sea o no administrador el usuario.
 
 ## Panel frame
 
@@ -472,6 +589,12 @@ with raw SQL, the way Supabase does. It starts from the fixture
 `inventory/fixtures/categories.json`, the 9 real categories dumped with
 `dumpdata inventory.Category`. The `config.E001` system check only runs against
 Postgres; other databases have no `django` schema to verify.
+
+`panel/test_invites.py` covers the review invites: the model (only the hash is stored,
+the ways a link stops working, the landing path rules), the confirmation page and its
+headers, the redemption (the session of the handoff, key rotation, the role still read
+on every request, one use at a time, CSRF, nothing used up when the session fails), the
+one page every refusal gets, the admin and the command.
 
 `panel/test_frame.py` covers the frame: the Más page through the panel admin
 session, which entry of both navigations is current for every route of the

@@ -821,11 +821,18 @@ class PanelAccessTests(TestCase):
 
     def test_every_panel_route_is_guarded_unless_it_is_meant_to_be_public(self):
         # The way in (`sesion`), the bridge (`acceso`) and the way out (`salir`)
-        # have to work without being an admin. Anything else mounted under
-        # /panel/, whichever app declares it, has to be guarded or be added here
-        # on purpose. The walk starts at the root URLconf, so it reaches the
-        # products (`panel/productos/`) and not only the routes of the panel app.
-        public = {"panel/acceso/", "panel/sesion/", "panel/salir/"}
+        # have to work without being an admin, and so does the review invite
+        # (`invitado`): its whole job is to open a session for someone who has none,
+        # and it answers 404 unless REVIEW_INVITES_ENABLED is on. Anything else
+        # mounted under /panel/, whichever app declares it, has to be guarded or be
+        # added here on purpose. The walk starts at the root URLconf, so it reaches
+        # the products (`panel/productos/`) and not only the routes of the panel app.
+        public = {
+            "panel/acceso/",
+            "panel/sesion/",
+            "panel/salir/",
+            "panel/invitado/<str:token>/",
+        }
         panel_routes = {
             path: callback
             for path, callback in routes(get_resolver().url_patterns)

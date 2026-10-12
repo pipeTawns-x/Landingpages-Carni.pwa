@@ -12,4 +12,5 @@ urlpatterns = [
     path("sesion/", views.sesion, name="sesion"),
     path("salir/", views.salir, name="salir"),
     path("mas/", views.mas, name="mas"),
+    path("invitado/<str:token>/", views.invitado, name="invitado"),
 ]

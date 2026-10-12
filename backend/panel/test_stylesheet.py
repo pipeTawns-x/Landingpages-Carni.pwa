@@ -33,7 +33,14 @@ TEMPLATE_TAG = re.compile(r"\{%.*?%\}|\{\{.*?\}\}")
 
 # The templates of the panel whose classes `PageClassesTests` checks. The stylesheet is committed,
 # not built when the page is served, so a page may only use classes it already defines.
-PANEL_PAGES = ("panel/base.html", "panel/mas.html", "panel/messages.html")
+PANEL_PAGES = (
+    "panel/base.html",
+    "panel/mas.html",
+    "panel/messages.html",
+    "panel/invitado_base.html",
+    "panel/invitado.html",
+    "panel/invitado_invalido.html",
+)
 
 
 def custom_properties(css):

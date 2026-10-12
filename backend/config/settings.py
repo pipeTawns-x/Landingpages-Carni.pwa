@@ -209,6 +209,15 @@ PANEL_TOKEN_MAX_AGE_SECONDS = parse_positive_int(
     require_env("PANEL_TOKEN_MAX_AGE_SECONDS"), "PANEL_TOKEN_MAX_AGE_SECONDS"
 )
 
+# Review invite links: a reviewer opens the panel from a link instead of signing in at the
+# store (see "Enlaces de invitado para revisión" in backend/README.md). A link is a way into
+# the panel, so the feature is off unless the environment turns it on, and it belongs on a
+# deployment with fake data, never on one with real data. When it is off, the invite URL is
+# a 404.
+REVIEW_INVITES_ENABLED = parse_bool(
+    os.environ.get("REVIEW_INVITES_ENABLED"), "REVIEW_INVITES_ENABLED", default=False
+)
+
 # Session and CSRF cookies, and the Referrer-Policy header
 # https://docs.djangoproject.com/en/5.2/topics/security/
 #

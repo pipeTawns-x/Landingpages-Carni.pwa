@@ -1,25 +1,30 @@
-"""Views of the panel shell: the Supabase handoff, the way out, the bridge and the landing page."""
+"""Views of the panel shell: the Supabase handoff, the review invite, the way out, the bridge
+and the landing page."""
 
 import logging
 
 from django.conf import settings
 from django.contrib.auth import logout
-from django.http import HttpResponseForbidden
+from django.db import transaction
+from django.http import Http404, HttpResponseForbidden
 from django.shortcuts import redirect, render
+from django.urls import reverse
+from django.utils.cache import add_never_cache_headers
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.debug import sensitive_post_parameters
-from django.views.decorators.http import require_POST, require_safe
+from django.views.decorators.http import require_http_methods, require_POST, require_safe
 
 from panel import supabase_auth
 from panel.access import (
     PANEL_SESSION_KEY,
     get_or_create_panel_user,
+    get_or_create_panel_user_by_id,
     is_panel_admin,
     open_panel_session,
     panel_admin_required,
 )
-from panel.models import Profile
+from panel.models import Profile, ReviewInvite, is_valid_landing_path
 
 logger = logging.getLogger(__name__)
 
@@ -80,6 +85,104 @@ def sesion(request):
     open_panel_session(request, user)
     logger.info("Panel session opened for Supabase user %s.", verified.user_id)
     return redirect("panel:inicio")
+
+
+def _mark_private(response):
+    """Keep a response that belongs to an invite link out of caches, search engines and Referers.
+
+    The link is the secret, and it is in the address of the page. `Referrer-Policy` is
+    `strict-origin`, which sends the origin and never the path, so the token does not travel
+    in a `Referer` header to the page that follows or to anything this one loads. It is not
+    `no-referrer`, although that would keep even the origin back: with `no-referrer` a browser
+    sends `Origin: null` on the form POST, Django refuses a null origin, and the button would
+    never work (see "Panel session handoff" in backend/README.md).
+    """
+    response["Referrer-Policy"] = "strict-origin"
+    response["X-Robots-Tag"] = "noindex, nofollow"
+    add_never_cache_headers(response)
+    return response
+
+
+def _refuse_invite(request, reason, invite=None):
+    """Answer a link that cannot be used: one page, one status, whatever the reason was.
+
+    As with the handoff, the reason goes to the server log (never the token) and the browser
+    cannot tell an unknown link from an expired, a revoked or a used up one.
+    """
+    detail = f" (invite {invite.pk})" if invite is not None else ""
+    logger.warning("Review invite refused: %s%s.", reason, detail)
+    return render(request, "panel/invitado_invalido.html", status=404)
+
+
+def _show_invite(request, token):
+    """Show the page that asks for a click. Nothing is opened, counted or created here."""
+    invite = ReviewInvite.find(token)
+    reason = "unknown" if invite is None else invite.refusal_reason()
+    if reason:
+        return _refuse_invite(request, reason, invite)
+    return render(request, "panel/invitado.html", {"invite": invite})
+
+
+def _redeem_invite(request, token):
+    """Use the link: count the use and open the panel session of the user it is for.
+
+    Everything happens in one transaction with the invite row locked, so the last use of a
+    link goes to one person even when two click at once, and a failure while opening the
+    session does not burn a use.
+    """
+    with transaction.atomic():
+        invite = ReviewInvite.find(token, for_update=True)
+        reason = "unknown" if invite is None else invite.refusal_reason()
+        if reason:
+            return _refuse_invite(request, reason, invite)
+
+        user = get_or_create_panel_user_by_id(invite.supabase_user_id)
+        if not user.is_active:
+            # Panel access can be revoked by deactivating the user, link or no link.
+            return _refuse_invite(request, "inactive_user", invite)
+
+        invite.record_use()
+        # Nothing the browser carried survives: not even a session of this same user, whose
+        # key `login()` would keep. So whoever planted a key cannot keep it.
+        request.session.flush()
+        open_panel_session(request, user)
+
+        # The model refuses a landing path that leaves the site, but a row can come from
+        # elsewhere (SQL, bulk_create), so the redirect checks it again.
+        landing = invite.landing_path
+        if not is_valid_landing_path(landing):
+            landing = reverse("panel:inicio")
+
+    logger.info(
+        "Review invite %s opened a panel session for Supabase user %s.",
+        invite.pk,
+        invite.supabase_user_id,
+    )
+    return redirect(landing)
+
+
+# Like `sesion`, this view is a way in, so it cannot ask for a signed-in user. What stands in
+# for one: a token that is looked up by its hash and that expires, can be revoked and can run
+# out of uses; Django's CSRF check on the POST; and the server-side validation of every step
+# (the page that asks for the click never changes anything). It answers 404 unless the
+# environment turns it on.
+@require_http_methods(["GET", "HEAD", "POST"])
+def invitado(request, token):
+    """The review invite: a link that opens the panel for a reviewer who has no password.
+
+    A GET only shows a page with a button, and never opens a session: a chat or a mail
+    scanner that opens the link for a preview must not be able to use it. The POST behind
+    the button, which carries Django's CSRF token, validates the link again, counts the use
+    and opens the same session the Supabase handoff opens. From then on the panel works as
+    for any admin, reading the role of that user on every request.
+
+    With `REVIEW_INVITES_ENABLED` off, the route answers 404 as if it did not exist.
+    """
+    if not settings.REVIEW_INVITES_ENABLED:
+        raise Http404("Review invites are off.")
+
+    handler = _redeem_invite if request.method == "POST" else _show_invite
+    return _mark_private(handler(request, token))
 
 
 # Not behind `panel_admin_required` on purpose: whoever has a session has to be

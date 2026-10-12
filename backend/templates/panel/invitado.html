@@ -1,0 +1,38 @@
+{% extends "panel/invitado_base.html" %}
+{% comment %}
+  The page a valid review invite link opens (GET /panel/invitado/<token>/, panel:invitado). It only
+  asks for a click: the button is a POST form with Django's CSRF token, and that POST is what opens
+  the session. A bot that follows the link (a chat preview, a mail scanner) sees this page and
+  nothing happens. The form has no action, so it posts to the address of the page and the token is
+  not repeated in the HTML.
+
+  Context of the view: invite (the ReviewInvite: its label and its expiry are shown).
+{% endcomment %}
+{% block contenido %}
+<section aria-labelledby="invitado-titulo" class="flex flex-col gap-5 rounded-card border border-border bg-surface-1 p-5">
+  <div class="flex flex-col gap-2">
+    <p class="text-meta text-text-muted">Carnicería El Señor de La Misericordia</p>
+    <h1 id="invitado-titulo" class="font-display text-titulo font-medium">Revisión del panel</h1>
+  </div>
+
+  <p class="text-ui">Te invitaron a revisar el panel de la tienda. Al continuar se abre una sesión de revisión en este navegador, con los permisos de un administrador del panel.</p>
+
+  <dl class="flex flex-col gap-3 border-t border-border pt-5 text-ui">
+    <div class="flex items-baseline justify-between gap-4">
+      <dt class="text-text-muted">Invitación</dt>
+      <dd class="min-w-0 text-right font-semibold">{{ invite.label }}</dd>
+    </div>
+    <div class="flex items-baseline justify-between gap-4">
+      <dt class="text-text-muted">Vence</dt>
+      <dd class="text-right font-semibold tabular-nums">{{ invite.expires_at|date:"DATETIME_FORMAT"|lower }}</dd>
+    </div>
+  </dl>
+
+  <form method="post" class="flex flex-col">
+    {% csrf_token %}
+    <button type="submit" class="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-pill bg-red px-6 text-ui font-semibold text-white transition-[background-color,scale] duration-160 ease-out-strong hover:bg-red-hover active:scale-[0.97] motion-reduce:transition-none">Entrar al panel</button>
+  </form>
+
+  <p class="text-meta text-text-muted">Este enlace es personal: no lo compartas. Puede vencer o revocarse en cualquier momento.</p>
+</section>
+{% endblock %}

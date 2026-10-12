@@ -27,6 +27,9 @@ os.environ["PANEL_TOKEN_MAX_AGE_SECONDS"] = "300"
 os.environ["DJANGO_COOKIE_SECURE"] = "False"
 os.environ["DJANGO_COOKIE_HTTPONLY"] = "True"
 os.environ["DJANGO_COOKIE_SAMESITE"] = "Lax"
+# The review invites stay off unless a test turns them on. An empty value is the "unset" case, so
+# the tests see the default whatever backend/.env says.
+os.environ["REVIEW_INVITES_ENABLED"] = ""
 
 from .settings import *  # noqa: E402, F403
 
