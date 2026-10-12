@@ -451,7 +451,6 @@ ellas: se cambian en la pestaña Environment del servicio.
 | Variable | Valor |
 | --- | --- |
 | `PYTHON_VERSION` | `3.12.11`, el de `backend/.python-version`. Render exige la versión completa y la variable manda sobre `.python-version`; su documentación habla de ese archivo en la raíz del repo y no dice si lo lee dentro de `rootDir`, así que no se depende de él. |
-| `UV_PYTHON_PREFERENCE` | `only-system`: `uv` usa el Python que Render instala y, si no lo encuentra, el build falla en voz alta en lugar de descargar por su cuenta otro intérprete que quizá no llegue intacto al arranque. |
 | `DJANGO_BEHIND_PROXY` | `true`: ver "Detrás del proxy de Render". |
 | `PGSSLMODE` | `require`: la conexión a Postgres tiene que ir cifrada con TLS, o no se establece. Ver "La base de datos". |
 | `PANEL_TOKEN_MAX_AGE_SECONDS` | `300`, como en local. |
@@ -631,8 +630,12 @@ usa el almacenamiento simple y deja fuera a WhiteNoise.
 - Que `uv run` funcione como comando de arranque en Render: su documentación describe `uv` para
   el build y no menciona `uv run` al arrancar. Si falla, usa
   `.venv/bin/gunicorn config.wsgi:application --bind 0.0.0.0:$PORT`.
-- Que Render ponga su Python en el `PATH` que ve `uv` (lo que `UV_PYTHON_PREFERENCE=only-system`
-  necesita) y que `.venv/` llegue intacto del build al arranque.
+- Que `.venv/` llegue intacto del build al arranque.
+
+Lo que el primer despliegue enseñó: Render define por su cuenta `UV_NO_MANAGED_PYTHON`, que obliga
+a `uv` a usar el Python que Render instala. Si además se define `UV_PYTHON_PREFERENCE`, `uv` se
+niega a arrancar ("cannot be used with `--python-preference`") y el build falla en un segundo. Por
+eso el Blueprint no la declara, y una prueba lo fija.
 - Que el proxy de Render mande `X-Forwarded-Proto: https` en cada petición. Si no lo hiciera,
   el síntoma sería un 403 de CSRF en todos los POST, y la salida es
   `DJANGO_CSRF_TRUSTED_ORIGINS=https://<hostname del servicio>`: con el origen en esa lista, la

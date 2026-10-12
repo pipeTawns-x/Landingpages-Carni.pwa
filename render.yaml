@@ -28,10 +28,10 @@ services:
     startCommand: uv run --frozen --no-dev gunicorn config.wsgi:application --bind 0.0.0.0:$PORT
     envVars:
       # Plain values: neither secret nor specific to one environment.
+      # No UV_PYTHON_PREFERENCE: Render already sets UV_NO_MANAGED_PYTHON (uv only uses the
+      # Python Render installs), and uv refuses to start when both are set.
       - key: PYTHON_VERSION
         value: 3.12.11
-      - key: UV_PYTHON_PREFERENCE
-        value: only-system
       - key: DJANGO_BEHIND_PROXY
         value: "true"
       # libpq reads this one: the connection to the Supabase pooler is TLS or it does not happen.

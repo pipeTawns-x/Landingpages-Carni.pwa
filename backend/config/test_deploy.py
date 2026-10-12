@@ -441,12 +441,16 @@ class BlueprintTests(SimpleTestCase):
             plain,
             {
                 "PYTHON_VERSION": python_version,
-                "UV_PYTHON_PREFERENCE": "only-system",
                 "DJANGO_BEHIND_PROXY": "true",
                 "PGSSLMODE": "require",
                 "PANEL_TOKEN_MAX_AGE_SECONDS": "300",
             },
         )
+
+    def test_uv_is_not_told_which_python_to_prefer(self):
+        # Render sets UV_NO_MANAGED_PYTHON on its own, and uv exits with "cannot be used with
+        # --python-preference" when UV_PYTHON_PREFERENCE is set too: the first deploy failed so.
+        self.assertNotIn("UV_PYTHON_PREFERENCE", self.by_key)
 
     def test_the_database_connection_is_forced_to_tls(self):
         # libpq reads PGSSLMODE when the connection does not say otherwise, so the settings must
