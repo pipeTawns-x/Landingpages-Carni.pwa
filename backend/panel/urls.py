@@ -13,4 +13,5 @@ urlpatterns = [
     path("salir/", views.salir, name="salir"),
     path("mas/", views.mas, name="mas"),
     path("invitado/<str:token>/", views.invitado, name="invitado"),
+    path("invitado/<str:token>", views.invitado_sin_barra, name="invitado_sin_barra"),
 ]

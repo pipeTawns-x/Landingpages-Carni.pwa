@@ -25,10 +25,10 @@ from django.utils import timezone
 from django.utils.formats import date_format
 from django.utils.timezone import localtime
 
-from panel.access import PANEL_SESSION_KEY
+from panel.access import PANEL_INVITE_SESSION_KEY, PANEL_SESSION_KEY
 from panel.admin import ReviewInviteAdmin
 from panel.models import ReviewInvite, hash_token, is_valid_landing_path
-from panel.tests import insert_profile
+from panel.tests import hand_off, insert_profile
 
 GENERIC_PAGE = "Enlace no válido o vencido"
 
@@ -235,11 +235,44 @@ class FlagTests(TestCase):
         self.assertFalse(has_session(self.client))
         self.assertEqual(get_user_model().objects.count(), 0)
 
+    def test_with_the_flag_off_every_method_answers_404_and_none_answers_405(self):
+        # The method check must not run before the flag: a 405 would say the route exists.
+        _invite, token = issue()
+        url = invite_url(token)
+
+        for method in ("get", "head", "post", "put", "patch", "delete", "options", "trace"):
+            with self.subTest(method=method):
+                self.assertEqual(getattr(self.client, method)(url).status_code, 404)
+
+    def test_with_the_flag_off_the_link_without_its_closing_slash_is_a_404_and_not_a_redirect(self):
+        # A redirect to the slash form would say the route exists.
+        _invite, token = issue()
+        url = invite_url(token).rstrip("/")
+
+        for method in ("get", "head", "post", "put"):
+            with self.subTest(method=method):
+                response = getattr(self.client, method)(url)
+                self.assertEqual(response.status_code, 404)
+                self.assertNotIn("Location", response)
+
     @override_settings(REVIEW_INVITES_ENABLED=True)
     def test_with_the_flag_on_the_same_url_works(self):
         _invite, token = issue()
 
         self.assertEqual(self.client.get(invite_url(token)).status_code, 200)
+
+    @override_settings(REVIEW_INVITES_ENABLED=True)
+    def test_with_the_flag_on_the_link_without_its_closing_slash_goes_to_the_one_with_it(self):
+        _invite, token = issue()
+
+        response = self.client.get(invite_url(token).rstrip("/"))
+
+        self.assertRedirects(
+            response, invite_url(token), status_code=301, fetch_redirect_response=False
+        )
+        # The Location header holds the token, so the redirect is as private as the page.
+        self.assertEqual(response["Referrer-Policy"], "strict-origin")
+        self.assertIn("no-store", response["Cache-Control"])
 
     def test_the_route_is_always_mounted_and_it_is_the_flag_that_answers(self):
         self.assertEqual(invite_url("abc"), "/panel/invitado/abc/")
@@ -539,16 +572,27 @@ class RedemptionTests(TestCase):
         self.assertRedirects(response, reverse("panel:acceso"), fetch_redirect_response=False)
         self.assertFalse(has_session(self.client))
 
-    def test_an_invite_for_someone_who_is_not_an_admin_opens_nothing_the_panel_accepts(self):
-        customer = uuid.uuid4()
-        insert_profile(customer, "customer")
-        _invite, token = issue(supabase_user_id=customer)
+    def test_the_session_remembers_which_invite_opened_it(self):
+        self.redeem()
 
-        self.redeem(url=invite_url(token))
-        response = self.client.get(reverse("panel:inicio"))
+        self.assertEqual(self.client.session[PANEL_INVITE_SESSION_KEY], self.invite.pk)
 
-        self.assertRedirects(response, reverse("panel:acceso"), fetch_redirect_response=False)
-        self.assertFalse(has_session(self.client))
+    def test_a_session_of_the_supabase_handoff_carries_no_invite(self):
+        client = Client()
+
+        hand_off(client, self.admin_id)
+
+        self.assertIn(PANEL_SESSION_KEY, client.session)
+        self.assertNotIn(PANEL_INVITE_SESSION_KEY, client.session)
+
+    def test_a_handoff_after_an_invite_session_of_the_same_user_drops_the_invite(self):
+        # login() keeps the data of a session that is already this user's.
+        self.redeem()
+
+        hand_off(self.client, self.admin_id)
+
+        self.assertIn(PANEL_SESSION_KEY, self.client.session)
+        self.assertNotIn(PANEL_INVITE_SESSION_KEY, self.client.session)
 
     # who is refused
 
@@ -562,6 +606,59 @@ class RedemptionTests(TestCase):
         self.assertFalse(has_session(self.client))
         self.invite.refresh_from_db()
         self.assertEqual(self.invite.use_count, 0)
+
+    def not_admins(self):
+        """One invite per kind of target that is no panel admin: (name, invite, token, user id)."""
+        customer, nobody, demoted = uuid.uuid4(), uuid.uuid4(), uuid.uuid4()
+        insert_profile(customer, "customer")
+        insert_profile(demoted, "admin")
+        cases = [
+            ("customer", customer),
+            ("no profile", nobody),
+            ("demoted after the invite was issued", demoted),
+        ]
+        issued = [(name, *issue(supabase_user_id=user_id), user_id) for name, user_id in cases]
+        with connection.cursor() as cursor:
+            cursor.execute("UPDATE profiles SET role = 'customer' WHERE id = %s", [demoted.hex])
+        return issued
+
+    def test_a_target_who_is_not_a_panel_admin_is_refused_and_nothing_is_used_up(self):
+        for name, invite, token, user_id in self.not_admins():
+            with self.subTest(target=name):
+                client = Client()
+
+                response = self.redeem(client, invite_url(token))
+
+                self.assertEqual(response.status_code, 404)
+                self.assertContains(response, GENERIC_PAGE, status_code=404)
+                self.assertFalse(has_session(client))
+                invite.refresh_from_db()
+                self.assertEqual(invite.use_count, 0)
+                self.assertIsNone(invite.last_used_at)
+                self.assertFalse(get_user_model().objects.filter(username=str(user_id)).exists())
+
+    def test_a_refused_target_does_not_use_up_the_last_use_of_a_limited_invite(self):
+        customer = uuid.uuid4()
+        insert_profile(customer, "customer")
+        _invite, token = issue(supabase_user_id=customer, max_uses=1)
+
+        self.redeem(Client(), invite_url(token))
+
+        invite = ReviewInvite.objects.get(token_hash=hash_token(token))
+        self.assertIsNone(invite.refusal_reason())
+
+    def test_the_refusal_of_a_target_who_is_not_an_admin_is_logged_with_its_reason(self):
+        customer = uuid.uuid4()
+        insert_profile(customer, "customer")
+        invite, token = issue(supabase_user_id=customer)
+
+        with self.assertLogs("panel", level="WARNING") as logs:
+            self.redeem(Client(), invite_url(token))
+
+        output = "\n".join(logs.output)
+        self.assertIn("not_admin", output)
+        self.assertIn(f"invite {invite.pk}", output)
+        self.assertNotIn(token, output)
 
     def test_a_limit_of_one_use_lets_the_first_in_and_refuses_the_second(self):
         _invite, token = issue(supabase_user_id=self.admin_id, max_uses=1)
@@ -661,6 +758,100 @@ class RedemptionTests(TestCase):
 
         self.assertEqual(response.status_code, 403)
         self.assertNotEqual(client.get(self.url)["Referrer-Policy"], "no-referrer")
+
+
+@override_settings(REVIEW_INVITES_ENABLED=True)
+class InviteSessionLifetimeTests(TestCase):
+    """A session an invite opened lasts as long as the invite does, not as long as the cookie."""
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.admin_id = uuid.uuid4()
+        insert_profile(cls.admin_id, "admin")
+
+    def setUp(self):
+        self.invite, self.token = issue(supabase_user_id=self.admin_id)
+        self.client.post(invite_url(self.token))
+
+    def assert_panel_open(self, client=None):
+        response = (client or self.client).get(reverse("panel:inicio"))
+        self.assertRedirects(response, reverse("inventory:list"), fetch_redirect_response=False)
+
+    def assert_panel_closed(self, client=None):
+        client = client or self.client
+        response = client.get(reverse("panel:inicio"))
+        self.assertRedirects(response, reverse("panel:acceso"), fetch_redirect_response=False)
+        self.assertFalse(has_session(client))
+
+    def test_the_session_works_while_the_invite_is_alive(self):
+        self.assert_panel_open()
+        self.assert_panel_open()
+
+    def test_revoking_the_invite_ends_the_session_it_already_opened(self):
+        ReviewInvite.objects.filter(pk=self.invite.pk).update(revoked_at=timezone.now())
+
+        self.assert_panel_closed()
+
+    def test_the_invite_expiring_ends_the_session_it_already_opened(self):
+        past = timezone.now() - timedelta(seconds=1)
+        ReviewInvite.objects.filter(pk=self.invite.pk).update(expires_at=past)
+
+        self.assert_panel_closed()
+
+    def test_deleting_the_invite_ends_the_session_it_opened(self):
+        ReviewInvite.objects.filter(pk=self.invite.pk).delete()
+
+        self.assert_panel_closed()
+
+    def test_a_session_that_ends_this_way_stays_ended(self):
+        ReviewInvite.objects.filter(pk=self.invite.pk).update(revoked_at=timezone.now())
+        self.assert_panel_closed()
+
+        # Un-revoking it does not bring back a session that was closed.
+        ReviewInvite.objects.filter(pk=self.invite.pk).update(revoked_at=None)
+
+        self.assert_panel_closed()
+
+    def test_the_bridge_does_not_wave_a_revoked_session_through(self):
+        ReviewInvite.objects.filter(pk=self.invite.pk).update(revoked_at=timezone.now())
+
+        response = self.client.get(reverse("panel:acceso"))
+
+        self.assertRedirects(response, settings.STORE_LOGIN_URL, fetch_redirect_response=False)
+
+    def test_running_out_of_uses_does_not_end_the_session_that_took_the_last_one(self):
+        _invite, token = issue(supabase_user_id=self.admin_id, max_uses=1)
+        client = Client()
+        self.assertEqual(client.post(invite_url(token)).status_code, 302)
+
+        self.assert_panel_open(client)
+
+    def test_revoking_another_invite_leaves_this_session_alone(self):
+        other, _token = issue(supabase_user_id=self.admin_id)
+        ReviewInvite.objects.filter(pk=other.pk).update(revoked_at=timezone.now())
+
+        self.assert_panel_open()
+
+    def test_revoking_an_invite_leaves_a_handoff_session_of_the_same_user_alone(self):
+        client = Client()
+        hand_off(client, self.admin_id)
+        ReviewInvite.objects.filter(pk=self.invite.pk).update(revoked_at=timezone.now())
+
+        self.assert_panel_open(client)
+
+    def test_a_handoff_after_the_invite_session_is_not_tied_to_the_invite(self):
+        hand_off(self.client, self.admin_id)
+        ReviewInvite.objects.filter(pk=self.invite.pk).update(revoked_at=timezone.now())
+
+        self.assert_panel_open()
+
+    def test_signing_out_still_works_for_a_session_whose_invite_was_revoked(self):
+        ReviewInvite.objects.filter(pk=self.invite.pk).update(revoked_at=timezone.now())
+
+        response = self.client.post(reverse("panel:salir"))
+
+        self.assertRedirects(response, settings.STORE_LOGIN_URL, fetch_redirect_response=False)
+        self.assertFalse(has_session(self.client))
 
 
 class ReviewInviteAdminTests(TestCase):

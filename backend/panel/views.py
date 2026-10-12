@@ -2,6 +2,7 @@
 and the landing page."""
 
 import logging
+from functools import wraps
 
 from django.conf import settings
 from django.contrib.auth import logout
@@ -136,6 +137,11 @@ def _redeem_invite(request, token):
         if reason:
             return _refuse_invite(request, reason, invite)
 
+        # The same check the handoff makes, before anything is created or counted: a user who
+        # lost the admin role after the invite was issued gets neither a use nor a Django user.
+        if not Profile.is_admin(invite.supabase_user_id):
+            return _refuse_invite(request, "not_admin", invite)
+
         user = get_or_create_panel_user_by_id(invite.supabase_user_id)
         if not user.is_active:
             # Panel access can be revoked by deactivating the user, link or no link.
@@ -145,7 +151,7 @@ def _redeem_invite(request, token):
         # Nothing the browser carried survives: not even a session of this same user, whose
         # key `login()` would keep. So whoever planted a key cannot keep it.
         request.session.flush()
-        open_panel_session(request, user)
+        open_panel_session(request, user, invite=invite)
 
         # The model refuses a landing path that leaves the site, but a row can come from
         # elsewhere (SQL, bulk_create), so the redirect checks it again.
@@ -161,11 +167,28 @@ def _redeem_invite(request, token):
     return redirect(landing)
 
 
+def _only_with_review_invites(view):
+    """Answer 404 to anything at all, whatever the method, unless review invites are on.
+
+    It has to be the outermost wrapper of the view: a method check that ran first would answer
+    405 and say that the route exists.
+    """
+
+    @wraps(view)
+    def wrapper(request, *args, **kwargs):
+        if not settings.REVIEW_INVITES_ENABLED:
+            raise Http404("Review invites are off.")
+        return view(request, *args, **kwargs)
+
+    return wrapper
+
+
 # Like `sesion`, this view is a way in, so it cannot ask for a signed-in user. What stands in
-# for one: a token that is looked up by its hash and that expires, can be revoked and can run
-# out of uses; Django's CSRF check on the POST; and the server-side validation of every step
+# for one: a random token that is looked up by its hash and that expires, can be revoked and can
+# run out of uses; Django's CSRF check on the POST; and the server-side validation of every step
 # (the page that asks for the click never changes anything). It answers 404 unless the
 # environment turns it on.
+@_only_with_review_invites
 @require_http_methods(["GET", "HEAD", "POST"])
 def invitado(request, token):
     """The review invite: a link that opens the panel for a reviewer who has no password.
@@ -174,15 +197,22 @@ def invitado(request, token):
     scanner that opens the link for a preview must not be able to use it. The POST behind
     the button, which carries Django's CSRF token, validates the link again, counts the use
     and opens the same session the Supabase handoff opens. From then on the panel works as
-    for any admin, reading the role of that user on every request.
+    for any admin, reading the role of that user on every request, and the session ends with
+    the invite if it is revoked or expires.
 
     With `REVIEW_INVITES_ENABLED` off, the route answers 404 as if it did not exist.
     """
-    if not settings.REVIEW_INVITES_ENABLED:
-        raise Http404("Review invites are off.")
-
     handler = _redeem_invite if request.method == "POST" else _show_invite
     return _mark_private(handler(request, token))
+
+
+# The link as someone may type or paste it, without its closing slash. Django's own
+# APPEND_SLASH redirect would do the same, but it also answers a redirect with the flag off,
+# and a redirect says that the route exists. A route of its own lets the flag answer first.
+@_only_with_review_invites
+def invitado_sin_barra(request, token):
+    """Send the link without its closing slash to the one with it. A 404 with the flag off."""
+    return _mark_private(redirect(request.get_full_path(force_append_slash=True), permanent=True))
 
 
 # Not behind `panel_admin_required` on purpose: whoever has a session has to be

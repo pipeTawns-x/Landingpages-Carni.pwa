@@ -284,22 +284,33 @@ CSRF_TRUSTED_ORIGINS = parse_optional_origins(
 
 # The panel logs why it refused a handoff (never the token) so the reason can
 # be found on the server while the browser only gets a generic refusal.
+#
+# The console handler also redacts the token of a review invite link, which sits in the path:
+# a 500 on /panel/invitado/<token>/ is logged by `django.request` with that path.
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
     "formatters": {
         "plain": {"format": "%(levelname)s %(name)s: %(message)s"},
     },
+    "filters": {
+        "redact_invite_token": {"()": "config.logging_filters.RedactInviteToken"},
+    },
     "handlers": {
-        "console": {"class": "logging.StreamHandler", "formatter": "plain"},
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "plain",
+            "filters": ["redact_invite_token"],
+        },
     },
     "loggers": {
         "panel": {"handlers": ["console"], "level": "INFO"},
         # A server error and its traceback. Django writes them to the console only with DEBUG on
         # and mails them to ADMINS otherwise, so on a host that shows the output of the process
         # (Render) they would vanish. Only errors: a 404 is logged as a warning with its path, and
-        # the path of a review invite holds its token. `propagate` is off so that, with DEBUG on,
-        # Django's own console handler does not repeat them.
+        # the path of a review invite holds its token (the filter above covers the errors that do
+        # get through). `propagate` is off so that, with DEBUG on, Django's own console handler
+        # does not repeat them.
         "django.request": {"handlers": ["console"], "level": "ERROR", "propagate": False},
     },
 }

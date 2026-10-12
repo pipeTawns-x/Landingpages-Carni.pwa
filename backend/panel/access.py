@@ -15,12 +15,16 @@ from django.contrib.auth import get_user_model, login, logout
 from django.contrib.auth.hashers import make_password
 from django.shortcuts import redirect
 
-from panel.models import Profile
+from panel.models import Profile, ReviewInvite
 from panel.supabase_auth import VerifiedToken
 
 # Written to the session by the handoff. Its value is the Supabase user id, the
 # same text as the username of the Django user the session belongs to.
 PANEL_SESSION_KEY = "panel_supabase_user_id"
+
+# Written next to it when a review invite opened the session. Its value is the id of that
+# invite, so the session can be tied to the invite for as long as it lasts.
+PANEL_INVITE_SESSION_KEY = "panel_invite_id"
 
 
 def get_or_create_panel_user_by_id(supabase_user_id: uuid.UUID, email: str = ""):
@@ -61,10 +65,20 @@ def get_or_create_panel_user(verified: VerifiedToken):
     return get_or_create_panel_user_by_id(verified.user_id, verified.email)
 
 
-def open_panel_session(request, user) -> None:
-    """Log `user` in and mark the session as one that came from a Supabase handoff."""
+def open_panel_session(request, user, invite=None) -> None:
+    """Log `user` in and mark the session as one that came from a Supabase handoff.
+
+    A session that a review invite opened also remembers that invite, and lasts only as long as
+    it does (see `is_panel_admin`). Any other one forgets it: `login()` keeps the data of a
+    session that already belongs to this user, so an old mark would otherwise tie a session of
+    the handoff to an invite it has nothing to do with.
+    """
     login(request, user)
     request.session[PANEL_SESSION_KEY] = user.get_username()
+    if invite is None:
+        request.session.pop(PANEL_INVITE_SESSION_KEY, None)
+    else:
+        request.session[PANEL_INVITE_SESSION_KEY] = invite.pk
 
 
 def is_panel_admin(request) -> bool:
@@ -74,6 +88,11 @@ def is_panel_admin(request) -> bool:
     user has to be an admin in Supabase right now: the role is read on every
     request, so taking it away there ends the access at once and not when the
     session expires.
+
+    A session that a review invite opened has one more condition: the invite
+    has to be alive still, not revoked and not expired. Without it, revoking a
+    link that leaked would stop new visitors and leave in whoever was already
+    in, for up to the eight hours of the session.
     """
     user = request.user
     if not (user.is_authenticated and user.is_active):
@@ -81,6 +100,11 @@ def is_panel_admin(request) -> bool:
 
     marker = request.session.get(PANEL_SESSION_KEY)
     if marker != user.get_username():
+        return False
+
+    if PANEL_INVITE_SESSION_KEY in request.session and not ReviewInvite.allows_session(
+        request.session[PANEL_INVITE_SESSION_KEY]
+    ):
         return False
 
     try:
@@ -94,9 +118,10 @@ def panel_admin_required(view):
     """Send everyone but a handed-off admin to the access bridge instead of running `view`.
 
     A session that came from a handoff and no longer qualifies (the admin was
-    demoted in Supabase, or deactivated here) is closed on the spot instead of
-    being left open. A session that never came from one, such as a staff member
-    of the Django admin site, is left alone: it is just not a panel session.
+    demoted in Supabase, deactivated here, or the invite that opened it was
+    revoked or expired) is closed on the spot instead of being left open. A
+    session that never came from one, such as a staff member of the Django
+    admin site, is left alone: it is just not a panel session.
 
     The wrapper carries `panel_admin_required = True` so a test can tell which
     panel routes are guarded and fail when a new one is not.

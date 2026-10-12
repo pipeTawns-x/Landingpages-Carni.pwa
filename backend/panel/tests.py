@@ -832,6 +832,7 @@ class PanelAccessTests(TestCase):
             "panel/sesion/",
             "panel/salir/",
             "panel/invitado/<str:token>/",
+            "panel/invitado/<str:token>",
         }
         panel_routes = {
             path: callback

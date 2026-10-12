@@ -51,7 +51,7 @@ uv run python -c "from django.core.management.utils import get_random_secret_key
 | `DJANGO_COOKIE_SAMESITE` | `Lax` or `None` (which needs `Secure`). Optional: `Lax`. `Strict` is refused because it would break the panel handoff. |
 | `DJANGO_BEHIND_PROXY` | `True`/`False`. Trust the `X-Forwarded-Proto` header that a proxy sets (`SECURE_PROXY_SSL_HEADER`). Optional: off. Turn it on only behind a proxy that ends TLS, such as Render: see "Despliegue del entorno de revisión (demo)". |
 | `DJANGO_CSRF_TRUSTED_ORIGINS` | Comma-separated origins, besides the host itself, that may post a form (`CSRF_TRUSTED_ORIGINS`). Optional: none. |
-| `REVIEW_INVITES_ENABLED` | `True`/`False`. Turns on the review invite links (`/panel/invitado/<token>/`), which open the panel without signing in at the store. Optional: off, and the route answers 404. Only for a deployment with fake data: see "Enlaces de invitado para revisión". |
+| `REVIEW_INVITES_ENABLED` | `True`/`False`. Turns on the review invite links (`/panel/invitado/<token>/`), which open the panel without signing in at the store. Optional: off, and every request to the route answers 404, whatever its method. Only for a deployment with fake data: see "Enlaces de invitado para revisión". |
 
 Django refuses to start when a required variable is missing or has a value it
 cannot use, naming it. The test settings supply their own values for the
@@ -217,7 +217,7 @@ to Supabase at the store and the store hands the session over (see
 | `POST /panel/salir/` | `panel:salir` | Ends the session and sends the person to the store login. Works for any session, behind Django's CSRF check. |
 | `GET /panel/` | `panel:inicio` | Landing page, admins only. Until the dashboard exists it forwards to the products. |
 | `GET /panel/mas/` | `panel:mas` | The "Más" page of the phone layout: Clientes, Publicidad, Ajustes and the sign-out. Admins only. |
-| `GET`, `POST /panel/invitado/<token>/` | `panel:invitado` | A review invite link: the GET shows a button and the POST opens the session. A 404 unless `REVIEW_INVITES_ENABLED` is on. See "Enlaces de invitado para revisión". |
+| `GET`, `POST /panel/invitado/<token>/` | `panel:invitado` | A review invite link: the GET shows a button and the POST opens the session. A 404 for every method, and for the link without its closing slash, unless `REVIEW_INVITES_ENABLED` is on. See "Enlaces de invitado para revisión". |
 
 `/panel/sesion/` checks the following, in this order. Whatever fails, the
 browser gets the same plain 403 and the reason (never the token) goes to the
@@ -291,14 +291,23 @@ concreto, sin contraseña y sin tocar datos reales, porque se usa en un entorno 
 demostración aparte (un proyecto de Supabase con datos falsos).
 
 Está **apagado** salvo que `REVIEW_INVITES_ENABLED` lo encienda. Apagado, la ruta
-`/panel/invitado/<token>/` responde 404 como si no existiera. Se enciende solo en el
-entorno de demostración: una invitación da permisos de administrador del panel, y en un
-entorno con datos reales eso sería abrir una puerta que nadie pidió.
+`/panel/invitado/<token>/` responde 404 como si no existiera, y eso vale para **todo**:
+cualquier método (`GET`, `POST`, `PUT`, `OPTIONS`...) y también el enlace sin la barra final,
+que Django, por su cuenta, redirigiría con un 301 a la versión con barra. Un 405 o un 301
+dirían que la ruta existe, así que la bandera se comprueba antes que el método y la ruta sin
+barra tiene vista propia (`invitado_sin_barra`). Se enciende solo en el entorno de
+demostración: una invitación da permisos de administrador del panel, y en un entorno con
+datos reales eso sería abrir una puerta que nadie pidió.
 
 ### El riesgo: un enlace es una llave al portador
 
 Quien tiene el enlace entra, y no hay una segunda comprobación. Todo el diseño sale de
-aceptar eso y de reducir lo que se puede perder con un enlace filtrado:
+aceptar eso y de reducir lo que se puede perder con un enlace filtrado.
+
+El enlace **no está firmado**. No lleva ninguna firma que verificar ni datos dentro: el token
+es un nombre largo y aleatorio, opaco, y el servidor solo lo busca en la base por su SHA-256.
+Por eso no hay clave que proteger ni que rotar, y por eso la única autoridad es la fila de la
+base: allí es donde el enlace vence, se revoca y se agota.
 
 | Decisión | Por qué |
 | --- | --- |
@@ -308,7 +317,8 @@ aceptar eso y de reducir lo que se puede perder con un enlace filtrado:
 | Vence (`expires_at`, de 1 a 90 días) | Un enlace que se filtra deja de servir por sí solo. |
 | Se revoca (`revoked_at`) | Un enlace filtrado se mata sin esperar a que venza: acción «Revocar» del admin. |
 | Puede tener un límite de usos (`max_uses`) | Un enlace de un solo uso no sirve a quien lo encuentre después. |
-| La sesión dura lo de siempre (8 horas) y el panel lee el rol del usuario en cada petición | Quitarle el rol de administrador en Supabase corta el acceso aunque el enlace siga vivo. `panel_admin_required` no se tocó. |
+| La sesión dura lo de siempre (8 horas) y el panel lee el rol del usuario en cada petición | Quitarle el rol de administrador en Supabase corta el acceso aunque el enlace siga vivo. |
+| La sesión recuerda qué invitación la abrió (`panel_invite_id`) y `is_panel_admin` comprueba en cada petición que esa invitación siga viva (no revocada, no vencida) | Revocar o vencer un enlace cierra también las sesiones que ya había abierto, en su siguiente clic, y no solo impide usos nuevos. Sin esto, un enlace filtrado y revocado dejaba dentro a quien ya había entrado hasta 8 horas. Agotar los usos no cierra nada: el último uso es el que abrió esa sesión. Una sesión del traspaso de Supabase no lleva esa marca y se comporta como siempre. |
 
 ### Por qué la página usa POST
 
@@ -325,15 +335,20 @@ uso):
 
 1. Vuelve a validar el enlace: que exista, que no haya vencido, que no esté revocado y
    que le queden usos.
-2. Obtiene o crea el usuario de Django con la misma regla del traspaso
+2. Comprueba que el usuario sea administrador **ahora mismo** en Supabase
+   (`profiles.role = 'admin'`, la misma consulta del traspaso). Si lo degradaron después de
+   emitir la invitación, se rechaza aquí: sin gastar el uso, sin crear el usuario de Django y
+   sin abrir sesión.
+3. Obtiene o crea el usuario de Django con la misma regla del traspaso
    (`get_or_create_panel_user_by_id`: el `username` es el id de Supabase, la contraseña
    es inutilizable y no es staff). Si ese usuario está desactivado en Django, se rechaza.
-3. Cuenta el uso (`use_count`, `last_used_at`).
-4. Vacía la sesión que traía el navegador (`session.flush()`) y abre la del panel
-   (`open_panel_session`). Así la clave de sesión siempre es nueva, también cuando el
-   navegador ya traía una sesión de ese mismo usuario, que `login()` por sí solo
-   conservaría: quien haya plantado esa clave no la conserva (fijación de sesión).
-5. Redirige a `landing_path`, que se vuelve a validar (debe ser una ruta de este sitio:
+4. Cuenta el uso (`use_count`, `last_used_at`).
+5. Vacía la sesión que traía el navegador (`session.flush()`) y abre la del panel
+   (`open_panel_session`), que además guarda el id de la invitación en la sesión. Así la
+   clave de sesión siempre es nueva, también cuando el navegador ya traía una sesión de ese
+   mismo usuario, que `login()` por sí solo conservaría: quien haya plantado esa clave no la
+   conserva (fijación de sesión).
+6. Redirige a `landing_path`, que se vuelve a validar (debe ser una ruta de este sitio:
    empezar con una sola `/` y no llevar `\`, espacios ni caracteres de control, de modo
    que `//evil.example` y `https://evil.example` no se aceptan nunca).
 
@@ -341,11 +356,14 @@ Si algo falla al abrir la sesión, la transacción se deshace y no se gasta el u
 
 ### Una sola respuesta para todo lo que no sirve
 
-Un token desconocido, vencido, revocado, agotado o de un usuario desactivado reciben la
-misma página («Enlace no válido o vencido»), con el mismo estado (404), el mismo cuerpo y
-las mismas cabeceras, tanto en el GET como en el POST. La razón concreta se escribe en el
-log del logger `panel` (nunca el token) y el navegador no la ve, así que la respuesta no
-sirve para averiguar si un token existió alguna vez.
+Un token desconocido, vencido, revocado, agotado, de un usuario desactivado o de uno que ya
+no es administrador reciben la misma página («Enlace no válido o vencido»), con el mismo
+estado (404), el mismo cuerpo y las mismas cabeceras, tanto en el GET como en el POST. Con una
+salvedad: el GET solo comprueba el enlace en sí (que exista, no haya vencido, no esté revocado
+y le queden usos), así que lo de «ya no es administrador» se rechaza al pulsar el botón, que es
+cuando algo se gasta. La razón concreta se escribe en el log del logger `panel` (nunca el
+token) y el navegador no la ve, así que la respuesta no sirve para averiguar si un token
+existió alguna vez.
 
 ### Cabeceras
 
@@ -379,8 +397,9 @@ uv run python manage.py issue_review_invite \
 
 El comando imprime el enlace completo **una vez** (y avisa si `REVIEW_INVITES_ENABLED`
 está apagado, porque entonces el enlace respondería 404). Para revocarlo: `/admin/` →
-«Invitaciones de revisión» → seleccionar → «Revocar las invitaciones seleccionadas». El
-admin lista la etiqueta, el usuario, el vencimiento, si está revocada, los usos y el
+«Invitaciones de revisión» → seleccionar → «Revocar las invitaciones seleccionadas». Revocar
+(igual que dejar que venza) cierra también las sesiones que ese enlace ya había abierto, en su
+siguiente clic. El admin lista la etiqueta, el usuario, el vencimiento, si está revocada, los usos y el
 último uso; nunca muestra el token ni su huella, y no permite crear invitaciones desde
 ahí, porque un formulario no puede mostrar el enlace una sola vez.
 
@@ -393,7 +412,9 @@ ahí, porque un formulario no puede mostrar el enlace una sola vez.
 - Quien reenvía el enlace da acceso: es una llave al portador.
 - No hay límite de intentos por IP. Con 256 bits de token no hace falta.
 - `/my-products/` (práctica M15) solo pide haber iniciado sesión, y la sesión de una
-  invitación lo cumple, sea o no administrador el usuario.
+  invitación lo cumple, sea o no administrador el usuario. Como esa vista no pasa por
+  `panel_admin_required`, una sesión cuya invitación ya se revocó o venció sigue entrando ahí
+  hasta que toque una página del panel, que es la petición que la cierra.
 
 ## Despliegue del entorno de revisión (demo)
 
@@ -422,7 +443,9 @@ abre el panel como administrador, con permiso para escribir.
 `render.yaml` declara cada variable por su nombre. Las que no son secretas ni dependen del
 entorno llevan su valor en el archivo; todas las demás llevan `sync: false`, así que **los
 valores los escribe el dueño en el Dashboard de Render** y ni el repo ni este README llevan
-ninguno. Render pide esos valores solo al crear el Blueprint y después ignora el archivo para
+ninguno. `REVIEW_INVITES_ENABLED` es la excepción que lo explica: no es un secreto ni depende
+del entorno, pero lleva `sync: false` a propósito, para que encender los enlaces sea un acto
+del dueño y no algo que el archivo decide por él. Render pide esos valores solo al crear el Blueprint y después ignora el archivo para
 ellas: se cambian en la pestaña Environment del servicio.
 
 | Variable | Valor |
@@ -430,8 +453,9 @@ ellas: se cambian en la pestaña Environment del servicio.
 | `PYTHON_VERSION` | `3.12.11`, el de `backend/.python-version`. Render exige la versión completa y la variable manda sobre `.python-version`; su documentación habla de ese archivo en la raíz del repo y no dice si lo lee dentro de `rootDir`, así que no se depende de él. |
 | `UV_PYTHON_PREFERENCE` | `only-system`: `uv` usa el Python que Render instala y, si no lo encuentra, el build falla en voz alta en lugar de descargar por su cuenta otro intérprete que quizá no llegue intacto al arranque. |
 | `DJANGO_BEHIND_PROXY` | `true`: ver "Detrás del proxy de Render". |
-| `REVIEW_INVITES_ENABLED` | `true`: enciende los enlaces de invitado. |
+| `PGSSLMODE` | `require`: la conexión a Postgres tiene que ir cifrada con TLS, o no se establece. Ver "La base de datos". |
 | `PANEL_TOKEN_MAX_AGE_SECONDS` | `300`, como en local. |
+| `REVIEW_INVITES_ENABLED` | `true`, que escribes tú en el Dashboard cuando quieras enlaces de invitado. Apagado (o sin escribir), la ruta responde 404 a todo. Si lo apagas en una emergencia, la próxima sincronización del Blueprint no lo vuelve a encender, porque el archivo no lleva valor. |
 | `DJANGO_SECRET_KEY` | Una clave nueva para este entorno, con el comando de "Environment variables". |
 | `DJANGO_ALLOWED_HOSTS` | El hostname `*.onrender.com` del servicio, que Render muestra al crearlo. Hasta ponerlo, Django responde 400 a todo. |
 | `POSTGRES_DB` | `postgres`. |
@@ -450,7 +474,8 @@ dominio que publique formularios, o el origen https del servicio si el proxy no 
 con HS256 en lugar de publicar sus llaves) y `DJANGO_DEBUG`, que no se enciende nunca fuera
 de local. Una prueba (`config/test_deploy.py`) falla si una variable que los settings exigen
 falta en `render.yaml`, si una variable distinta de las cinco primeras de la tabla lleva su
-valor escrito en el archivo o si `PYTHON_VERSION` no coincide con `.python-version`.
+valor escrito en el archivo (`REVIEW_INVITES_ENABLED` incluida) o si `PYTHON_VERSION` no
+coincide con `.python-version`.
 
 ### La base de datos: el pooler de Supabase, no la conexión directa
 
@@ -465,6 +490,15 @@ Esto se comprobó contra la documentación vigente de Supabase:
   persistentes en redes solo IPv4, que es el caso de Django. El usuario lleva la referencia
   del proyecto: `postgres.<project_ref>` para el rol `postgres`, y `<rol>.<project_ref>` para
   otro, así que aquí es `django.<project_ref>`.
+
+La conexión va por **TLS**: `render.yaml` define `PGSSLMODE=require`. `libpq` (el cliente de
+Postgres que usa `psycopg`) lee esa variable cuando la conexión no trae un `sslmode` propio, y
+`config/settings.py` no pone ninguno (una prueba lo vigila: el suyo ganaría sobre la variable).
+Se comprobó que `psycopg` la toma como valor por defecto de `sslmode`. Sin ella el valor por
+defecto es `prefer`: prueba con TLS, pero acepta seguir sin cifrar si no se logra, y entonces la
+contraseña del rol `django` y los datos viajarían en claro entre Render y el pooler. `require`
+cifra el canal, pero no comprueba quién está al otro lado: eso lo haría `verify-full` con el
+certificado raíz de Supabase, y queda fuera de este demo.
 
 Lo que **no** se pudo comprobar: `config/settings.py` manda a Postgres la opción de arranque
 `options=-c search_path=django,public`, y la documentación de Supavisor solo describe
@@ -530,6 +564,13 @@ del proceso eso dejaría las fallas sin explicación, así que `config/settings.
 errores del logger `django.request` a la consola. Solo errores: un 404 se registra como aviso
 con su ruta, y la de una invitación lleva el token.
 
+Un error 500 sí lleva la ruta (`Internal Server Error: /panel/invitado/<token>/`), así que el
+handler de consola tiene un filtro (`config/logging_filters.py`, `RedactInviteToken`) que
+reescribe `/panel/invitado/<lo que sea>` como `/panel/invitado/<redacted>` en el mensaje del
+registro. Reescribe el mensaje, no el texto del traceback, que lleva líneas de código y el mensaje
+de la excepción y no la ruta de la petición. Una prueba usa el `LOGGING` real, provoca un 500 en
+esa ruta y comprueba que el token no sale.
+
 ### Detrás del proxy de Render
 
 Render termina TLS en su balanceador y le habla al servicio por http (y manda a https las
@@ -575,7 +616,8 @@ usa el almacenamiento simple y deja fuera a WhiteNoise.
 ### Primer despliegue
 
 1. En Render: New → Blueprint → conecta el repo y elige `practicas-ebac`. Render lee
-   `render.yaml` y pide los valores de las variables con `sync: false`.
+   `render.yaml` y pide los valores de las variables con `sync: false`; en
+   `REVIEW_INVITES_ENABLED` escribe `true`, o los enlaces responderán 404.
 2. Cuando exista el servicio, copia su hostname `*.onrender.com` a `DJANGO_ALLOWED_HOSTS` y
    vuelve a desplegar.
 3. Emite una invitación (arriba), ábrela, pulsa «Entrar al panel».
@@ -596,6 +638,9 @@ usa el almacenamiento simple y deja fuera a WhiteNoise.
   `DJANGO_CSRF_TRUSTED_ORIGINS=https://<hostname del servicio>`: con el origen en esa lista, la
   comprobación no depende del esquema que Django crea ver.
 - Lo del pooler y `options`, arriba.
+- Que el pooler de Supabase acepte la conexión con `PGSSLMODE=require`. Lo esperable es que sí,
+  pero no se probó contra el real. Si no, el síntoma sería un error de conexión en el build
+  (el `migrate`) y lo confirma el mismo `psql` de arriba con `?sslmode=require` en la URL.
 - Un despliegue real: todo lo demás se comprobó en local (`collectstatic` con las
   configuraciones reales, `gunicorn` sirviendo los archivos con caché inmutable) y con las
   pruebas, no en Render.
@@ -800,15 +845,18 @@ Postgres; other databases have no `django` schema to verify.
 `config/test_deploy.py` covers the deployment: the settings that read the environment
 (`DJANGO_BEHIND_PROXY`, `DJANGO_CSRF_TRUSTED_ORIGINS`, imported in a fresh interpreter), why
 the proxy header matters for the CSRF check, WhiteNoise's place in the middleware, the logging
-of server errors, and `render.yaml` and `scripts/render_build.sh` against the code they
-configure (the variables the settings require, the plain values it may hold, the apps that
-have migrations).
+of server errors (and that the real `LOGGING` keeps an invite token out of the console), and
+`render.yaml` and `scripts/render_build.sh` against the code they configure (the variables the
+settings require, the plain values it may hold, `PGSSLMODE`, the owner's switch for the invites,
+the apps that have migrations).
 
 `panel/test_invites.py` covers the review invites: the model (only the hash is stored,
-the ways a link stops working, the landing path rules), the confirmation page and its
-headers, the redemption (the session of the handoff, key rotation, the role still read
-on every request, one use at a time, CSRF, nothing used up when the session fails), the
-one page every refusal gets, the admin and the command.
+the ways a link stops working, the landing path rules), the flag (every method and the link
+without its slash answer 404 when it is off), the confirmation page and its headers, the
+redemption (the session of the handoff, key rotation, the role still read on every request,
+a target who is no longer an admin refused without using anything up, one use at a time, CSRF,
+nothing used up when the session fails), the lifetime of the session an invite opened (revoking
+or expiring the invite ends it), the one page every refusal gets, the admin and the command.
 
 `panel/test_frame.py` covers the frame: the Más page through the panel admin
 session, which entry of both navigations is current for every route of the

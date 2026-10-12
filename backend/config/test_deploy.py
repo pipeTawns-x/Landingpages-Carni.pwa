@@ -6,21 +6,27 @@ configure, so that a required variable, an app with migrations or a secret put i
 fails here and not in the first deploy.
 """
 
+import copy
+import io
 import json
 import logging
+import logging.config
 import os
 import re
 import shutil
 import subprocess
 import sys
 from pathlib import Path
+from unittest import mock
 
 from django.apps import apps
 from django.conf import settings
 from django.test import Client, SimpleTestCase, TestCase, override_settings
 from django.urls import reverse
+from django.utils.log import configure_logging
 
 from config import settings as production_settings
+from config.logging_filters import RedactInviteToken
 
 BACKEND_DIR = Path(settings.BASE_DIR)
 BLUEPRINT = BACKEND_DIR.parent / "render.yaml"
@@ -217,6 +223,114 @@ class LoggingSettingsTests(SimpleTestCase):
         self.assertGreater(logging.getLevelName(logger["level"]), logging.WARNING)
 
 
+class RedactInviteTokenTests(SimpleTestCase):
+    """The filter rewrites the path of a review invite, which is where its token sits."""
+
+    def redacted(self, message, *args):
+        record = logging.LogRecord("test", logging.ERROR, __file__, 1, message, args, None)
+
+        self.assertIs(RedactInviteToken().filter(record), True, "a record is never dropped")
+        return record.getMessage()
+
+    def test_the_token_of_the_path_is_replaced(self):
+        self.assertEqual(
+            self.redacted("Internal Server Error: %s", "/panel/invitado/aB3-_xYz0123456789/"),
+            "Internal Server Error: /panel/invitado/<redacted>",
+        )
+
+    def test_a_query_string_after_the_token_goes_too(self):
+        self.assertEqual(
+            self.redacted("boom: /panel/invitado/aB3/?next=/panel/ end"),
+            "boom: /panel/invitado/<redacted> end",
+        )
+
+    def test_the_scheme_the_host_and_the_words_around_it_stay(self):
+        self.assertEqual(
+            self.redacted("GET https://demo.onrender.com/panel/invitado/aB3/ failed"),
+            "GET https://demo.onrender.com/panel/invitado/<redacted> failed",
+        )
+
+    def test_a_quote_closes_the_path_and_stays(self):
+        self.assertEqual(
+            self.redacted("path '/panel/invitado/aB3/' and \"/panel/invitado/cD4/\""),
+            "path '/panel/invitado/<redacted>' and \"/panel/invitado/<redacted>\"",
+        )
+
+    def test_every_token_of_a_message_is_replaced(self):
+        self.assertEqual(
+            self.redacted("%s then %s", "/panel/invitado/one/", "/panel/invitado/two/"),
+            "/panel/invitado/<redacted> then /panel/invitado/<redacted>",
+        )
+
+    def test_running_it_twice_changes_nothing_more(self):
+        once = self.redacted("/panel/invitado/aB3/")
+
+        self.assertEqual(self.redacted(once), once)
+
+    def test_anything_else_is_left_exactly_as_it_was(self):
+        record = logging.LogRecord(
+            "test", logging.INFO, __file__, 1, "Opened %s for %s", ("/panel/productos/", 7), None
+        )
+
+        RedactInviteToken().filter(record)
+
+        self.assertEqual(record.msg, "Opened %s for %s")
+        self.assertEqual(record.args, ("/panel/productos/", 7))
+
+    def test_a_message_that_cannot_be_formatted_does_not_raise_inside_the_logging_call(self):
+        record = logging.LogRecord("test", logging.ERROR, __file__, 1, "%s %s", ("one",), None)
+
+        self.assertIs(RedactInviteToken().filter(record), True)
+
+
+class ConsoleLoggingTests(TestCase):
+    """The real LOGGING of the settings, with its console writing to a buffer we can read.
+
+    The test settings swap the console handler for one that writes nothing, so the config under
+    test is the one in config/settings.py, applied to the logging module here and put back after.
+    """
+
+    TOKEN = "aB3-_xYz0123456789AbCdEfGhIjKlMnOpQrStUvW"
+
+    def setUp(self):
+        self.output = io.StringIO()
+        config = copy.deepcopy(production_settings.LOGGING)
+        config["handlers"]["console"]["stream"] = self.output
+        logging.config.dictConfig(config)
+        self.addCleanup(configure_logging, settings.LOGGING_CONFIG, settings.LOGGING)
+
+    @override_settings(REVIEW_INVITES_ENABLED=True)
+    def test_a_server_error_on_an_invite_link_reaches_the_console_without_its_token(self):
+        client = Client(raise_request_exception=False)
+
+        with mock.patch("panel.views.ReviewInvite.find", side_effect=RuntimeError("boom")):
+            response = client.get(f"/panel/invitado/{self.TOKEN}/")
+
+        self.assertEqual(response.status_code, 500)
+        written = self.output.getvalue()
+        self.assertIn("Internal Server Error: /panel/invitado/<redacted>", written)
+        self.assertIn("RuntimeError: boom", written)  # the traceback is still there to debug with
+        self.assertNotIn(self.TOKEN, written)
+
+    def test_what_the_panel_logs_goes_through_the_same_filter(self):
+        logging.getLogger("panel").warning("Looked at %s", f"/panel/invitado/{self.TOKEN}/")
+
+        written = self.output.getvalue()
+        self.assertIn("WARNING panel: Looked at /panel/invitado/<redacted>", written)
+        self.assertNotIn(self.TOKEN, written)
+
+    def test_the_filter_is_on_the_console_handler_and_not_on_a_logger_that_could_be_bypassed(self):
+        # A filter on a logger does not apply to the records of its children; one on the handler
+        # applies to everything the handler writes.
+        console = production_settings.LOGGING["handlers"]["console"]
+
+        self.assertEqual(console["filters"], ["redact_invite_token"])
+        self.assertEqual(
+            production_settings.LOGGING["filters"]["redact_invite_token"]["()"],
+            "config.logging_filters.RedactInviteToken",
+        )
+
+
 def read_blueprint():
     """Read render.yaml, which uses only a small subset of YAML.
 
@@ -324,9 +438,24 @@ class BlueprintTests(SimpleTestCase):
                 "PYTHON_VERSION": python_version,
                 "UV_PYTHON_PREFERENCE": "only-system",
                 "DJANGO_BEHIND_PROXY": "true",
-                "REVIEW_INVITES_ENABLED": "true",
+                "PGSSLMODE": "require",
                 "PANEL_TOKEN_MAX_AGE_SECONDS": "300",
             },
+        )
+
+    def test_the_database_connection_is_forced_to_tls(self):
+        # libpq reads PGSSLMODE when the connection does not say otherwise, so the settings must
+        # not set an `sslmode` of their own: it would win over this variable.
+        self.assertEqual(self.by_key["PGSSLMODE"], {"key": "PGSSLMODE", "value": "require"})
+        options = production_settings.DATABASES["default"].get("OPTIONS", {})
+        self.assertNotIn("sslmode", options)
+
+    def test_the_review_invites_switch_is_the_owners_and_a_sync_never_flips_it(self):
+        # With a value in the file, a Blueprint sync would turn back on a switch that the owner
+        # turned off in the Dashboard in an emergency.
+        self.assertEqual(
+            self.by_key["REVIEW_INVITES_ENABLED"],
+            {"key": "REVIEW_INVITES_ENABLED", "sync": "false"},
         )
 
     def test_every_other_variable_is_typed_by_the_owner_and_never_synced_from_the_file(self):

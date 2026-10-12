@@ -91,9 +91,12 @@ class ReviewInvite(models.Model):
     """A link that lets a reviewer into the panel as one Supabase user, without a password.
 
     The link carries a random token that is shown once, when the invite is issued, and never
-    stored: only its hash is. The link stops working when it expires, when it is revoked and
-    when it has been used `max_uses` times. It opens the same session the Supabase handoff
-    opens, so the panel keeps reading the role of that user on every request.
+    stored: only its hash is. The token is opaque: it is not signed and it holds nothing, it is
+    only a long random name that the server looks up by its SHA-256, so it is a bearer secret
+    and whoever holds it can use it. The link stops working when it expires, when it is revoked
+    and when it has been used `max_uses` times. It opens the same session the Supabase handoff
+    opens, so the panel keeps reading the role of that user on every request, and it ties that
+    session to the invite (see `allows_session`).
     """
 
     label = models.CharField(
@@ -173,6 +176,17 @@ class ReviewInvite(models.Model):
         """
         invites = cls.objects.select_for_update() if for_update else cls.objects.all()
         return invites.filter(token_hash=hash_token(token)).first()
+
+    @classmethod
+    def allows_session(cls, pk, now=None) -> bool:
+        """Say whether the session an invite opened may go on.
+
+        It may while the invite exists, is not revoked and has not expired, so revoking or
+        expiring a link ends the sessions it already opened and not only the next use. Running
+        out of uses does not: the last use is the one that opened the session.
+        """
+        now = now or timezone.now()
+        return cls.objects.filter(pk=pk, revoked_at__isnull=True, expires_at__gt=now).exists()
 
     def refusal_reason(self, now=None) -> str | None:
         """Say why the invite cannot open a session now, as a short code for the log.

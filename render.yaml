@@ -7,7 +7,9 @@
 # one is and where it comes from: "Despliegue del entorno de revisión (demo)" in backend/README.md.
 #
 # It is a DEMO environment. It needs a Supabase project of its own with fake data, never the real
-# one: REVIEW_INVITES_ENABLED turns on links that open the panel as an administrator.
+# one: REVIEW_INVITES_ENABLED turns on links that open the panel as an administrator. It is
+# `sync: false` on purpose, so that turning it on is the owner's own act in the Dashboard and a
+# later sync of this file can never switch it back on after an emergency "off".
 services:
   - type: web
     name: carni-backend-demo
@@ -31,11 +33,14 @@ services:
         value: only-system
       - key: DJANGO_BEHIND_PROXY
         value: "true"
-      - key: REVIEW_INVITES_ENABLED
-        value: "true"
+      # libpq reads this one: the connection to the Supabase pooler is TLS or it does not happen.
+      - key: PGSSLMODE
+        value: require
       - key: PANEL_TOKEN_MAX_AGE_SECONDS
         value: "300"
       # Typed by the owner in the Dashboard.
+      - key: REVIEW_INVITES_ENABLED
+        sync: false
       - key: DJANGO_SECRET_KEY
         sync: false
       - key: DJANGO_ALLOWED_HOSTS
