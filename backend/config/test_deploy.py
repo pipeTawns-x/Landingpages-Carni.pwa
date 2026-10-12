@@ -392,6 +392,11 @@ class BlueprintTests(SimpleTestCase):
         self.assertEqual(self.service["branch"], "practicas-ebac")
         self.assertEqual(self.service["rootDir"], "backend")
 
+    def test_it_runs_in_the_region_of_the_demo_database(self):
+        # The region cannot be changed once the service exists, and the demo Supabase project
+        # lives in East US (Ohio): every query would cross the country from Render's default.
+        self.assertEqual(self.service["region"], "ohio")
+
     def test_it_builds_with_the_script_and_starts_gunicorn_on_the_port_render_gives(self):
         self.assertEqual(self.service["buildCommand"], "bash scripts/render_build.sh")
         start = self.service["startCommand"]

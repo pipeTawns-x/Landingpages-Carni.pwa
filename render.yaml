@@ -15,8 +15,9 @@ services:
     name: carni-backend-demo
     runtime: python
     plan: free
-    # Region: Render's default is oregon and it cannot be changed after the service is created.
-    # Pick the one closest to the Supabase project first, for example `region: virginia`.
+    # Region: it cannot be changed after the service is created (Render's default is oregon).
+    # ohio sits next to the demo Supabase project (East US, Ohio), so every query stays close.
+    region: ohio
     branch: practicas-ebac
     rootDir: backend
     autoDeployTrigger: commit
