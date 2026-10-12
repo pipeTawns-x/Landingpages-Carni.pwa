@@ -190,6 +190,16 @@ course-only app `ecommerce/`: see [`ecommerce/README.md`](ecommerce/README.md).
 Its adaptation to the store is the paginated product list and the test suite
 described in "Tests".
 
+### EBAC practice M15 — Django Class-based Views
+
+`ProtectedListView`, a `ListView` behind `LoginRequiredMixin`, lists the sample
+products of the signed-in user at `/my-products/`. It lives in the same course-only
+app, `ecommerce/`: see the "Práctica M15" section of
+[`ecommerce/README.md`](ecommerce/README.md). An anonymous visitor goes to
+`LOGIN_URL`, which is the panel's access bridge (`panel:acceso`), so Django never asks
+for a password. The bridge ignores the `?next=` that Django adds, and the view
+requires a login but not the admin role.
+
 ## Panel session handoff
 
 The panel is served by Django, but nobody signs in to Django: an admin signs in

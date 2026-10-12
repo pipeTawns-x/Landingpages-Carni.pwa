@@ -28,11 +28,48 @@ FONT_LICENSES = ["panel/fonts/geist/LICENSE", "panel/fonts/fraunces/LICENSE"]
 TOKENS_FILE = Path(settings.BASE_DIR) / "assets" / "tokens.css"
 
 CUSTOM_PROPERTY = re.compile(r"(--[a-z0-9-]+)\s*:\s*([^;}]+)")
+CLASS_ATTRIBUTE = re.compile(r'class="([^"]*)"')
+TEMPLATE_TAG = re.compile(r"\{%.*?%\}|\{\{.*?\}\}")
+
+# The templates of the panel whose classes `PageClassesTests` checks. The stylesheet is committed,
+# not built when the page is served, so a page may only use classes it already defines.
+PANEL_PAGES = ("panel/base.html", "panel/mas.html", "panel/messages.html")
 
 
 def custom_properties(css):
     """Map each custom property declared in `css` to its value."""
     return {name: value.strip() for name, value in CUSTOM_PROPERTY.findall(css)}
+
+
+def classes_missing_from(css, html):
+    """Return the classes `html` uses in a `class` attribute that `css` does not define.
+
+    A class counts as defined when `.<class>` is in the CSS, escaped the way Tailwind
+    escapes it (`lg:pl-62` is `.lg\\:pl-62`) and not followed by more of the same
+    identifier (`.size-5` is not `.size-5\\.5`). Django tags inside an attribute are dropped
+    before it is split.
+    """
+    used = set()
+    for value in CLASS_ATTRIBUTE.findall(html):
+        used.update(TEMPLATE_TAG.sub(" ", value).split())
+
+    missing = []
+    for name in sorted(used):
+        selector = "." + re.sub(r"([^a-zA-Z0-9_-])", r"\\\1", name)
+        if not re.search(re.escape(selector) + r"(?![\w\\-])", css):
+            missing.append(name)
+    return missing
+
+
+def undefined_classes(template_name):
+    """Return the classes of a template that the compiled stylesheet does not define.
+
+    Tailwind only compiles the classes it finds in the templates when the script runs, so a
+    class added to a page without rebuilding the stylesheet silently has no style.
+    """
+    css = Path(finders.find(STYLESHEET)).read_text(encoding="utf-8")
+    html = (Path(settings.BASE_DIR) / "templates" / template_name).read_text(encoding="utf-8")
+    return classes_missing_from(css, html)
 
 
 def squash(value):
@@ -158,3 +195,37 @@ class CompiledStylesheetTests(SimpleTestCase):
                     self.assertIsNotNone(finders.find(path))
                     served.add(path)
         self.assertLessEqual(set(FONTS.values()), served)
+
+
+class ClassesMissingFromTests(SimpleTestCase):
+    """The check that the pages below rely on, tried on small inputs."""
+
+    CSS = ".flex{display:flex}.lg\\:pl-62{padding-left:1rem}.size-5\\.5{width:1rem}"
+
+    def test_a_class_the_css_defines_is_not_reported(self):
+        html = '<p class="flex lg:pl-62 size-5.5">'
+
+        self.assertEqual(classes_missing_from(self.CSS, html), [])
+
+    def test_a_class_the_css_lacks_is_reported(self):
+        html = '<p class="flex gap-9 lg:pl-9">'
+
+        self.assertEqual(classes_missing_from(self.CSS, html), ["gap-9", "lg:pl-9"])
+
+    def test_a_class_is_not_found_by_the_start_of_a_longer_one(self):
+        # `.size-5\.5` is defined, `.size-5` is not.
+        self.assertEqual(classes_missing_from(self.CSS, '<p class="size-5">'), ["size-5"])
+
+    def test_django_tags_inside_the_attribute_are_not_classes(self):
+        html = '<p class="flex {% if big %}size-5.5{% endif %} {{ extra }}">'
+
+        self.assertEqual(classes_missing_from(self.CSS, html), [])
+
+
+class PageClassesTests(SimpleTestCase):
+    """The pages are styled by the committed stylesheet, so they may only use classes it defines."""
+
+    def test_every_class_of_the_panel_pages_is_defined_by_the_stylesheet(self):
+        for template_name in PANEL_PAGES:
+            with self.subTest(template=template_name):
+                self.assertEqual(undefined_classes(template_name), [])

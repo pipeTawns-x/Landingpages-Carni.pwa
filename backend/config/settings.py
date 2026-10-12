@@ -162,6 +162,15 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 
 
+# Where Django sends an anonymous visitor to a view that needs a login. Only the EBAC M15
+# practice (ecommerce.views.ProtectedListView) asks for one. It is the panel's access
+# bridge, so Django never asks for a password: the bridge sends the visitor to the store
+# login, where Supabase signs them in and the store hands the session over. The bridge
+# ignores the `?next=` that Django adds, so after signing in the visitor lands on the panel.
+# https://docs.djangoproject.com/en/5.2/ref/settings/#login-url
+LOGIN_URL = "panel:acceso"
+
+
 # Panel session handoff (Supabase -> Django)
 # See docs/CONTRATO_PANEL_DJANGO.md, sections 5b and 6.
 #

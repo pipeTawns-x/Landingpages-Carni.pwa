@@ -5,8 +5,8 @@ from ecommerce.models import Product
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ("name", "slug", "price", "stock", "is_active", "created_at")
-    list_filter = ("is_active",)
+    list_display = ("name", "slug", "owner", "price", "stock", "is_active", "created_at")
+    list_filter = ("is_active", "owner")
     search_fields = ("name", "slug")
     readonly_fields = ("slug", "created_at", "updated_at")
     list_per_page = 50

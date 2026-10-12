@@ -26,4 +26,6 @@ urlpatterns = [
     # contract (docs/CONTRATO_PANEL_DJANGO.md) names them `inventory:*`.
     path("panel/productos/", include("inventory.urls")),
     path("panel/", include("panel.urls")),
+    # EBAC M15 practice, course-only: /my-products/ (see ecommerce/README.md).
+    path("", include("ecommerce.urls")),
 ]

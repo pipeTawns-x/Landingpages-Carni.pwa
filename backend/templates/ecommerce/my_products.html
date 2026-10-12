@@ -1,0 +1,88 @@
+{% extends "panel/base.html" %}
+{% comment %}
+  My products (/my-products/, ecommerce:my-products): the page of the EBAC M15 practice. It lists the
+  sample products whose owner is the signed-in user, 50 per page, on the frame of the panel
+  (panel/base.html, which this page leaves as it is). The list is the one of inventory/product_list.html
+  with the columns this model has. Every class is one the committed stylesheet already defines, so the
+  stylesheet was not rebuilt for it (a test checks that).
+
+  Context of the view: products (the products of the page), page_obj, paginator and is_paginated.
+{% endcomment %}
+{% block title %}<title>Mis productos · Panel · Carnicería El Señor de La Misericordia</title>{% endblock %}
+{% block titulo %}Mis productos{% endblock %}
+{% block accion %}
+<a href="{% url 'inventory:list' %}" class="inline-flex min-h-12 items-center justify-center gap-2 rounded-pill border border-sand px-6 text-ui font-semibold text-text transition-[background-color,scale] duration-160 ease-out-strong hover:bg-surface-2 active:scale-[0.97] motion-reduce:transition-none shrink-0">Ver catálogo</a>
+{% endblock %}
+{% block contenido %}
+<div class="flex flex-col gap-5 lg:gap-6">
+  <p class="max-w-prose text-meta text-text-muted">Aquí solo aparecen los productos que tienen como dueño a tu usuario.</p>
+
+  {% if products %}
+  <section aria-labelledby="lista-titulo" class="flex flex-col gap-3">
+    <h2 id="lista-titulo" class="sr-only">Lista de mis productos</h2>
+    <p class="text-meta text-text-muted tabular-nums">Mostrando {{ page_obj.start_index }}–{{ page_obj.end_index }} de {{ paginator.count }} producto{{ paginator.count|pluralize }}</p>
+
+    {# A table from 1024 px; below that each row becomes a card. The roles keep the table semantics. #}
+    <div class="lg:overflow-hidden lg:rounded-card lg:border lg:border-border lg:bg-surface-1">
+      <table role="table" aria-label="Mis productos" class="block w-full text-left text-ui lg:table lg:border-collapse">
+        <thead role="rowgroup" class="hidden lg:table-header-group">
+          <tr role="row" class="text-meta text-text-muted">
+            <th role="columnheader" scope="col" class="px-5 py-3 font-medium">Producto</th>
+            <th role="columnheader" scope="col" class="px-5 py-3 text-right font-medium">Precio</th>
+            <th role="columnheader" scope="col" class="px-5 py-3 text-right font-medium">Existencia</th>
+            <th role="columnheader" scope="col" class="px-5 py-3 font-medium">Estado</th>
+          </tr>
+        </thead>
+        <tbody role="rowgroup" class="flex flex-col gap-3 lg:table-row-group">
+          {% for product in products %}
+          <tr role="row" class="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-x-3 gap-y-1 rounded-card border border-border bg-surface-1 p-4 lg:table-row lg:rounded-none lg:border-0 lg:border-t lg:bg-transparent lg:p-0 lg:hover:bg-surface-2">
+            <td role="cell" class="col-start-1 row-start-1 min-w-0 lg:table-cell lg:px-5 lg:py-2">
+              <span class="inline-flex min-h-11 items-center font-semibold text-text">{{ product.name }}</span>
+            </td>
+            <td role="cell" class="col-start-1 row-start-2 text-ui font-semibold tabular-nums lg:table-cell lg:px-5 lg:py-2 lg:text-right">${{ product.price|floatformat:"2g" }}</td>
+            <td role="cell" class="col-start-2 row-start-2 text-right text-ui tabular-nums lg:table-cell lg:px-5 lg:py-2">
+              <span class="text-text-muted lg:hidden">Existencia </span><span class="font-semibold">{{ product.stock }}</span>
+            </td>
+            <td role="cell" class="col-start-2 row-start-1 self-center lg:table-cell lg:px-5 lg:py-2">
+              {% if product.is_active %}
+              <span class="inline-flex h-6 items-center gap-1.5 rounded-control border border-border bg-surface-2 px-2 text-meta font-semibold"><svg class="size-3.5 shrink-0 text-success" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0ZM8 12.5l3 3 5-6" /></svg><span>Activo</span></span>
+              {% else %}
+              <span class="inline-flex h-6 items-center gap-1.5 rounded-control border border-border bg-surface-2 px-2 text-meta font-semibold"><svg class="size-3.5 shrink-0 text-text-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0ZM8.5 12h7" /></svg><span>Inactivo</span></span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    {% if is_paginated %}
+    <nav aria-label="Paginación de mis productos" class="mt-2 flex items-center justify-between gap-3">
+      {% if page_obj.has_previous %}
+      <a href="{% querystring page=page_obj.previous_page_number %}" class="inline-flex size-11 items-center justify-center gap-1 rounded-pill border border-sand text-ui font-semibold text-text transition-[background-color,scale] duration-160 ease-out-strong hover:bg-surface-2 active:scale-[0.97] motion-reduce:transition-none lg:w-auto lg:px-4"><svg class="size-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m15 5-7 7 7 7" /></svg><span class="sr-only lg:not-sr-only">Anterior</span></a>
+      {% else %}
+      <span aria-disabled="true" class="inline-flex size-11 select-none items-center justify-center gap-1 rounded-pill border border-border text-ui text-text-muted lg:w-auto lg:px-4"><svg class="size-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m15 5-7 7 7 7" /></svg><span class="sr-only lg:not-sr-only">Anterior</span></span>
+      {% endif %}
+
+      <p class="text-ui text-text-muted tabular-nums" aria-current="page">Página <span class="font-semibold text-text">{{ page_obj.number }}</span> de {{ paginator.num_pages }}</p>
+
+      {% if page_obj.has_next %}
+      <a href="{% querystring page=page_obj.next_page_number %}" class="inline-flex size-11 items-center justify-center gap-1 rounded-pill border border-sand text-ui font-semibold text-text transition-[background-color,scale] duration-160 ease-out-strong hover:bg-surface-2 active:scale-[0.97] motion-reduce:transition-none lg:w-auto lg:px-4"><span class="sr-only lg:not-sr-only">Siguiente</span><svg class="size-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m9 5 7 7-7 7" /></svg></a>
+      {% else %}
+      <span aria-disabled="true" class="inline-flex size-11 select-none items-center justify-center gap-1 rounded-pill border border-border text-ui text-text-muted lg:w-auto lg:px-4"><span class="sr-only lg:not-sr-only">Siguiente</span><svg class="size-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m9 5 7 7-7 7" /></svg></span>
+      {% endif %}
+    </nav>
+    {% endif %}
+  </section>
+  {% else %}
+  <section aria-labelledby="vacio-titulo" class="flex flex-col items-center gap-3 rounded-card border border-border bg-surface-1 px-4 py-12 text-center">
+    <span class="grid size-12 place-items-center rounded-control bg-surface-2 text-sand"><svg class="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M20 13.5 13.5 20a1.5 1.5 0 0 1-2.1 0L4 12.6V4h8.6l7.4 7.4a1.5 1.5 0 0 1 0 2.1ZM8.5 8.5h.01" /></svg></span>
+    <h2 id="vacio-titulo" class="font-sans text-ui font-semibold">Aún no tienes productos asignados</h2>
+    <p class="max-w-prose text-meta text-text-muted">Cuando se te asigne alguno, aparecerá aquí. Mientras tanto puedes ver el catálogo completo del panel.</p>
+    <div class="mt-2 flex flex-col gap-3 sm:flex-row">
+      <a href="{% url 'inventory:list' %}" class="inline-flex min-h-12 items-center justify-center gap-2 rounded-pill bg-red px-6 text-ui font-semibold text-white transition-[background-color,scale] duration-160 ease-out-strong hover:bg-red-hover active:scale-[0.97] motion-reduce:transition-none">Ver catálogo del panel</a>
+    </div>
+  </section>
+  {% endif %}
+</div>
+{% endblock %}

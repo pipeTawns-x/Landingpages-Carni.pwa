@@ -23,7 +23,7 @@ from panel.supabase_auth import VerifiedToken
 PANEL_SESSION_KEY = "panel_supabase_user_id"
 
 
-def get_or_create_panel_user(verified: VerifiedToken):
+def get_or_create_panel_user_by_id(supabase_user_id: uuid.UUID, email: str = ""):
     """Return the Django user that stands for a Supabase user, creating it on first use.
 
     The username is the Supabase user id: unique, it never changes, and it is
@@ -31,23 +31,34 @@ def get_or_create_panel_user(verified: VerifiedToken):
     (nothing in Django can sign this user in, only the handoff opens a session)
     and the user is no staff and no superuser, so it does not reach the Django
     admin site. If a password was ever set on it, it is taken away again.
+
+    `email` is informational. An empty one, which is what whoever has no token
+    to show passes, never erases the one already stored.
     """
     user_model = get_user_model()
     user, _created = user_model.objects.get_or_create(
-        username=str(verified.user_id),
-        defaults={"password": make_password(None), "email": verified.email},
+        username=str(supabase_user_id),
+        defaults={"password": make_password(None), "email": email},
     )
 
     changed = []
     if user.has_usable_password():
         user.set_unusable_password()
         changed.append("password")
-    if verified.email and user.email != verified.email:
-        user.email = verified.email
+    if email and user.email != email:
+        user.email = email
         changed.append("email")
     if changed:
         user.save(update_fields=changed)
     return user
+
+
+def get_or_create_panel_user(verified: VerifiedToken):
+    """Return the Django user for the Supabase user a verified token names.
+
+    The rules are those of `get_or_create_panel_user_by_id`.
+    """
+    return get_or_create_panel_user_by_id(verified.user_id, verified.email)
 
 
 def open_panel_session(request, user) -> None:

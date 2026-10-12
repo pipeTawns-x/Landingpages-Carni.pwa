@@ -32,6 +32,7 @@ from panel import supabase_auth
 from panel.access import (
     PANEL_SESSION_KEY,
     get_or_create_panel_user,
+    get_or_create_panel_user_by_id,
     is_panel_admin,
 )
 from panel.models import Profile
@@ -435,6 +436,23 @@ class PanelUserTests(TestCase):
         get_or_create_panel_user(self.verified)
 
         user = get_or_create_panel_user(VerifiedToken(self.user_id, ""))
+
+        self.assertEqual(user.email, "admin@example.test")
+
+    def test_the_user_can_also_be_made_from_the_supabase_id_alone(self):
+        # For whoever has no token to show (a command, an invite): the same user, the same rules.
+        user = get_or_create_panel_user_by_id(self.user_id)
+
+        self.assertEqual(user.username, str(self.user_id))
+        self.assertEqual(user.email, "")
+        self.assertFalse(user.has_usable_password())
+        self.assertFalse(user.is_staff)
+        self.assertEqual(get_or_create_panel_user(self.verified).pk, user.pk)
+
+    def test_the_id_alone_does_not_erase_the_stored_email(self):
+        get_or_create_panel_user(self.verified)
+
+        user = get_or_create_panel_user_by_id(self.user_id)
 
         self.assertEqual(user.email, "admin@example.test")
 
