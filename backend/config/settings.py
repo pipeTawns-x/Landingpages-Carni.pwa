@@ -17,6 +17,7 @@ from dotenv import load_dotenv
 from .env import (
     parse_bool,
     parse_http_url,
+    parse_optional_origins,
     parse_origin,
     parse_origins,
     parse_positive_int,
@@ -71,6 +72,10 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    # Serves the files that `collectstatic` collects from the Django process itself, so a deployment
+    # needs no web server for them. It goes right after SecurityMiddleware.
+    # https://whitenoise.readthedocs.io/en/stable/django.html
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -161,6 +166,16 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 # and runserver would publish it. See "Panel stylesheet" in backend/README.md.
 STATICFILES_DIRS = [BASE_DIR / "static"]
 
+# `collectstatic` writes every static file to STATIC_ROOT with a hash in its name and a gzip copy,
+# and WhiteNoise serves them with a cache that never expires: the hash changes with the content.
+# The manifest that maps a name to its hashed name only exists after `collectstatic` (the Render
+# build runs it), so whoever runs without it uses the plain storage instead: the tests do, through
+# settings_test.py. With DEBUG on, `runserver` serves the files from where they are.
+STORAGES = {
+    "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+    "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
+}
+
 
 # Where Django sends an anonymous visitor to a view that needs a login. Only the EBAC M15
 # practice (ecommerce.views.ProtectedListView) asks for one. It is the panel's access
@@ -249,6 +264,24 @@ SESSION_COOKIE_AGE = 8 * 60 * 60
 # refuses `null`, which would break the logout, the product forms and the admin.
 SECURE_REFERRER_POLICY = "same-origin"
 
+# Behind a proxy that ends TLS
+# https://docs.djangoproject.com/en/5.2/ref/settings/#secure-proxy-ssl-header
+#
+# A platform such as Render ends TLS at its edge and talks plain http to this process, with
+# `X-Forwarded-Proto: https` set. Without the line below Django sees every request as http:
+# `request.is_secure()` is false and the CSRF check, which compares the `Origin` of a form (https)
+# with the scheme of the request, refuses every POST. It is off unless asked for, because Django
+# believes that header: it has to be one that a proxy sets and a client cannot, and with the app
+# reachable some other way anyone could send it.
+if parse_bool(os.environ.get("DJANGO_BEHIND_PROXY"), "DJANGO_BEHIND_PROXY", default=False):
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
+# Other origins that may post a form here, comma-separated (optional). The host the request came to
+# is always trusted, so this is only for a second domain.
+CSRF_TRUSTED_ORIGINS = parse_optional_origins(
+    os.environ.get("DJANGO_CSRF_TRUSTED_ORIGINS"), "DJANGO_CSRF_TRUSTED_ORIGINS"
+)
+
 # The panel logs why it refused a handoff (never the token) so the reason can
 # be found on the server while the browser only gets a generic refusal.
 LOGGING = {
@@ -262,6 +295,12 @@ LOGGING = {
     },
     "loggers": {
         "panel": {"handlers": ["console"], "level": "INFO"},
+        # A server error and its traceback. Django writes them to the console only with DEBUG on
+        # and mails them to ADMINS otherwise, so on a host that shows the output of the process
+        # (Render) they would vanish. Only errors: a 404 is logged as a warning with its path, and
+        # the path of a review invite holds its token. `propagate` is off so that, with DEBUG on,
+        # Django's own console handler does not repeat them.
+        "django.request": {"handlers": ["console"], "level": "ERROR", "propagate": False},
     },
 }
 

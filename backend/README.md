@@ -49,13 +49,15 @@ uv run python -c "from django.core.management.utils import get_random_secret_key
 | `DJANGO_COOKIE_SECURE` | `True`/`False`. Marks the session and CSRF cookies `Secure`. Optional: on whenever `DJANGO_DEBUG` is off. |
 | `DJANGO_COOKIE_HTTPONLY` | `True`/`False`. Hides the session cookie from JavaScript. Optional: `True`. |
 | `DJANGO_COOKIE_SAMESITE` | `Lax` or `None` (which needs `Secure`). Optional: `Lax`. `Strict` is refused because it would break the panel handoff. |
+| `DJANGO_BEHIND_PROXY` | `True`/`False`. Trust the `X-Forwarded-Proto` header that a proxy sets (`SECURE_PROXY_SSL_HEADER`). Optional: off. Turn it on only behind a proxy that ends TLS, such as Render: see "Despliegue del entorno de revisión (demo)". |
+| `DJANGO_CSRF_TRUSTED_ORIGINS` | Comma-separated origins, besides the host itself, that may post a form (`CSRF_TRUSTED_ORIGINS`). Optional: none. |
 | `REVIEW_INVITES_ENABLED` | `True`/`False`. Turns on the review invite links (`/panel/invitado/<token>/`), which open the panel without signing in at the store. Optional: off, and the route answers 404. Only for a deployment with fake data: see "Enlaces de invitado para revisión". |
 
 Django refuses to start when a required variable is missing or has a value it
 cannot use, naming it. The test settings supply their own values for the
 `SUPABASE_*`, `STORE_ORIGIN`, `PANEL_*` and `DJANGO_COOKIE_*` variables and leave
-`REVIEW_INVITES_ENABLED` unset, so the tests never depend on what `backend/.env`
-holds.
+`REVIEW_INVITES_ENABLED`, `DJANGO_BEHIND_PROXY` and `DJANGO_CSRF_TRUSTED_ORIGINS` unset,
+so the tests never depend on what `backend/.env` holds.
 
 ## Common commands
 
@@ -393,6 +395,211 @@ ahí, porque un formulario no puede mostrar el enlace una sola vez.
 - `/my-products/` (práctica M15) solo pide haber iniciado sesión, y la sesión de una
   invitación lo cumple, sea o no administrador el usuario.
 
+## Despliegue del entorno de revisión (demo)
+
+El demo es este backend desplegado en un servicio web **gratuito de Render** (`render.yaml`
+en la raíz del repo, rama `practicas-ebac`) y conectado a un **proyecto de Supabase aparte,
+con datos falsos**. Existe para que quienes revisan las prácticas de EBAC abran el panel
+con un enlace de invitado (ver "Enlaces de invitado para revisión") sin tocar datos reales.
+Por eso nunca debe compartir proyecto de Supabase con la tienda de verdad: una invitación
+abre el panel como administrador, con permiso para escribir.
+
+### Antes del primer despliegue (fuera del repo)
+
+1. Crea el proyecto de Supabase del demo y aplica `supabase/migrations` (crean el esquema
+   `django`, el rol `django` y sus permisos): con la CLI, `supabase link` y
+   `supabase db push`. Nunca `db reset`.
+2. Ponle contraseña al rol `django` en el editor SQL del proyecto:
+   `ALTER ROLE django WITH LOGIN PASSWORD '<contraseña nueva>';`. Es la que irá en
+   `POSTGRES_PASSWORD`. (`scripts/set_django_role_password.sh` es para la base local: lee
+   `backend/.env`.)
+3. Crea en Supabase Auth un usuario de prueba y deja su perfil con `role = 'admin'`: es el
+   que recibirá `--supabase-user` al emitir invitaciones.
+4. Carga los datos falsos que el demo necesite.
+
+### Variables de entorno
+
+`render.yaml` declara cada variable por su nombre. Las que no son secretas ni dependen del
+entorno llevan su valor en el archivo; todas las demás llevan `sync: false`, así que **los
+valores los escribe el dueño en el Dashboard de Render** y ni el repo ni este README llevan
+ninguno. Render pide esos valores solo al crear el Blueprint y después ignora el archivo para
+ellas: se cambian en la pestaña Environment del servicio.
+
+| Variable | Valor |
+| --- | --- |
+| `PYTHON_VERSION` | `3.12.11`, el de `backend/.python-version`. Render exige la versión completa y la variable manda sobre `.python-version`; su documentación habla de ese archivo en la raíz del repo y no dice si lo lee dentro de `rootDir`, así que no se depende de él. |
+| `UV_PYTHON_PREFERENCE` | `only-system`: `uv` usa el Python que Render instala y, si no lo encuentra, el build falla en voz alta en lugar de descargar por su cuenta otro intérprete que quizá no llegue intacto al arranque. |
+| `DJANGO_BEHIND_PROXY` | `true`: ver "Detrás del proxy de Render". |
+| `REVIEW_INVITES_ENABLED` | `true`: enciende los enlaces de invitado. |
+| `PANEL_TOKEN_MAX_AGE_SECONDS` | `300`, como en local. |
+| `DJANGO_SECRET_KEY` | Una clave nueva para este entorno, con el comando de "Environment variables". |
+| `DJANGO_ALLOWED_HOSTS` | El hostname `*.onrender.com` del servicio, que Render muestra al crearlo. Hasta ponerlo, Django responde 400 a todo. |
+| `POSTGRES_DB` | `postgres`. |
+| `POSTGRES_USER` | `django.<project_ref>`: el rol `django` más la referencia del proyecto (ver abajo). |
+| `POSTGRES_PASSWORD` | La contraseña que le pusiste al rol `django`. |
+| `POSTGRES_HOST` | El host del pooler en modo sesión: panel **Connect** del proyecto, `aws-…-<región>.pooler.supabase.com`. |
+| `POSTGRES_PORT` | `5432`. |
+| `SUPABASE_URL` | La URL del proyecto, `https://<project_ref>.supabase.co`. |
+| `SUPABASE_JWKS_URL` | `<SUPABASE_URL>/auth/v1/.well-known/jwks.json`. |
+| `STORE_ORIGIN` | El origen de la tienda del demo, donde un administrador inicia sesión. |
+| `PANEL_ALLOWED_ORIGINS` | Ese mismo origen. |
+
+No están en `render.yaml`, y casi nunca hacen falta: `DJANGO_CSRF_TRUSTED_ORIGINS` (otro
+dominio que publique formularios, o el origen https del servicio si el proxy no manda
+`X-Forwarded-Proto`), `SUPABASE_JWT_SECRET` (solo si el proyecto todavía firma
+con HS256 en lugar de publicar sus llaves) y `DJANGO_DEBUG`, que no se enciende nunca fuera
+de local. Una prueba (`config/test_deploy.py`) falla si una variable que los settings exigen
+falta en `render.yaml`, si una variable distinta de las cinco primeras de la tabla lleva su
+valor escrito en el archivo o si `PYTHON_VERSION` no coincide con `.python-version`.
+
+### La base de datos: el pooler de Supabase, no la conexión directa
+
+Esto se comprobó contra la documentación vigente de Supabase:
+
+- La conexión directa (`db.<project_ref>.supabase.co:5432`) usa **IPv6** por defecto; solo
+  tiene IPv4 con el complemento de pago.
+- La propia documentación de Supabase lista a **Render** entre las plataformas que solo
+  aceptan IPv4. Un servicio de Render no puede usar la conexión directa.
+- El pooler compartido (Supavisor) es IPv4 y tiene dos modos: **sesión** en el puerto `5432`
+  y transacción en el `6543`. La documentación recomienda el de sesión para clientes
+  persistentes en redes solo IPv4, que es el caso de Django. El usuario lleva la referencia
+  del proyecto: `postgres.<project_ref>` para el rol `postgres`, y `<rol>.<project_ref>` para
+  otro, así que aquí es `django.<project_ref>`.
+
+Lo que **no** se pudo comprobar: `config/settings.py` manda a Postgres la opción de arranque
+`options=-c search_path=django,public`, y la documentación de Supavisor solo describe
+`options=reference=<tenant>`; no encontré que diga que reenvía `-c search_path`. (El
+repositorio de Supavisor tiene trabajo reciente sobre validar sus opciones de arranque, el PR
+#1201, y ahí una opción inválida se avisa con un NOTICE y no se rechaza.) Compruébalo con el
+pooler real, desde tu máquina:
+
+```bash
+psql "postgresql://django.<project_ref>:<contraseña>@<host del pooler>:5432/postgres" \
+  -c "SHOW search_path;"
+```
+
+Si no dice `django, public`, deja el orden fijo en el propio rol, desde el editor SQL del
+proyecto:
+
+```sql
+ALTER ROLE django SET search_path = django, public;
+```
+
+PostgreSQL aplica esa configuración al inicio de cada sesión nueva del rol (documentación de
+`ALTER ROLE`), y no depende de que el pooler reenvíe nada. Como el rol y el esquema se llaman
+igual, el `search_path` por defecto (`"$user", public`) debería resolver ya a
+`django, public`; el comando de arriba lo confirma.
+
+### Qué hace el Blueprint y el build
+
+`render.yaml` define un servicio `web` con `runtime: python`, `plan: free`, `rootDir: backend`
+y `branch: practicas-ebac`, y con `autoDeployTrigger: commit`: cada commit a esa rama vuelve
+a desplegar el demo. Los comandos:
+
+| | Comando |
+| --- | --- |
+| Build | `bash scripts/render_build.sh` |
+| Start | `uv run --frozen --no-dev gunicorn config.wsgi:application --bind 0.0.0.0:$PORT` |
+
+`scripts/render_build.sh` corre con `backend/` como directorio y hace, en este orden:
+
+1. Usa `uv` (Render lo agrega si la raíz del servicio tiene `uv.lock`; si no, lo instala con
+   `pip` en la versión que escribió el lock) y corre `uv sync --frozen --no-dev`: las
+   dependencias exactas del lock, sin `ruff`.
+2. `collectstatic --noinput`: copia cada archivo estático a `staticfiles/` con un hash en el
+   nombre y una copia comprimida. WhiteNoise los sirve desde el propio proceso de Django,
+   con una caché que no vence porque el hash cambia con el contenido; no hace falta otro
+   servidor. `staticfiles/` no se versiona.
+3. `migrate` **por etiqueta, una app a la vez**: `contenttypes`, `auth`, `admin`, `sessions`,
+   `inventory`, `ecommerce` y `panel`, nunca un `migrate` sin etiqueta. Django es dueño de
+   unas pocas tablas de la base compartida y la regla del proyecto es nombrar lo que se
+   migra. Una prueba compara esa lista con las apps que tienen migraciones, para que una
+   app nueva no se quede fuera. `migrate` corre antes el chequeo `config.E001`: si el
+   esquema `django` no existe, el build se detiene con un mensaje claro y no crea tablas
+   en `public`.
+
+El arranque usa `--frozen --no-dev` para que `uv run` no busque herramientas de desarrollo ni
+un lock nuevo cada vez que el servicio despierta, y `--bind 0.0.0.0:$PORT` porque Render
+define el puerto en `PORT` y enruta a él. No se enciende el registro de accesos de `gunicorn`
+(`--access-logfile`): cada línea llevaría la ruta de la petición, y la de una invitación
+lleva su token.
+
+Con `DEBUG` apagado, Django no escribe en consola el error de una petición que falla; lo
+manda por correo a `ADMINS`, que aquí no existe. En un host cuyo único rastro es la salida
+del proceso eso dejaría las fallas sin explicación, así que `config/settings.py` envía los
+errores del logger `django.request` a la consola. Solo errores: un 404 se registra como aviso
+con su ruta, y la de una invitación lleva el token.
+
+### Detrás del proxy de Render
+
+Render termina TLS en su balanceador y le habla al servicio por http (y manda a https las
+peticiones http), según su documentación. Lo habitual es que ese proxy ponga
+`X-Forwarded-Proto: https`; la documentación de referencia de Render no la nombra, y eso
+quedó sin comprobar (ver al final). `gunicorn` solo cree esa cabecera si quien se conecta
+está en `--forwarded-allow-ips` (por defecto, `127.0.0.1`), y el proxy de Render, que es otra
+máquina, no lo está. Sin más, Django ve todas las peticiones como http, y su comprobación
+CSRF, que compara el `Origin` del formulario (https) con el esquema de la petición, rechaza
+todos los POST. `DJANGO_BEHIND_PROXY=true` activa `SECURE_PROXY_SSL_HEADER`, que le dice a
+Django que crea esa cabecera aunque `gunicorn` no. Se comprobó con `gunicorn` real y un
+cliente que este no considera de confianza: el mismo POST con `Origin: https://…` da 403 sin
+la variable y 302 con ella.
+
+Está apagada por defecto porque Django cree lo que diga esa cabecera: solo es seguro cuando un
+proxy la pone y el cliente no puede, y con la app alcanzable de otra forma cualquiera podría
+mandarla. Una prueba (`config/test_deploy.py`) fija las dos mitades.
+
+### Archivos estáticos en local
+
+Con `DJANGO_DEBUG=True`, `runserver` sirve los archivos desde donde están y no hace falta nada.
+Con `DJANGO_DEBUG=False`, el almacenamiento con hash exige que antes corra
+`uv run python manage.py collectstatic`. Los tests no lo necesitan: `config/settings_test.py`
+usa el almacenamiento simple y deja fuera a WhiteNoise.
+
+### Límites del plan gratuito (según la documentación de Render)
+
+- El servicio se **duerme tras 15 minutos sin tráfico** y despertarlo tarda alrededor de un
+  minuto: la primera visita de quien revisa es lenta.
+- Cada workspace tiene 750 horas de instancia gratuitas al mes.
+- **No hay Shell ni SSH** en un servicio gratuito. Por eso las invitaciones se emiten desde tu
+  máquina, contra la base del demo, con las variables del demo exportadas en tu terminal (no
+  las pegues en `backend/.env`):
+
+  ```bash
+  uv run python manage.py issue_review_invite --supabase-user <uuid> \
+    --label "Profesora M15" --days 7 --base-url https://<servicio>.onrender.com
+  ```
+
+- El sistema de archivos es efímero y no hay disco persistente: nada se guarda en disco. Las
+  sesiones y las invitaciones viven en Postgres.
+
+### Primer despliegue
+
+1. En Render: New → Blueprint → conecta el repo y elige `practicas-ebac`. Render lee
+   `render.yaml` y pide los valores de las variables con `sync: false`.
+2. Cuando exista el servicio, copia su hostname `*.onrender.com` a `DJANGO_ALLOWED_HOSTS` y
+   vuelve a desplegar.
+3. Emite una invitación (arriba), ábrela, pulsa «Entrar al panel».
+4. Para revocarla: `/admin/` del demo → «Invitaciones de revisión» (el admin de Django pide
+   un superusuario con contraseña, que se crea con `createsuperuser` y las variables del demo
+   en tu terminal), o, sin admin, desde el editor SQL de Supabase:
+   `UPDATE django.panel_reviewinvite SET revoked_at = now() WHERE id = <id>;`.
+
+### Lo que no se pudo comprobar
+
+- Que `uv run` funcione como comando de arranque en Render: su documentación describe `uv` para
+  el build y no menciona `uv run` al arrancar. Si falla, usa
+  `.venv/bin/gunicorn config.wsgi:application --bind 0.0.0.0:$PORT`.
+- Que Render ponga su Python en el `PATH` que ve `uv` (lo que `UV_PYTHON_PREFERENCE=only-system`
+  necesita) y que `.venv/` llegue intacto del build al arranque.
+- Que el proxy de Render mande `X-Forwarded-Proto: https` en cada petición. Si no lo hiciera,
+  el síntoma sería un 403 de CSRF en todos los POST, y la salida es
+  `DJANGO_CSRF_TRUSTED_ORIGINS=https://<hostname del servicio>`: con el origen en esa lista, la
+  comprobación no depende del esquema que Django crea ver.
+- Lo del pooler y `options`, arriba.
+- Un despliegue real: todo lo demás se comprobó en local (`collectstatic` con las
+  configuraciones reales, `gunicorn` sirviendo los archivos con caché inmutable) y con las
+  pruebas, no en Render.
+
 ## Panel frame
 
 Every page of the panel extends `templates/panel/base.html`: the sidebar from
@@ -589,6 +796,13 @@ with raw SQL, the way Supabase does. It starts from the fixture
 `inventory/fixtures/categories.json`, the 9 real categories dumped with
 `dumpdata inventory.Category`. The `config.E001` system check only runs against
 Postgres; other databases have no `django` schema to verify.
+
+`config/test_deploy.py` covers the deployment: the settings that read the environment
+(`DJANGO_BEHIND_PROXY`, `DJANGO_CSRF_TRUSTED_ORIGINS`, imported in a fresh interpreter), why
+the proxy header matters for the CSRF check, WhiteNoise's place in the middleware, the logging
+of server errors, and `render.yaml` and `scripts/render_build.sh` against the code they
+configure (the variables the settings require, the plain values it may hold, the apps that
+have migrations).
 
 `panel/test_invites.py` covers the review invites: the model (only the hash is stored,
 the ways a link stops working, the landing path rules), the confirmation page and its

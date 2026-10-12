@@ -1,0 +1,60 @@
+# Render Blueprint for the review demo: one free web service that serves the Django panel of
+# backend/ from the branch `practicas-ebac`, for reviewers who open it with an invite link.
+#
+# This file holds no secret and no value that belongs to one environment. Each of those is declared
+# with `sync: false`: Render asks for it in the Dashboard when the Blueprint is first created, and
+# ignores the file for it afterwards (change it in the Environment tab of the service). What each
+# one is and where it comes from: "Despliegue del entorno de revisión (demo)" in backend/README.md.
+#
+# It is a DEMO environment. It needs a Supabase project of its own with fake data, never the real
+# one: REVIEW_INVITES_ENABLED turns on links that open the panel as an administrator.
+services:
+  - type: web
+    name: carni-backend-demo
+    runtime: python
+    plan: free
+    # Region: Render's default is oregon and it cannot be changed after the service is created.
+    # Pick the one closest to the Supabase project first, for example `region: virginia`.
+    branch: practicas-ebac
+    rootDir: backend
+    autoDeployTrigger: commit
+    buildCommand: bash scripts/render_build.sh
+    # `--frozen --no-dev`: the same environment the build made, without looking for dev tools or a
+    # new lock on every start (a free service starts again after each sleep). No access log is
+    # turned on: the path of a review invite holds its token.
+    startCommand: uv run --frozen --no-dev gunicorn config.wsgi:application --bind 0.0.0.0:$PORT
+    envVars:
+      # Plain values: neither secret nor specific to one environment.
+      - key: PYTHON_VERSION
+        value: 3.12.11
+      - key: UV_PYTHON_PREFERENCE
+        value: only-system
+      - key: DJANGO_BEHIND_PROXY
+        value: "true"
+      - key: REVIEW_INVITES_ENABLED
+        value: "true"
+      - key: PANEL_TOKEN_MAX_AGE_SECONDS
+        value: "300"
+      # Typed by the owner in the Dashboard.
+      - key: DJANGO_SECRET_KEY
+        sync: false
+      - key: DJANGO_ALLOWED_HOSTS
+        sync: false
+      - key: POSTGRES_DB
+        sync: false
+      - key: POSTGRES_USER
+        sync: false
+      - key: POSTGRES_PASSWORD
+        sync: false
+      - key: POSTGRES_HOST
+        sync: false
+      - key: POSTGRES_PORT
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_JWKS_URL
+        sync: false
+      - key: STORE_ORIGIN
+        sync: false
+      - key: PANEL_ALLOWED_ORIGINS
+        sync: false

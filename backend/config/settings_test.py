@@ -30,6 +30,9 @@ os.environ["DJANGO_COOKIE_SAMESITE"] = "Lax"
 # The review invites stay off unless a test turns them on. An empty value is the "unset" case, so
 # the tests see the default whatever backend/.env says.
 os.environ["REVIEW_INVITES_ENABLED"] = ""
+# The deployment settings start unset, for the same reason.
+os.environ["DJANGO_BEHIND_PROXY"] = ""
+os.environ["DJANGO_CSRF_TRUSTED_ORIGINS"] = ""
 
 from .settings import *  # noqa: E402, F403
 
@@ -46,6 +49,19 @@ DATABASES = {
 MIGRATION_MODULES = {"inventory": None, "panel": None}
 
 TEST_RUNNER = "config.test_runner.UnmanagedModelsTestRunner"
+
+# The real settings serve static files with WhiteNoise, under hashed names that need `collectstatic`
+# to have run (the Render build does it). The tests serve them from where they are, as before, and
+# leave WhiteNoise out: it warns about a STATIC_ROOT that does not exist yet.
+STORAGES = {
+    **STORAGES,  # noqa: F405
+    "staticfiles": {"BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"},
+}
+MIDDLEWARE = [
+    middleware
+    for middleware in MIDDLEWARE  # noqa: F405
+    if middleware != "whitenoise.middleware.WhiteNoiseMiddleware"
+]
 
 # MD5 is insecure and fast, which is what a throwaway test database wants.
 PASSWORD_HASHERS = ["django.contrib.auth.hashers.MD5PasswordHasher"]

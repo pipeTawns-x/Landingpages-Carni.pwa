@@ -6,6 +6,7 @@ from django.test import SimpleTestCase
 from config.env import (
     parse_bool,
     parse_http_url,
+    parse_optional_origins,
     parse_origin,
     parse_origins,
     parse_positive_int,
@@ -84,6 +85,35 @@ class ParseOriginsTests(SimpleTestCase):
     def test_one_bad_entry_fails_the_whole_list(self):
         with self.assertRaises(ImproperlyConfigured):
             parse_origins("http://localhost:3002,not-an-origin", "X")
+
+
+class ParseOptionalOriginsTests(SimpleTestCase):
+    def test_an_unset_or_empty_variable_gives_no_origins(self):
+        for raw in (None, "", "   "):
+            with self.subTest(raw=raw):
+                self.assertEqual(parse_optional_origins(raw, "X"), [])
+
+    def test_a_list_is_parsed_like_the_required_one(self):
+        raw = (
+            "https://demo.onrender.com, https://tienda.example.com:8443/, https://demo.onrender.com"
+        )
+
+        self.assertEqual(
+            parse_optional_origins(raw, "X"),
+            ["https://demo.onrender.com", "https://tienda.example.com:8443"],
+        )
+
+    def test_something_that_is_only_separators_is_a_mistake_and_fails(self):
+        with self.assertRaisesMessage(ImproperlyConfigured, "at least one origin"):
+            parse_optional_origins(" , ", "X")
+
+    def test_a_bad_entry_fails_and_names_the_variable(self):
+        for raw in ("demo.onrender.com", "https://demo.onrender.com/path", "ftp://x.example"):
+            with (
+                self.subTest(raw=raw),
+                self.assertRaisesMessage(ImproperlyConfigured, "DJANGO_CSRF_TRUSTED_ORIGINS"),
+            ):
+                parse_optional_origins(raw, "DJANGO_CSRF_TRUSTED_ORIGINS")
 
 
 class ParsePositiveIntTests(SimpleTestCase):

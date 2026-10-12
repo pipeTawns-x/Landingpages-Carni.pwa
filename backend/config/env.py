@@ -69,6 +69,17 @@ def parse_origins(raw: str, name: str) -> list[str]:
     return list(dict.fromkeys(origins))
 
 
+def parse_optional_origins(raw: str | None, name: str) -> list[str]:
+    """Parse a comma-separated list of origins that may be left out: unset or empty gives [].
+
+    Anything else goes through `parse_origins`, so a list that is only separators is still a
+    mistake worth stopping at startup.
+    """
+    if raw is None or not raw.strip():
+        return []
+    return parse_origins(raw, name)
+
+
 def parse_bool(raw: str | None, name: str, *, default: bool) -> bool:
     """Read a True/False variable. Unset or empty gives `default`; anything unclear fails.
 
