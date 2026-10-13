@@ -407,7 +407,7 @@ ahí, porque un formulario no puede mostrar el enlace una sola vez.
 
 - El token va en la dirección. Queda en el historial del navegador de quien lo abre y, si
   el servidor o un proxy guardan las rutas de cada petición, en esos registros. Por eso
-  `gunicorn` no se arranca con registro de accesos en la demostración. Lo que limita el
+  el registro de accesos de `gunicorn` se manda a `/dev/null` en la demostración. Lo que limita el
   daño es el vencimiento, la revocación y el límite de usos.
 - Quien reenvía el enlace da acceso: es una llave al portador.
 - No hay límite de intentos por IP. Con 256 bits de token no hace falta.
@@ -553,9 +553,10 @@ a desplegar el demo. Los comandos:
 
 El arranque usa `--frozen --no-dev` para que `uv run` no busque herramientas de desarrollo ni
 un lock nuevo cada vez que el servicio despierta, y `--bind 0.0.0.0:$PORT` porque Render
-define el puerto en `PORT` y enruta a él. No se enciende el registro de accesos de `gunicorn`
-(`--access-logfile`): cada línea llevaría la ruta de la petición, y la de una invitación
-lleva su token.
+define el puerto en `PORT` y enruta a él. El registro de accesos de `gunicorn` va a
+`/dev/null` (`--access-logfile /dev/null`): cada línea llevaría la ruta de la petición, y la de
+una invitación lleva su token. No alcanza con no pedirlo: el primer despliegue mostró que Render
+lo enciende por su cuenta, y un flag en la línea de comandos le gana a `GUNICORN_CMD_ARGS`.
 
 Con `DEBUG` apagado, Django no escribe en consola el error de una petición que falla; lo
 manda por correo a `ADMINS`, que aquí no existe. En un host cuyo único rastro es la salida

@@ -23,9 +23,11 @@ services:
     autoDeployTrigger: commit
     buildCommand: bash scripts/render_build.sh
     # `--frozen --no-dev`: the same environment the build made, without looking for dev tools or a
-    # new lock on every start (a free service starts again after each sleep). No access log is
-    # turned on: the path of a review invite holds its token.
-    startCommand: uv run --frozen --no-dev gunicorn config.wsgi:application --bind 0.0.0.0:$PORT
+    # new lock on every start (a free service starts again after each sleep). The access log is
+    # sent to /dev/null on purpose: the path of a review invite holds its token, and Render turns
+    # gunicorn's access log on by itself (the first deploy logged every path). A flag on the
+    # command line wins over GUNICORN_CMD_ARGS.
+    startCommand: uv run --frozen --no-dev gunicorn config.wsgi:application --bind 0.0.0.0:$PORT --access-logfile /dev/null
     envVars:
       # Plain values: neither secret nor specific to one environment.
       # No UV_PYTHON_PREFERENCE: Render already sets UV_NO_MANAGED_PYTHON (uv only uses the

@@ -407,12 +407,14 @@ class BlueprintTests(SimpleTestCase):
     def test_the_start_does_not_sync_the_dev_group_and_does_not_log_accesses(self):
         # A free service starts again after every sleep: `uv run` must not reach for dev tools.
         # An access log would write the path of every request, and the path of a review invite
-        # holds its token.
+        # holds its token. Leaving the flag out is not enough: Render turns gunicorn's access log
+        # on by itself (the first deploy logged every path), so it is sent to /dev/null on the
+        # command line, which wins over GUNICORN_CMD_ARGS.
         start = self.service["startCommand"]
 
         self.assertIn("--no-dev", start)
         self.assertIn("--frozen", start)
-        self.assertNotIn("--access-logfile", start)
+        self.assertTrue(start.endswith("--access-logfile /dev/null"), start)
         self.assertNotIn("--reload", start)
 
     def test_every_variable_the_settings_require_is_declared(self):
