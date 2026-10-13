@@ -1,8 +1,8 @@
 /**
- * Copia deliberada de `assetUrl` (src/entry/shared.tsx), no una reexportación.
+ * Copia deliberada de `assetUrl` (el `shared.tsx` de las entradas), no una reexportación.
  *
- * `src/entry/shared.tsx` importa, en su primera línea, `getProducts` y
- * `getCategories` de `js/modules/supabase.js` — y ese archivo LANZA una
+ * Ese `shared.tsx` importa, en su primera línea, `getProducts` y
+ * `getCategories` del cliente vanilla de Supabase (`supabase.js`) — y ese archivo LANZA una
  * excepción en el nivel superior del módulo si `VITE_SUPABASE_URL` /
  * `VITE_SUPABASE_ANON_KEY` no están definidas (líneas 10-14 de ese archivo).
  * Un `import` estático de cualquier cosa de `shared.tsx`, aunque sea solo
@@ -12,8 +12,8 @@
  * TODO el árbol de imports que llega hasta ella.
  *
  * Se comprobó en vivo: con la landing importando `assetUrl` desde
- * `@src/entry/shared`, la página quedaba completamente en blanco en este
- * entorno (sin variables VITE_SUPABASE_* configuradas) — React nunca
+ * el `shared.tsx` de las entradas, la página quedaba completamente en blanco en este
+ * entorno (sin las variables de Supabase configuradas) — React nunca
  * llegaba a montar nada. `index.html` tiene el mismo problema de fondo
  * (`home.tsx` también importa de `shared.tsx`), pero ahí queda parcialmente
  * disimulado porque la mayoría de esa página es HTML estático con islas de
@@ -24,7 +24,7 @@
  * `import.meta.env.BASE_URL` — así que copiarla aquí, fuera de esa cadena de
  * imports, es lo que evita el problema sin tocar `shared.tsx` (un módulo
  * compartido con otras páginas, fuera del alcance de esta tarea) ni
- * `js/modules/supabase.js`. Debe quedar en sincronía a mano si
+ * el cliente vanilla (`supabase.js`). Debe quedar en sincronía a mano si
  * `assetUrl` cambia allá.
  */
 export function assetUrl(path: string): string {
