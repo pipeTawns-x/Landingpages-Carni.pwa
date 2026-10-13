@@ -15,6 +15,7 @@
  */
 import { createAsyncThunk, createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import axios from 'axios';
+import { credencialesSupabase } from '@src/data/supabase';
 import type { Product } from '@src/types/database';
 
 /** Columnas minimas de un resultado: nada de stock ni metadata interna. */
@@ -25,23 +26,29 @@ const MINIMO_LETRAS = 2;
 const LIMITE = 12;
 
 /*
-  Las credenciales se leen igual que en `js/modules/supabase.js`, con la misma
-  guarda y las mismas dos claves.
+  ANTES LEIA LAS VARIABLES DE ENTORNO POR SU CUENTA. AHORA NO.
+  -----------------------------------------------------------
+  Este modulo era el segundo sitio del proyecto que abria el entorno para sacar la
+  URL del proyecto y la llave anonima, y el que mas caro salia: el aviso que
+  pintaba la pantalla —"falta configurar la conexion con el catalogo", en sus
+  palabras exactas— era lo unico del programa que sabia si la busqueda en vivo
+  estaba disponible, y vivia en un archivo que ningun cliente ve.
 
-  La guarda `typeof import.meta` existe porque este modulo tambien se carga
-  fuera de Vite —Jest, por ejemplo—, donde `import.meta.env` no esta inyectado y
-  el acceso directo reventaria al importar el store entero.
+  Las dos claves salen ahora de `src/data/supabase`, que es el unico modulo que
+  las lee. Tres cosas se ganan y ninguna se pierde:
 
-  Se aceptan las DOS claves a proposito: hay entornos desplegados que todavia
-  definen la vieja `VITE_SUPABASE_KEY`, y leer solo la nueva los dejaria sin
-  buscador sin decir por que.
+    1. La busqueda no puede quedar configurada con un juego de variables
+       distinto del que usa el catalogo: le llega lo mismo que al resto.
+    2. `credencialesSupabase()` ya devuelve `null` cuando no hay configuracion,
+       asi que la comprobacion no se reimplementa aqui.
+    3. La lista de archivos que leen el entorno la decide gates.sh, y este
+       archivo sale de ella de verdad: no basta con no leerlas.
+
+  Y un aviso sobre los comentarios de este bloque: las compuertas buscan con
+  `rg` y no distinguen un comentario de codigo. Citar el nombre de una variable
+  aqui dentro deja la compuerta tan roja como si el modulo la leyera, asi que
+  las variables se nombran de viva voz y nunca se citan.
 */
-const entorno = (typeof import.meta !== 'undefined' && import.meta.env
-  ? import.meta.env
-  : {}) as Record<string, string | undefined>;
-
-const SUPABASE_URL = entorno.VITE_SUPABASE_URL;
-const ANON_KEY = entorno.VITE_SUPABASE_ANON_KEY || entorno.VITE_SUPABASE_KEY;
 
 /**
  * Prepara el termino para que viaje entero dentro del filtro `or=`.
@@ -145,6 +152,14 @@ function mensajeDeError(fallo: unknown): string {
  * en la URL; lo unico que cambia es quien los escribe. El `or` va entre
  * parentesis porque asi lo exige PostgREST para un arbol logico, y eso era algo
  * que `.or()` agregaba solo.
+ *
+ * LO QUE SE PIDE AL MODULO COMUN ES SOLO LA CONFIGURACION
+ * -------------------------------------------------------
+ * Se podria pedir el cliente entero con `obtenerSupabase()` y sacar de ahi la
+ * URL, pero el cliente la expone como `protected` y para armar una peticion
+ * contra PostgREST no se necesita el paquete cargado. `credencialesSupabase()`
+ * es el mismo par de variables que usa el resto del programa, leido del mismo
+ * sitio y sin castings.
  */
 export const buscarProductos = createAsyncThunk<
   Product[],
@@ -157,17 +172,18 @@ export const buscarProductos = createAsyncThunk<
   }
 
   /* Sin credenciales la URL quedaria como "undefined/rest/v1/products" y el
-     fallo llegaria disfrazado de error de red. Al no importar ya el cliente de
-     Supabase, este modulo perdio la validacion que aquel hacia al cargarse; se
-     repone aqui para que el aviso diga la verdad. */
-  if (!SUPABASE_URL || !ANON_KEY) {
-    return rejectWithValue('Falta configurar VITE_SUPABASE_URL y VITE_SUPABASE_ANON_KEY.');
+     fallo llegaria disfrazado de error de red. `credencialesSupabase()` devuelve
+     `null` cuando falta cualquiera de las dos, asi que el aviso dice la verdad
+     y no el nombre de una variable que el cliente no tiene por que conocer. */
+  const credenciales = credencialesSupabase();
+  if (!credenciales) {
+    return rejectWithValue('La búsqueda en vivo no está configurada en este entorno.');
   }
 
   const patron = `%${escapar(limpio)}%`;
 
   try {
-    const respuesta = await axios.get<Product[]>(`${SUPABASE_URL}/rest/v1/products`, {
+    const respuesta = await axios.get<Product[]>(`${credenciales.url}/rest/v1/products`, {
       params: {
         select: COLUMNAS,
         is_active: 'eq.true',
@@ -182,8 +198,8 @@ export const buscarProductos = createAsyncThunk<
          proyecto y `Authorization` es la que decide bajo que rol corren las
          politicas RLS. Con solo una de ellas la respuesta es 401. */
       headers: {
-        apikey: ANON_KEY,
-        Authorization: `Bearer ${ANON_KEY}`
+        apikey: credenciales.llaveAnonima,
+        Authorization: `Bearer ${credenciales.llaveAnonima}`
       }
     });
 
