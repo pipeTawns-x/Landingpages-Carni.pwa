@@ -70,8 +70,15 @@ module.exports = {
       },
       // El alias que usa el codigo de produccion (vite.config.ts y tsconfig).
       // Sin esto, `@src/theme/carniTheme` no existe para Jest.
+      //
+      // Y los estilos: Vite los inyecta en la pagina, Jest no tiene quien lo
+      // haga, asi que `import './Hoja.css'` (el marco de la superposicion
+      // comun) no encuentra transformador para esa extension y tumba el
+      // modulo. Se apuntan al modulo vacio de los helpers de este mismo
+      // directorio: en las pruebas no hay nada que pintar y ninguna mide CSS.
       moduleNameMapper: {
-        '^@src/(.*)$': '<rootDir>/src/$1'
+        '^@src/(.*)$': '<rootDir>/src/$1',
+        '\\.css$': '<rootDir>/src/components/__tests__/estilosVacios.ts'
       }
     }
   ],

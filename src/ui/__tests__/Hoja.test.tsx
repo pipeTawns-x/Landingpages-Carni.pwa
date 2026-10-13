@@ -2,37 +2,19 @@
  * Los globales de Jest se importan a mano: `tsconfig.json` fija `types` sin los
  * de Jest, así que `describe` y `expect` no existen para TypeScript aunque sí
  * existan al ejecutar.
+ *
+ * El shim de `<dialog>` (`showModal`/`close`) NO está aquí: vive en
+ * `src/components/__tests__/polyfillsJsdom.ts`, que es `setupFiles` y lo instala
+ * para todas las suites. La primera prueba que lo traía duplicado fue la de esta
+ * hoja; la de la búsqueda lo necesitaba también y ya no tiene por qué escribirlo
+ * otra vez.
  */
-import { beforeAll, describe, expect, jest, test } from '@jest/globals';
+import { describe, expect, jest, test } from '@jest/globals';
 import '@testing-library/jest-dom/jest-globals';
 import { StrictMode } from 'react';
 import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Hoja } from '../Hoja';
-
-/**
- * jsdom no implementa `showModal()` ni `close()` del `<dialog>`. Este polyfill
- * mínimo hace lo justo para probar el comportamiento de la Hoja: abrir pone el
- * atributo `open`; cerrar lo quita y despacha `close`, como el navegador.
- */
-beforeAll(() => {
-  const prototipo = HTMLDialogElement.prototype;
-
-  if (typeof prototipo.showModal !== 'function') {
-    prototipo.showModal = function showModal(this: HTMLDialogElement): void {
-      this.setAttribute('open', '');
-    };
-  }
-  if (typeof prototipo.close !== 'function') {
-    prototipo.close = function close(this: HTMLDialogElement): void {
-      if (!this.hasAttribute('open')) {
-        return;
-      }
-      this.removeAttribute('open');
-      this.dispatchEvent(new Event('close'));
-    };
-  }
-});
 
 function pintar(abierta = true, alCerrar: () => void = jest.fn<() => void>()) {
   const propiedades = {

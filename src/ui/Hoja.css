@@ -1,0 +1,353 @@
+/**
+ * El marco de `Hoja`, en CSS plano y con clases propias.
+ *
+ * POR QUÉ NO ES UN ARCHIVO DE UTILIDADES
+ * --------------------------------------
+ * `Hoja` es la única superposición del proyecto y la usan páginas de dos
+ * mundos: la carcasa nueva, que carga `src/styles/tailwind.css`, y las páginas
+ * viejas del sitio, que nunca lo cargan a propósito —cargar su reinicio global
+ * ahí parte el Bootstrap que las sostiene—. Con utilidades, el marco se veía
+ * bien en un mundo y a pelo en el otro: en las páginas viejas el diálogo
+ * salía blanco, sin radio, con el velo gris claro del navegador y con una X de
+ * 24×30 en vez de 44×44.
+ *
+ * Por eso ningún valor de este archivo depende de que exista una clase: cada
+ * uno se escribe `var(--token, valor-de-respaldo)`. Así decide la hoja de
+ * estilos que la página ya carga, y esta primitiva no obliga a cargar nada:
+ *
+ *   - donde existe el token, gana el diseño nuevo —tema oscuro, radio y velo
+ *     del diseño, porque `--color-*` los define `src/styles/tailwind.css:29`;
+ *   - donde no existe, manda el respaldo, y los respaldos salen de
+ *     `src/theme/carniTheme.ts`, que es de donde los sacaba la Lupa vieja con
+ *     sus estilos propios. No hay ninguna paleta nueva aquí.
+ *
+ * DOS FUENTES, UNA DECLARACIÓN
+ * ----------------------------
+ * El bloque de variables de `src/styles/tailwind.css` sigue siendo la ÚNICA
+ * fuente de tokens del diseño; este archivo no los declara, solo los lee. Y cada
+ * respaldo viene de `src/theme/carniTheme.ts`, la paleta clara de las páginas
+ * viejas. Si un valor de carniTheme cambia, hay que cambiar aquí el respaldo que
+ * lo copia: es el mismo precio que paga `src/components/Lupa/styles.ts`.
+ *
+ * LO QUE NO HAY AQUÍ
+ * ------------------
+ * El reinicio global, las variables del tema y el velo de la superposición
+ * siguen siendo de quien carga la página. Este archivo solo describe la caja,
+ * el velo del `<dialog>` y sus tres piezas: cabecera, cuerpo y pie.
+ */
+
+/* ------------------------------------------------------------ marco común -- */
+
+/*
+ * `dialog:modal` trae del navegador cosas que estorban y que el reinicio global
+ * de Tailwind tapaba sin que nadie lo supiera: `margin: auto`, `padding: 1em`,
+ * `border: solid`, `background-color: Canvas` y un `max-width`/`max-height`
+ * calculados que recortan la caja. Aquí se anulan uno por uno, que es lo que
+ * hace hoy `m-0 p-0 bg-surface-1 text-text` —más lo que el navegador pone.
+ */
+.hoja {
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background-color: var(--color-surface-1, #ffffff);
+  color: var(--color-text, #363432);
+  font-family: var(--font-sans, inherit);
+
+  /*
+   * Entrada y salida. Solo `translate`, `scale` y `opacity`: se animan en la GPU
+   * y una interrupción a medias se reencamina sin saltos. `display` y `overlay`
+   * con `allow-discrete` mantienen el diálogo en la capa superior mientras dura
+   * la salida; sin soporte, simplemente cierra sin animar.
+   */
+  transition-property: translate, scale, opacity, display, overlay;
+  transition-behavior: allow-discrete;
+  transition-duration: 300ms;
+  transition-timing-function: var(--ease-drawer, cubic-bezier(0.32, 0.72, 0, 1));
+}
+
+/*
+ * El velo. Es `::backdrop`, un pseudoelemento del `<dialog>`: no admite clase, y
+ * una utilidad no lo alcanza nunca. El navegador lo deja en `rgb(0 0 0 / 0.1)`.
+ * La X —`.hoja__cerrar`, con su `aria-label` puesto por `Hoja`— es del
+ * `<button>` de dentro y esta regla no la toca.
+ *
+ * `--color-backdrop` no existe todavía en el bloque de variables del diseño; el
+ * respaldo es el valor que ese diseño ya usa hoy (negro al 60 %), así que el
+ * velo se ve igual en los dos mundos y el token queda ahí para el día en que
+ * alguien lo declare.
+ */
+.hoja::backdrop {
+  background-color: var(--color-backdrop, rgb(0 0 0 / 0.6));
+  opacity: 0;
+  transition-property: opacity, display, overlay;
+  transition-behavior: allow-discrete;
+  transition-duration: 300ms;
+  transition-timing-function: var(--ease-drawer, cubic-bezier(0.32, 0.72, 0, 1));
+}
+
+.hoja[open]::backdrop {
+  opacity: 1;
+}
+
+@starting-style {
+  .hoja[open]::backdrop {
+    opacity: 0;
+  }
+}
+
+/* ------------------------------------------------------- interior y piezas -- */
+
+/*
+ * Columnaflex con la cabecera fija arriba, el cuerpo con scroll en el medio y el
+ * pie fijo abajo. `min-height: 0` es lo que permite que el cuerpo encoja: sin
+ * él, un contenido largo estira la columna y el scroll se va al `<dialog>`.
+ */
+.hoja__interior {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* Las hojas laterales y la inferior ocupan su alto entero; la centrada, el suyo. */
+.hoja:not(.hoja--centro) .hoja__interior {
+  height: 100%;
+}
+
+.hoja--centro .hoja__interior {
+  max-height: 85dvh;
+}
+
+/* La cabecera no se desplaza: es el ancla del título y de la X. */
+.hoja__cabecera {
+  display: flex;
+  flex-shrink: 0;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.75rem 0.5rem 0.75rem 1.25rem;
+  border-bottom: 1px solid var(--color-border, color-mix(in srgb, #363432 14%, transparent));
+}
+
+.hoja__inicio {
+  flex-shrink: 0;
+  padding-top: 0.125rem;
+}
+
+.hoja__titulos {
+  min-width: 0;
+  flex: 1 1 0%;
+  padding: 0.5rem 0;
+}
+
+/*
+ * El título. En las páginas viejas el `<h2>` es un título de Bootstrap —2rem en
+ * negrita con su margen—, así que tamaño, peso, márgenes y familia se escriben
+ * aquí en vez de heredarlos: el respaldo del tamaño es el que ya usaba el
+ * rótulo de la Lupa vieja.
+ */
+.hoja__titulo {
+  margin: 0;
+  font-size: var(--text-titulo, 1.15rem);
+  line-height: var(--text-titulo--line-height, 1.2);
+  font-weight: 500;
+  font-family: var(--font-display, inherit);
+  /* Recibe el foco al abrir, no el usuario: el anillo se pone en la X. */
+  outline: none;
+}
+
+.hoja__descripcion {
+  margin: 0.25rem 0 0;
+  font-size: var(--text-meta, 0.8125rem);
+  line-height: var(--text-meta--line-height, 1.125rem);
+  color: var(--color-text-muted, #a3a3a3);
+}
+
+/*
+ * La X. 44×44 exactos, que es el mínimo táctil: en las páginas viejas mide lo
+ * mismo porque el ancho y el alto van escritos, no heredados de una utilidad.
+ * El `padding: 0` quita el del botón de Bootstrap, que también empuja la caja.
+ */
+.hoja__cerrar {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-pill, 9999px);
+  background-color: transparent;
+  color: var(--color-text-muted, #a3a3a3);
+  cursor: pointer;
+  /* Que el doble toque no haga zoom: el resto de la hoja no lo hace. */
+  touch-action: manipulation;
+  transition-property: background-color, color, scale;
+  transition-duration: 150ms;
+  transition-timing-function: var(--ease-out-strong, cubic-bezier(0.23, 1, 0.32, 1));
+}
+
+.hoja__cerrar:hover {
+  background-color: var(--color-surface-2, #f8f8f8);
+  color: var(--color-text, #363432);
+}
+
+.hoja__cerrar:active {
+  scale: 0.95;
+}
+
+/* El anillo se escribe aquí porque el de las páginas viejas no existe. */
+.hoja__cerrar:focus-visible {
+  outline: 2px solid var(--color-sand, #dc2626);
+  outline-offset: 2px;
+}
+
+/*
+ * El cuerpo: aquí y solo aquí se desplaza la hoja. `overscroll-behavior:
+ * contain` corta la cadena de scroll, para que llegar al final no empiece a
+ * desplazar la página que hay debajo.
+ */
+.hoja__cuerpo {
+  flex: 1 1 0%;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* El pie no se desplaza y respeta la barra de inicio del iPhone. */
+.hoja__pie {
+  flex-shrink: 0;
+  padding: 1rem 1.25rem max(1rem, env(safe-area-inset-bottom));
+  border-top: 1px solid var(--color-border, color-mix(in srgb, #363432 14%, transparent));
+}
+
+/* --------------------------------------------------------- lado: centro ---- */
+
+/*
+ * La centrada. Entra con una escala corta y sin desplazamiento: es una tarea
+ * corta —escribir, elegir, salir— y entra donde está, no desde un borde.
+ */
+.hoja--centro {
+  margin: auto;
+  width: min(92vw, 480px);
+  max-width: none;
+  max-height: 85dvh;
+  border: 1px solid var(--color-border, color-mix(in srgb, #363432 14%, transparent));
+  border-radius: var(--radius-dialog, 1.25rem);
+  opacity: 0;
+  scale: 0.95;
+}
+
+.hoja--centro[open] {
+  opacity: 1;
+  scale: 1;
+}
+
+@starting-style {
+  .hoja--centro[open] {
+    opacity: 0;
+    scale: 0.95;
+  }
+}
+
+/* --------------------------------------------------------- lado: derecha --- */
+
+.hoja--derecha {
+  margin: 0;
+  margin-left: auto;
+  height: 100dvh;
+  max-height: none;
+  width: min(92vw, 420px);
+  max-width: none;
+  translate: 100% 0;
+}
+
+.hoja--derecha[open] {
+  translate: 0 0;
+}
+
+@starting-style {
+  .hoja--derecha[open] {
+    translate: 100% 0;
+  }
+}
+
+/* -------------------------------------------------------- lado: izquierda -- */
+
+.hoja--izquierda {
+  margin: 0;
+  margin-right: auto;
+  height: 100dvh;
+  max-height: none;
+  width: min(86vw, 360px);
+  max-width: none;
+  translate: -100% 0;
+}
+
+.hoja--izquierda[open] {
+  translate: 0 0;
+}
+
+@starting-style {
+  .hoja--izquierda[open] {
+    translate: -100% 0;
+  }
+}
+
+/* --------------------------------------------------------- lado: inferior -- */
+
+.hoja--inferior {
+  margin: 0;
+  margin-top: auto;
+  height: min(80dvh, 640px);
+  max-height: none;
+  width: 100%;
+  max-width: none;
+  border-radius: var(--radius-sheet, 1.25rem) var(--radius-sheet, 1.25rem) 0 0;
+  translate: 0 100%;
+}
+
+.hoja--inferior[open] {
+  translate: 0 0;
+}
+
+@starting-style {
+  .hoja--inferior[open] {
+    translate: 0 100%;
+  }
+}
+
+/*
+ * Desde 64rem la hoja inferior deja de ser una hoja y pasa a ser una tarjeta
+ * apoyada en la esquina: es el corte de Tailwind (`lg`), en rem para que no
+ * dependa del tamaño de fuente del navegador.
+ */
+@media (min-width: 64rem) {
+  .hoja--inferior {
+    top: auto;
+    right: 1.5rem;
+    bottom: 6rem;
+    left: auto;
+    height: min(560px, calc(100dvh - 8rem));
+    width: 380px;
+    border: 1px solid var(--color-border, color-mix(in srgb, #363432 14%, transparent));
+    border-radius: var(--radius-dialog, 1.25rem);
+    transform-origin: bottom right;
+    translate: 0 0;
+    opacity: 0;
+    scale: 0.95;
+  }
+
+  .hoja--inferior[open] {
+    opacity: 1;
+    scale: 1;
+  }
+
+  @starting-style {
+    .hoja--inferior[open] {
+      translate: 0 0;
+      opacity: 0;
+      scale: 0.95;
+    }
+  }
+}

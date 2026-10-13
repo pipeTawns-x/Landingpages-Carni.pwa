@@ -1,5 +1,6 @@
 import { useEffect, useId, useRef, type ReactNode } from 'react';
 import { IconoCerrar } from './iconos';
+import './Hoja.css';
 
 export type LadoHoja = 'derecha' | 'izquierda' | 'inferior' | 'centro';
 
@@ -18,6 +19,17 @@ export interface HojaProps {
   descripcion?: string;
   /** Algo a la izquierda del título, p. ej. el avatar del asistente. */
   inicioEncabezado?: ReactNode;
+  /**
+   * Que el foco inicial caiga en el primer control del contenido en vez de en
+   * el título.
+   *
+   * La regla por defecto es el título, porque es lo que hace que un lector de
+   * pantalla anuncie "Tu pedido, diálogo" y no un control suelto. Pero hay hojas
+   * que son UNA TAREA y no una lectura: la de búsqueda existe para escribir en un
+   * campo, y dejar el foco en la X obliga a tabular para empezar a teclear.
+   * Quien la monta decide; la primitiva no lo adivina.
+   */
+  focoEnContenido?: boolean;
   /** Acciones fijas al pie. */
   pie?: ReactNode;
   children: ReactNode;
@@ -44,44 +56,11 @@ export interface HojaProps {
  */
 
 /**
- * Entrada y salida. Solo `translate`, `scale` y `opacity`: se animan en la GPU
- * y una interrupción a medias se reencamina sin saltos. `display` y `overlay`
- * con `transition-discrete` mantienen el diálogo en la capa superior mientras
- * dura la salida; sin soporte, simplemente cierra sin animar.
+ * El marco —caja, velo, cabecera, cuerpo y pie— no se pinta aquí: está en
+ * `./Hoja.css`, con clases suyas y tokens con respaldo, para que la hoja se vea
+ * igual en las páginas que cargan Tailwind y en las que no lo cargan. Este
+ * archivo solo decide qué lado es y qué va dentro.
  */
-const TRANSICION =
-  'transition-[translate,scale,opacity,display,overlay] transition-discrete duration-300 ease-drawer';
-
-/** El velo de detrás: negro al 60 %, sin desenfoque, con su propio fundido. */
-const VELO =
-  'backdrop:bg-black/60 backdrop:opacity-0 open:backdrop:opacity-100 starting:open:backdrop:opacity-0 ' +
-  'backdrop:transition-[opacity,display,overlay] backdrop:transition-discrete backdrop:duration-300 backdrop:ease-drawer';
-
-const CAJA_POR_LADO: Record<LadoHoja, string> = {
-  derecha:
-    'm-0 ml-auto h-dvh max-h-none w-[min(92vw,420px)] max-w-none bg-surface-1 text-text ' +
-    'translate-x-full open:translate-x-0 starting:open:translate-x-full',
-  izquierda:
-    'm-0 mr-auto h-dvh max-h-none w-[min(86vw,360px)] max-w-none bg-surface-1 text-text ' +
-    '-translate-x-full open:translate-x-0 starting:open:-translate-x-full',
-  inferior:
-    'm-0 mt-auto h-[min(80dvh,640px)] max-h-none w-full max-w-none rounded-t-sheet bg-surface-1 text-text ' +
-    'translate-y-full open:translate-y-0 starting:open:translate-y-full ' +
-    'lg:top-auto lg:right-6 lg:bottom-24 lg:left-auto lg:h-[min(560px,calc(100dvh-8rem))] lg:w-[380px] ' +
-    'lg:origin-bottom-right lg:rounded-dialog lg:border lg:border-border lg:translate-y-0 lg:scale-95 lg:opacity-0 ' +
-    'lg:open:scale-100 lg:open:opacity-100 lg:starting:open:scale-95 lg:starting:open:opacity-0',
-  centro:
-    'm-auto w-[min(92vw,480px)] max-h-[85dvh] max-w-none rounded-dialog border border-border bg-surface-1 text-text ' +
-    'scale-95 opacity-0 open:scale-100 open:opacity-100 starting:open:scale-95 starting:open:opacity-0'
-};
-
-const INTERIOR_POR_LADO: Record<LadoHoja, string> = {
-  derecha: 'h-full',
-  izquierda: 'h-full',
-  inferior: 'h-full',
-  centro: 'max-h-[85dvh]'
-};
-
 export function Hoja({
   abierta,
   alCerrar,
@@ -91,11 +70,13 @@ export function Hoja({
   lado = 'derecha',
   descripcion,
   inicioEncabezado,
+  focoEnContenido = false,
   pie,
   children
 }: HojaProps): JSX.Element {
   const dialogo = useRef<HTMLDialogElement>(null);
   const encabezado = useRef<HTMLHeadingElement>(null);
+  const contenido = useRef<HTMLDivElement>(null);
   const pulsoEnFondo = useRef(false);
   const idTitulo = useId();
   const idDescripcion = useId();
@@ -110,7 +91,17 @@ export function Hoja({
     // diálogo que ya está abierto lanza una excepción.
     if (abierta && !d.open) {
       d.showModal();
-      encabezado.current?.focus({ preventScroll: true });
+
+      // El foco se lo lleva el ÚLTIMO efecto en ejecutarse, y el del hijo corre
+      // antes que el de la hoja: si el contenido se enfocara a sí mismo, esta
+      // línea se lo quitaría. Por eso la política vive aquí y no en el hijo.
+      const primero = focoEnContenido
+        ? contenido.current?.querySelector<HTMLElement>(
+            'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])'
+          )
+        : null;
+
+      (primero ?? encabezado.current)?.focus({ preventScroll: true });
     }
     if (!abierta && d.open) {
       d.close();
@@ -150,17 +141,17 @@ export function Hoja({
         }
         pulsoEnFondo.current = false;
       }}
-      className={`overflow-hidden p-0 ${TRANSICION} ${VELO} ${CAJA_POR_LADO[lado]}`}
+      className={`hoja hoja--${lado}`}
     >
-      <div className={`flex min-h-0 flex-col ${INTERIOR_POR_LADO[lado]}`}>
-        <header className="flex shrink-0 items-start gap-3 border-b border-border py-3 pl-5 pr-2">
-          {inicioEncabezado ? <div className="shrink-0 pt-0.5">{inicioEncabezado}</div> : null}
-          <div className="min-w-0 flex-1 py-2">
-            <h2 id={idTitulo} ref={encabezado} tabIndex={-1} className="text-titulo outline-none">
+      <div className="hoja__interior">
+        <header className="hoja__cabecera">
+          {inicioEncabezado ? <div className="hoja__inicio">{inicioEncabezado}</div> : null}
+          <div className="hoja__titulos">
+            <h2 id={idTitulo} ref={encabezado} tabIndex={-1} className="hoja__titulo">
               {titulo}
             </h2>
             {descripcion ? (
-              <p id={idDescripcion} className="mt-1 text-meta text-text-muted">
+              <p id={idDescripcion} className="hoja__descripcion">
                 {descripcion}
               </p>
             ) : null}
@@ -170,19 +161,17 @@ export function Hoja({
             data-cerrar
             aria-label={etiquetaCerrar}
             onClick={() => dialogo.current?.close()}
-            className="grid size-11 shrink-0 place-items-center rounded-full text-text-muted transition-[background-color,color,scale] duration-150 ease-out-strong hover:bg-surface-2 hover:text-text active:scale-95"
+            className="hoja__cerrar"
           >
             <IconoCerrar tamano={20} />
           </button>
         </header>
 
-        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">{children}</div>
+        <div ref={contenido} className="hoja__cuerpo">
+          {children}
+        </div>
 
-        {pie ? (
-          <footer className="shrink-0 border-t border-border px-5 pt-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
-            {pie}
-          </footer>
-        ) : null}
+        {pie ? <footer className="hoja__pie">{pie}</footer> : null}
       </div>
     </dialog>
   );
