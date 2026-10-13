@@ -46,9 +46,11 @@ chk G2  'js/modules|styled-components|montarCarrito|montarLupa|entry/shared'
 chk G3  'cdn\.jsdelivr|unpkg\.com|fonts\.googleapis|fonts\.gstatic'
 chk G4  "from\('(orders|order_items)'\)\.(insert|update|upsert|delete)"
 chk G5  'falta backend|EJEMPLO|onfirmar con el due|No tenemos picaña|carniceriasenmisericordia|carniceriamisericordia\.com|mailto:'
-chk G6  'VITE_(?!SUPABASE_URL|SUPABASE_ANON_KEY|SUPABASE_KEY)' -P
+chk G6  'VITE_(?!SUPABASE_URL\b|SUPABASE_ANON_KEY\b|SUPABASE_KEY\b|PANEL_URL\b)' -P
 chk G7  'service_role|sb_secret_|GROQ'
-n=$(rg -n "${X[@]}" 'import\.meta\.env\.VITE' $N 2>/dev/null | rg -v 'src/data/supabase.ts' | wc -l | tr -d ' '); [ "$n" = 0 ] && ok G8 0 || falla G8 "$n"
+# G8: solo dos archivos leen variables VITE_*: supabase.ts (las de Supabase) y
+# panelEnv.ts (VITE_PANEL_URL, el origen del panel de Django; contrato S4).
+n=$(rg -n "${X[@]}" 'import\.meta\.env\.VITE' $N 2>/dev/null | rg -v '^src/data/(supabase|panelEnv)\.ts:' | wc -l | tr -d ' '); [ "$n" = 0 ] && ok G8 0 || falla G8 "$n"
 chk G9  'en stock|existencia|Pocas piezas'
 chk G10 'text-\[[0-9]|text-(xs|sm|base|lg|xl|[2-9]xl)\b|font-\[[0-9]'
 chk G11 'rounded-(sm|md|lg|xl|2xl|3xl)\b|backdrop-blur'

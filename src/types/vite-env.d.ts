@@ -4,3 +4,8 @@
 // `assetUrl` in src/entry/shared.tsx uses to resolve database image paths
 // against whichever base the site was built for. tsconfig.json pins an explicit
 // `types` array, so the reference has to be declared here for tsc to see it.
+
+// Origin of the Django admin panel, read only by `src/data/panelEnv.ts`. Optional: without it the store behaves as before.
+interface ImportMetaEnv {
+  readonly VITE_PANEL_URL?: string;
+}

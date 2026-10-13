@@ -1,4 +1,5 @@
 import { supabase } from '../supabase.js';
+import { ESPERA_NAVEGACION_MS, cerrarSesionTrasSalirDelPanel, handoffToPanel } from '../../../src/data/panel';
 
 // Estado de la aplicación
 export const appState = {
@@ -8,6 +9,14 @@ export const appState = {
 };
 
 let authSubscription;
+
+// Verificar si es acceso administrativo. Va antes de initAuth, que lo lee sin esperar (zona muerta temporal).
+const urlParams = new URLSearchParams(window.location.search);
+const isAdminLogin = urlParams.get('admin') === 'true';
+// Cierre de la sesión de Supabase tras salir del panel; el login espera a que termine.
+let salidaDelPanel = Promise.resolve();
+// Se espera, pero no más de 5 s: si la red se cuelga, el login y el estado de la app no se quedan colgados.
+const esperarSalida = () => Promise.race([salidaDelPanel, new Promise((resolve) => setTimeout(resolve, 5000))]);
 
 // Elementos del DOM
 let loginForm;
@@ -130,7 +139,11 @@ async function initAuth() {
   googleLoginBtn = document.getElementById('googleLogin');
   facebookLoginBtn = document.getElementById('facebookLogin');
 
-  await hydrateAuthState();
+  // Sin await: los formularios se cablean ya (un envío sin manejador haría un GET con la contraseña en la URL).
+  salidaDelPanel = cerrarSesionTrasSalirDelPanel(supabase).then((salida) => {
+    if (salida === 'fallida') alert('No se pudo cerrar tu sesión en este navegador. Borra los datos del sitio e intenta de nuevo.');
+  });
+  void esperarSalida().then(hydrateAuthState);
 
   if (!authSubscription) {
     const {
@@ -167,10 +180,6 @@ if (document.readyState === 'loading') {
   void initAuth();
 }
 
-// Verificar si es acceso administrativo
-const urlParams = new URLSearchParams(window.location.search);
-const isAdminLogin = urlParams.get('admin') === 'true';
-
 // Configurar formulario de login
 function setupLoginForm() {
   loginForm.addEventListener('submit', async (e) => {
@@ -192,6 +201,7 @@ function setupLoginForm() {
     submitBtn.disabled = true;
     
     try {
+      await esperarSalida(); // Un cierre tardío revocaría la sesión recién abierta.
       // Intentar login
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
@@ -212,12 +222,21 @@ function setupLoginForm() {
 
       syncAppState(data.user);
 
-      // Redirección según tipo de usuario
+      // dashboar.html ya no es entrada de la tienda (el backend hizo el mismo cambio): el panel lo sirve
+      // Django y el admin le entrega su sesión (contrato S4). Sin panel configurado, entra por el inicio.
       if (isAdmin) {
-        window.location.href = 'dashboar.html';
-      } else {
-        window.location.href = 'index.html';
+        const traspaso = await handoffToPanel(supabase);
+        if (traspaso === 'enviado') {
+          // El navegador ya sale hacia el panel: el botón sigue en "Procesando..." hasta que `finally`
+          // lo libere, pasados 10 s, por si la navegación nunca ocurre (Esc, un panel que no contesta).
+          await new Promise((resolve) => setTimeout(resolve, ESPERA_NAVEGACION_MS));
+          return;
+        }
+        if (traspaso === 'error') {
+          throw new Error('No se pudo abrir el panel. Intenta de nuevo.');
+        }
       }
+      window.location.href = 'index.html';
     } catch (error) {
       console.error('Login error:', error);
       alert('Error al iniciar sesión: ' + error.message);
