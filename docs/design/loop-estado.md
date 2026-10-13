@@ -1,0 +1,47 @@
+# Estado del loop: rediseno-final
+
+- Proyecto Engram: carni-mvp · tema `loop/rediseno-final/estado`
+- Rama: pruebas · Actualizado: 2026-09-28 17:10 (hora de San Luis Potosí)
+- Loop: `docs/design/loop-agentico.md`
+
+## Unidades
+
+| # | Unidad | Estado | Evidencia | Revisión |
+|---|---|---|---|---|
+| U0 | Estado inicial | hecho | este archivo y Engram `loop/rediseno-final/estado` | aprobada |
+| U1 | Pasada 1 a Claude Design | PARCIAL | Captura del chat de Claude Design (2026-09-29 ~02:00): el Índice existe con 50 fichas pero las miniaturas salen rotas; 1.8 va a medias (faltan picaña, el plazo de "Revisa tu correo", la nota de Supabase, los minigráficos y el eje, y la tabla de contraste); del resto no hay reporte | Eduardo: "yo veo que no cumplió" |
+| U2 | Verificar pasada 1 | pendiente | — | — |
+| U3 | Tiras de movimiento (opcional) | pendiente | — | — |
+| U4 | Referencia de foto (opcional, pide permiso para instalar) | pendiente | — | — |
+| U5 | Pasada 2 a Claude Design | pendiente | — | — |
+| U6 | Verificar pasada 2 | pendiente | — | — |
+| U7 | Referencias del chatbot (opcional) | pendiente | — | — |
+| U8 | Pasada 3 a Claude Design | pendiente | — | — |
+| U9 | Verificar pasada 3 | pendiente | — | — |
+| U10 | Revisión final | pendiente | — | — |
+| U11 | Pendientes | pendiente | — | — |
+| U12 | Cierre | pendiente | — | — |
+
+Estados posibles:
+- pendiente → en curso → en revisión → hecho. Una unidad solo pasa a "hecho" con evidencia.
+- bloqueado: se anota el motivo y quién lo resuelve.
+- saltado: se anota la decisión del punto de control.
+
+## Siguiente
+
+U2 · Revisar el resultado real de la pasada 1: Eduardo exporta el .zip de Claude Design, o se usa el enlace compartido del proyecto 95f972a0, página 00 Índice. Con lo que falló, escribir el loop v3 de verdaderas mejoras: unidades más chicas, cada una al inicio de una ventana de 5 horas, y lo que Claude Design no puede hacer (por ejemplo, las miniaturas) lo produce Claude Code en el repo. Antes de eso, Claude Design no sigue con la pasada 1.
+
+## Para retomar
+
+```
+/goal Sigue docs/design/loop-agentico.md desde docs/design/loop-estado.md. La meta se cumple cuando tu último mensaje imprime "REDISEÑO TERMINADO", un PUNTO DE CONTROL con PAUSO o PAUSO YA, una línea para Claude Design o una pregunta para Eduardo; si no, detente tras 40 turnos.
+```
+
+## Bitácora de puntos de control
+
+- 2026-09-28 17:10 · U0 · 5 h 23 % · semanal 26 % · contexto 26 % (sesión de preparación) · SIGO
+- 2026-09-29 02:00 · U1 PARCIAL · 5 h 94 % (se reinicia 03:30) · semanal 41 % · contexto 61 % · PAUSO YA
+- 2026-09-29 · U2 EN CURSO · verificación automática del export diseños1.zip: 19 de 24 criterios; fallan href="#" (1), logo en imagen (7 menciones), eje $15k (0), "picaña" (8) y 4 PARCIAL en la Bitácora. Informe: docs/design/verificacion/pasada-1/informe.md. Siguiente: revisar el contexto de los fallos y escribir el loop v3.
+- 2026-09-29 · U2 HECHO · falsos positivos: href="#" y logo en imagen solo aparecen en notas. Fallos reales: miniaturas {{ p.mini }} rotas, picaña (la base no la tiene), eje $15k y minigráficos, y "Revisa tu correo". Siguiente: TANDA 1A de docs/design/loop-v3.md (el mensaje está ahí); después, 1B de miniaturas (Claude Code) y el script verificar_export.py.
+- 2026-09-29 · TANDA 1A HECHA según el reporte de Claude Design (eje $15k, minigráficos, 1.1 y 1.8 en CERRADO; el Índice quedó con huecos "miniatura pendiente"). Eduardo la rechaza por incompleta y pide el rediseño completo en un solo loop. Hallazgo: el proyecto de Claude Design no tiene los recursos nuevos (0 archivos de mascota, video, datos y referencias en el export). Entregado: docs/design/loop-completo.md, la carpeta ~/Desktop/subir-a-claude-design (4.3 MB, 45 archivos) y verificar_export.py con los criterios A, B y C. Siguiente: Eduardo sube la carpeta, pega el loop en un chat nuevo de Claude Design y responde "continúa" tras cada pausa por límite. Al terminar exporta el .zip y aquí se verifica con el script.
+- 2026-09-29 · export diseños1.0.zip: 29 de 43. Causas: (1) los recursos nunca llegaron (0 en uploads; el repo rechazó el video por peso); (2) el orden de la Landing que pidió Eduardo (Ofertas antes de Preguntas frecuentes y Comentarios antes del Pie) nunca estuvo en los loops; (3) el Índice sin miniaturas; (4) Acceso, Chatbot y Movimiento quedaron PARCIAL por límite. Entregado: docs/design/loop-rediseno-completo.md, con verificación previa y una puerta por punto; 16 miniaturas reales en docs/design/miniaturas/; la carpeta plana ~/Desktop/subir-a-claude-design (60 archivos, 5.4 MB); y verificar_export.py con 43 criterios, incluido el orden de la Landing. Siguiente: Eduardo sube la carpeta, abre un chat nuevo, pega el loop y responde "continúa"; al terminar exporta el .zip y aquí se corre verificar_export.py.

@@ -1,0 +1,60 @@
+/**
+ * Tokens del diseño de Carni-mvp (contrato S1 con el backend).
+ *
+ * Este archivo NO importa Tailwind: solo declara el `@theme` y las variantes
+ * propias. Lo importan dos canalizaciones, y las dos generan los mismos valores:
+ *   1. la tienda (`src/styles/tailwind.css`, con Vite);
+ *   2. el panel que sirve Django (su propia compilación de Tailwind v4).
+ * Cambiar un token aquí cambia la tienda y el panel a la vez. Los tamaños de
+ * texto y los radios por defecto de Tailwind no se usan: solo estos tokens.
+ */
+@theme {
+  /* Color. Las superficies suben de luminosidad; el rojo solo rellena. */
+  --color-bg: #0b0b0c;
+  --color-surface-1: #151517;
+  --color-surface-2: #1c1c1f;
+  --color-surface-3: #232326;
+  --color-border: #3f3f46;          /* SOLO hairlines decorativas (1,88:1). Nunca borde de un control. */
+  --color-border-control: #71717a;  /* campos, chips, conmutadores: >= 3,24:1 en bg y en las tres superficies */
+  --color-text: #f5f3ef;
+  --color-text-muted: #a8a29b;
+  --color-red: #dc2626;             /* SOLO relleno (botón principal). Texto blanco encima: 4,83:1 */
+  --color-red-hover: #c81e1e;       /* texto blanco encima: 5,74:1 */
+  --color-red-text: #f05252;        /* rojo como texto: >= 4,50:1 en bg y en las tres superficies */
+  --color-sand: #e4d1b0;            /* anillo de foco, enlaces y detalles: 13,16:1 */
+  --color-gold: #f59e0b;
+  --color-success: #059669;
+  --color-danger: #f43f5e;
+  --color-veil: rgb(0 0 0 / 0.92);  /* encabezado con hover o con foco dentro */
+
+  /* Tipografía autoalojada (Fontsource): los nombres de familia llevan "Variable". */
+  --font-display: "Fraunces Variable", ui-serif, Georgia, serif;
+  --font-sans: "Geist Variable", ui-sans-serif, system-ui, sans-serif;
+
+  /* Escala de 6 roles. Se borran los tamaños por defecto para que nadie use text-sm ni text-xl. */
+  --text-*: initial;
+  --text-meta: 0.8125rem;   --text-meta--line-height: 1.125rem;       /* 13/18: etiquetas, notas */
+  --text-ui: 0.9375rem;     --text-ui--line-height: 1.375rem;         /* 15/22: cuerpo e interfaz */
+  --text-lead: 1.125rem;    --text-lead--line-height: 1.625rem;       /* 18/26: entradillas */
+  --text-titulo: clamp(1.125rem, 1rem + 0.55vw, 1.5rem);              /* 18 a 24: tarjetas, h3 */
+  --text-titulo--line-height: 1.2;
+  --text-seccion: clamp(1.75rem, 1.25rem + 1.9vw, 3rem);              /* 28 a 48: h2 */
+  --text-seccion--line-height: 1.08;
+  --text-seccion--letter-spacing: -0.01em;
+  --text-portada: clamp(1.75rem, 1rem + 3.9vw, 4.5rem);               /* 30 a 360, 31 a 390, 72 a 1440: h1 */
+  --text-portada--line-height: 1.04;
+  --text-portada--letter-spacing: -0.015em;
+
+  /* Radios: candado documentado. */
+  --radius-control: 0.75rem;   /* campos, chips, filas táctiles, miniaturas */
+  --radius-card: 1rem;         /* Tarjeta de producto y bento */
+  --radius-dialog: 1.25rem;    /* diálogos centrados */
+  --radius-sheet: 1.5rem;      /* esquinas superiores de la hoja inferior; esquinas inferiores de la portada móvil */
+  --radius-pill: 9999px;       /* SOLO botones */
+
+  /* Movimiento: nunca ease-in; interfaz por debajo de 300 ms. */
+  --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);   /* presión, encabezado, puntos del carrusel */
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);        /* hojas y cajones */
+}
+
+@custom-variant reduced-transparency (@media (prefers-reduced-transparency: reduce));

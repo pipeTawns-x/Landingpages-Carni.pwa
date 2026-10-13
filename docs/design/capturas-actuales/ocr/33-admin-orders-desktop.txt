@@ -1,0 +1,29 @@
+pt Pedidos
+CARNICERIA
+Panel de
+
+Administracion
+ORDERS COMMAND
+
+© sions Seguimiento de pedidos, tickets y contexto operativo
+
+® Productos
+El médulo de pedidos ahora tiene un frente visual mas alineado al dashboard
+
+Clientes principal, listo para enlazar tickets, logistica y validacion comercial sin eliminar
+PediddD? la tabla operativa actual
+Salir ‘7 .
+> Prioridad logistica Trazabilidad
+Identifica pedidos pendientes, entregas y excepciones de forma inmediata. Prepara la vista para ticketing, impresion y auditoria de detalle por pedido
+
+Seguimiento operativo
+
+Vista minima para monitorear pedidos sin dejar enlaces rotos en el dashboard
+
+ID Cliente Canal Total Estado
+ORD-1001 Juan Pérez Web $1,250 En proceso
+ORD-1002 Maria Gonzalez WhatsApp $850 [com
+
+ORD-1003 Carlos Lopez Web $1,750 | Canceladc
+
+https://pipetawns-x.github.io/Landingpages-Carni.pwa/admin-orders.html

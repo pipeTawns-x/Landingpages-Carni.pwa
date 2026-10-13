@@ -1,0 +1,45 @@
+iSin conexién!
+
+Parece que no tienes conexién a
+internet en este momento. No te
+preocupes, puedes seguir accediendo
+a algunas funciones que hemos
+guardado para ti.
+
+Catalogo Guardado
+
+Puedes ver los productos que ya
+habias consultado anteriormente.
+
+Carrito de Compras
+
+Tu carrito se mantiene intacto y podrds
+completar tu pedido cuando vuelvas a
+tener conexion.
+
+Pedidos Pendientes
+
+Los pedidos que realices se
+sincronizaran automaticamente cuando
+recuperes la conexi6n.
+
+MODO OFFLINE
+
+La carniceria
+sigue
+respondiendo
+incluso sin
+conexion
+
+lo offline ahora tiene una
+
+lineada
+
+a, para que el usuario
+
+entienda qué partes del catalogo
+iguen disponibles y como volver
+a sincronizar cuando regrese la
+
+nexion.
+

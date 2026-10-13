@@ -1,9 +1,14 @@
 import react from '@vitejs/plugin-react';
+import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'vite';
 import { resolve } from 'path';
 
 export default defineConfig({
-  plugins: [react()],
+  // El plugin de Tailwind procesa cualquier `@import "tailwindcss"` que
+  // encuentre (hoy solo src/styles/tailwind.css, importado únicamente desde
+  // src/entry/landing.tsx) — no compila nada en las páginas que no lo
+  // importan, así que el resto del sitio sigue en SCSS 7-1 sin tocar.
+  plugins: [react(), tailwindcss()],
   root: '.',
   server: {
     port: 3002,
@@ -29,7 +34,10 @@ export default defineConfig({
         accessweb: resolve(__dirname, 'accessweb.html'),
         adminCustomers: resolve(__dirname, 'admin-customers.html'),
         adminOrders: resolve(__dirname, 'admin-orders.html'),
-        offline: resolve(__dirname, 'offline.html')
+        offline: resolve(__dirname, 'offline.html'),
+        landing: resolve(__dirname, 'landing.html'),
+        catalogo: resolve(__dirname, 'catalogo.html'),
+        panel: resolve(__dirname, 'panel.html')
       }
     }
   },

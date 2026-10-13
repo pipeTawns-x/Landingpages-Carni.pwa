@@ -37,7 +37,7 @@ entre ellas.
 ```
 mem_suggest_topic_key(title: "<título>", type: "<tipo>")   # si el tema va a evolucionar
 mem_save(
-  project: "Carni-mvp",
+  project: "carni-mvp",
   title:   "<verbo + qué, corto y buscable>",
   type:    "decision | architecture | bugfix | pattern | config | discovery | preference",
   topic_key: "<clave estable, ej. carni/lupa/busqueda-en-vivo>",
@@ -47,9 +47,9 @@ mem_save(
 
 Reglas que no se negocian:
 
-- **`project` es siempre `Carni-mvp`.** Los alias (`carni-mvp`,
-  `Landingpages-Carni.pwa`) se unificaron el 2026-07-25 y volver a partirlos
-  esconde observaciones.
+- **`project` es siempre `carni-mvp`, en minúsculas.** Los alias se unificaron
+  el 2026-07-25 y Engram distingue mayúsculas: lo guardado como `Carni-mvp`
+  no aparece al buscar en `carni-mvp` (comprobado el 2026-09-28).
 - **Mismo tema → mismo `topic_key`.** Es un upsert: reusar la clave actualiza,
   cambiarla duplica. Temas distintos NUNCA comparten clave.
 - **`Where` lleva rutas reales.** Antes de escribirlas, comprobalas. Una ruta
