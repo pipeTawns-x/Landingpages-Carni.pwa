@@ -15,8 +15,9 @@ const urlParams = new URLSearchParams(window.location.search);
 const isAdminLogin = urlParams.get('admin') === 'true';
 // Cierre de la sesión de Supabase tras salir del panel; el login espera a que termine.
 let salidaDelPanel = Promise.resolve();
-// Se espera, pero no más de 5 s: si la red se cuelga, el login y el estado de la app no se quedan colgados.
-const esperarSalida = () => Promise.race([salidaDelPanel, new Promise((resolve) => setTimeout(resolve, 5000))]);
+// El login espera el cierre, pero no más de 5 s. Si se pasa, NO entra: un cierre tardío borraría la sesión recién abierta.
+const esperarSalida = () =>
+  Promise.race([salidaDelPanel.then(() => 'lista'), new Promise((resolve) => setTimeout(() => resolve('tiempo'), 5000))]);
 
 // Elementos del DOM
 let loginForm;
@@ -143,7 +144,7 @@ async function initAuth() {
   salidaDelPanel = cerrarSesionTrasSalirDelPanel(supabase).then((salida) => {
     if (salida === 'fallida') alert('No se pudo cerrar tu sesión en este navegador. Borra los datos del sitio e intenta de nuevo.');
   });
-  void esperarSalida().then(hydrateAuthState);
+  void salidaDelPanel.then(hydrateAuthState);
 
   if (!authSubscription) {
     const {
@@ -201,7 +202,9 @@ function setupLoginForm() {
     submitBtn.disabled = true;
     
     try {
-      await esperarSalida(); // Un cierre tardío revocaría la sesión recién abierta.
+      if ((await esperarSalida()) === 'tiempo') {
+        throw new Error('Todavía se está cerrando tu sesión anterior. Intenta de nuevo en unos segundos.');
+      }
       // Intentar login
       const { data, error } = await supabase.auth.signInWithPassword({
         email,

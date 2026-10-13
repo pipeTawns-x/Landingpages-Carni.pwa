@@ -243,7 +243,8 @@ describe('cerrarSesionTrasSalirDelPanel', () => {
   it.each([
     ['/accessweb.html?admin=true&salir=1#login', '?admin=true', '#login'],
     ['/accessweb.html?salir=1&admin=true&x=a%20b', '?admin=true&x=a+b', ''],
-    ['/accessweb.html?salir=1', '', '']
+    ['/accessweb.html?salir=1', '', ''],
+    ['/Landingpages-Carni.pwa/accessweb.html?salir=1', '', '']
   ])('con %s cierra una vez con alcance local y deja la consulta en %j y el hash en %j', async (ruta, consulta, hash) => {
     irA(ruta);
     const { cliente, signOut } = clienteCerrable();
@@ -252,7 +253,7 @@ describe('cerrarSesionTrasSalirDelPanel', () => {
 
     expect(signOut).toHaveBeenCalledTimes(1);
     expect(signOut).toHaveBeenCalledWith({ scope: 'local' });
-    expect(window.location.pathname).toBe('/accessweb.html');
+    expect(window.location.pathname).toBe(ruta.split('?')[0]);
     expect(window.location.search).toBe(consulta);
     expect(window.location.hash).toBe(hash);
     expect(window.history.state).toEqual({ marca: 'estado' });
@@ -275,7 +276,8 @@ describe('cerrarSesionTrasSalirDelPanel', () => {
 
   it.each<[string, LlamadaSalida]>([
     ['devuelve un error', fallo],
-    ['lanza', async () => Promise.reject(new Error('sin red'))]
+    ['lanza', async () => Promise.reject(new Error('sin red'))],
+    ['resuelve sin respuesta', (async () => undefined) as unknown as LlamadaSalida]
   ])('si signOut %s, borra a mano la sesión local y devuelve "cerrada"', async (_caso, implementacion) => {
     irA('/accessweb.html?salir=1');
     window.localStorage.setItem(CLAVE, '{"sesion":"de-mentira"}');
