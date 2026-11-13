@@ -1,0 +1,56 @@
+{
+  "meta": {
+    "descripcion": "Casos compartidos de cotización de comercio-v1. Los leen las pruebas SQL (quote_line), las de Django y las del estimador TypeScript. Los números van como texto para no perder decimales.",
+    "lb_kg": "0.45359237",
+    "g_kg": "0.001",
+    "redondeo": "half_up",
+    "reglas": [
+      "quantity_kg se guarda con 3 decimales; el dinero con 2.",
+      "weight: line_total_mxn = round(amount_en_kg_exacto * unit_price, 2).",
+      "money: line_total = amount (el cliente paga lo que pidió); quantity_kg = round(amount_mxn / unit_price, 3).",
+      "pieces con peso por pieza: kg = pieces * avg_piece_weight_kg * (thickness_in / thickness_default_in); sin grosor el factor es 1.",
+      "pieces con price_unit piece o package: line_total = pieces * unit_price; quantity_kg = 0.",
+      "house_rate = round(rate * (1 - buffer_pct/100), 4); total_usd = ceil(total_mxn / house_rate * 100) / 100.",
+      "money en USD: total_usd = amount; total_mxn = round(amount * house_rate, 2).",
+      "Una tasa con más de 4 días apaga el USD (fx_unavailable)."
+    ]
+  },
+  "productos": {
+    "bistec": {"price_per_kg": "200.00", "price_unit": "kg", "sale_modes": ["money", "weight", "pieces"], "avg_piece_weight_kg": "0.150", "thickness_default_in": "1.00"},
+    "molida": {"price_per_kg": "140.00", "price_unit": "kg", "sale_modes": ["money", "weight"]},
+    "camiseta": {"price_per_kg": "250.00", "price_unit": "piece", "sale_modes": ["pieces"]}
+  },
+  "fx": {"rate": "18.6100", "buffer_pct": "2.00", "house_rate": "18.2378", "dias_de_antiguedad": 0},
+  "casos": [
+    {"id": "dinero-100-bistec", "producto": "bistec", "entrada": {"mode": "money", "amount": "100", "currency": "MXN"}, "esperado": {"quantity_kg": "0.500", "pieces": null, "unit_price": "200.00", "line_total_mxn": "100.00", "discount_mxn": "0.00"}},
+    {"id": "peso-1lb-bistec", "producto": "bistec", "entrada": {"mode": "weight", "amount": "1", "unit": "lb", "currency": "MXN"}, "esperado": {"quantity_kg": "0.454", "pieces": null, "unit_price": "200.00", "line_total_mxn": "90.72", "discount_mxn": "0.00"}},
+    {"id": "peso-500g-bistec", "producto": "bistec", "entrada": {"mode": "weight", "amount": "500", "unit": "g", "currency": "MXN"}, "esperado": {"quantity_kg": "0.500", "pieces": null, "unit_price": "200.00", "line_total_mxn": "100.00", "discount_mxn": "0.00"}},
+    {"id": "piezas-3x150-bistec", "producto": "bistec", "entrada": {"mode": "pieces", "amount": "3", "currency": "MXN"}, "esperado": {"quantity_kg": "0.450", "pieces": 3, "unit_price": "200.00", "line_total_mxn": "90.00", "discount_mxn": "0.00"}},
+    {"id": "grosor-2in-cuesta-doble", "producto": "bistec", "entrada": {"mode": "pieces", "amount": "1", "thickness_in": "2", "currency": "MXN"}, "esperado": {"quantity_kg": "0.300", "pieces": 1, "unit_price": "200.00", "line_total_mxn": "60.00", "discount_mxn": "0.00"}},
+    {"id": "dinero-50-molida", "producto": "molida", "entrada": {"mode": "money", "amount": "50", "currency": "MXN"}, "esperado": {"quantity_kg": "0.357", "pieces": null, "unit_price": "140.00", "line_total_mxn": "50.00", "discount_mxn": "0.00"}},
+    {"id": "mercancia-2-camisetas", "producto": "camiseta", "entrada": {"mode": "pieces", "amount": "2", "currency": "MXN"}, "esperado": {"quantity_kg": "0.000", "pieces": 2, "unit_price": "250.00", "line_total_mxn": "500.00", "discount_mxn": "0.00"}},
+    {"id": "mercancia-por-peso-rechazada", "producto": "camiseta", "entrada": {"mode": "weight", "amount": "1", "unit": "kg", "currency": "MXN"}, "error": "sale_mode_not_allowed"},
+    {"id": "molida-por-piezas-rechazada", "producto": "molida", "entrada": {"mode": "pieces", "amount": "2", "currency": "MXN"}, "error": "sale_mode_not_allowed"},
+    {"id": "promo-10pct-1kg-bistec", "producto": "bistec", "promo": {"kind": "percent", "value": "10"}, "entrada": {"mode": "weight", "amount": "1", "unit": "kg", "currency": "MXN"}, "esperado": {"quantity_kg": "1.000", "pieces": null, "unit_price": "180.00", "line_total_mxn": "180.00", "discount_mxn": "20.00"}},
+    {"id": "promo-precio-fijo-1kg-bistec", "producto": "bistec", "promo": {"kind": "fixed_price", "value": "170"}, "entrada": {"mode": "weight", "amount": "1", "unit": "kg", "currency": "MXN"}, "esperado": {"quantity_kg": "1.000", "pieces": null, "unit_price": "170.00", "line_total_mxn": "170.00", "discount_mxn": "30.00"}},
+    {"id": "promo-monto-menos-1kg-bistec", "producto": "bistec", "promo": {"kind": "amount_off", "value": "25"}, "entrada": {"mode": "weight", "amount": "1", "unit": "kg", "currency": "MXN"}, "esperado": {"quantity_kg": "1.000", "pieces": null, "unit_price": "175.00", "line_total_mxn": "175.00", "discount_mxn": "25.00"}},
+    {"id": "usd-18-pesos", "producto": "bistec", "entrada": {"mode": "money", "amount": "18", "currency": "MXN"}, "cobro_en": "USD", "esperado": {"quantity_kg": "0.090", "pieces": null, "unit_price": "200.00", "line_total_mxn": "18.00", "discount_mxn": "0.00", "total_usd": "0.99", "referencia_usd_tasa_pura": "0.967"}},
+    {"id": "usd-dinero-10-dolares", "producto": "bistec", "entrada": {"mode": "money", "amount": "10", "currency": "USD"}, "esperado": {"quantity_kg": "0.912", "pieces": null, "unit_price": "200.00", "line_total_mxn": "182.38", "discount_mxn": "0.00", "total_usd": "10.00"}},
+    {"id": "usd-tasa-vencida", "producto": "bistec", "fx": {"dias_de_antiguedad": 5}, "entrada": {"mode": "money", "amount": "10", "currency": "USD"}, "error": "fx_unavailable"},
+    {"id": "cantidad-cero", "producto": "bistec", "entrada": {"mode": "weight", "amount": "0", "unit": "kg", "currency": "MXN"}, "error": "invalid_amount"},
+    {"id": "cantidad-negativa", "producto": "bistec", "entrada": {"mode": "money", "amount": "-5", "currency": "MXN"}, "error": "invalid_amount"},
+    {"id": "piezas-con-decimales", "producto": "bistec", "entrada": {"mode": "pieces", "amount": "2.5", "currency": "MXN"}, "error": "invalid_amount"}
+  ],
+  "stock": [
+    {"id": "cinco-manzanas-quedan-cuatro", "stock_unit": "piece", "stock_inicial": "5.000", "pedido": {"pieces": 1}, "al_crear": "5.000", "al_confirmar": "4.000"},
+    {"id": "medio-kilo-de-diez", "stock_unit": "kg", "stock_inicial": "10.000", "pedido": {"quantity_kg": "0.500"}, "al_crear": "10.000", "al_confirmar": "9.500"},
+    {"id": "sin-stock-suficiente-al-confirmar", "stock_unit": "kg", "stock_inicial": "0.300", "pedido": {"quantity_kg": "0.500"}, "al_confirmar_error": "insufficient_stock", "estado_final": "pending"},
+    {"id": "cancelar-confirmado-repone", "stock_unit": "kg", "stock_inicial": "10.000", "pedido": {"quantity_kg": "0.500"}, "al_confirmar": "9.500", "al_cancelar": "10.000"},
+    {"id": "cancelar-pendiente-no-toca", "stock_unit": "kg", "stock_inicial": "10.000", "pedido": {"quantity_kg": "0.500"}, "al_cancelar_desde_pending": "10.000"},
+    {"id": "sin-seguimiento-no-descuenta", "track_stock": false, "stock_inicial": "0.000", "pedido": {"quantity_kg": "0.500"}, "al_confirmar": "0.000"}
+  ],
+  "transiciones": {
+    "permitidas": {"pending": ["confirmed", "cancelled"], "confirmed": ["preparing", "cancelled"], "preparing": ["ready", "cancelled"], "ready": ["delivered", "cancelled"], "delivered": [], "cancelled": []},
+    "ejemplo_rechazado": {"de": "pending", "a": "delivered", "error": "invalid_transition"}
+  }
+}
