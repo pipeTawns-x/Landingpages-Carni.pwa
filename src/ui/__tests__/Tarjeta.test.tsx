@@ -5,7 +5,7 @@
  */
 import { describe, expect, jest, test } from '@jest/globals';
 import '@testing-library/jest-dom/jest-globals';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import type { ProductoVista } from '@src/data/catalogo';
 import type { Presentacion } from '../presentacionProducto';
 import { CeldaBento, Tarjeta, type VarianteTarjeta } from '../Tarjeta';
@@ -142,5 +142,62 @@ describe('CeldaBento', () => {
       'href',
       'catalogo.html#categoria=pollo'
     );
+  });
+
+  test('con ilustración pide los dos anchos y la deja decorativa dentro del enlace', () => {
+    const { container } = render(
+      <CeldaBento
+        nombre="Pollo"
+        descripcion="Pechuga, pierna y muslo"
+        slug="pollo"
+        href="catalogo.html#categoria=pollo"
+        ilustracion="/img/comercio-v1/categoria-pollo"
+      />
+    );
+    const img = container.querySelector('img');
+
+    expect(img).toHaveAttribute(
+      'srcset',
+      '/img/comercio-v1/categoria-pollo-800.webp 800w, /img/comercio-v1/categoria-pollo.webp 1344w'
+    );
+    expect(img).toHaveAttribute('alt', '');
+    expect(screen.getByRole('link', { name: /Pollo/ })).toContainElement(img as HTMLElement);
+  });
+
+  test('si la ilustración aún no existe cae a la foto de siempre y, sin ninguna, deja el ícono', () => {
+    const { container } = render(
+      <CeldaBento
+        nombre="Pollo"
+        descripcion="Pechuga, pierna y muslo"
+        slug="pollo"
+        href="catalogo.html#categoria=pollo"
+        ilustracion="/img/comercio-v1/categoria-pollo"
+        foto="/img/products/pollo.webp"
+      />
+    );
+
+    fireEvent.error(container.querySelector('img') as HTMLImageElement);
+    expect(container.querySelector('img')).toHaveAttribute('src', '/img/products/pollo.webp');
+
+    fireEvent.error(container.querySelector('img') as HTMLImageElement);
+    expect(container.querySelector('img')).toBeNull();
+    // El ícono de la categoría queda detrás: nunca una caja vacía ni un icono de imagen rota.
+    expect(container.querySelector('svg')).toHaveAttribute('aria-hidden', 'true');
+    expect(screen.getByRole('link', { name: /Pollo/ })).toHaveAttribute('href', 'catalogo.html#categoria=pollo');
+  });
+
+  test('el número de la carta es adorno: se ve, pero no entra en el nombre del enlace', () => {
+    render(
+      <CeldaBento
+        nombre="Pollo"
+        descripcion="Pechuga, pierna y muslo"
+        slug="pollo"
+        href="catalogo.html#categoria=pollo"
+        numero={3}
+      />
+    );
+
+    expect(screen.getByText('N.º 3')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Pollo/ })).not.toHaveAccessibleName(/N\.º/);
   });
 });

@@ -6,6 +6,11 @@
  * `opsz.css` de Fraunces conserva el eje de tamaño óptico junto al de peso
  * (rango 100 a 900), de modo que los titulares grandes ganan contraste y los
  * pequeños ganan abertura sin cargar otra fuente.
+ *
+ * `opsz-italic.css` trae la cursiva real (la palabra con énfasis del titular de
+ * la portada). Sin ella el navegador inclinaría la romana y se vería falsa. El
+ * archivo de la cursiva solo se descarga cuando una página pinta texto en cursiva.
  */
 import '@fontsource-variable/geist'; // familia "Geist Variable", eje wght
 import '@fontsource-variable/fraunces/opsz.css'; // familia "Fraunces Variable", ejes opsz y wght
+import '@fontsource-variable/fraunces/opsz-italic.css'; // la misma familia en cursiva

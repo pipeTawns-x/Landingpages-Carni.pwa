@@ -29,6 +29,30 @@
 @source not "../pages";
 
 
+/*
+ * La entrada de la portada: titular, entradilla y botón suben 12 px y aparecen,
+ * escalonados por `--retardo`. Es el único momento de movimiento de la primera
+ * pantalla. El estado por defecto es el visible: con movimiento reducido no hay
+ * animación y nada queda en opacidad 0 esperando a que algo la devuelva.
+ */
+@keyframes carni-entra {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@utility entra {
+  @media (prefers-reduced-motion: no-preference) {
+    animation: carni-entra 300ms var(--ease-out-strong) both;
+    animation-delay: var(--retardo, 0ms);
+  }
+}
+
 /* El giro de las reseñas: dos filas que se desplazan en sentidos opuestos. */
 @keyframes carni-izq {
   from {
@@ -51,6 +75,8 @@
   html {
     color-scheme: dark;
     scrollbar-gutter: stable;
+    /* La barra de desplazamiento también es del diseño: pulgar gris sobre el fondo, no el del sistema. */
+    scrollbar-color: var(--color-border-control) var(--color-bg);
     /* Los enlaces internos (#preguntas, #contacto) no aterrizan bajo el encabezado fijo. */
     scroll-padding-top: 5rem;
     -webkit-text-size-adjust: 100%;

@@ -8,7 +8,10 @@
   <title>Carnicería El Señor de La Misericordia · San Luis Potosí</title>
   <meta name="description" content="Carnicería familiar en San Luis Potosí. Cortes de res, cerdo y pollo, paquetes para asar y pedidos por WhatsApp.">
   <link rel="icon" href="img/recursos_web/logo-user.png" type="image/png">
-  <link rel="preload" as="image" href="img/Videos/portada-carne-poster.webp" fetchpriority="high">
+  <!-- La portada nueva: vertical en celular, horizontal desde 640 px. Si el archivo aún no existe,
+       la portada vuelve sola al póster clásico (img/Videos/portada-carne-poster.webp). -->
+  <link rel="preload" as="image" href="img/comercio-v1/portada-mostrador-vertical.webp" media="(max-width: 639px)" fetchpriority="high">
+  <link rel="preload" as="image" href="img/comercio-v1/portada-mostrador-800.webp" imagesrcset="img/comercio-v1/portada-mostrador-800.webp 800w, img/comercio-v1/portada-mostrador.webp 1344w" imagesizes="100vw" media="(min-width: 640px)" fetchpriority="high">
 </head>
 <body>
   <div id="raiz"></div>
