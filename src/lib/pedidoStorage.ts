@@ -1,6 +1,47 @@
-import type { CartLegacyItem, OrderLine } from '@src/types/database';
+import type { CartLegacyItem, OrderLine, SolicitudLinea } from '@src/types/database';
 
 export const LLAVE_PEDIDO = 'carni_cart_v1';
+
+const MODOS: ReadonlySet<unknown> = new Set(['money', 'weight', 'pieces']);
+const UNIDADES: ReadonlySet<unknown> = new Set(['kg', 'g', 'lb']);
+
+/**
+ * `solicitud` viene del almacenamiento, que otra pestaña o un script pudo escribir:
+ * solo se acepta si tiene la forma exacta de D7 y topes de largo. Cualquier otra
+ * cosa se ignora y la línea se lee como siempre, por su cantidad y su unidad.
+ */
+function leerSolicitud(valor: unknown): SolicitudLinea | undefined {
+  if (typeof valor !== 'object' || valor === null) {
+    return undefined;
+  }
+  const s = valor as Record<string, unknown>;
+  const unit = s.unit ?? null;
+  const grosor = s.thickness_in ?? null;
+  const nota = s.note ?? null;
+  const textoONulo = (v: unknown, maximo: number): v is string | null =>
+    v === null || (typeof v === 'string' && v.length <= maximo);
+
+  if (
+    (typeof s.product_id !== 'number' && typeof s.product_id !== 'string') ||
+    !MODOS.has(s.mode) ||
+    typeof s.amount !== 'string' ||
+    s.amount.length > 32 ||
+    !(unit === null || UNIDADES.has(unit)) ||
+    !textoONulo(grosor, 16) ||
+    !textoONulo(nota, 500)
+  ) {
+    return undefined;
+  }
+
+  return {
+    product_id: s.product_id,
+    mode: s.mode as SolicitudLinea['mode'],
+    amount: s.amount,
+    unit: unit as SolicitudLinea['unit'],
+    thickness_in: grosor,
+    note: nota
+  };
+}
 
 /**
  * Reads whatever is already in the shared cart key and turns it into order
@@ -44,6 +85,7 @@ export function leerPedidoGuardado(): OrderLine[] {
       // actually numeric; keep the original otherwise.
       const numericId = typeof item.id === 'number' ? item.id : Number(item.id);
       const productId = Number.isFinite(numericId) ? numericId : item.id;
+      const solicitud = leerSolicitud(item.solicitud);
 
       return {
         lineId: `${item.id}-restored-${index}`,
@@ -57,7 +99,8 @@ export function leerPedidoGuardado(): OrderLine[] {
         // Carried untouched so syncLegacyCart can merge the fields React never
         // models — grosor, basePeso, the orderMode quote inputs — instead of
         // rebuilding the legacy shape and dropping them.
-        legacy: item
+        legacy: item,
+        ...(solicitud ? { solicitud } : {})
       };
     });
   } catch {

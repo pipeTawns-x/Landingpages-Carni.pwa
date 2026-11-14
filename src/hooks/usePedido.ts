@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import type { OrderLine } from '@src/types/database';
-import { hidratarCarrito, quitarProducto } from '@src/redux/slices/carritoSlice';
+import { totalDeLinea } from '@src/lib/solicitudLinea';
+import type { OrderLine, SolicitudLinea } from '@src/types/database';
+import { editarLinea, hidratarCarrito, quitarProducto } from '@src/redux/slices/carritoSlice';
 import type { Despacho, EstadoRaiz } from '@src/redux/store';
 
 /**
@@ -31,6 +32,8 @@ export interface Pedido {
   abrir: () => void;
   cerrar: () => void;
   quitar: (lineId: string) => void;
+  /** Guarda lo que el cliente pidió en una línea y la cantidad estimada que sale de ello. */
+  editar: (lineId: string, solicitud: SolicitudLinea, cantidad: number) => void;
 }
 
 export interface OpcionesPedido {
@@ -79,6 +82,13 @@ export function usePedido({ leer, estaSincronizando }: OpcionesPedido): Pedido {
     [despachar]
   );
 
+  const editar = useCallback(
+    (lineId: string, solicitud: SolicitudLinea, cantidad: number) => {
+      despachar(editarLinea({ lineId, solicitud, cantidad }));
+    },
+    [despachar]
+  );
+
   /* El store arranca vacio; el pedido de verdad ya esta en `localStorage`,
      escrito por esta pestaña, por otra o por el `cart.js` plano. Esta es la
      puerta por la que ese estado entra una sola vez al montar. */
@@ -87,10 +97,9 @@ export function usePedido({ leer, estaSincronizando }: OpcionesPedido): Pedido {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const total = useMemo(
-    () => lineas.reduce((suma, l) => suma + l.pricePerKg * l.quantity, 0),
-    [lineas]
-  );
+  // Una línea que pasó por el editor se cobra por lo que pidió (igual que el
+  // servidor); cualquier otra, por cantidad x precio como siempre.
+  const total = useMemo(() => lineas.reduce((suma, l) => suma + totalDeLinea(l), 0), [lineas]);
 
   // El cajón queda donde el cliente lo dejó, también al cambiar de página.
   useEffect(() => {
@@ -190,5 +199,5 @@ export function usePedido({ leer, estaSincronizando }: OpcionesPedido): Pedido {
     };
   }, [abierto]);
 
-  return { lineas, total, abierto, abrir, cerrar, quitar };
+  return { lineas, total, abierto, abrir, cerrar, quitar, editar };
 }

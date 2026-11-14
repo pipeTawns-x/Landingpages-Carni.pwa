@@ -63,7 +63,10 @@ function aItemLegacy(linea: OrderLine): CartLegacyItem {
     // una unidad. El campo que no aplica va en 0, nunca ausente.
     peso: linea.unit === 'kg' ? linea.quantity : 0,
     piezas: linea.unit === 'kg' ? 0 : linea.quantity,
-    categoria: linea.categorySlug
+    categoria: linea.categorySlug,
+    // La solicitud D7 viaja al disco como una clave más: `cart.js` ignora las que
+    // no conoce, y una línea que nunca pasó por el editor no la escribe.
+    ...(linea.solicitud ? { solicitud: linea.solicitud } : {})
   };
 }
 

@@ -96,6 +96,24 @@ export interface OrderLine {
    * Keeping the original here lets syncLegacyCart merge instead of overwrite.
    */
   legacy?: CartLegacyItem;
+  /**
+   * What the customer asked for, in the exact shape of one `p_items` entry of the
+   * server RPCs (contract D7). Additive: lines that never went through the
+   * editor have none, and `quantity` + `unit` above keep describing them.
+   * `quantity` is always the ESTIMATED amount derived from this request (kg for
+   * a kg-priced product, pieces or packages otherwise), so totals keep working.
+   */
+  solicitud?: SolicitudLinea;
+}
+
+/** One cart line as the server reads it (contract D7). Amounts are text: no float ever touches money. */
+export interface SolicitudLinea {
+  product_id: number | string;
+  mode: 'money' | 'weight' | 'pieces';
+  amount: string;
+  unit: 'kg' | 'g' | 'lb' | null;
+  thickness_in: string | null;
+  note: string | null;
 }
 
 export interface CartLegacyItem {
@@ -103,6 +121,8 @@ export interface CartLegacyItem {
   name: string;
   price: number;
   img?: string;
+  /** Additive key (D7). `cart.js` ignores keys it does not know, so the old pages keep working. */
+  solicitud?: SolicitudLinea;
   tipo: 'kg' | 'corte' | 'unidad' | 'paquete';
   peso?: number;
   piezas?: number;
