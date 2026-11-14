@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-# Rebuilds the work database, applies the 5 comercio-v1 migrations in order, proves
-# every -- DOWN block (apply, revert, apply) and runs every SQL test.
+# Rebuilds the work database, applies the comercio-v1 migrations that exist (1-5) in order,
+# proves every -- DOWN block (apply, revert, apply) and runs every SQL test. A missing number is
+# skipped and the run says so right before the TOTAL line.
 #
 # Last line of the output:   TOTAL: N pruebas, F fallas
 # Exit code is non-zero when F > 0.
@@ -15,6 +16,8 @@
 #   correr.sh up N            apply comercio-v1 migration N (1-5)
 #   correr.sh down N          run the DOWN block of comercio-v1 migration N
 #   correr.sh prueba NOMBRE   run supabase/tests/comercio_v1_NOMBRE.sql
+#   correr.sh reversa N       prove the DOWN of migration N alone: with 1..N-1 applied and N not,
+#                             dump the schema, apply N, revert N, dump again, compare, apply N
 #   correr.sh                 everything, from scratch
 #
 # Pruebas run as supabase_admin (superuser): postgres cannot SET ROLE django nor
@@ -145,25 +148,42 @@ case "$cmd" in
     correr_prueba "$AQUI/comercio_v1_${2:?name}.sql"
     resumen
     ;;
+  reversa)
+    n="${2:?number 1-5}"
+    volcar > "$TMP/antes.schema";  huella > "$TMP/antes.huella"
+    subir "$n";      paso $? "migration $n applies"
+    bajar "$n";      paso $? "DOWN of migration $n runs"
+    volcar > "$TMP/despues.schema"; huella > "$TMP/despues.huella"
+    diff "$TMP/antes.schema" "$TMP/despues.schema" > "$TMP/reversa.diff"
+    paso $? "after DOWN $n the schema is identical to before (diff in $TMP/reversa.diff)"
+    [ -s "$TMP/reversa.diff" ] && head -n 40 "$TMP/reversa.diff" | sed 's/^/--   /'
+    cmp -s "$TMP/antes.huella" "$TMP/despues.huella"
+    paso $? "after DOWN $n categories and products hold the same data"
+    subir "$n";      paso $? "migration $n applies again after the revert"
+    resumen
+    ;;
   todo)
     crear_base;      paso $? "work database $DB recreated"
     aplicar_base;    paso $? "9 base migrations + seed + Django fixtures applied"
     volcar > "$TMP/base.schema";  huella > "$TMP/base.huella"
 
     for n in 1 2 3 4 5; do
+      [ -n "$(migracion "$n")" ] || continue
       subir "$n";    paso $? "migration $n applies on top of the previous ones"
     done
     for n in 5 4 3 2 1; do
+      [ -n "$(migracion "$n")" ] || continue
       bajar "$n";    paso $? "DOWN of migration $n runs"
     done
     volcar > "$TMP/revertida.schema"
     diff "$TMP/base.schema" "$TMP/revertida.schema" > "$TMP/revertida.diff"
-    paso $? "after the 5 DOWN blocks the schema is identical to the base (diff in $TMP/revertida.diff)"
+    paso $? "after every DOWN block the schema is identical to the base (diff in $TMP/revertida.diff)"
     [ -s "$TMP/revertida.diff" ] && head -n 40 "$TMP/revertida.diff" | sed 's/^/--   /'
     huella > "$TMP/revertida.huella"
     cmp -s "$TMP/base.huella" "$TMP/revertida.huella"
-    paso $? "after the 5 DOWN blocks categories and products hold the same data"
+    paso $? "after every DOWN block categories and products hold the same data"
     for n in 1 2 3 4 5; do
+      [ -n "$(migracion "$n")" ] || continue
       subir "$n";    paso $? "migration $n applies again after the revert"
     done
 
@@ -171,10 +191,13 @@ case "$cmd" in
     for f in "$AQUI"/comercio_v1_*.sql; do
       [ -e "$f" ] && correr_prueba "$f"
     done
+    FALTAN=""
+    for n in 1 2 3 4 5; do [ -n "$(migracion "$n")" ] || FALTAN="$FALTAN $n"; done
+    [ -z "$FALTAN" ] || echo "-- AVISO: faltan las migraciones$FALTAN; este TOTAL no cubre esas rebanadas"
     resumen
     ;;
   *)
-    echo "usage: correr.sh [base | up N | down N | prueba NOMBRE]" >&2
+    echo "usage: correr.sh [base | up N | down N | prueba NOMBRE | reversa N]" >&2
     exit 2
     ;;
 esac

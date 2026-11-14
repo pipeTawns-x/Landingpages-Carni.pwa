@@ -143,3 +143,29 @@ BEGIN
     VALUES (p_rate, p_buffer, p_source,
             (now() AT TIME ZONE 'America/Mexico_City')::date - p_age_days);
 END $$;
+
+-- ---------------------------------------------------------------- probes
+-- Rows a role really sees in a public table or view (RLS applies). Raises 42501 when
+-- the role holds no SELECT on it, which t.code() turns into '42501'.
+CREATE FUNCTION t.n(p_table text) RETURNS bigint LANGUAGE plpgsql AS $$
+DECLARE
+    v bigint;
+BEGIN
+    EXECUTE format('SELECT count(*) FROM public.%I', p_table) INTO v;
+    RETURN v;
+END $$;
+
+-- The table privileges a role holds, in a fixed order: 'SELECT,INSERT'. '' for none.
+CREATE FUNCTION t.privs(p_role text, p_table text) RETURNS text LANGUAGE sql STABLE AS $$
+    SELECT coalesce(string_agg(v.p, ',' ORDER BY v.ord), '')
+    FROM (VALUES (1, 'SELECT'), (2, 'INSERT'), (3, 'UPDATE'), (4, 'DELETE'),
+                 (5, 'TRUNCATE'), (6, 'REFERENCES'), (7, 'TRIGGER')) AS v(ord, p)
+    WHERE has_table_privilege(p_role, 'public.' || p_table, v.p)
+$$;
+
+-- The sequence privileges a role holds: 'USAGE,SELECT,UPDATE' or a subset. '' for none.
+CREATE FUNCTION t.seq_privs(p_role text, p_seq text) RETURNS text LANGUAGE sql STABLE AS $$
+    SELECT coalesce(string_agg(v.p, ',' ORDER BY v.ord), '')
+    FROM (VALUES (1, 'USAGE'), (2, 'SELECT'), (3, 'UPDATE')) AS v(ord, p)
+    WHERE has_sequence_privilege(p_role, 'public.' || p_seq, v.p)
+$$;
