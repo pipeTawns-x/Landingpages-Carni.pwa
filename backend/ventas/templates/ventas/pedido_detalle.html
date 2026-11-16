@@ -22,6 +22,18 @@
       <div><dt>Notas</dt><dd>{{ order.notes|default:"Sin notas" }}</dd></div>
       <div><dt>Registrado</dt><dd>{{ order.created_at|date:"d/m/Y H:i" }}</dd></div>
     </dl>
+    {% if order.moves %}
+    <div class="v-moves">
+      {% for to, label in order.moves %}
+      <form class="v-inline" method="post" action="{% url 'orders:mover' order.pk %}">
+        {% csrf_token %}
+        <input type="hidden" name="status" value="{{ to }}">
+        <input type="hidden" name="next" value="{{ request.path }}">
+        <button class="v-btn {% if to == 'cancelled' %}v-btn--danger{% else %}v-btn--primary{% endif %}" type="submit">{{ label }}</button>
+      </form>
+      {% endfor %}
+    </div>
+    {% endif %}
   </section>
 
   <section class="v-card" aria-labelledby="lineas-titulo">

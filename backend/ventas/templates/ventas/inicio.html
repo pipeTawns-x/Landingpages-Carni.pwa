@@ -1,0 +1,110 @@
+{% extends "panel/base.html" %}
+{% load static %}
+{% comment %}
+  The home of the panel (/panel/, panel:inicio): the metrics of panel_kpis() (shape D4) and the
+  latest orders. Bars are classes from 0 to 10 of the best value, so the page needs no script and
+  no inline style.
+{% endcomment %}
+{% block title %}<title>Inicio · Panel · Carnicería El Señor de La Misericordia</title>{% endblock %}
+{% block head_extra %}<link rel="stylesheet" href="{% static 'ventas/ventas.css' %}" />{% endblock %}
+{% block titulo %}Inicio{% endblock %}
+{% block accion %}<a class="v-btn v-btn--primary" href="{% url 'ventas:nueva' %}">Nueva venta</a>{% endblock %}
+{% block contenido %}
+<div class="v-stack">
+  {% if metrics %}
+  <ul class="v-kpis" role="list">
+    <li class="v-kpi">
+      <span class="v-kpi__label">Ventas de hoy</span>
+      <span class="v-kpi__value">${{ metrics.ventas_hoy.total }}</span>
+      <span class="v-muted">{{ metrics.ventas_hoy.pedidos }} pedido{{ metrics.ventas_hoy.pedidos|pluralize }}</span>
+    </li>
+    <li class="v-kpi">
+      <span class="v-kpi__label">Pendientes</span>
+      <span class="v-kpi__value">{{ metrics.pendientes }}</span>
+      <a class="v-link" href="{% url 'orders:board' %}">Ver pedidos</a>
+    </li>
+    <li class="v-kpi">
+      <span class="v-kpi__label">Ticket promedio</span>
+      <span class="v-kpi__value">${{ metrics.ticket }}</span>
+      <span class="v-muted">Últimos 30 días</span>
+    </li>
+    <li class="v-kpi">
+      <span class="v-kpi__label">Margen</span>
+      {% if metrics.margen %}
+      <span class="v-kpi__value">${{ metrics.margen.monto }}</span>
+      <span class="v-muted">{{ metrics.margen.pct }} % de lo vendido con costo</span>
+      {% else %}
+      <span class="v-kpi__value">—</span>
+      <span class="v-muted">Sin costos registrados</span>
+      {% endif %}
+    </li>
+  </ul>
+
+  <div class="v-grid">
+    <section class="v-card" aria-labelledby="semana-titulo">
+      <h2 id="semana-titulo" class="v-card__title">Ventas de la semana</h2>
+      <ol class="v-chart" role="list">
+        {% for day in metrics.semana %}
+        <li class="v-chart__col">
+          <span class="v-chart__value">${{ day.total }}</span>
+          <span class="v-chart__track"><span class="v-bar {{ day.bar_class }}"></span></span>
+          <span class="v-chart__label" title="{{ day.dia }}">{{ day.label }}</span>
+        </li>
+        {% endfor %}
+      </ol>
+    </section>
+
+    <section class="v-card" aria-labelledby="top-titulo">
+      <h2 id="top-titulo" class="v-card__title">Lo que más se vende</h2>
+      {% if metrics.top5 %}
+      <ol class="v-top" role="list">
+        {% for row in metrics.top5 %}
+        <li class="v-top__row">
+          <div class="v-product__head">
+            <span class="v-product__name">{{ row.producto }}</span>
+            <span class="v-num">${{ row.ingreso }}</span>
+          </div>
+          <span class="v-meter"><span class="v-meter__fill {{ row.width_class }}"></span></span>
+          <span class="v-muted">{{ row.kg }} kg</span>
+        </li>
+        {% endfor %}
+      </ol>
+      {% else %}
+      <p class="v-empty">Aún no hay ventas en los últimos 30 días.</p>
+      {% endif %}
+    </section>
+  </div>
+  {% else %}
+  <p class="v-notice">No se pudieron cargar las métricas. Revisa la conexión con la base de datos e inténtalo de nuevo.</p>
+  {% endif %}
+
+  <section class="v-card" aria-labelledby="recientes-titulo">
+    <div class="v-product__head">
+      <h2 id="recientes-titulo" class="v-card__title">Pedidos recientes</h2>
+      <a class="v-chip" href="{% url 'orders:board' %}">Tablero de pedidos</a>
+    </div>
+    {% if recent %}
+    <ul class="v-cart" role="list">
+      {% for order in recent %}
+      <li class="v-cart__line">
+        <div class="v-product__head">
+          <a class="v-link" href="{% url 'ventas:pedido_detalle' order.pk %}">{{ order.customer_name|default:"Sin nombre" }} · {{ order.short_id }}</a>
+          <span class="v-num">${{ order.total_mxn }}</span>
+        </div>
+        <p class="v-muted"><span class="v-badge">{{ order.status_label }}</span> {{ order.channel_label }} · {{ order.created_at|date:"d/m H:i" }}</p>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p class="v-empty">Todavía no hay pedidos. Registra uno desde Nueva venta.</p>
+    {% endif %}
+  </section>
+
+  <nav class="v-quick" aria-label="Accesos rápidos">
+    <a class="v-chip" href="{% url 'ventas:nueva' %}">Nueva venta</a>
+    <a class="v-chip" href="{% url 'orders:board' %}">Pedidos</a>
+    <a class="v-chip" href="{% url 'inventory:list' %}">Productos y precios</a>
+    <a class="v-chip" href="{% url 'ventas:catalogo' %}">Catálogo público</a>
+  </nav>
+</div>
+{% endblock %}

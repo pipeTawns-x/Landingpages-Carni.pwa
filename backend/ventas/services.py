@@ -192,6 +192,17 @@ class PostgresGateway:
         )
         return result if isinstance(result, uuid.UUID) else uuid.UUID(str(result))
 
+    def panel_kpis(self):
+        """The numbers of the home of the panel (shape D4), money and kilos as text."""
+        result = self._call("SELECT public.panel_kpis()", [])
+        return json.loads(result) if isinstance(result, str | bytes) else result
+
+    def set_order_status(self, order_id, status, actor=None):
+        """Move an order; the function checks the transition and moves the stock."""
+        return self._call(
+            "SELECT public.set_order_status(%s::uuid, %s, %s)", [str(order_id), status, actor]
+        )
+
 
 _gateway = None
 

@@ -558,7 +558,9 @@ class RedemptionTests(TestCase):
 
         response = self.client.get(reverse("panel:inicio"))
 
-        self.assertRedirects(response, reverse("inventory:list"), fetch_redirect_response=False)
+        # The home of the panel is the dashboard: an open session gets the page itself.
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "ventas/inicio.html")
 
     def test_the_role_is_still_read_on_every_request_and_demoting_ends_the_access(self):
         self.redeem()
@@ -775,7 +777,8 @@ class InviteSessionLifetimeTests(TestCase):
 
     def assert_panel_open(self, client=None):
         response = (client or self.client).get(reverse("panel:inicio"))
-        self.assertRedirects(response, reverse("inventory:list"), fetch_redirect_response=False)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "ventas/inicio.html")
 
     def assert_panel_closed(self, client=None):
         client = client or self.client

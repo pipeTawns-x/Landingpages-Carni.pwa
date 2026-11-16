@@ -43,7 +43,7 @@
           </a>
         </li>
         <li>
-          <a href="/panel/pedidos/"{% if section == 'orders' %} aria-current="page"{% endif %} class="group flex min-h-11 items-center gap-3 rounded-control px-3 text-ui text-text-muted transition-transform duration-160 ease-out-strong hover:bg-surface-2 hover:text-text active:scale-[0.97] motion-reduce:transition-none aria-[current]:bg-surface-2 aria-[current]:font-semibold aria-[current]:text-text">
+          <a href="{% url 'orders:board' %}"{% if section == 'orders' %} aria-current="page"{% endif %} class="group flex min-h-11 items-center gap-3 rounded-control px-3 text-ui text-text-muted transition-transform duration-160 ease-out-strong hover:bg-surface-2 hover:text-text active:scale-[0.97] motion-reduce:transition-none aria-[current]:bg-surface-2 aria-[current]:font-semibold aria-[current]:text-text">
             <svg class="size-5 shrink-0 group-aria-[current]:text-red-text" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 5h4.5v14H4zM9.75 5h4.5v9h-4.5zM15.5 5H20v11h-4.5z" /></svg>
             <span>Pedidos</span>
           </a>
@@ -120,7 +120,7 @@
         </a>
       </li>
       <li>
-        <a href="/panel/pedidos/"{% if section == 'orders' %} aria-current="page"{% endif %} class="flex min-h-14 flex-col items-center justify-center gap-1 rounded-control text-meta text-text-muted transition-transform duration-160 ease-out-strong hover:text-text active:scale-[0.97] motion-reduce:transition-none aria-[current]:font-semibold aria-[current]:text-red-text">
+        <a href="{% url 'orders:board' %}"{% if section == 'orders' %} aria-current="page"{% endif %} class="flex min-h-14 flex-col items-center justify-center gap-1 rounded-control text-meta text-text-muted transition-transform duration-160 ease-out-strong hover:text-text active:scale-[0.97] motion-reduce:transition-none aria-[current]:font-semibold aria-[current]:text-red-text">
           <svg class="size-5.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 5h4.5v14H4zM9.75 5h4.5v9h-4.5zM15.5 5H20v11h-4.5z" /></svg>
           <span>Pedidos</span>
         </a>

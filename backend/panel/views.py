@@ -26,6 +26,7 @@ from panel.access import (
     panel_admin_required,
 )
 from panel.models import Profile, ReviewInvite, is_valid_landing_path
+from ventas.views import home
 
 logger = logging.getLogger(__name__)
 
@@ -247,12 +248,12 @@ def acceso(request):
 
 @panel_admin_required
 def inicio(request):
-    """Landing page of the panel.
+    """Landing page of the panel: the dashboard with the metrics of the store.
 
-    The dashboard is not served from here yet (it arrives with `panel/base.html`),
-    so for now the panel opens on the only section that exists: the products.
+    The page belongs to `ventas`, which owns the door to the database functions that compute
+    the metrics (`ventas.views.home`).
     """
-    return redirect("inventory:list")
+    return home(request)
 
 
 @panel_admin_required

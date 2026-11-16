@@ -786,8 +786,9 @@ class PanelAccessTests(TestCase):
 
         response = self.client.get(self.url)
 
-        # The landing page forwards to the first section that exists: the products.
-        self.assertRedirects(response, reverse("inventory:list"), fetch_redirect_response=False)
+        # The landing page is the dashboard of the panel.
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "ventas/inicio.html")
 
     def test_a_django_superuser_made_some_other_way_is_not_a_panel_admin(self):
         self.client.force_login(get_user_model().objects.create_superuser("local"))
@@ -871,7 +872,7 @@ class RoleRevalidationTests(TestCase):
         for _ in range(2):
             response = self.client.get(self.url)
 
-            self.assertRedirects(response, reverse("inventory:list"), fetch_redirect_response=False)
+            self.assertEqual(response.status_code, 200)
 
     def test_an_admin_demoted_after_the_handoff_is_sent_to_the_bridge(self):
         self.change_profile("UPDATE profiles SET role = 'customer' WHERE id = %s")

@@ -36,6 +36,24 @@ KG_PER = {
 }
 MAX_LINES = 50
 STALE_AFTER_DAYS = 4
+# set_order_status (A2): where an order can go from each status.
+TRANSITIONS = {
+    "pending": ("confirmed", "cancelled"),
+    "confirmed": ("preparing", "cancelled"),
+    "preparing": ("ready", "cancelled"),
+    "ready": ("delivered", "cancelled"),
+    "delivered": (),
+    "cancelled": (),
+}
+# panel_kpis with no orders at all (the shape D4 and the SQL test of A3 fix).
+EMPTY_KPIS = {
+    "ventas_hoy": {"total": "0.00", "pedidos": 0},
+    "pendientes": 0,
+    "ticket_promedio_30d": "0.00",
+    "margen_30d": None,
+    "top5": [],
+    "serie_7d": [{"dia": f"2026-11-{day:02d}", "total": "0.00"} for day in range(10, 17)],
+}
 
 
 def q2(value):
@@ -66,6 +84,8 @@ class FakeGateway:
         self.warnings = []
         self.quotes = []
         self.orders = []
+        self.moves = []
+        self.kpis = None
 
     @classmethod
     def from_cases(cls, ids, *, fx_age_days=None, promos=None):
@@ -180,6 +200,25 @@ class FakeGateway:
         # The mirror refuses writes from Django, as it should; the database is what writes it.
         models.Model.save(row, force_insert=True)
         return row.pk
+
+    def panel_kpis(self):
+        self._fail_if_asked("panel_kpis")
+        return self.kpis if self.kpis is not None else EMPTY_KPIS
+
+    def set_order_status(self, order_id, status, actor=None):
+        """The transitions of `set_order_status` (A2), applied to the mirror the tests read."""
+        self._fail_if_asked("set_order_status")
+        if status not in TRANSITIONS:
+            raise GatewayError("invalid_status")
+        row = PanelOrder.objects.filter(pk=order_id).first()
+        if row is None:
+            raise GatewayError("order_not_found")
+        if status not in TRANSITIONS[row.status]:
+            raise GatewayError("invalid_transition")
+        self.moves.append((order_id, status, actor))
+        row.status = status
+        models.Model.save(row, update_fields=["status"])
+        return status
 
     def _quote_line(self, item, currency):
         product = self.products.get(item["product_id"])

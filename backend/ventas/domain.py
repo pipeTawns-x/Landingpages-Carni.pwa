@@ -17,6 +17,22 @@ STATUS_LABELS = {
     "delivered": "Entregado",
     "cancelled": "Cancelado",
 }
+# Where an order can go from each status: the map of `set_order_status` (A2), for the buttons.
+TRANSITIONS = {
+    "pending": ("confirmed", "cancelled"),
+    "confirmed": ("preparing", "cancelled"),
+    "preparing": ("ready", "cancelled"),
+    "ready": ("delivered", "cancelled"),
+    "delivered": (),
+    "cancelled": (),
+}
+MOVE_LABELS = {
+    "confirmed": "Confirmar",
+    "preparing": "A preparar",
+    "ready": "Marcar listo",
+    "delivered": "Entregado",
+    "cancelled": "Cancelar",
+}
 CHANNEL_LABELS = {"web": "Tienda en línea", "mostrador": "Mostrador", "whatsapp": "WhatsApp"}
 # A sale registered by the staff is never a `web` order: that channel is the store's own.
 STAFF_CHANNELS = ("mostrador", "whatsapp")

@@ -24,7 +24,6 @@ from panel.tests import sign_in_as_panel_admin
 # frame links them by their literal path. The day one of them resolves, a test below fails and the
 # link has to become a url tag in panel/base.html and panel/mas.html.
 PENDING_PATHS = {
-    "/panel/pedidos/",
     "/panel/clientes/",
     "/panel/publicidad/",
     "/panel/ajustes/",

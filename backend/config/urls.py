@@ -25,6 +25,8 @@ urlpatterns = [
     # `panel` namespace would rename their routes to `panel:inventory:*`, and the
     # contract (docs/CONTRATO_PANEL_DJANGO.md) names them `inventory:*`.
     path("panel/productos/", include("inventory.urls")),
+    # The orders board of the panel (ventas/orders_urls.py, namespace `orders`).
+    path("panel/pedidos/", include("ventas.orders_urls")),
     # /tienda/ and /panel/ventas/...: the sales of the store (ventas/urls.py).
     path("", include("ventas.urls")),
     path("panel/", include("panel.urls")),
