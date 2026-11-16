@@ -122,8 +122,13 @@ class Product(models.Model):
     image_url = models.TextField(  # noqa: DJ001
         null=True, blank=True, verbose_name="URL de imagen"
     )
-    stock = models.IntegerField(
-        default=0, validators=[MinValueValidator(0)], verbose_name="inventario"
+    # numeric(10,3) in the store since comercio-v1 A1: kilos with grams, or whole pieces.
+    stock = models.DecimalField(
+        max_digits=10,
+        decimal_places=3,
+        default=0,
+        validators=[MinValueValidator(Decimal("0"))],
+        verbose_name="inventario",
     )
     is_active = models.BooleanField(default=True, verbose_name="activo")
     created_at = models.DateTimeField(auto_now_add=True, null=True, verbose_name="creado el")
@@ -150,6 +155,11 @@ class Product(models.Model):
         """Keep price_per_lb consistent with price_per_kg on every save."""
         self.price_per_lb = price_per_lb_for(self.price_per_kg)
         super().save(*args, **kwargs)
+
+    @property
+    def stock_display(self) -> str:
+        """The stock without trailing zeros: 80 and 7.5, not 80.000 and 7.500."""
+        return format(Decimal(self.stock).normalize(), "f")
 
     @property
     def unit_label(self) -> str:

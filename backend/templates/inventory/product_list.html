@@ -80,7 +80,7 @@
               <span>${{ product.price_per_kg|floatformat:"2g" }}</span> <span class="font-normal text-text-muted">/ {{ product.unit_label }}</span>
             </td>
             <td role="cell" class="col-start-2 row-start-3 text-right text-ui tabular-nums lg:table-cell lg:px-5 lg:py-2">
-              <span class="text-text-muted lg:hidden">Existencia </span><span class="font-semibold">{{ product.stock }}</span>
+              <span class="text-text-muted lg:hidden">Existencia </span><span class="font-semibold">{{ product.stock_display }}</span>
             </td>
             <td role="cell" class="col-start-2 row-start-1 self-center lg:table-cell lg:px-5 lg:py-2">
               {% if product.is_active %}

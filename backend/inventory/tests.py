@@ -1368,7 +1368,8 @@ class ProductFormPageTests(TestCase):
         expected = {
             "price_per_kg": ("0.01", "0.01"),
             "min_quantity_kg": ("0.001", "0"),
-            "stock": ("1", "0"),
+            # Kilos with grams since comercio-v1 A1 (numeric(10,3)).
+            "stock": ("0.001", "0"),
             "avg_piece_weight_kg": ("0.001", "0"),
             "thickness_min_in": ("0.01", "0"),
             "thickness_max_in": ("0.01", "0"),
@@ -2359,3 +2360,46 @@ class ProductAdminTests(TestCase):
         self.assertRedirects(response, self.changelist_url)
         self.assertFalse(Product.objects.exists())
         self.assertEqual(self.warnings(response), [])
+
+
+class FractionalStockTests(TestCase):
+    """The stock is numeric(10,3) in the store (A1): kilos with grams, kept as they are."""
+
+    fixtures = ["categories.json"]
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.product = Product.objects.create(
+            category=Category.objects.first(),
+            name="Arrachera",
+            price_per_kg=Decimal("320.00"),
+            stock=Decimal("7.5"),
+        )
+
+    def setUp(self):
+        self.url = reverse("inventory:update", args=[self.product.pk])
+        sign_in_as_panel_admin(self.client)
+
+    def post_data(self, **overrides):
+        return {
+            "name": "Arrachera",
+            "category": self.product.category_id,
+            "price_per_kg": "320.00",
+            "min_quantity_kg": "0",
+            "stock": "7.5",
+            "is_active": "on",
+            **overrides,
+        }
+
+    def test_editing_a_product_keeps_a_stock_with_grams(self):
+        self.client.post(self.url, self.post_data(name="Arrachera marinada"))
+
+        self.assertEqual(Product.objects.get(pk=self.product.pk).stock, Decimal("7.500"))
+
+    def test_the_form_takes_grams_and_shows_the_stock_without_trailing_zeros(self):
+        self.client.post(self.url, self.post_data(stock="2.125"))
+
+        self.assertEqual(Product.objects.get(pk=self.product.pk).stock, Decimal("2.125"))
+        html = self.client.get(self.url).content.decode()
+        self.assertRegex(html, r'name="stock"[^>]*value="2\.125"|value="2\.125"[^>]*name="stock"')
+        self.assertRegex(html, r'name="stock"[^>]*step="0\.001"|step="0\.001"[^>]*name="stock"')

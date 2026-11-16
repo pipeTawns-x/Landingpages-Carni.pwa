@@ -6,6 +6,8 @@ Django is the one that draws a widget; `assets/panel.css` lists this file with `
 how Tailwind finds them. A class that is not in the redesign's kit does not belong here.
 """
 
+from decimal import Decimal
+
 from django import forms
 
 from inventory.models import CutSpec, Product
@@ -77,7 +79,12 @@ class ProductForm(forms.ModelForm):
                 }
             ),
             "stock": forms.NumberInput(
-                attrs={"class": NUMBER, "min": "0", "step": "1", "aria-describedby": "help-stock"}
+                attrs={
+                    "class": NUMBER,
+                    "min": "0",
+                    "step": "0.001",
+                    "aria-describedby": "help-stock",
+                }
             ),
             "is_active": forms.CheckboxInput(attrs={"class": SWITCH}),
             "image_url": forms.TextInput(
@@ -95,6 +102,10 @@ class ProductForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         # The blank option of the select is the prompt of the design, not Django's dashes.
         self.fields["category"].empty_label = "Elige una categoría"
+        # The stock is stored with three decimals: show 15 and 7.5, not 15.000 and 7.500.
+        stock = self.initial.get("stock")
+        if isinstance(stock, Decimal):
+            self.initial["stock"] = format(stock.normalize(), "f")
 
 
 class CutSpecForm(forms.ModelForm):
