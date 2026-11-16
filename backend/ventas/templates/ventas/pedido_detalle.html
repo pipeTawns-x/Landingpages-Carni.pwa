@@ -1,0 +1,50 @@
+{% extends "panel/base.html" %}
+{% load static %}
+{% comment %}
+  One order as the store registered it (/panel/ventas/pedidos/<uuid>/, ventas:pedido_detalle). It
+  reads the `panel_orders` view and never writes: the status changes from the orders board.
+{% endcomment %}
+{% block title %}<title>Pedido {{ order.short_id }} · Panel · Carnicería El Señor de La Misericordia</title>{% endblock %}
+{% block head_extra %}<link rel="stylesheet" href="{% static 'ventas/ventas.css' %}" />{% endblock %}
+{% block titulo %}Pedido {{ order.short_id }}{% endblock %}
+{% block accion %}<a class="v-chip" href="{% url 'ventas:nueva' %}">Nueva venta</a>{% endblock %}
+{% block contenido %}
+<div class="v-grid">
+  <section class="v-card" aria-labelledby="cliente-titulo">
+    <h2 id="cliente-titulo" class="v-card__title">Cliente y entrega</h2>
+    <dl class="v-dl">
+      <div><dt>Estado</dt><dd><span class="v-badge">{{ status_label }}</span></dd></div>
+      <div><dt>Cliente</dt><dd>{{ order.customer_name|default:"Sin nombre" }}</dd></div>
+      <div><dt>Teléfono</dt><dd>{{ order.customer_phone|default:"Sin teléfono" }}</dd></div>
+      <div><dt>Canal</dt><dd>{{ channel_label }}</dd></div>
+      <div><dt>Pago</dt><dd>{{ payment_label }}</dd></div>
+      <div><dt>Entrega</dt><dd>{{ delivery_label }}{% if address %} · {{ address }}{% endif %}</dd></div>
+      <div><dt>Notas</dt><dd>{{ order.notes|default:"Sin notas" }}</dd></div>
+      <div><dt>Registrado</dt><dd>{{ order.created_at|date:"d/m/Y H:i" }}</dd></div>
+    </dl>
+  </section>
+
+  <section class="v-card" aria-labelledby="lineas-titulo">
+    <h2 id="lineas-titulo" class="v-card__title">Productos</h2>
+    <ul class="v-cart" role="list">
+      {% for line in order.lines %}
+      <li class="v-cart__line">
+        <div class="v-product__head">
+          <span class="v-product__name">{{ line.product_name }}</span>
+          <span class="v-num">${{ line.subtotal }}</span>
+        </div>
+        <p class="v-muted">{{ line.quantity_kg }} kg{% if line.pieces %} · {{ line.pieces }} piezas{% endif %} · ${{ line.unit_price }} el kilo</p>
+        {% if line.note %}<p class="v-muted">Nota: {{ line.note }}</p>{% endif %}
+      </li>
+      {% endfor %}
+    </ul>
+    <dl class="v-totals">
+      <div class="v-total"><dt>Total</dt><dd class="v-num">${{ order.total_mxn }} MXN</dd></div>
+      {% if order.currency == "USD" %}
+      <div class="v-total"><dt>Cobro en USD</dt><dd class="v-num">US${{ order.total_usd }}</dd></div>
+      {% if order.fx_rate_used %}<div class="v-total"><dt>Tipo de cambio</dt><dd class="v-num">{{ order.fx_rate_used }}</dd></div>{% endif %}
+      {% endif %}
+    </dl>
+  </section>
+</div>
+{% endblock %}

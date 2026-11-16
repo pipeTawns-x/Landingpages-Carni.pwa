@@ -50,7 +50,8 @@ class DoubleAppliesTheSharedCasesTests(SimpleTestCase):
 
     def test_every_case_with_a_result_gives_the_numbers_of_the_file(self):
         cases = [case for case in CASES["casos"] if "esperado" in case]
-        self.assertGreaterEqual(len(cases), 15)
+        # The cases file has 12 cases with a result and 6 with an error (18 in all).
+        self.assertGreaterEqual(len(cases), 12)
         for case in cases:
             with self.subTest(case=case["id"]):
                 quote = gateway_for(case).quote_cart([line_for(case)], case["entrada"]["currency"])
@@ -103,6 +104,14 @@ class ErrorCodesTests(SimpleTestCase):
                     "order_not_found",
                     "invalid_status",
                     "below_minimum_order",
+                    "invalid_address",
+                    "address_too_long",
+                    "invalid_channel",
+                    "invalid_customer_name",
+                    "invalid_customer_phone",
+                    "invalid_payment_method",
+                    "invalid_staff_ref",
+                    "below_minimum_quantity",
                 ]
             ),
         )
@@ -117,6 +126,12 @@ class ErrorCodesTests(SimpleTestCase):
         self.assertEqual(
             domain.message_for("invalid_amount"), domain.ERROR_MESSAGES["invalid_amount"]
         )
+
+
+class RaisedByTheStore(Exception):
+    """Stands for the psycopg error of a `RAISE EXCEPTION` (SQLSTATE P0001)."""
+
+    sqlstate = "P0001"
 
 
 class RecordingCursor:
@@ -234,7 +249,7 @@ class PostgresGatewayTests(SimpleTestCase):
 
     def test_a_rule_with_a_code_this_code_does_not_know_is_still_a_rule_of_the_store(self):
         error = InternalError("a_new_rule: detail")
-        error.__cause__ = mock.Mock(sqlstate="P0001")
+        error.__cause__ = RaisedByTheStore("a_new_rule: detail")
         gateway, _ = self.open_gateway(error=error)
 
         with self.assertRaises(GatewayError) as caught:

@@ -21,6 +21,7 @@
   {# The logo belongs to the store (it is 700 KB): the panel links it there instead of copying it. #}
   <link rel="icon" href="{{ store_origin }}/img/recursos_web/logo-user.png" type="image/png" />
   <link rel="stylesheet" href="{% static 'panel/panel.css' %}" />
+  {% block head_extra %}{% endblock %}
 </head>
 <body class="min-h-dvh bg-bg text-text lg:pl-62">
   {# Sidebar from 1024 px of width. Fixed, 248 px wide. #}

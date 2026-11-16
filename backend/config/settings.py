@@ -66,6 +66,8 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "inventory.apps.InventoryConfig",
     "panel.apps.PanelConfig",
+    # The store sales: public catalogue and the sale at the counter (EBAC M16 on the real store).
+    "ventas.apps.VentasConfig",
     # EBAC M14 practice: course-only, not part of the store (see ecommerce/README.md).
     "ecommerce.apps.EcommerceConfig",
 ]

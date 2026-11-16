@@ -43,7 +43,11 @@ class SaleTestCase(SalesTestCase):
     def add(self, key, **line):
         """Add a line to the cart through the view, the way the page does."""
         line = {"mode": "weight", "amount": "1", "unit": "kg", **line}
-        return self.client.post(add_url(self.store[key]), line)
+        response = self.client.post(add_url(self.store[key]), line)
+        # The page the redirect leads to would show the message; the tests do not follow it,
+        # so it is dropped here and the next response carries only its own messages.
+        self.client.cookies.pop("messages", None)
+        return response
 
     def levels(self, response):
         return [level for level, _ in messages_of(response)]

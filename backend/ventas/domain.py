@@ -43,6 +43,14 @@ ERROR_MESSAGES = {
     "order_not_found": "El pedido ya no existe.",
     "invalid_status": "El estado no es válido.",
     "below_minimum_order": "El pedido no llega al mínimo para este tipo de entrega.",
+    "invalid_address": "La dirección de entrega no es válida.",
+    "address_too_long": "La dirección de entrega es demasiado larga.",
+    "invalid_channel": "El canal de venta no es válido.",
+    "invalid_customer_name": "El nombre del cliente no es válido.",
+    "invalid_customer_phone": "El teléfono del cliente no es válido.",
+    "invalid_payment_method": "La forma de pago no es válida.",
+    "invalid_staff_ref": "No se pudo identificar a quién registra la venta.",
+    "below_minimum_quantity": "La cantidad está por debajo del mínimo de este producto.",
 }
 WARNING_MESSAGES = {"low_stock": "Poco stock: puede que no alcance."}
 GENERIC_REFUSAL = "La tienda no pudo registrar esto. Revisa los datos e inténtalo de nuevo."

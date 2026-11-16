@@ -115,12 +115,7 @@ class FakeGateway:
             raise GatewayError("too_many_lines")
         lines = [self._quote_line(item, currency) for item in items]
         total_mxn = sum((line.line_total_mxn for line in lines), Decimal("0.00"))
-        if currency == "USD":
-            total_usd = sum((line.line_total_usd for line in lines), Decimal("0.00"))
-        elif self.usd_available():
-            total_usd = ceil_cents(total_mxn / self.house_rate())
-        else:
-            total_usd = None
+        total_usd = self._cart_total_usd(lines, currency, total_mxn)
         fx = None
         if self.usd_available():
             fx = {
@@ -131,6 +126,16 @@ class FakeGateway:
         return Quote(
             lines=lines, total_mxn=total_mxn, total_usd=total_usd, currency=currency, fx=fx
         )
+
+    def _cart_total_usd(self, lines, currency, total_mxn):
+        """Datos' formula: the money lines asked in dollars add up exactly, and the rest of the
+        cart gets one single ceiling to the cent (not one per line)."""
+        if not self.usd_available():
+            return None
+        in_dollars = [line for line in lines if currency == "USD" and line.sale_mode == "money"]
+        exact_usd = sum((line.line_total_usd for line in in_dollars), Decimal("0.00"))
+        rest_mxn = total_mxn - sum((line.line_total_mxn for line in in_dollars), Decimal("0.00"))
+        return exact_usd + ceil_cents(rest_mxn / self.house_rate())
 
     def create_order_staff(self, **order):
         self._fail_if_asked("create_order_staff")

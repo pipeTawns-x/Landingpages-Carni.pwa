@@ -25,6 +25,8 @@ urlpatterns = [
     # `panel` namespace would rename their routes to `panel:inventory:*`, and the
     # contract (docs/CONTRATO_PANEL_DJANGO.md) names them `inventory:*`.
     path("panel/productos/", include("inventory.urls")),
+    # /tienda/ and /panel/ventas/...: the sales of the store (ventas/urls.py).
+    path("", include("ventas.urls")),
     path("panel/", include("panel.urls")),
     # EBAC M15 practice, course-only: /my-products/ (see ecommerce/README.md).
     path("", include("ecommerce.urls")),

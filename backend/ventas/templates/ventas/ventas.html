@@ -1,0 +1,196 @@
+{% extends "panel/base.html" %}
+{% load static %}
+{% comment %}
+  The sale at the counter (/panel/ventas/nueva/, ventas:nueva): the M16 page of the `ventas` app.
+  Three parts, all plain forms: the products to pick from, the cart quoted by the store, and the
+  order. No number here is computed by Django or the browser: they are the quote of the store.
+{% endcomment %}
+{% block title %}<title>Nueva venta · Panel · Carnicería El Señor de La Misericordia</title>{% endblock %}
+{% block head_extra %}<link rel="stylesheet" href="{% static 'ventas/ventas.css' %}" />{% endblock %}
+{% block titulo %}Nueva venta{% endblock %}
+{% block accion %}
+<a class="v-chip" href="?currency={{ other_currency }}">Cobrar en {{ other_currency }}</a>
+{% endblock %}
+{% block contenido %}
+<div class="v-grid">
+  <section class="v-card" aria-labelledby="productos-titulo">
+    <h2 id="productos-titulo" class="v-card__title">Productos</h2>
+    <form class="v-search" method="get" action="{% url 'ventas:nueva' %}">
+      <input type="hidden" name="currency" value="{{ currency }}">
+      <label class="v-sr" for="buscar">Buscar producto</label>
+      <input class="v-input" id="buscar" type="search" name="q" value="{{ query }}" placeholder="Buscar corte o producto">
+      <label class="v-sr" for="categoria">Categoría</label>
+      <select class="v-select" id="categoria" name="category">
+        <option value="">Todas</option>
+        {% for category in categories %}
+        <option value="{{ category.pk }}"{% if selected_category == category.pk|stringformat:"d" %} selected{% endif %}>{{ category.name }}</option>
+        {% endfor %}
+      </select>
+      <button class="v-btn v-btn--ghost" type="submit">Buscar</button>
+    </form>
+
+    {% if page_obj %}
+    <ul class="v-products" role="list">
+      {% for product in page_obj %}
+      <li class="v-product">
+        <div class="v-product__head">
+          <span class="v-product__name">{{ product.name }}</span>
+          <span class="v-product__price">${{ product.price_per_kg }} / {{ product.unit_label }}</span>
+        </div>
+        <form class="v-line-form" method="post" action="{% url 'ventas:carrito_agregar' product.pk %}">
+          {% csrf_token %}
+          <label class="v-field"><span class="v-label">Forma</span>
+            <select class="v-select" name="mode">
+              {% for value, label in product.modes %}<option value="{{ value }}">{{ label }}</option>{% endfor %}
+            </select>
+          </label>
+          <label class="v-field"><span class="v-label">Cantidad</span>
+            <input class="v-input" type="text" inputmode="decimal" name="amount" required>
+          </label>
+          {% for value, label in product.modes %}{% if value == "weight" %}
+          <label class="v-field"><span class="v-label">Unidad</span>
+            <select class="v-select" name="unit">
+              <option value="">Solo por peso</option>
+              {% for unit in units %}<option value="{{ unit }}">{{ unit }}</option>{% endfor %}
+            </select>
+          </label>
+          {% endif %}{% endfor %}
+          {% if product.asks_thickness %}
+          <label class="v-field"><span class="v-label">Grosor (pulgadas)</span>
+            <input class="v-input" type="text" inputmode="decimal" name="thickness_in" placeholder="Solo por piezas">
+          </label>
+          {% endif %}
+          <label class="v-field"><span class="v-label">Nota</span>
+            <input class="v-input" type="text" name="note" maxlength="200">
+          </label>
+          <button class="v-btn v-btn--ghost" type="submit">Agregar</button>
+        </form>
+      </li>
+      {% endfor %}
+    </ul>
+    {% if page_obj.has_other_pages %}
+    <nav class="v-pager" aria-label="Páginas de productos">
+      {% if page_obj.has_previous %}<a class="v-chip" href="?page={{ page_obj.previous_page_number }}&amp;q={{ query|urlencode }}&amp;category={{ selected_category }}&amp;currency={{ currency }}">Anterior</a>{% endif %}
+      <span class="v-muted">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+      {% if page_obj.has_next %}<a class="v-chip" href="?page={{ page_obj.next_page_number }}&amp;q={{ query|urlencode }}&amp;category={{ selected_category }}&amp;currency={{ currency }}">Siguiente</a>{% endif %}
+    </nav>
+    {% endif %}
+    {% else %}
+    <p class="v-empty">No encontramos productos con esa búsqueda.</p>
+    {% endif %}
+  </section>
+
+  <div class="v-stack">
+    <section class="v-card" aria-labelledby="carrito-titulo">
+      <h2 id="carrito-titulo" class="v-card__title">Carrito</h2>
+      {% if rows %}
+      <ul class="v-cart" role="list">
+        {% for row in rows %}
+        <li class="v-cart__line{% if row.error %} v-cart__line--blocked{% endif %}">
+          <div class="v-product__head">
+            <span class="v-product__name">{% if row.product %}{{ row.product.name }}{% else %}Producto no disponible{% endif %}</span>
+            {% if row.quote %}<span class="v-num">${{ row.quote.line_total_mxn }} MXN</span>{% endif %}
+          </div>
+          {% if row.quote %}
+          <p class="v-muted">
+            {{ row.quote.quantity_kg }} kg{% if row.quote.pieces %} · {{ row.quote.pieces }} piezas{% endif %}
+            · ${{ row.quote.unit_price }} el kilo
+            {% if row.quote.discount_mxn %} · descuento ${{ row.quote.discount_mxn }}{% endif %}
+            {% if currency == "USD" and row.quote.line_total_usd %} · US${{ row.quote.line_total_usd }}{% endif %}
+          </p>
+          {% endif %}
+          {% if row.line.note %}<p class="v-muted">Nota: {{ row.line.note }}</p>{% endif %}
+          {% if row.error %}<p class="v-error-text">{{ row.error }}</p>{% endif %}
+          {% for warning in row.warnings %}<p class="v-warning">{{ warning }}</p>{% endfor %}
+          {% if row.product %}
+          <form class="v-line-form" method="post" action="{% url 'ventas:carrito_actualizar' row.product.pk %}">
+            {% csrf_token %}
+            <label class="v-field"><span class="v-label">Forma</span>
+              <select class="v-select" name="mode">
+                {% for value, label in row.modes %}<option value="{{ value }}"{% if row.line.mode == value %} selected{% endif %}>{{ label }}</option>{% endfor %}
+              </select>
+            </label>
+            <label class="v-field"><span class="v-label">Cantidad</span>
+              <input class="v-input" type="text" inputmode="decimal" name="amount" value="{{ row.line.amount }}" required>
+            </label>
+            {% for value, label in row.modes %}{% if value == "weight" %}
+            <label class="v-field"><span class="v-label">Unidad</span>
+              <select class="v-select" name="unit">
+                <option value="">Solo por peso</option>
+                {% for unit in row.unit_choices %}<option value="{{ unit }}"{% if row.line.unit == unit %} selected{% endif %}>{{ unit }}</option>{% endfor %}
+              </select>
+            </label>
+            {% endif %}{% endfor %}
+            {% if row.line.thickness_in %}<input type="hidden" name="thickness_in" value="{{ row.line.thickness_in }}">{% endif %}
+            <input type="hidden" name="note" value="{{ row.line.note|default_if_none:'' }}">
+            <button class="v-btn v-btn--ghost" type="submit">Actualizar</button>
+          </form>
+          {% endif %}
+          <form class="v-inline" method="post" action="{% url 'ventas:carrito_quitar' row.line.product_id %}">
+            {% csrf_token %}
+            <button class="v-btn v-btn--danger" type="submit">Quitar</button>
+          </form>
+        </li>
+        {% endfor %}
+      </ul>
+      {% if quote %}
+      <dl class="v-totals">
+        <div class="v-total"><dt>Total</dt><dd class="v-num">${{ quote.total_mxn }} MXN</dd></div>
+        {% if quote.total_usd %}<div class="v-total"><dt>En dólares</dt><dd class="v-num">US${{ quote.total_usd }}</dd></div>{% endif %}
+      </dl>
+      {% endif %}
+      {% else %}
+      <p class="v-empty">El carrito está vacío. Agrega productos de la lista.</p>
+      {% endif %}
+    </section>
+
+    <section class="v-card" aria-labelledby="pedido-titulo">
+      <h2 id="pedido-titulo" class="v-card__title">Datos del pedido</h2>
+      <form class="v-order-form" method="post" action="{% url 'ventas:procesar' %}">
+        {% csrf_token %}
+        <input type="hidden" name="currency" value="{{ currency }}">
+        <label class="v-field"><span class="v-label">Cliente</span>
+          <input class="v-input" type="text" name="customer_name" maxlength="120" value="{{ order_form.customer_name.value|default_if_none:'' }}" required>
+        </label>
+        {% if order_form.customer_name.errors %}<p class="v-field-error">{{ order_form.customer_name.errors.0 }}</p>{% endif %}
+        <label class="v-field"><span class="v-label">Teléfono (opcional)</span>
+          <input class="v-input" type="tel" name="customer_phone" maxlength="20" value="{{ order_form.customer_phone.value|default_if_none:'' }}">
+        </label>
+        {% if order_form.customer_phone.errors %}<p class="v-field-error">{{ order_form.customer_phone.errors.0 }}</p>{% endif %}
+        <label class="v-field"><span class="v-label">Entrega</span>
+          <select class="v-select" name="delivery_type">
+            {% for value, label in delivery_labels.items %}<option value="{{ value }}"{% if order_form.delivery_type.value == value %} selected{% endif %}>{{ label }}</option>{% endfor %}
+          </select>
+        </label>
+        {% if order_form.delivery_type.errors %}<p class="v-field-error">{{ order_form.delivery_type.errors.0 }}</p>{% endif %}
+        <label class="v-field"><span class="v-label">Dirección (solo envíos)</span>
+          <input class="v-input" type="text" name="delivery_address" maxlength="2000" value="{{ order_form.delivery_address.value|default_if_none:'' }}">
+        </label>
+        {% if order_form.delivery_address.errors %}<p class="v-field-error">{{ order_form.delivery_address.errors.0 }}</p>{% endif %}
+        <label class="v-field"><span class="v-label">Canal</span>
+          <select class="v-select" name="channel">
+            {% for value, label in channel_choices %}<option value="{{ value }}"{% if order_form.channel.value == value %} selected{% endif %}>{{ label }}</option>{% endfor %}
+          </select>
+        </label>
+        {% if order_form.channel.errors %}<p class="v-field-error">{{ order_form.channel.errors.0 }}</p>{% endif %}
+        <label class="v-field"><span class="v-label">Pago</span>
+          <select class="v-select" name="payment_method">
+            <option value="">Sin indicar</option>
+            {% for value, label in payment_labels.items %}<option value="{{ value }}"{% if order_form.payment_method.value == value %} selected{% endif %}>{{ label }}</option>{% endfor %}
+          </select>
+        </label>
+        {% if order_form.payment_method.errors %}<p class="v-field-error">{{ order_form.payment_method.errors.0 }}</p>{% endif %}
+        <label class="v-field"><span class="v-label">Notas</span>
+          <textarea class="v-input" name="notes" maxlength="500" rows="2">{{ order_form.notes.value|default_if_none:'' }}</textarea>
+        </label>
+        {% if order_form.notes.errors %}<p class="v-field-error">{{ order_form.notes.errors.0 }}</p>{% endif %}
+        {% if order_form.currency.errors %}<p class="v-field-error">{{ order_form.currency.errors.0 }}</p>{% endif %}
+        <div class="v-actions">
+          <span class="v-muted">Se cobra en {{ currency }}</span>
+          <button class="v-btn v-btn--primary" type="submit"{% if blocked %} disabled{% endif %}>Procesar pedido</button>
+        </div>
+      </form>
+    </section>
+  </div>
+</div>
+{% endblock %}
