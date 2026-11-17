@@ -16,6 +16,7 @@ import logging
 import re
 import uuid
 from dataclasses import dataclass, field
+from datetime import date
 from decimal import Decimal
 
 from django.db import Error as DatabaseError
@@ -201,6 +202,36 @@ class PostgresGateway:
         """Move an order; the function checks the transition and moves the stock."""
         return self._call(
             "SELECT public.set_order_status(%s::uuid, %s, %s)", [str(order_id), status, actor]
+        )
+
+    def current_fx(self):
+        """The rate in force, read from the view `current_fx` (D8), numbers and date decoded.
+
+        `status` is "ok", "stale" (older than four days) or "missing" (no rate at all: then the
+        numbers are None).
+        """
+        result = self._call(
+            "SELECT jsonb_build_object('status', f.status, 'rate', f.rate::text, "
+            "'buffer_pct', f.buffer_pct::text, 'house_rate', f.house_rate::text, "
+            "'fetched_on', f.fetched_on::text, 'source', f.source) "
+            "FROM public.current_fx f LIMIT 1",
+            [],
+        )
+        data = json.loads(result) if isinstance(result, str | bytes) else result
+        fetched_on = data.get("fetched_on")
+        return {
+            "status": data["status"],
+            "rate": _decimal(data.get("rate")),
+            "buffer_pct": _decimal(data.get("buffer_pct")),
+            "house_rate": _decimal(data.get("house_rate")),
+            "fetched_on": date.fromisoformat(fetched_on) if fetched_on else None,
+            "source": data.get("source"),
+        }
+
+    def set_manual_fx_rate(self, rate, buffer_pct=None, staff_ref=None):
+        """Write the rate of the owner for today (one per day); the function checks the range."""
+        return self._call(
+            "SELECT public.set_manual_fx_rate(%s, %s, %s)", [rate, buffer_pct, staff_ref]
         )
 
 

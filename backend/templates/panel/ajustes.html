@@ -1,0 +1,53 @@
+{% extends "panel/base.html" %}
+{% comment %}
+  Ajustes (/panel/ajustes/, panel:ajustes): the basic settings of the store. The data of the
+  business is read-only (ventas/negocio.py). The exchange rate is the one in force (`fx`, or None
+  when the database could not answer) and a POST form with Django's CSRF token that sets today's
+  manual rate through the gateway. Context of the view: negocio, horario, fx, form.
+{% endcomment %}
+{% block title %}<title>Ajustes · Panel · Carnicería El Señor de La Misericordia</title>{% endblock %}
+{% block titulo %}Ajustes{% endblock %}
+{% block contenido %}
+<div class="mx-auto flex w-full max-w-2xl flex-col gap-5 lg:mx-0 lg:gap-6">
+  <section aria-labelledby="negocio-titulo" class="flex flex-col gap-4 rounded-card border border-border bg-surface-1 p-5 lg:p-8">
+    <h2 id="negocio-titulo" class="font-display text-titulo font-medium">Datos de la tienda</h2>
+    <p class="text-meta text-text-muted">Solo lectura: son los datos que muestra la tienda.</p>
+    <dl class="flex flex-col gap-3 text-ui">
+      <div class="flex flex-col gap-1"><dt class="text-meta text-text-muted">Nombre</dt><dd class="font-semibold">{{ negocio.nombre }}</dd></div>
+      <div class="flex flex-col gap-1"><dt class="text-meta text-text-muted">Teléfono</dt><dd class="tabular-nums">{{ negocio.telefono }}</dd></div>
+      <div class="flex flex-col gap-1"><dt class="text-meta text-text-muted">Dirección</dt><dd>{% for line in negocio.direccion %}{{ line }}{% if not forloop.last %}<br />{% endif %}{% endfor %}</dd></div>
+      <div class="flex flex-col gap-1"><dt class="text-meta text-text-muted">Horario</dt><dd>{{ horario.dias }}, de {{ horario.abre }} a {{ horario.cierra }}. {{ horario.cerrado }}.</dd></div>
+    </dl>
+  </section>
+
+  <section aria-labelledby="cambio-titulo" class="flex flex-col gap-4 rounded-card border border-border bg-surface-1 p-5 lg:p-8">
+    <h2 id="cambio-titulo" class="font-display text-titulo font-medium">Tipo de cambio</h2>
+    {% if fx and fx.status != "missing" %}
+    <dl class="flex flex-col gap-3 text-ui">
+      <div class="flex flex-col gap-1"><dt class="text-meta text-text-muted">Pesos por dólar (MXN por USD)</dt><dd class="font-semibold tabular-nums">${{ fx.rate|floatformat:"2" }}</dd></div>
+      <div class="flex flex-col gap-1"><dt class="text-meta text-text-muted">Margen de seguridad</dt><dd class="tabular-nums">{{ fx.buffer_pct|floatformat:"2" }} %</dd></div>
+      <div class="flex flex-col gap-1"><dt class="text-meta text-text-muted">Tasa de la casa</dt><dd class="tabular-nums">${{ fx.house_rate|floatformat:"2" }}</dd></div>
+      <div class="flex flex-col gap-1"><dt class="text-meta text-text-muted">Registrada el</dt><dd class="tabular-nums">{{ fx.fetched_on|date:"d/m/Y" }}</dd></div>
+    </dl>
+    {% if fx.status == "stale" %}
+    <p class="flex items-start gap-2 text-ui text-text"><svg class="mt-0.5 size-5 shrink-0 text-sand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 9v4M12 16.5h.01M10.3 4.2 2.8 17.5A2 2 0 0 0 4.5 20.5h15a2 2 0 0 0 1.7-3L13.7 4.2a2 2 0 0 0-3.4 0Z" /></svg><span>Esta tasa tiene más de cuatro días: el cobro en dólares está apagado hasta que la actualices.</span></p>
+    {% endif %}
+    {% elif fx %}
+    <p class="text-ui text-text-muted">Todavía no hay tipo de cambio. Captura uno para poder cobrar en dólares.</p>
+    {% else %}
+    <p class="text-ui text-text-muted">No se pudo leer el tipo de cambio vigente.</p>
+    {% endif %}
+
+    <form method="post" action="{% url 'panel:ajustes' %}" novalidate class="flex flex-col gap-3 border-t border-border pt-3">
+      {% csrf_token %}
+      <div class="flex flex-col gap-2">
+        <label for="{{ form.rate.id_for_label }}" class="text-ui font-semibold">{{ form.rate.label }}<span class="font-normal text-text-muted"> · obligatorio</span></label>
+        {{ form.rate }}
+        {% include "inventory/_field_error.html" with field=form.rate %}
+        <p class="text-meta text-text-muted">Es la tasa de hoy: si ya habías capturado una hoy, se reemplaza.</p>
+      </div>
+      <div class="flex"><button type="submit" class="inline-flex min-h-12 items-center justify-center gap-2 rounded-pill bg-red px-6 text-ui font-semibold text-white transition-[background-color,scale] duration-160 ease-out-strong hover:bg-red-hover active:scale-[0.97] motion-reduce:transition-none">Guardar tipo de cambio</button></div>
+    </form>
+  </section>
+</div>
+{% endblock %}

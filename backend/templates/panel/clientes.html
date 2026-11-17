@@ -1,0 +1,72 @@
+{% extends "panel/base.html" %}
+{% comment %}
+  Clientes (/panel/clientes/, panel:clientes): a basic list of the customers with their orders.
+  Context of the view: page_obj, 20 customers per page, newest order first. Each customer is a dict
+  with name, phone ("" when unknown), orders (how many), total_mxn (without the cancelled ones),
+  last_order_at and last_order_id (the link goes to that order). It reads the orders; nothing is
+  written here.
+{% endcomment %}
+{% block title %}<title>Clientes · Panel · Carnicería El Señor de La Misericordia</title>{% endblock %}
+{% block titulo %}Clientes{% endblock %}
+{% block contenido %}
+<div class="flex flex-col gap-5 lg:gap-6">
+  {% if page_obj %}
+  <section aria-labelledby="lista-titulo" class="flex flex-col gap-3">
+    <h2 id="lista-titulo" class="sr-only">Lista de clientes</h2>
+    <p class="text-meta text-text-muted tabular-nums">Mostrando {{ page_obj.start_index }}–{{ page_obj.end_index }} de {{ page_obj.paginator.count }} clientes</p>
+
+    {# A table from 1024 px; below that each row becomes a card, as in the list of products. #}
+    <div class="lg:overflow-hidden lg:rounded-card lg:border lg:border-border lg:bg-surface-1">
+      <table role="table" aria-label="Clientes" class="block w-full text-left text-ui lg:table lg:border-collapse">
+        <thead role="rowgroup" class="hidden lg:table-header-group">
+          <tr role="row" class="text-meta text-text-muted">
+            <th role="columnheader" scope="col" class="px-5 py-3 font-medium">Cliente</th>
+            <th role="columnheader" scope="col" class="px-5 py-3 font-medium">Teléfono</th>
+            <th role="columnheader" scope="col" class="px-5 py-3 text-right font-medium">Pedidos</th>
+            <th role="columnheader" scope="col" class="px-5 py-3 text-right font-medium">Total gastado</th>
+            <th role="columnheader" scope="col" class="px-5 py-3 font-medium">Último pedido</th>
+          </tr>
+        </thead>
+        <tbody role="rowgroup" class="flex flex-col gap-3 lg:table-row-group">
+          {% for customer in page_obj %}
+          <tr role="row" class="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-x-3 gap-y-1 rounded-card border border-border bg-surface-1 p-4 lg:table-row lg:rounded-none lg:border-0 lg:border-t lg:bg-transparent lg:p-0 lg:hover:bg-surface-2">
+            <td role="cell" class="col-start-1 row-start-1 min-w-0 font-semibold lg:table-cell lg:px-5 lg:py-2">{{ customer.name }}</td>
+            <td role="cell" class="col-span-2 row-start-2 text-meta text-text-muted tabular-nums lg:table-cell lg:px-5 lg:py-2 lg:text-ui">{{ customer.phone|default:"Sin teléfono" }}</td>
+            <td role="cell" class="col-start-2 row-start-1 text-right text-ui tabular-nums lg:table-cell lg:px-5 lg:py-2">
+              <span class="font-semibold">{{ customer.orders }}</span> <span class="font-normal text-text-muted">{% if customer.orders == 1 %}pedido{% else %}pedidos{% endif %}</span>
+            </td>
+            <td role="cell" class="col-start-1 row-start-3 text-ui font-semibold tabular-nums lg:table-cell lg:px-5 lg:py-2 lg:text-right">${{ customer.total_mxn|floatformat:"2g" }}</td>
+            <td role="cell" class="col-start-2 row-start-3 text-ui tabular-nums lg:table-cell lg:px-5 lg:py-2">
+              <a href="{% url 'ventas:pedido_detalle' customer.last_order_id %}" class="inline-flex min-h-11 items-center text-text underline decoration-transparent underline-offset-4 transition-colors duration-160 hover:decoration-sand">{{ customer.last_order_at|date:"d/m/Y" }}<span class="sr-only">, ver el pedido de {{ customer.name }}</span></a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <nav aria-label="Paginación de clientes" class="mt-2 flex items-center justify-between gap-3">
+      {% if page_obj.has_previous %}
+      <a href="{% querystring page=page_obj.previous_page_number %}" class="inline-flex size-11 items-center justify-center gap-1 rounded-pill border border-sand text-ui font-semibold text-text transition-[background-color,scale] duration-160 ease-out-strong hover:bg-surface-2 active:scale-[0.97] motion-reduce:transition-none lg:w-auto lg:px-4"><svg class="size-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m15 5-7 7 7 7" /></svg><span class="sr-only lg:not-sr-only">Anterior</span></a>
+      {% else %}
+      <span aria-disabled="true" class="inline-flex size-11 select-none items-center justify-center gap-1 rounded-pill border border-border text-ui text-text-muted lg:w-auto lg:px-4"><svg class="size-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m15 5-7 7 7 7" /></svg><span class="sr-only lg:not-sr-only">Anterior</span></span>
+      {% endif %}
+
+      <p class="text-ui text-text-muted tabular-nums" aria-current="page">Página <span class="font-semibold text-text">{{ page_obj.number }}</span> de {{ page_obj.paginator.num_pages }}</p>
+
+      {% if page_obj.has_next %}
+      <a href="{% querystring page=page_obj.next_page_number %}" class="inline-flex size-11 items-center justify-center gap-1 rounded-pill border border-sand text-ui font-semibold text-text transition-[background-color,scale] duration-160 ease-out-strong hover:bg-surface-2 active:scale-[0.97] motion-reduce:transition-none lg:w-auto lg:px-4"><span class="sr-only lg:not-sr-only">Siguiente</span><svg class="size-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m9 5 7 7-7 7" /></svg></a>
+      {% else %}
+      <span aria-disabled="true" class="inline-flex size-11 select-none items-center justify-center gap-1 rounded-pill border border-border text-ui text-text-muted lg:w-auto lg:px-4"><span class="sr-only lg:not-sr-only">Siguiente</span><svg class="size-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m9 5 7 7-7 7" /></svg></span>
+      {% endif %}
+    </nav>
+  </section>
+  {% else %}
+  <section aria-labelledby="vacio-titulo" class="flex flex-col items-center gap-3 rounded-card border border-border bg-surface-1 px-4 py-12 text-center">
+    <span class="grid size-12 place-items-center rounded-control bg-surface-2 text-sand"><svg class="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7ZM3 20a6 6 0 0 1 12 0M16 4.3a3.5 3.5 0 0 1 0 6.4M21 20a6 6 0 0 0-3.5-5.4" /></svg></span>
+    <h2 id="vacio-titulo" class="font-sans text-ui font-semibold">Todavía no hay clientes</h2>
+    <p class="max-w-prose text-meta text-text-muted">Los clientes aparecen aquí cuando se registra su primer pedido.</p>
+  </section>
+  {% endif %}
+</div>
+{% endblock %}

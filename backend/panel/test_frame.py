@@ -20,15 +20,6 @@ from django.urls import Resolver404, resolve, reverse
 from panel.context_processors import store_origin
 from panel.tests import sign_in_as_panel_admin
 
-# Sections of the contract (docs/CONTRATO_PANEL_DJANGO.md, section 1) that have no route yet. The
-# frame links them by their literal path. The day one of them resolves, a test below fails and the
-# link has to become a url tag in panel/base.html and panel/mas.html.
-PENDING_PATHS = {
-    "/panel/clientes/",
-    "/panel/publicidad/",
-    "/panel/ajustes/",
-}
-
 
 class AnchorParser(HTMLParser):
     """Collect the attributes of every <a> of a piece of HTML."""
@@ -137,7 +128,10 @@ class MasPageTests(TestCase):
 
         page = html[html.index("<main") : html.index("</main>")]
         links = [a["href"] for a in anchors(page)]
-        self.assertEqual(links, ["/panel/clientes/", "/panel/publicidad/", "/panel/ajustes/"])
+        self.assertEqual(
+            links,
+            ["/panel/clientes/", "/panel/buildads/", "/panel/productads/", "/panel/ajustes/"],
+        )
 
     def test_the_mas_tab_is_the_current_page_and_no_sidebar_entry_is_current(self):
         html = self.client.get(self.url).content.decode()
@@ -183,13 +177,15 @@ class NavigationStateTests(SimpleTestCase):
             {"/panel/productos/": "page"},
             {"/panel/productos/": "page"},
         ),
-        ("customers:list", "customers"): (
+        ("panel:clientes", "panel"): (
             {"/panel/clientes/": "page"},
             {"/panel/clientes/": "page"},
         ),
-        # Publicidad and Ajustes live inside Más on the phone: that tab is current "in a way".
-        ("panel:ads", "panel"): ({"/panel/publicidad/": "page"}, {"/panel/mas/": "true"}),
-        ("settings:index", "settings"): ({"/panel/ajustes/": "page"}, {"/panel/mas/": "true"}),
+        # BuildAds, ProductAds and Ajustes live inside Más on the phone: that tab is current "in
+        # a way".
+        ("panel:buildads", "panel"): ({"/panel/buildads/": "page"}, {"/panel/mas/": "true"}),
+        ("panel:productads", "panel"): ({"/panel/productads/": "page"}, {"/panel/mas/": "true"}),
+        ("panel:ajustes", "panel"): ({"/panel/ajustes/": "page"}, {"/panel/mas/": "true"}),
         ("panel:mas", "panel"): ({}, {"/panel/mas/": "page"}),
         # The bridge and the other routes of the panel app belong to no entry.
         ("panel:acceso", "panel"): ({}, {}),
@@ -209,7 +205,7 @@ class NavigationStateTests(SimpleTestCase):
         self.assertEqual(current_links(sidebar_of(html)), {})
         self.assertEqual(current_links(tab_bar_of(html)), {})
 
-    def test_the_sidebar_has_six_entries_and_the_tab_bar_five(self):
+    def test_the_sidebar_has_seven_entries_and_the_tab_bar_five(self):
         html = render_frame("panel:inicio", "panel")
 
         self.assertEqual(
@@ -219,7 +215,8 @@ class NavigationStateTests(SimpleTestCase):
                 "/panel/pedidos/",
                 "/panel/productos/",
                 "/panel/clientes/",
-                "/panel/publicidad/",
+                "/panel/buildads/",
+                "/panel/productads/",
                 "/panel/ajustes/",
             ],
         )
@@ -229,30 +226,24 @@ class NavigationStateTests(SimpleTestCase):
         )
 
 
-class PendingSectionsTests(SimpleTestCase):
-    """The frame only links to routes that exist, or to the ones the contract still owes."""
+class FrameLinksTests(SimpleTestCase):
+    """Every link of the frame is a route that exists, and "Publicidad" is not one of them."""
 
-    def test_the_sections_still_without_a_route_do_not_resolve(self):
-        for path in sorted(PENDING_PATHS):
-            with self.subTest(path=path), self.assertRaises(Resolver404, msg=self.news(path)):
-                resolve(path)
-
-    def test_every_panel_link_of_the_frame_resolves_or_is_known_to_be_pending(self):
+    def test_every_panel_link_of_the_frame_resolves(self):
         html = render_frame("panel:inicio", "panel")
-        hrefs = {a["href"] for a in anchors(html)}
 
-        self.assertTrue(hrefs >= PENDING_PATHS)
-        for href in sorted(hrefs - PENDING_PATHS):
+        for href in sorted({a["href"] for a in anchors(html)}):
             with self.subTest(href=href):
                 self.assertTrue(href.startswith("/panel/"))
                 resolve(href)
 
-    @staticmethod
-    def news(path):
-        return (
-            f"{path} resolves now: link it with its url tag in panel/base.html and "
-            "panel/mas.html, and take it out of PENDING_PATHS."
-        )
+    def test_publicidad_does_not_resolve_and_the_frame_does_not_link_it(self):
+        html = render_frame("panel:inicio", "panel")
+
+        with self.assertRaises(Resolver404):
+            resolve("/panel/publicidad/")
+        self.assertNotIn("Publicidad", html)
+        self.assertNotIn("/panel/publicidad/", html)
 
 
 class MessagesPartialTests(SimpleTestCase):

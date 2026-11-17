@@ -86,6 +86,38 @@ class FakeGateway:
         self.orders = []
         self.moves = []
         self.kpis = None
+        self.manual_rates = []
+
+    def current_fx(self):
+        """The exchange rate the settings page shows, like the `current_fx` view."""
+        self._fail_if_asked("current_fx")
+        if self.fx is None:
+            return {
+                "status": "missing",
+                "rate": None,
+                "buffer_pct": None,
+                "house_rate": None,
+                "fetched_on": None,
+                "source": None,
+            }
+        return {
+            "status": "ok" if self.usd_available() else "stale",
+            "rate": self.fx["rate"],
+            "buffer_pct": self.fx["buffer_pct"],
+            "house_rate": self.house_rate(),
+            "fetched_on": timezone.localdate(),
+            "source": "manual",
+        }
+
+    def set_manual_fx_rate(self, rate, buffer_pct=None, staff_ref=None):
+        """Record a manual rate, refusing what set_manual_fx_rate refuses (0 < rate <= 1000)."""
+        self._fail_if_asked("set_manual_fx_rate")
+        if rate <= 0 or rate > 1000:
+            raise GatewayError("invalid_rate")
+        self.manual_rates.append((rate, buffer_pct, staff_ref))
+        kept = self.fx.get("buffer_pct", Decimal("2")) if self.fx else Decimal("2")
+        self.fx = {"rate": rate, "buffer_pct": kept, "age_days": 0}
+        return len(self.manual_rates)
 
     @classmethod
     def from_cases(cls, ids, *, fx_age_days=None, promos=None):

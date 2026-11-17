@@ -2,10 +2,14 @@
 and the landing page."""
 
 import logging
+from decimal import Decimal
 from functools import wraps
 
+from django import forms
 from django.conf import settings
+from django.contrib import messages
 from django.contrib.auth import logout
+from django.core.paginator import Paginator
 from django.db import transaction
 from django.http import Http404, HttpResponseForbidden
 from django.shortcuts import redirect, render
@@ -16,6 +20,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.http import require_http_methods, require_POST, require_safe
 
+from inventory.forms import NUMBER
 from panel import supabase_auth
 from panel.access import (
     PANEL_SESSION_KEY,
@@ -26,6 +31,9 @@ from panel.access import (
     panel_admin_required,
 )
 from panel.models import Profile, ReviewInvite, is_valid_landing_path
+from ventas import domain, services
+from ventas.models import PanelOrder
+from ventas.negocio import HORARIO, NEGOCIO
 from ventas.views import home
 
 logger = logging.getLogger(__name__)
@@ -267,3 +275,138 @@ def mas(request):
     sign-out live on a page of their own instead of in a drawer.
     """
     return render(request, "panel/mas.html")
+
+
+# The two products of the panel that are not built yet (Eduardo: "tenemos BuildAds y ProductAds,
+# nada más"). They share one page that says so; there is no "Publicidad" section.
+IN_DEVELOPMENT = {
+    "buildads": "BuildAds",
+    "productads": "ProductAds",
+}
+
+
+def _in_development(request, slug):
+    return render(request, "panel/proximamente.html", {"product": IN_DEVELOPMENT[slug]})
+
+
+@panel_admin_required
+@require_safe
+def buildads(request):
+    """BuildAds: a page that says it is under development."""
+    return _in_development(request, "buildads")
+
+
+@panel_admin_required
+@require_safe
+def productads(request):
+    """ProductAds: a page that says it is under development."""
+    return _in_development(request, "productads")
+
+
+CUSTOMERS_PER_PAGE = 20
+
+
+def _customers():
+    """Group the orders of the mirror by customer, the one with the newest order first.
+
+    A customer is a name and a phone as the order carries them (a counter sale has no account to
+    point to). Every order counts; a cancelled one adds no money. The orders are read newest
+    first, so the first one seen for a customer is the one the list links to.
+    """
+    grouped = {}
+    rows = PanelOrder.objects.order_by("-created_at").values_list(
+        "order_id", "customer_name", "customer_phone", "total_mxn", "created_at", "status"
+    )
+    for order_id, name, phone, total, created_at, status in rows:
+        key = ((name or "").strip(), (phone or "").strip())
+        customer = grouped.get(key)
+        if customer is None:
+            customer = grouped[key] = {
+                "name": key[0] or "Sin nombre",
+                "phone": key[1],
+                "orders": 0,
+                "total_mxn": Decimal("0.00"),
+                "last_order_at": created_at,
+                "last_order_id": order_id,
+            }
+        customer["orders"] += 1
+        if status != "cancelled":
+            customer["total_mxn"] += total
+    return list(grouped.values())
+
+
+@panel_admin_required
+@require_safe
+def clientes(request):
+    """A basic list of the customers with their orders, built from the orders of the panel."""
+    page = Paginator(_customers(), CUSTOMERS_PER_PAGE).get_page(request.GET.get("page"))
+    return render(request, "panel/clientes.html", {"page_obj": page})
+
+
+class ManualRateForm(forms.Form):
+    """The rate the owner types. The function of the store checks the range again."""
+
+    rate = forms.DecimalField(
+        label="MXN por cada USD",
+        max_digits=8,
+        decimal_places=4,
+        widget=forms.NumberInput(
+            attrs={"class": NUMBER, "step": "0.0001", "inputmode": "decimal", "min": "0"}
+        ),
+        error_messages={
+            "required": "El tipo de cambio es obligatorio.",
+            "invalid": "Escribe un número, por ejemplo 18.50.",
+            "max_digits": "Escribe un tipo de cambio de hasta 4 enteros y 4 decimales.",
+            "max_decimal_places": "Usa como máximo 4 decimales.",
+            "max_whole_digits": "Escribe un tipo de cambio de hasta 4 enteros y 4 decimales.",
+        },
+    )
+
+    def clean_rate(self):
+        rate = self.cleaned_data["rate"]
+        if rate <= 0:
+            raise forms.ValidationError("El tipo de cambio debe ser mayor que cero.")
+        if rate > 1000:
+            raise forms.ValidationError("El tipo de cambio no puede pasar de 1,000.")
+        return rate
+
+
+def _current_fx(request):
+    """The rate in force, or None with a message when the database cannot say."""
+    try:
+        return services.get_gateway().current_fx()
+    except services.GatewayError as error:
+        messages.error(request, domain.message_for(error.code))
+    except services.GatewayUnavailable:
+        messages.error(request, domain.UNAVAILABLE_MESSAGE)
+    return None
+
+
+@panel_admin_required
+@require_http_methods(["GET", "HEAD", "POST"])
+def ajustes(request):
+    """The basic settings of the store: its data (read-only) and the exchange rate.
+
+    Saving the rate is a POST with Django's CSRF token that calls `set_manual_fx_rate` through
+    the gateway, then redirects (POST/redirect/GET) with a success message.
+    """
+    form = ManualRateForm(request.POST if request.method == "POST" else None)
+    if form.is_bound and form.is_valid():
+        try:
+            services.get_gateway().set_manual_fx_rate(
+                form.cleaned_data["rate"], staff_ref=request.session.get(PANEL_SESSION_KEY)
+            )
+        except services.GatewayError as error:
+            messages.error(request, domain.message_for(error.code))
+        except services.GatewayUnavailable:
+            messages.error(request, domain.UNAVAILABLE_MESSAGE)
+        else:
+            messages.success(request, "Tipo de cambio actualizado.")
+            return redirect("panel:ajustes")
+    context = {
+        "negocio": NEGOCIO,
+        "horario": HORARIO,
+        "fx": _current_fx(request),
+        "form": form,
+    }
+    return render(request, "panel/ajustes.html", context)

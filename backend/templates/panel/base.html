@@ -6,9 +6,8 @@
   inline styles. Pages fill the blocks: title (the whole <title> element), titulo (the h1),
   accion (the button on the right of the top bar) and contenido.
   Which entry is current is read from request.resolver_match: `view_name` is "namespace:name" and
-  `section` is the namespace. The links to sections that do not exist yet keep their literal path
-  from the contract (docs/CONTRATO_PANEL_DJANGO.md, section 1); swap each for the url tag when its
-  route lands (a test lists them and fails the day one of them resolves).
+  `section` is the namespace. Every entry is a url tag now. BuildAds and ProductAds (the two ad
+  products; there is no "Publicidad" section) are pages that say they are under development.
 {% endcomment %}
 <html lang="es-MX">
 <head>
@@ -55,19 +54,25 @@
           </a>
         </li>
         <li>
-          <a href="/panel/clientes/"{% if section == 'customers' %} aria-current="page"{% endif %} class="group flex min-h-11 items-center gap-3 rounded-control px-3 text-ui text-text-muted transition-transform duration-160 ease-out-strong hover:bg-surface-2 hover:text-text active:scale-[0.97] motion-reduce:transition-none aria-[current]:bg-surface-2 aria-[current]:font-semibold aria-[current]:text-text">
+          <a href="{% url 'panel:clientes' %}"{% if view_name == 'panel:clientes' %} aria-current="page"{% endif %} class="group flex min-h-11 items-center gap-3 rounded-control px-3 text-ui text-text-muted transition-transform duration-160 ease-out-strong hover:bg-surface-2 hover:text-text active:scale-[0.97] motion-reduce:transition-none aria-[current]:bg-surface-2 aria-[current]:font-semibold aria-[current]:text-text">
             <svg class="size-5 shrink-0 group-aria-[current]:text-red-text" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7ZM3 20a6 6 0 0 1 12 0M16 4.3a3.5 3.5 0 0 1 0 6.4M21 20a6 6 0 0 0-3.5-5.4" /></svg>
             <span>Clientes</span>
           </a>
         </li>
         <li>
-          <a href="/panel/publicidad/"{% if view_name == 'panel:ads' %} aria-current="page"{% endif %} class="group flex min-h-11 items-center gap-3 rounded-control px-3 text-ui text-text-muted transition-transform duration-160 ease-out-strong hover:bg-surface-2 hover:text-text active:scale-[0.97] motion-reduce:transition-none aria-[current]:bg-surface-2 aria-[current]:font-semibold aria-[current]:text-text">
+          <a href="{% url 'panel:buildads' %}"{% if view_name == 'panel:buildads' %} aria-current="page"{% endif %} class="group flex min-h-11 items-center gap-3 rounded-control px-3 text-ui text-text-muted transition-transform duration-160 ease-out-strong hover:bg-surface-2 hover:text-text active:scale-[0.97] motion-reduce:transition-none aria-[current]:bg-surface-2 aria-[current]:font-semibold aria-[current]:text-text">
             <svg class="size-5 shrink-0 group-aria-[current]:text-red-text" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 10v4a1 1 0 0 0 1 1h2l6 4V5L7 9H5a1 1 0 0 0-1 1ZM17 9a4 4 0 0 1 0 6" /></svg>
-            <span>Publicidad</span>
+            <span>BuildAds</span>
           </a>
         </li>
         <li>
-          <a href="/panel/ajustes/"{% if section == 'settings' %} aria-current="page"{% endif %} class="group flex min-h-11 items-center gap-3 rounded-control px-3 text-ui text-text-muted transition-transform duration-160 ease-out-strong hover:bg-surface-2 hover:text-text active:scale-[0.97] motion-reduce:transition-none aria-[current]:bg-surface-2 aria-[current]:font-semibold aria-[current]:text-text">
+          <a href="{% url 'panel:productads' %}"{% if view_name == 'panel:productads' %} aria-current="page"{% endif %} class="group flex min-h-11 items-center gap-3 rounded-control px-3 text-ui text-text-muted transition-transform duration-160 ease-out-strong hover:bg-surface-2 hover:text-text active:scale-[0.97] motion-reduce:transition-none aria-[current]:bg-surface-2 aria-[current]:font-semibold aria-[current]:text-text">
+            <svg class="size-5 shrink-0 group-aria-[current]:text-red-text" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M20 13.5 13.5 20a1.5 1.5 0 0 1-2.1 0L4 12.6V4h8.6l7.4 7.4a1.5 1.5 0 0 1 0 2.1ZM8.5 8.5h.01" /></svg>
+            <span>ProductAds</span>
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'panel:ajustes' %}"{% if view_name == 'panel:ajustes' %} aria-current="page"{% endif %} class="group flex min-h-11 items-center gap-3 rounded-control px-3 text-ui text-text-muted transition-transform duration-160 ease-out-strong hover:bg-surface-2 hover:text-text active:scale-[0.97] motion-reduce:transition-none aria-[current]:bg-surface-2 aria-[current]:font-semibold aria-[current]:text-text">
             <svg class="size-5 shrink-0 group-aria-[current]:text-red-text" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 7h10M18 7h2M4 17h4M12 17h8M16 5v4M10 15v4" /></svg>
             <span>Ajustes</span>
           </a>
@@ -132,13 +137,13 @@
         </a>
       </li>
       <li>
-        <a href="/panel/clientes/"{% if section == 'customers' %} aria-current="page"{% endif %} class="flex min-h-14 flex-col items-center justify-center gap-1 rounded-control text-meta text-text-muted transition-transform duration-160 ease-out-strong hover:text-text active:scale-[0.97] motion-reduce:transition-none aria-[current]:font-semibold aria-[current]:text-red-text">
+        <a href="{% url 'panel:clientes' %}"{% if view_name == 'panel:clientes' %} aria-current="page"{% endif %} class="flex min-h-14 flex-col items-center justify-center gap-1 rounded-control text-meta text-text-muted transition-transform duration-160 ease-out-strong hover:text-text active:scale-[0.97] motion-reduce:transition-none aria-[current]:font-semibold aria-[current]:text-red-text">
           <svg class="size-5.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7ZM3 20a6 6 0 0 1 12 0M16 4.3a3.5 3.5 0 0 1 0 6.4M21 20a6 6 0 0 0-3.5-5.4" /></svg>
           <span>Clientes</span>
         </a>
       </li>
       <li>
-        <a href="{% url 'panel:mas' %}"{% if view_name == 'panel:mas' %} aria-current="page"{% elif view_name == 'panel:ads' or view_name == 'settings:index' %} aria-current="true"{% endif %} class="flex min-h-14 flex-col items-center justify-center gap-1 rounded-control text-meta text-text-muted transition-transform duration-160 ease-out-strong hover:text-text active:scale-[0.97] motion-reduce:transition-none aria-[current]:font-semibold aria-[current]:text-red-text">
+        <a href="{% url 'panel:mas' %}"{% if view_name == 'panel:mas' %} aria-current="page"{% elif view_name == 'panel:buildads' or view_name == 'panel:productads' or view_name == 'panel:ajustes' %} aria-current="true"{% endif %} class="flex min-h-14 flex-col items-center justify-center gap-1 rounded-control text-meta text-text-muted transition-transform duration-160 ease-out-strong hover:text-text active:scale-[0.97] motion-reduce:transition-none aria-[current]:font-semibold aria-[current]:text-red-text">
           <svg class="size-5.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h.01M12 12h.01M19 12h.01" /></svg>
           <span>Más</span>
         </a>
