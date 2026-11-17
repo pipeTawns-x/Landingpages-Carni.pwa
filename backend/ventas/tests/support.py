@@ -306,7 +306,7 @@ def make_store():
     bistec = Product.objects.create(category=meat, name="Bistec", price_per_kg=Decimal("200.00"))
     molida = Product.objects.create(category=meat, name="Molida", price_per_kg=Decimal("140.00"))
     camiseta = Product.objects.create(
-        category=merch, name="Camiseta", price_per_kg=Decimal("250.00")
+        category=merch, name="Camiseta", price_per_kg=Decimal("250.00"), price_unit="piece"
     )
     CutSpec.objects.create(
         product=bistec,

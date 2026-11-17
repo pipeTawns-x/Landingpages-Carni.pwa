@@ -9,8 +9,9 @@ how Tailwind finds them. A class that is not in the redesign's kit does not belo
 from decimal import Decimal
 
 from django import forms
+from django.core.validators import MinValueValidator
 
-from inventory.models import CutSpec, Product
+from inventory.models import CutSpec, Product, price_per_kg_from
 
 # The shell of every control of the panel: 48 px tall, the control radius, the border of a control
 # (never the decorative one), and text that is larger on a phone so the browser does not zoom.
@@ -51,6 +52,7 @@ class ProductForm(forms.ModelForm):
             "name",
             "category",
             "description",
+            "price_unit",
             "price_per_kg",
             "min_quantity_kg",
             "stock",
@@ -71,6 +73,7 @@ class ProductForm(forms.ModelForm):
                     "aria-describedby": "help-price_per_kg",
                 }
             ),
+            "price_unit": forms.Select(attrs={"class": SELECT}),
             "min_quantity_kg": forms.NumberInput(
                 attrs={
                     "class": NUMBER_WITH_UNIT,
@@ -98,14 +101,55 @@ class ProductForm(forms.ModelForm):
             ),
         }
 
+    # What the number typed in the price box is "per". Only a kilo product has the three.
+    PRICE_ENTRY_CHOICES = [("kg", "por kilo"), ("lb", "por libra"), ("g100", "por 100 g")]
+
+    price_entry_unit = forms.ChoiceField(
+        choices=PRICE_ENTRY_CHOICES,
+        required=False,
+        initial="kg",
+        label="Precio escrito",
+        widget=forms.Select(attrs={"class": SELECT}),
+    )
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # The blank option of the select is the prompt of the design, not Django's dashes.
         self.fields["category"].empty_label = "Elige una categoría"
+        # The price is the one thing a wrong value costs money on, so its messages are explicit.
+        price = self.fields["price_per_kg"]
+        price.label = "Precio"
+        price.validators = [
+            MinValueValidator(Decimal("0.01"), message="El precio debe ser mayor que cero.")
+        ]
+        price.error_messages["required"] = "Escribe el precio del producto."
+        price.error_messages["invalid"] = "Escribe el precio como un número, por ejemplo 189.50."
+        self.fields["price_unit"].label = "El precio es"
+        # A post that leaves the unit out keeps the one the product has (kg for a new one).
+        self.fields["price_unit"].required = False
         # The stock is stored with three decimals: show 15 and 7.5, not 15.000 and 7.500.
         stock = self.initial.get("stock")
         if isinstance(stock, Decimal):
             self.initial["stock"] = format(stock.normalize(), "f")
+
+    def clean_price_unit(self):
+        return self.cleaned_data["price_unit"] or self.instance.price_unit
+
+    def clean(self):
+        """Turn the price the admin typed into the price per kilo the store keeps.
+
+        The per-pound and per-100-g entry only makes sense for a product priced per kilo; for a
+        piece or a package the number is the price of that piece or package, whatever the entry
+        unit says. Nothing here lets a price through that the field refused.
+        """
+        cleaned = super().clean()
+        price = cleaned.get("price_per_kg")
+        if price is not None:
+            unit = cleaned.get("price_entry_unit") or "kg"
+            if cleaned.get("price_unit") != Product.PriceUnit.KG:
+                unit = "kg"
+            cleaned["price_per_kg"] = price_per_kg_from(price, unit)
+        return cleaned
 
 
 class CutSpecForm(forms.ModelForm):

@@ -46,6 +46,22 @@
         </div>
       </li>
       {% endif %}
+      {% if unit_changed %}
+      <li class="flex flex-col gap-2">
+        <p class="text-ui font-semibold">Forma de venta</p>
+        <div class="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-3">
+          <div class="flex min-w-0 flex-col gap-1 rounded-control border border-border bg-bg p-4">
+            <span class="text-meta text-text-muted">Antes</span>
+            <span class="text-lead text-text-muted line-through">{{ old_unit_label }}</span>
+          </div>
+          <svg class="size-5 shrink-0 text-sand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+          <div class="flex min-w-0 flex-col gap-1 rounded-control border border-sand bg-bg p-4">
+            <span class="text-meta text-text-muted">Después</span>
+            <span class="text-lead font-semibold">{{ new_unit_label }}</span>
+          </div>
+        </div>
+      </li>
+      {% endif %}
       {% if min_quantity_changed %}
       <li class="flex flex-col gap-2">
         <p class="text-ui font-semibold">Cantidad mínima</p>

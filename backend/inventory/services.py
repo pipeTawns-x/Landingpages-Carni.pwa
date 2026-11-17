@@ -29,6 +29,10 @@ class PriceChange:
     new_price_per_kg: Decimal
     old_min_quantity_kg: Decimal
     new_min_quantity_kg: Decimal
+    # The unit the price is for: kilo, piece or package. The same number means another price
+    # when the unit changes, so a new unit is confirmed like a new price.
+    old_price_unit: str = ""
+    new_price_unit: str = ""
 
     @property
     def price_changed(self) -> bool:
@@ -39,8 +43,12 @@ class PriceChange:
         return self.new_min_quantity_kg != self.old_min_quantity_kg
 
     @property
+    def unit_changed(self) -> bool:
+        return self.new_price_unit != self.old_price_unit
+
+    @property
     def needs_confirmation(self) -> bool:
-        return self.price_changed or self.min_quantity_changed
+        return self.price_changed or self.min_quantity_changed or self.unit_changed
 
 
 class ProductReferences(NamedTuple):

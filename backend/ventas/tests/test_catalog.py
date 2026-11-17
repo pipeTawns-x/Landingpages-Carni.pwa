@@ -27,6 +27,10 @@ class PublicCatalogTests(TestCase):
     def setUpTestData(cls):
         cls.store = make_store()
         meat = cls.store["meat"]
+        # The shirt is sold by the piece; the unit shown comes from price_unit, not from the name.
+        Product.objects.filter(pk=cls.store["camiseta"].pk).update(
+            price_unit="piece", stock_unit="piece", sale_modes=["pieces"]
+        )
         Product.objects.create(
             category=meat,
             name="Descontinuado",
@@ -70,6 +74,25 @@ class PublicCatalogTests(TestCase):
         # Bistec is sold by the kilo and the shirt by the piece.
         self.assertContains(response, "/ kg")
         self.assertContains(response, "/ pieza")
+
+    def test_the_unit_comes_from_price_unit_and_not_from_the_name(self):
+        Product.objects.create(
+            category=self.store["meat"],
+            name="Paquete Parrillada",
+            price_per_kg=Decimal("999.00"),
+            price_unit="package",
+        )
+        Product.objects.create(
+            category=self.store["merch"],
+            name="Gorra por kilo",
+            price_per_kg=Decimal("77.00"),
+        )
+
+        html = re.sub(r"\s+", " ", self.client.get(self.url).content.decode())
+
+        self.assertIn("$999.00 / paquete", html)
+        self.assertIn("$77.00 / kg", html)
+        self.assertIn("$250.00 / pieza", html)
 
     def test_an_inactive_product_is_not_listed(self):
         self.assertNotContains(self.client.get(self.url), "Descontinuado")

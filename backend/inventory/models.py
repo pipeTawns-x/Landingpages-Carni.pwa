@@ -10,6 +10,7 @@ foreign key (`db_constraint=False`) so Django cannot alter a Supabase-owned
 table.
 """
 
+import json
 from decimal import ROUND_HALF_UP, Decimal
 from typing import NoReturn
 from urllib.parse import urljoin, urlsplit
@@ -29,28 +30,64 @@ def price_per_lb_for(price_per_kg: Decimal) -> Decimal:
     return (price_per_kg * KG_TO_LB_PRICE_FACTOR).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
 
 
-# What a product's price is for. `price_per_kg` holds the price per kilo of most products, but a
-# "Paquete ..." is priced per package and the merchandise and miscellaneous categories per piece.
-# PROVISIONAL: Eduardo has not confirmed the unit of Merch and Otros, and a `unit` column on
-# `products` (backlog) would make this rule unnecessary. The rule is here and nowhere else.
-PACKAGE_PREFIX = "Paquete "
-PER_KILO_MARK = "por kilo"
-PIECE_CATEGORY_SLUGS = frozenset({"merch", "otros"})
+# 1 lb is exactly 0.45359237 kg. The price the admin types per pound or per 100 g is converted
+# to a price per kilo (the only one the store keeps) with these, rounded half up to cents.
+POUND_IN_KG = Decimal("0.45359237")
+CENTS = Decimal("0.01")
 
 
-def unit_label_for(name: str, category_slug: str) -> str:
-    """Say what the price of a product is for: "paquete", "pieza" or "kg".
+def price_per_kg_from(price: Decimal, unit: str) -> Decimal:
+    """Convert a price typed per kilo ("kg"), per pound ("lb") or per 100 g ("g100") to per kilo."""
+    if unit == "kg":
+        converted = price
+    elif unit == "lb":
+        converted = price / POUND_IN_KG
+    elif unit == "g100":
+        converted = price * 10
+    else:
+        raise ValueError(f"Unknown price entry unit: {unit!r}")
+    return converted.quantize(CENTS, rounding=ROUND_HALF_UP)
 
-    A name that starts with "Paquete " is a package, unless it says "por kilo": the carnitas
-    package is sold by weight. That is the rule of `unidadDe` in the store
-    (src/ui/presentacionProducto.ts). The Merch and Otros categories are sold by the piece, and
-    everything else by the kilo.
+
+def price_equivalents(price_per_kg: Decimal) -> dict[str, Decimal]:
+    """The same price per kilo, per pound and per 100 g, rounded half up to cents."""
+    return {
+        "kg": price_per_kg.quantize(CENTS, rounding=ROUND_HALF_UP),
+        "lb": (price_per_kg * POUND_IN_KG).quantize(CENTS, rounding=ROUND_HALF_UP),
+        "g100": (price_per_kg / 10).quantize(CENTS, rounding=ROUND_HALF_UP),
+    }
+
+
+class TextArrayField(models.Field):
+    """A `text[]` column (`products.sale_modes`) that also works on the SQLite of the tests.
+
+    PostgreSQL gets and gives a real list. Any other backend keeps the list as JSON text, which
+    is only there so the test database can hold the mirror: the table is Supabase's. An
+    `ArrayField` would not do, because it is PostgreSQL only and the tests run on SQLite.
     """
-    if name.startswith(PACKAGE_PREFIX) and PER_KILO_MARK not in name.lower():
-        return "paquete"
-    if category_slug in PIECE_CATEGORY_SLUGS:
-        return "pieza"
-    return "kg"
+
+    def db_type(self, connection):
+        return "text[]" if connection.vendor == "postgresql" else "text"
+
+    def from_db_value(self, value, expression, connection):
+        if isinstance(value, str):
+            return json.loads(value)
+        return value
+
+    def to_python(self, value):
+        return json.loads(value) if isinstance(value, str) else value
+
+    def get_db_prep_value(self, value, connection, prepared=False):
+        if value is None:
+            return None
+        if connection.vendor == "postgresql":
+            return list(value)
+        return json.dumps(list(value))
+
+
+def default_sale_modes() -> list[str]:
+    """The default of `products.sale_modes` in the table: money and weight."""
+    return ["money", "weight"]
 
 
 def store_image_url(image_url: str | None) -> str:
@@ -141,6 +178,23 @@ class Product(models.Model):
         verbose_name="cantidad mínima (kg)",
     )
 
+    class PriceUnit(models.TextChoices):
+        """What `price_per_kg` is the price of. The values are those of the table's CHECK."""
+
+        KG = "kg", "Por kilo"
+        PIECE = "piece", "Por pieza"
+        PACKAGE = "package", "Por paquete"
+
+    price_unit = models.TextField(
+        choices=PriceUnit.choices,
+        default=PriceUnit.KG,
+        verbose_name="unidad del precio",
+    )
+    # Not editable: the table ties them to `price_unit` with CHECKs, and `save()` keeps them in
+    # step. They are mirrored so that the one UPDATE that changes the unit also changes them.
+    stock_unit = models.TextField(default="kg", editable=False)
+    sale_modes = TextArrayField(default=default_sale_modes, editable=False)
+
     class Meta:
         managed = False
         db_table = "products"
@@ -152,8 +206,20 @@ class Product(models.Model):
         return self.name
 
     def save(self, *args: object, **kwargs: object) -> None:
-        """Keep price_per_lb consistent with price_per_kg on every save."""
+        """Keep price_per_lb, stock_unit and sale_modes consistent on every save.
+
+        The table refuses a product priced per piece or package unless it is counted in pieces
+        and sold only in pieces (supabase/migrations/20261113000001, lines 107-110), so the same
+        rule that migration applied to the old rows applies here: a unit other than kg means
+        stock_unit "piece" and sale_modes ["pieces"]. Going back to kg undoes only that state.
+        """
         self.price_per_lb = price_per_lb_for(self.price_per_kg)
+        if self.price_unit != self.PriceUnit.KG:
+            self.stock_unit = "piece"
+            self.sale_modes = ["pieces"]
+        elif self.stock_unit == "piece" or self.sale_modes == ["pieces"]:
+            self.stock_unit = "kg"
+            self.sale_modes = default_sale_modes()
         super().save(*args, **kwargs)
 
     @property
@@ -163,8 +229,17 @@ class Product(models.Model):
 
     @property
     def unit_label(self) -> str:
-        """The unit the price is for ("kg", "pieza" or "paquete"); see `unit_label_for`."""
-        return unit_label_for(self.name, self.category.slug)
+        """The unit the price is for, read from `price_unit`: "kg", "pieza" or "paquete"."""
+        return {"piece": "pieza", "package": "paquete"}.get(self.price_unit, "kg")
+
+    @property
+    def price_equivalents(self) -> dict[str, Decimal]:
+        """The saved price per kilo, per pound and per 100 g (see `price_equivalents`).
+
+        The pound is the stored `price_per_lb`, the one the store shows, so that the panel and the
+        shop never differ by a cent; it is derived with `KG_TO_LB_PRICE_FACTOR`.
+        """
+        return {**price_equivalents(self.price_per_kg), "lb": self.price_per_lb}
 
     @property
     def image_src(self) -> str:

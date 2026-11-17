@@ -25,7 +25,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.messages import get_messages
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, connection
-from django.test import SimpleTestCase, TestCase, override_settings
+from django.test import Client, SimpleTestCase, TestCase, override_settings
 from django.test.utils import CaptureQueriesContext
 from django.urls import reverse
 from django.utils.html import strip_tags
@@ -39,12 +39,13 @@ from inventory.models import (
     OrderItem,
     Product,
     ReadOnlyModelError,
+    price_equivalents,
+    price_per_kg_from,
     price_per_lb_for,
     store_image_url,
-    unit_label_for,
 )
 from panel.test_frame import anchors, current_links
-from panel.tests import sign_in_as_panel_admin
+from panel.tests import hand_off, insert_profile, sign_in_as_panel_admin
 
 # What every title of the panel ends with.
 PANEL_TITLE = "Panel · Carnicería El Señor de La Misericordia"
@@ -290,6 +291,15 @@ class ProductUpdateConfirmationTests(TestCase):
         self.assertEqual(response.context["old_price_per_kg"], Decimal("549.00"))
         self.assertEqual(response.context["new_price_per_kg"], Decimal("600.00"))
         self.assertEqual(self.stored_product().price_per_kg, Decimal("549.00"))
+
+    def test_a_new_selling_unit_stops_at_the_confirmation_page(self):
+        response = self.client.post(self.url, self.post_data(price_unit="piece"))
+
+        self.assertTemplateUsed(response, "inventory/product_confirm_price_change.html")
+        self.assertTrue(response.context["unit_changed"])
+        self.assertContains(response, "Por kilo")
+        self.assertContains(response, "Por pieza")
+        self.assertEqual(self.stored_product().price_unit, "kg")
 
     def test_a_new_minimum_quantity_stops_at_the_confirmation_page(self):
         response = self.client.post(self.url, self.post_data(min_quantity_kg="0.250"))
@@ -592,48 +602,404 @@ class ProductListPaginationTests(TestCase):
         self.assertNotContains(response, "Mostrando")
 
 
-class UnitLabelTests(SimpleTestCase):
-    """What a price is for: the provisional rule that the list and the detail show."""
-
-    def test_a_package_is_priced_per_package(self):
-        self.assertEqual(unit_label_for("Paquete Asador 4 a 6 Personas", "ofertas"), "paquete")
-        self.assertEqual(
-            unit_label_for("Paquete Parrillada Familiar 8 a 10 Personas", "ofertas"), "paquete"
-        )
-
-    def test_a_package_that_says_por_kilo_is_priced_per_kilo(self):
-        # The same rule as unidadDe in the store: the carnitas package is sold by weight.
-        self.assertEqual(unit_label_for("Paquete Carnitas por Kilo", "ofertas"), "kg")
-        self.assertEqual(unit_label_for("Paquete Carnitas POR KILO", "ofertas"), "kg")
-
-    def test_merch_and_otros_are_priced_per_piece(self):
-        self.assertEqual(unit_label_for("Gorra Bordada", "merch"), "pieza")
-        self.assertEqual(unit_label_for("Bolsa de Hielo", "otros"), "pieza")
-
-    def test_everything_else_is_priced_per_kilo(self):
-        for slug in ("carnes-rojas", "cortes-especiales", "cerdo", "pollo", "embutidos"):
-            with self.subTest(slug=slug):
-                self.assertEqual(unit_label_for("Arrachera", slug), "kg")
-
-    def test_the_prefix_is_the_whole_word_and_case_sensitive(self):
-        # "Paquetería" is no package, and the store only reads a capital P.
-        self.assertEqual(unit_label_for("Paquetería de Res", "carnes-rojas"), "kg")
-        self.assertEqual(unit_label_for("paquete asador", "ofertas"), "kg")
-
-    def test_a_package_in_merch_is_still_a_package(self):
-        self.assertEqual(unit_label_for("Paquete de Regalo", "merch"), "paquete")
-
-
 class ProductUnitLabelTests(TestCase):
+    """What a price is for comes from the price_unit column, not from the name."""
+
     fixtures = ["categories.json"]
 
-    def test_the_property_reads_the_name_and_the_slug_of_the_category(self):
-        merch = Category.objects.get(slug="merch")
+    def test_the_label_reads_price_unit(self):
         pollo = Category.objects.get(slug="pollo")
 
-        self.assertEqual(Product(name="Gorra Bordada", category=merch).unit_label, "pieza")
-        self.assertEqual(Product(name="Alas Adobadas", category=pollo).unit_label, "kg")
-        self.assertEqual(Product(name="Paquete Asador", category=pollo).unit_label, "paquete")
+        for unit, label in (("kg", "kg"), ("piece", "pieza"), ("package", "paquete")):
+            with self.subTest(unit=unit):
+                self.assertEqual(
+                    Product(name="Cualquiera", category=pollo, price_unit=unit).unit_label, label
+                )
+
+    def test_the_name_and_the_category_no_longer_decide(self):
+        merch = Category.objects.get(slug="merch")
+
+        self.assertEqual(Product(name="Paquete Asador", category=merch).unit_label, "kg")
+        self.assertEqual(Product(name="Gorra", category=merch).unit_label, "kg")
+
+    def test_a_new_product_is_priced_per_kilo_by_default(self):
+        self.assertEqual(Product().price_unit, "kg")
+
+    def test_the_choices_are_the_ones_of_the_database_check(self):
+        self.assertEqual(
+            {value for value, _label in Product.PriceUnit.choices}, {"kg", "piece", "package"}
+        )
+        self.assertEqual(
+            [label for _value, label in Product.PriceUnit.choices],
+            ["Por kilo", "Por pieza", "Por paquete"],
+        )
+
+
+class ProductSaleModesSyncTests(TestCase):
+    """The CHECKs of the table tie stock_unit and sale_modes to price_unit; save() keeps them."""
+
+    fixtures = ["categories.json"]
+
+    def make(self, **fields):
+        return Product.objects.create(
+            category=Category.objects.first(), name="X", price_per_kg=Decimal("10"), **fields
+        )
+
+    def stored(self, product):
+        return Product.objects.get(pk=product.pk)
+
+    def test_a_kilo_product_keeps_the_defaults_of_the_table(self):
+        product = self.stored(self.make())
+
+        self.assertEqual(product.stock_unit, "kg")
+        self.assertEqual(product.sale_modes, ["money", "weight"])
+
+    def test_a_piece_or_package_product_is_counted_and_sold_in_pieces(self):
+        for unit in ("piece", "package"):
+            with self.subTest(unit=unit):
+                product = self.stored(self.make(price_unit=unit))
+
+                self.assertEqual(product.stock_unit, "piece")
+                self.assertEqual(product.sale_modes, ["pieces"])
+
+    def test_going_back_to_kilo_restores_money_and_weight(self):
+        product = self.make(price_unit="piece")
+
+        product.price_unit = "kg"
+        product.save()
+
+        product = self.stored(product)
+        self.assertEqual(product.stock_unit, "kg")
+        self.assertEqual(product.sale_modes, ["money", "weight"])
+
+    def test_a_kilo_product_that_also_sells_pieces_is_left_alone(self):
+        product = self.make(sale_modes=["money", "weight", "pieces"])
+
+        product.name = "Y"
+        product.save()
+
+        self.assertEqual(self.stored(product).sale_modes, ["money", "weight", "pieces"])
+
+
+class PriceEntryConversionTests(SimpleTestCase):
+    """The admin types the price per kilo, per pound or per 100 g; the store keeps it per kilo."""
+
+    def convert(self, price, unit):
+        return price_per_kg_from(Decimal(price), unit)
+
+    def test_per_kilo_is_kept(self):
+        self.assertEqual(self.convert("189.50", "kg"), Decimal("189.50"))
+
+    def test_per_pound_divides_by_the_exact_pound(self):
+        # 100 / 0.45359237 = 220.4622...
+        self.assertEqual(self.convert("100.00", "lb"), Decimal("220.46"))
+        # 85.99 / 0.45359237 = 189.58...
+        self.assertEqual(self.convert("85.99", "lb"), Decimal("189.58"))
+
+    def test_per_100_grams_multiplies_by_ten(self):
+        self.assertEqual(self.convert("18.95", "g100"), Decimal("189.50"))
+
+    def test_the_result_rounds_half_up_to_cents(self):
+        self.assertEqual(self.convert("0.125", "g100"), Decimal("1.25"))
+        self.assertEqual(self.convert("0.1255", "g100"), Decimal("1.26"))
+
+    def test_an_unknown_unit_is_refused(self):
+        with self.assertRaises(ValueError):
+            self.convert("10", "oz")
+
+    def test_the_equivalents_of_a_kilo_price(self):
+        self.assertEqual(
+            price_equivalents(Decimal("220.46")),
+            {"kg": Decimal("220.46"), "lb": Decimal("100.00"), "g100": Decimal("22.05")},
+        )
+
+
+class PriceUnitFormTests(TestCase):
+    fixtures = ["categories.json"]
+
+    def data(self, **overrides):
+        return {
+            "name": "Arrachera",
+            "category": Category.objects.first().pk,
+            "price_per_kg": "189.50",
+            "min_quantity_kg": "0",
+            "stock": "5",
+            "is_active": "on",
+            "price_unit": "kg",
+            **overrides,
+        }
+
+    def form(self, **overrides):
+        return ProductForm(self.data(**overrides))
+
+    def test_the_price_unit_is_a_field_and_the_entry_unit_is_not_a_model_field(self):
+        form = ProductForm()
+
+        self.assertIn("price_unit", form.fields)
+        self.assertIn("price_entry_unit", form.fields)
+        self.assertNotIn("price_entry_unit", ProductForm.Meta.fields)
+        self.assertEqual(
+            [value for value, _label in form.fields["price_entry_unit"].choices],
+            ["kg", "lb", "g100"],
+        )
+        self.assertEqual(
+            [label for _value, label in form.fields["price_entry_unit"].choices],
+            ["por kilo", "por libra", "por 100 g"],
+        )
+
+    def test_without_an_entry_unit_the_price_is_per_kilo(self):
+        form = self.form()
+
+        self.assertTrue(form.is_valid(), form.errors)
+        self.assertEqual(form.cleaned_data["price_per_kg"], Decimal("189.50"))
+
+    def test_a_price_per_pound_is_saved_per_kilo(self):
+        form = self.form(price_per_kg="85.99", price_entry_unit="lb")
+
+        self.assertTrue(form.is_valid(), form.errors)
+        self.assertEqual(form.save().price_per_kg, Decimal("189.58"))
+
+    def test_a_price_per_100_grams_is_saved_per_kilo(self):
+        form = self.form(price_per_kg="18.95", price_entry_unit="g100")
+
+        self.assertTrue(form.is_valid(), form.errors)
+        self.assertEqual(form.save().price_per_kg, Decimal("189.50"))
+
+    def test_the_entry_unit_only_means_something_for_a_kilo_product(self):
+        form = self.form(price_per_kg="50.00", price_unit="piece", price_entry_unit="g100")
+
+        self.assertTrue(form.is_valid(), form.errors)
+        self.assertEqual(form.cleaned_data["price_per_kg"], Decimal("50.00"))
+
+    def test_an_unknown_entry_unit_is_refused(self):
+        form = self.form(price_entry_unit="oz")
+
+        self.assertFalse(form.is_valid())
+        self.assertIn("price_entry_unit", form.errors)
+
+    def test_an_unknown_price_unit_is_refused(self):
+        form = self.form(price_unit="litro")
+
+        self.assertFalse(form.is_valid())
+        self.assertIn("price_unit", form.errors)
+
+    def test_a_zero_negative_or_non_numeric_price_is_refused_in_spanish(self):
+        cases = {
+            "0": "El precio debe ser mayor que cero.",
+            "0.00": "El precio debe ser mayor que cero.",
+            "-5": "El precio debe ser mayor que cero.",
+            "abc": "Escribe el precio como un número, por ejemplo 189.50.",
+            "NaN": "Escribe el precio como un número, por ejemplo 189.50.",
+            "Infinity": "Escribe el precio como un número, por ejemplo 189.50.",
+            "": "Escribe el precio del producto.",
+        }
+        for unit in ("kg", "lb", "g100"):
+            for raw, message in cases.items():
+                with self.subTest(unit=unit, price=raw):
+                    form = self.form(price_per_kg=raw, price_entry_unit=unit)
+
+                    self.assertFalse(form.is_valid())
+                    self.assertEqual(form.errors["price_per_kg"], [message])
+
+
+class PriceEditPageTests(TestCase):
+    """The panel edit page: unit selects, equivalents, and the guards around the price."""
+
+    fixtures = ["categories.json"]
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.product = Product.objects.create(
+            category=Category.objects.first(),
+            name="Rib Eye",
+            price_per_kg=Decimal("220.46"),
+            stock=12,
+        )
+
+    def setUp(self):
+        self.url = reverse("inventory:update", args=[self.product.pk])
+        sign_in_as_panel_admin(self.client)
+
+    def post_data(self, **overrides):
+        return {
+            "name": "Rib Eye",
+            "category": self.product.category_id,
+            "price_per_kg": "220.46",
+            "price_unit": "kg",
+            "min_quantity_kg": "0",
+            "stock": "12",
+            "is_active": "on",
+            **overrides,
+        }
+
+    def stored(self):
+        return Product.objects.get(pk=self.product.pk)
+
+    def test_the_page_offers_both_selects_with_their_labels(self):
+        html = self.client.get(self.url).content.decode()
+
+        self.assertIn('name="price_unit"', html)
+        self.assertIn('name="price_entry_unit"', html)
+        for label in ("Por kilo", "Por pieza", "Por paquete", "por libra", "por 100 g"):
+            self.assertIn(label, html)
+
+    def test_the_page_shows_the_equivalents_of_the_saved_price(self):
+        text = " ".join(strip_tags(self.client.get(self.url).content.decode()).split())
+
+        self.assertIn("$220.46 por kg", text)
+        self.assertIn("$100.00 por libra", text)
+        self.assertIn("$22.05 por 100 g", text)
+
+    def test_a_price_per_pound_goes_through_the_confirmation_as_a_price_per_kilo(self):
+        data = self.post_data(price_per_kg="110.00", price_entry_unit="lb")
+
+        response = self.client.post(self.url, data)
+
+        self.assertTemplateUsed(response, "inventory/product_confirm_price_change.html")
+        self.assertEqual(response.context["old_price_per_kg"], Decimal("220.46"))
+        self.assertEqual(response.context["new_price_per_kg"], Decimal("242.51"))
+        self.assertEqual(self.stored().price_per_kg, Decimal("220.46"))
+
+        confirmed = self.client.post(self.url, {**data, "confirm": "1"})
+
+        self.assertRedirects(
+            confirmed,
+            reverse("inventory:detail", args=[self.product.pk]),
+            fetch_redirect_response=False,
+        )
+        self.assertEqual(self.stored().price_per_kg, Decimal("242.51"))
+
+    def test_the_same_price_typed_in_another_unit_needs_no_confirmation(self):
+        response = self.client.post(
+            self.url,
+            self.post_data(price_per_kg="100.00", price_entry_unit="lb", name="Rib Eye 2"),
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(self.stored().price_per_kg, Decimal("220.46"))
+        self.assertEqual(self.stored().name, "Rib Eye 2")
+
+    def test_without_confirm_nothing_is_saved(self):
+        response = self.client.post(
+            self.url, self.post_data(price_per_kg="300.00", name="Cambiado")
+        )
+
+        self.assertTemplateUsed(response, "inventory/product_confirm_price_change.html")
+        stored = self.stored()
+        self.assertEqual((stored.price_per_kg, stored.name), (Decimal("220.46"), "Rib Eye"))
+
+    def test_a_price_of_zero_is_refused_even_with_confirm(self):
+        response = self.client.post(self.url, self.post_data(price_per_kg="0", confirm="1"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "El precio debe ser mayor que cero.")
+        self.assertEqual(self.stored().price_per_kg, Decimal("220.46"))
+
+    def test_a_negative_or_text_price_saves_nothing(self):
+        for raw in ("-1", "gratis"):
+            with self.subTest(price=raw):
+                response = self.client.post(self.url, self.post_data(price_per_kg=raw, confirm="1"))
+
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(self.stored().price_per_kg, Decimal("220.46"))
+
+    def test_changing_the_unit_of_the_price_updates_the_catalogue_unit(self):
+        response = self.client.post(self.url, self.post_data(price_unit="piece", confirm="1"))
+
+        self.assertEqual(response.status_code, 302)
+        stored = self.stored()
+        self.assertEqual((stored.price_unit, stored.unit_label), ("piece", "pieza"))
+        self.assertEqual((stored.stock_unit, stored.sale_modes), ("piece", ["pieces"]))
+
+    def test_the_forms_carry_a_csrf_token_and_a_post_without_one_is_refused(self):
+        self.assertContains(self.client.get(self.url), "csrfmiddlewaretoken")
+        strict = Client(enforce_csrf_checks=True)
+        sign_in_as_panel_admin(strict)
+
+        response = strict.post(self.url, self.post_data(price_per_kg="1.00", confirm="1"))
+
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(self.stored().price_per_kg, Decimal("220.46"))
+
+
+class PriceAccessGuardTests(TestCase):
+    """Only a panel admin may create, edit or delete a product (and so change a price)."""
+
+    fixtures = ["categories.json"]
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.product = Product.objects.create(
+            category=Category.objects.first(), name="Rib Eye", price_per_kg=Decimal("220.46")
+        )
+
+    def urls(self):
+        return {
+            "create": reverse("inventory:create"),
+            "update": reverse("inventory:update", args=[self.product.pk]),
+            "delete": reverse("inventory:delete", args=[self.product.pk]),
+        }
+
+    def attack(self, client):
+        data = {
+            "name": "Hackeado",
+            "category": self.product.category_id,
+            "price_per_kg": "0.01",
+            "min_quantity_kg": "0",
+            "stock": "1",
+            "is_active": "on",
+            "price_unit": "kg",
+            "confirm": "1",
+        }
+        return {name: client.post(url, data) for name, url in self.urls().items()}
+
+    def assertUntouched(self):
+        self.assertEqual(
+            list(Product.objects.values_list("name", "price_per_kg", "is_active")),
+            [("Rib Eye", Decimal("220.46"), True)],
+        )
+
+    def test_an_anonymous_visitor_is_sent_to_the_bridge(self):
+        for name, response in self.attack(self.client).items():
+            with self.subTest(route=name):
+                self.assertRedirects(
+                    response, reverse("panel:acceso"), fetch_redirect_response=False
+                )
+        self.assertUntouched()
+
+    def test_a_customer_cannot_even_open_a_panel_session(self):
+        customer_id = uuid.uuid4()
+        insert_profile(customer_id, "customer")
+
+        response = hand_off(self.client, customer_id)
+
+        self.assertEqual(response.status_code, 403)
+        for name, response in self.attack(self.client).items():
+            with self.subTest(route=name):
+                self.assertRedirects(
+                    response, reverse("panel:acceso"), fetch_redirect_response=False
+                )
+        self.assertUntouched()
+
+    def test_an_admin_demoted_to_customer_is_refused_on_the_next_request(self):
+        admin_id = sign_in_as_panel_admin(self.client)
+        with connection.cursor() as cursor:
+            cursor.execute("UPDATE profiles SET role = 'customer' WHERE id = %s", [admin_id.hex])
+
+        for name, response in self.attack(self.client).items():
+            with self.subTest(route=name):
+                self.assertRedirects(
+                    response, reverse("panel:acceso"), fetch_redirect_response=False
+                )
+        self.assertUntouched()
+
+    def test_a_django_superuser_is_not_a_panel_admin(self):
+        self.client.force_login(get_user_model().objects.create_superuser("local"))
+
+        for name, response in self.attack(self.client).items():
+            with self.subTest(route=name):
+                self.assertEqual(response.status_code, 302)
+        self.assertUntouched()
 
 
 def html_between(html, start, end):
@@ -669,13 +1035,18 @@ class ProductListPageTests(TestCase):
             category=cls.ofertas,
             name="Paquete Asador 4 a 6 Personas",
             price_per_kg=Decimal("1599.00"),
+            price_unit="package",
             stock=12,
         )
         cls.carnitas = make(
             category=cls.ofertas, name="Paquete Carnitas por Kilo", price_per_kg=Decimal("389.00")
         )
         cls.gorra = make(
-            category=cls.merch, name="Gorra Bordada", price_per_kg=Decimal("250.00"), stock=40
+            category=cls.merch,
+            name="Gorra Bordada",
+            price_per_kg=Decimal("250.00"),
+            price_unit="piece",
+            stock=40,
         )
         cls.retirado = make(
             category=cls.pollo,
@@ -1005,6 +1376,7 @@ class ProductDetailPageTests(TestCase):
             category=self.ofertas,
             name="Paquete Asador 4 a 6 Personas",
             price_per_kg=Decimal("1599.00"),
+            price_unit="package",
         )
 
         text = self.text(self.page(paquete))
@@ -1014,7 +1386,10 @@ class ProductDetailPageTests(TestCase):
 
     def test_a_piece_has_no_price_per_pound(self):
         gorra = Product.objects.create(
-            category=self.merch, name="Gorra Bordada", price_per_kg=Decimal("250.00")
+            category=self.merch,
+            name="Gorra Bordada",
+            price_per_kg=Decimal("250.00"),
+            price_unit="piece",
         )
 
         text = self.text(self.page(gorra))
@@ -1290,7 +1665,7 @@ class ProductFormPageTests(TestCase):
         self.assertNotIn("confirm", form_controls(html).controls)
         text = self.main_text(html)
         self.assertNotIn("Confirmar cambio de precio o cantidad mínima", text)
-        self.assertIn("Precio por libra Se calcula al guardar", text)
+        self.assertIn("Precio guardado, en otras unidades Se calcula al guardar", text)
 
     def test_the_create_page_breadcrumb_and_cancel_go_back_to_the_list(self):
         html = self.create_page()
@@ -1342,7 +1717,7 @@ class ProductFormPageTests(TestCase):
         html = self.edit_page()
 
         self.assertNotIn("price_per_lb", form_controls(html).controls)
-        self.assertIn("Precio por libra $294.39", self.main_text(html))
+        self.assertIn("$294.39 por libra", self.main_text(html))
 
     def test_the_confirmation_checkbox_is_there_when_editing_and_starts_unticked(self):
         confirm = form_controls(self.edit_page()).controls["confirm"]

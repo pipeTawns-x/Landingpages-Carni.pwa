@@ -115,6 +115,7 @@ def product_update(request, product_id):
     # values would already be the new ones.
     old_price_per_kg = product.price_per_kg
     old_min_quantity_kg = product.min_quantity_kg
+    old_price_unit = product.price_unit
 
     if request.method == "POST":
         product_form = ProductForm(request.POST, instance=product)
@@ -126,6 +127,8 @@ def product_update(request, product_id):
                 new_price_per_kg=product_form.cleaned_data["price_per_kg"],
                 old_min_quantity_kg=old_min_quantity_kg,
                 new_min_quantity_kg=product_form.cleaned_data["min_quantity_kg"],
+                old_price_unit=old_price_unit,
+                new_price_unit=product_form.instance.price_unit,
             )
 
             if change.needs_confirmation and request.POST.get("confirm") != "1":
@@ -138,6 +141,9 @@ def product_update(request, product_id):
                     "product": product,
                     "price_changed": change.price_changed,
                     "min_quantity_changed": change.min_quantity_changed,
+                    "unit_changed": change.unit_changed,
+                    "old_unit_label": Product.PriceUnit(change.old_price_unit).label,
+                    "new_unit_label": Product.PriceUnit(change.new_price_unit).label,
                     "old_price_per_kg": change.old_price_per_kg,
                     "new_price_per_kg": change.new_price_per_kg,
                     "old_min_quantity_kg": change.old_min_quantity_kg,
