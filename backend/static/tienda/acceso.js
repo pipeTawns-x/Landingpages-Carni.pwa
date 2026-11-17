@@ -15,7 +15,7 @@ const aviso = document.getElementById("acceso-aviso");
 const formIngresar = document.getElementById("form-ingresar");
 const formRegistro = document.getElementById("form-registro");
 
-const ESPERA_SALIDA_MS = 5000;
+const ERROR_SALIDA = "No se pudo cerrar tu sesión en este navegador. Borra los datos del sitio y recarga la página antes de entrar o registrarte.";
 const CORREO = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const TELEFONO = /^\d{10}$/;
 
@@ -71,15 +71,27 @@ for (const boton of raiz.querySelectorAll("[data-accion]")) {
 
 // --- Busy state --------------------------------------------------------------------------------
 
+let autenticando = false;
+
 async function ocupado(formulario, texto, tarea) {
+  // Both forms create sessions: serialize them together, including programmatic submits.
+  if (autenticando) return;
+  autenticando = true;
   const boton = formulario.querySelector('button[type="submit"]');
   const original = boton.textContent;
-  boton.disabled = true;
+  for (const form of [formIngresar, formRegistro]) {
+    form.querySelector('button[type="submit"]').disabled = true;
+  }
   boton.textContent = texto;
   try {
     return await tarea();
+  } catch {
+    mostrarError(formulario, "No se pudo completar el acceso. Inténtalo de nuevo.");
   } finally {
-    boton.disabled = false;
+    autenticando = false;
+    for (const form of [formIngresar, formRegistro]) {
+      form.querySelector('button[type="submit"]').disabled = false;
+    }
     boton.textContent = original;
   }
 }
@@ -97,12 +109,16 @@ async function abrirSupabase() {
 // copy, so when it fails the stored session is removed by hand: leaving it would keep the
 // person signed in after they asked to leave.
 async function cerrarSesion(supabase) {
-  const { error } = await supabase.auth.signOut({ scope: "local" });
-  if (!error) return true;
+  try {
+    const { error } = await supabase.auth.signOut({ scope: "local" });
+    if (!error) return true;
+  } catch {
+    // A rejected transport must use the same verified local fallback as an error response.
+  }
   try {
     const clave = supabase.auth.storageKey;
     if (typeof clave === "string" && clave) window.localStorage.removeItem(clave);
-    return typeof clave === "string" && window.localStorage.getItem(clave) === null;
+    return typeof clave === "string" && clave !== "" && window.localStorage.getItem(clave) === null;
   } catch {
     return false;
   }
@@ -146,7 +162,7 @@ function iniciarIngreso(supabase, esperarSalida) {
     if (!CORREO.test(correo)) return mostrarError(formIngresar, "Escribe un correo válido.");
 
     await ocupado(formIngresar, "Procesando…", async () => {
-      await esperarSalida(); // A late sign-out would revoke the session that is about to open.
+      if (!(await esperarSalida())) return mostrarError(formIngresar, ERROR_SALIDA);
       const { data, error } = await supabase.auth.signInWithPassword({ email: correo, password: clave });
       if (error) {
         return mostrarError(formIngresar, mensajeDe(error, "No se pudo iniciar sesión. Inténtalo de nuevo."));
@@ -170,7 +186,7 @@ function iniciarIngreso(supabase, esperarSalida) {
   });
 }
 
-function iniciarRegistro(supabase) {
+function iniciarRegistro(supabase, esperarSalida) {
   formRegistro.addEventListener("submit", async (evento) => {
     evento.preventDefault();
     limpiarErrores();
@@ -196,6 +212,7 @@ function iniciarRegistro(supabase) {
     if (problema) return mostrarError(formRegistro, problema);
 
     await ocupado(formRegistro, "Registrando…", async () => {
+      if (!(await esperarSalida())) return mostrarError(formRegistro, ERROR_SALIDA);
       const { data, error } = await supabase.auth.signUp({
         email: correo,
         password: clave,
@@ -234,20 +251,24 @@ async function iniciar() {
     return;
   }
 
-  let salida = Promise.resolve();
-  if (parametros.get("salir") === "1") {
-    salida = cerrarSesion(supabase).then((cerrada) => {
-      if (!cerrada) mostrarAviso("No se pudo cerrar tu sesión en este navegador. Borra los datos del sitio e inténtalo de nuevo.");
-    });
-    // The address no longer asks for it: a reload does not repeat the sign-out.
-    parametros.delete("salir");
-    const resto = parametros.toString();
-    window.history.replaceState(null, "", window.location.pathname + (resto ? `?${resto}` : ""));
-  }
-  const esperarSalida = () => Promise.race([salida, new Promise((listo) => setTimeout(listo, ESPERA_SALIDA_MS))]);
+  // One completion barrier for both forms. Never time out: a late sign-out could erase
+  // a newly created session. Keep the URL signal until cleanup actually succeeds.
+  const salida = parametros.get("salir") === "1"
+    ? cerrarSesion(supabase).then((cerrada) => {
+      if (!cerrada) {
+        mostrarAviso(ERROR_SALIDA);
+        return false;
+      }
+      parametros.delete("salir");
+      const resto = parametros.toString();
+      window.history.replaceState(null, "", window.location.pathname + (resto ? `?${resto}` : "") + window.location.hash);
+      return true;
+    })
+    : Promise.resolve(true);
+  const esperarSalida = () => salida;
 
   iniciarIngreso(supabase, esperarSalida);
-  iniciarRegistro(supabase);
+  iniciarRegistro(supabase, esperarSalida);
   // The forms show only once they have their handlers: a submit before that would post a password.
   raiz.hidden = false;
 }
