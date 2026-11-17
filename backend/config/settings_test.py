@@ -20,6 +20,8 @@ os.environ["SUPABASE_URL"] = "http://supabase.test"
 os.environ["SUPABASE_JWKS_URL"] = ""
 os.environ["SUPABASE_JWT_SECRET"] = secrets.token_urlsafe(48)
 os.environ["SUPABASE_PUBLISHABLE_KEY"] = "sb_publishable_only_for_tests"
+# Never inherited from the shell: a test that needs the key sets it with override_settings.
+os.environ["SUPABASE_SERVICE_ROLE_KEY"] = ""
 os.environ["STORE_ORIGIN"] = "http://store.test"
 os.environ["PANEL_ALLOWED_ORIGINS"] = "http://store.test"
 os.environ["PANEL_TOKEN_MAX_AGE_SECONDS"] = "300"

@@ -11,6 +11,7 @@ from typing import NamedTuple
 
 from django.db import IntegrityError, transaction
 
+from inventory import storage
 from inventory.forms import CutSpecForm, ProductForm
 from inventory.models import Favorite, OrderItem, Product
 
@@ -126,16 +127,27 @@ def _spec_form_has_data(spec_form: CutSpecForm) -> bool:
 
 
 def save_product(product_form: ProductForm, spec_form: CutSpecForm) -> Product:
-    """Save a validated product form and, when it applies, its cut spec.
+    """Save a validated product form and, when it applies, its cut spec and its photo.
 
     The spec table stays clean: a spec is stored only if it already exists or
     if staff filled in at least one of its fields. A zero counts as filled in.
-    """
-    product = product_form.save()
-    spec = spec_form.save(commit=False)
 
-    if spec.pk or _spec_form_has_data(spec_form):
-        spec.product = product
-        spec.save()
+    A photo is uploaded after the product row exists (its id is part of the object path) and its
+    public URL replaces `image_url`. Everything runs in one transaction: if Storage fails the
+    `storage.StorageError` propagates and no product, spec or URL is left behind. Without a photo
+    the stored image is untouched.
+    """
+    photo = product_form.cleaned_data.get("photo")
+    with transaction.atomic():
+        product = product_form.save()
+        spec = spec_form.save(commit=False)
+
+        if spec.pk or _spec_form_has_data(spec_form):
+            spec.product = product
+            spec.save()
+
+        if photo:
+            product.image_url = storage.upload_product_image(photo, product.pk)
+            product.save(update_fields=["image_url"])
 
     return product

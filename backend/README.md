@@ -44,6 +44,7 @@ uv run python -c "from django.core.management.utils import get_random_secret_key
 | `SUPABASE_JWKS_URL` | Where the project publishes its signing keys, `<SUPABASE_URL>/auth/v1/.well-known/jwks.json`, locally and in production. When it is set, tokens are checked against those keys and `SUPABASE_JWT_SECRET` is ignored. The local Supabase CLI (v2.84) signs user tokens with ES256 and publishes the key there, so local needs it too. |
 | `SUPABASE_JWT_SECRET` | Shared HS256 secret, for a Supabase project that still signs with it; `supabase status -o env` prints it as `JWT_SECRET`. Used only when `SUPABASE_JWKS_URL` is empty: a real local token is refused with `algorithm` in that mode. One of the two is required. |
 | `SUPABASE_PUBLISHABLE_KEY` | The publishable (anon) key of the project, which the browser needs to sign in at `/acceso/`. It is public by design; never put the service key here. Optional at startup: without it `/acceso/` answers 503 and says it is not configured. Locally, `supabase status` prints it. |
+| `SUPABASE_SERVICE_ROLE_KEY` | The server-only key Django uses to upload product photos to Supabase Storage (bucket `product-images`). A secret: it lives only in `backend/.env` (or the host's secret store), never in a template, a `VITE_*` variable or the browser. Optional at startup: without it the product form refuses a photo with a clear message and the rest of the form still saves. `supabase status` prints the local one; Eduardo adds it. |
 | `STORE_ORIGIN` | Origin of the store's static files (`http://localhost:3002` locally); `store_image_url()` joins product photos to it. The sign-in is no longer there: it is `/acceso/`, a page of Django (`STORE_LOGIN_URL`). Required. |
 | `PANEL_ALLOWED_ORIGINS` | Comma-separated origins that may post a token to `/panel/sesion/` (the origin of this site, `http://localhost:8000` locally: the sign-in page is served by Django, so the token comes from the same origin). Required. |
 | `PANEL_TOKEN_MAX_AGE_SECONDS` | The oldest a token may be, counted from when Supabase issued it, when it is handed over (`300` is five minutes). Required. |
@@ -187,6 +188,33 @@ Behaviour worth knowing before touching it:
 | URLs | `inventory/urls.py` (namespace `inventory`), mounted in `config/urls.py` at `/panel/productos/` |
 | Forms | `inventory/forms.py` (`ProductForm`, `CutSpecForm`) |
 | Search and protection | `Q` filter in `product_list`; `panel_admin_required` on the five views (it replaced `login_required` and `LOGIN_URL` when the views moved under `/panel/productos/`) |
+
+## Product photos (Supabase Storage)
+
+The product form (`/panel/productos/nuevo/` and `/panel/productos/<id>/editar/`) has a "Foto del
+producto" field. Only a panel admin reaches it (`panel_admin_required`), the form is
+`multipart/form-data` and CSRF-protected. The file is checked by its bytes, not its name: JPEG, PNG
+or WebP, at most 5 MB and 8000 px a side (`inventory/storage.py`). The server uploads it to the
+public bucket `product-images` with `SUPABASE_SERVICE_ROLE_KEY` and stores the public URL in
+`Product.image_url`. Without a file the current image stays. Production disks are ephemeral, which
+is why the photo does not go to `public/`.
+
+- A price or minimum-quantity change goes through a confirmation page that cannot carry a file, so a
+  photo sent together with such a change is refused with a message: save the price first, then
+  upload the photo.
+- If Storage fails, nothing is saved (the product, its spec and its URL roll back together).
+- The tests use `FakeStorage` and mock the HTTP call: no network.
+
+Apply the bucket and its policies locally (Eduardo runs it; it is not applied to the remote project):
+
+```bash
+supabase migration up --local
+```
+
+The migration is `supabase/migrations/20261117000001_product_images_bucket.sql` (public-read bucket,
+5 MB, `image/jpeg`, `image/png`, `image/webp`, writes for `service_role` only). Its pgTAP test is
+`supabase/tests/product_images_bucket.sql`; it needs the `storage` schema of the local stack, so
+`supabase/tests/correr.sh` does not run it. Then add `SUPABASE_SERVICE_ROLE_KEY` to `backend/.env`.
 
 ## Panel session handoff
 

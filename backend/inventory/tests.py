@@ -26,8 +26,9 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.messages import get_messages
 from django.core.exceptions import ValidationError
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import IntegrityError, connection
-from django.test import Client, SimpleTestCase, TestCase
+from django.test import Client, SimpleTestCase, TestCase, override_settings
 from django.test.utils import CaptureQueriesContext
 from django.urls import reverse
 from django.utils.html import strip_tags
@@ -46,6 +47,8 @@ from inventory.models import (
     price_per_lb_for,
     store_image_url,
 )
+from inventory.storage import FakeStorage
+from inventory.test_storage import png_bytes
 from panel.test_frame import anchors, current_links
 from panel.tests import hand_off, insert_profile, sign_in_as_panel_admin
 
@@ -2782,3 +2785,179 @@ class FractionalStockTests(TestCase):
         html = self.client.get(self.url).content.decode()
         self.assertRegex(html, r'name="stock"[^>]*value="2\.125"|value="2\.125"[^>]*name="stock"')
         self.assertRegex(html, r'name="stock"[^>]*step="0\.001"|step="0\.001"[^>]*name="stock"')
+
+
+@override_settings(SUPABASE_SERVICE_ROLE_KEY="server-key")
+class ProductPhotoUploadTests(TestCase):
+    """The product form takes a photo, sends it to Storage and keeps its public URL."""
+
+    fixtures = ["categories.json"]
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.product = Product.objects.create(
+            category=Category.objects.first(),
+            name="New York",
+            price_per_kg=Decimal("549.00"),
+            stock=12,
+            image_url="/img/products/old.webp",
+        )
+
+    def setUp(self):
+        self.update_url = reverse("inventory:update", args=[self.product.pk])
+        self.create_url = reverse("inventory:create")
+        sign_in_as_panel_admin(self.client)
+        self.fake = FakeStorage()
+        patcher = mock.patch("inventory.storage.get_gateway", return_value=self.fake)
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
+    def post_data(self, photo=None, **overrides):
+        data = {
+            "name": self.product.name,
+            "category": self.product.category_id,
+            "price_per_kg": "549.00",
+            "min_quantity_kg": "0",
+            "stock": "12",
+            "is_active": "on",
+            "image_url": "/img/products/old.webp",
+            **overrides,
+        }
+        if photo is not None:
+            data["photo"] = photo
+        return data
+
+    def upload(self, content=None, name="corte.png", content_type="image/png"):
+        return SimpleUploadedFile(
+            name, png_bytes() if content is None else content, content_type=content_type
+        )
+
+    def stored(self):
+        return Product.objects.get(pk=self.product.pk)
+
+    def test_the_form_is_multipart_and_shows_the_current_image(self):
+        response = self.client.get(self.update_url)
+
+        self.assertContains(response, 'enctype="multipart/form-data"')
+        self.assertContains(response, 'name="photo"')
+        self.assertContains(response, "Foto del producto")
+        self.assertContains(response, "/img/products/old.webp")
+
+    def test_a_valid_photo_is_uploaded_and_its_url_becomes_the_image(self):
+        response = self.client.post(self.update_url, self.post_data(self.upload()))
+
+        self.assertRedirects(response, reverse("inventory:detail", args=[self.product.pk]))
+        self.assertEqual(len(self.fake.uploads), 1)
+        image, product_id, url = self.fake.uploads[0]
+        self.assertEqual((image.content_type, product_id), ("image/png", self.product.pk))
+        self.assertEqual(self.stored().image_url, url)
+
+    def test_a_photo_on_a_new_product_is_uploaded_under_the_new_id(self):
+        data = self.post_data(self.upload(), name="Ribeye", image_url="")
+        self.client.post(self.create_url, data)
+
+        created = Product.objects.get(name="Ribeye")
+        self.assertEqual(self.fake.uploads[0][1], created.pk)
+        self.assertEqual(created.image_url, self.fake.uploads[0][2])
+
+    def test_without_a_file_the_old_image_stays_and_nothing_is_uploaded(self):
+        self.client.post(self.update_url, self.post_data(name="New York 2"))
+
+        self.assertEqual(self.fake.uploads, [])
+        self.assertEqual(self.stored().image_url, "/img/products/old.webp")
+        self.assertEqual(self.stored().name, "New York 2")
+
+    def assertRejected(self, response, text):
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, text)
+        self.assertEqual(self.fake.uploads, [])
+        self.assertEqual(self.stored().image_url, "/img/products/old.webp")
+
+    def test_an_oversized_file_is_refused(self):
+        big = self.upload(png_bytes() + b"\x00" * (5 * 1024 * 1024))
+        self.assertRejected(self.client.post(self.update_url, self.post_data(big)), "5 MB")
+
+    def test_a_script_named_like_an_image_is_refused(self):
+        fake_image = self.upload(b"<?php system($_GET[1]); ?>", name="corte.png")
+        self.assertRejected(
+            self.client.post(self.update_url, self.post_data(fake_image)), "JPG, PNG o WebP"
+        )
+
+    def test_a_real_image_with_a_wrong_extension_is_accepted_by_its_bytes(self):
+        response = self.client.post(
+            self.update_url,
+            self.post_data(self.upload(name="corte.exe", content_type="text/plain")),
+        )
+
+        self.assertRedirects(response, reverse("inventory:detail", args=[self.product.pk]))
+        self.assertTrue(self.fake.uploads[0][2].endswith(".png"))
+
+    @override_settings(SUPABASE_SERVICE_ROLE_KEY="")
+    def test_a_missing_server_key_refuses_the_photo_but_not_the_rest_of_the_form(self):
+        self.assertRejected(
+            self.client.post(self.update_url, self.post_data(self.upload())),
+            "SUPABASE_SERVICE_ROLE_KEY",
+        )
+        # Without a photo the same form still saves.
+        self.client.post(self.update_url, self.post_data(name="Sin foto"))
+        self.assertEqual(self.stored().name, "Sin foto")
+
+    def test_a_storage_error_saves_nothing_and_says_so(self):
+        self.fake.fail = True
+        response = self.client.post(
+            self.update_url, self.post_data(self.upload(), name="Cambio perdido")
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "No se pudo subir la foto")
+        self.assertEqual(self.stored().name, "New York")
+        self.assertEqual(self.stored().image_url, "/img/products/old.webp")
+
+    def test_a_storage_error_on_create_leaves_no_product_behind(self):
+        self.fake.fail = True
+        self.client.post(self.create_url, self.post_data(self.upload(), name="Fantasma"))
+
+        self.assertFalse(Product.objects.filter(name="Fantasma").exists())
+
+    def test_a_photo_sent_with_a_price_change_is_not_dropped_silently(self):
+        response = self.client.post(
+            self.update_url, self.post_data(self.upload(), price_per_kg="600.00")
+        )
+
+        self.assertTemplateUsed(response, "inventory/product_form.html")
+        self.assertContains(response, "cambio de precio")
+        self.assertEqual(self.fake.uploads, [])
+        self.assertEqual(self.stored().price_per_kg, Decimal("549.00"))
+
+    def test_a_price_change_without_a_photo_still_goes_through_confirmation(self):
+        response = self.client.post(self.update_url, self.post_data(price_per_kg="600.00"))
+
+        self.assertTemplateUsed(response, "inventory/product_confirm_price_change.html")
+
+    def test_an_anonymous_visitor_cannot_upload(self):
+        anonymous = Client()
+        for url in (self.update_url, self.create_url):
+            response = anonymous.post(url, self.post_data(self.upload()))
+            self.assertRedirects(response, reverse("panel:acceso"), fetch_redirect_response=False)
+        self.assertEqual(self.fake.uploads, [])
+
+    def test_a_customer_cannot_upload(self):
+        customer = Client()
+        insert_profile(uuid.uuid4(), "customer")
+        response = customer.post(self.update_url, self.post_data(self.upload()))
+
+        self.assertRedirects(response, reverse("panel:acceso"), fetch_redirect_response=False)
+        self.assertEqual(self.fake.uploads, [])
+
+    def test_a_post_without_the_csrf_token_is_refused(self):
+        strict = Client(enforce_csrf_checks=True)
+        sign_in_as_panel_admin(strict)
+        response = strict.post(self.update_url, self.post_data(self.upload()))
+
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(self.fake.uploads, [])
+
+    def test_the_server_key_is_never_rendered(self):
+        response = self.client.get(self.update_url)
+
+        self.assertNotContains(response, "server-key")

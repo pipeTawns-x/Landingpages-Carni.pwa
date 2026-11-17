@@ -16,12 +16,32 @@ from django.core.paginator import Paginator
 from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404, redirect, render
 
-from inventory import services
+from inventory import services, storage
 from inventory.forms import CutSpecForm, ProductForm
 from inventory.models import Category, CutSpec, Product
 from panel.access import panel_admin_required
 
 PRODUCTS_PER_PAGE = 20
+PHOTO_WITH_PRICE_CHANGE = (
+    "Hay un cambio de precio o de cantidad mínima, que se confirma en otra pantalla y no puede "
+    "llevar la foto. Guarda primero ese cambio sin foto y sube la foto después."
+)
+
+
+def _photo_failed(product_form, error):
+    """Show a Storage failure as an error of the photo field; nothing was saved."""
+    product_form.add_error("photo", f"No se pudo subir la foto. {error} Inténtalo de nuevo.")
+
+
+def _render_form(request, product_form, spec_form, product=None):
+    context = {
+        "product_form": product_form,
+        "spec_form": spec_form,
+        "is_update": product is not None,
+    }
+    if product is not None:
+        context["product"] = product
+    return render(request, "inventory/product_form.html", context)
 
 
 @panel_admin_required
@@ -75,13 +95,17 @@ def product_detail(request, product_id):
 def product_create(request):
     """Create a product and, optionally, its cut spec."""
     if request.method == "POST":
-        product_form = ProductForm(request.POST)
+        product_form = ProductForm(request.POST, request.FILES)
         spec_form = CutSpecForm(request.POST)
 
         if product_form.is_valid() and spec_form.is_valid():
-            product = services.save_product(product_form, spec_form)
-            messages.success(request, f'Producto "{product.name}" creado correctamente.')
-            return redirect("inventory:detail", product_id=product.id)
+            try:
+                product = services.save_product(product_form, spec_form)
+            except storage.StorageError as error:
+                _photo_failed(product_form, error)
+            else:
+                messages.success(request, f'Producto "{product.name}" creado correctamente.')
+                return redirect("inventory:detail", product_id=product.id)
     else:
         product_form = ProductForm()
         spec_form = CutSpecForm()
@@ -118,7 +142,7 @@ def product_update(request, product_id):
     old_price_unit = product.price_unit
 
     if request.method == "POST":
-        product_form = ProductForm(request.POST, instance=product)
+        product_form = ProductForm(request.POST, request.FILES, instance=product)
         spec_form = CutSpecForm(request.POST, instance=spec)
 
         if product_form.is_valid() and spec_form.is_valid():
@@ -132,6 +156,11 @@ def product_update(request, product_id):
             )
 
             if change.needs_confirmation and request.POST.get("confirm") != "1":
+                if product_form.cleaned_data["photo"]:
+                    # The confirmation page cannot carry a file, and a photo must not vanish
+                    # without a word: nothing is saved and the admin is told what to do.
+                    product_form.add_error("photo", PHOTO_WITH_PRICE_CHANGE)
+                    return _render_form(request, product_form, spec_form, product)
                 hidden_fields = {
                     key: value
                     for key, value in request.POST.items()
@@ -152,9 +181,13 @@ def product_update(request, product_id):
                 }
                 return render(request, "inventory/product_confirm_price_change.html", context)
 
-            product = services.save_product(product_form, spec_form)
-            messages.success(request, f'Producto "{product.name}" actualizado correctamente.')
-            return redirect("inventory:detail", product_id=product.id)
+            try:
+                product = services.save_product(product_form, spec_form)
+            except storage.StorageError as error:
+                _photo_failed(product_form, error)
+            else:
+                messages.success(request, f'Producto "{product.name}" actualizado correctamente.')
+                return redirect("inventory:detail", product_id=product.id)
     else:
         product_form = ProductForm(instance=product)
         spec_form = CutSpecForm(instance=spec)

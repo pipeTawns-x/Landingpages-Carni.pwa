@@ -9,8 +9,10 @@ how Tailwind finds them. A class that is not in the redesign's kit does not belo
 from decimal import Decimal
 
 from django import forms
+from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 
+from inventory import storage
 from inventory.models import CutSpec, Product, price_per_kg_from
 
 # The shell of every control of the panel: 48 px tall, the control radius, the border of a control
@@ -112,6 +114,20 @@ class ProductForm(forms.ModelForm):
         widget=forms.Select(attrs={"class": SELECT}),
     )
 
+    # The photo is not a model field: `clean_photo` turns it into a `storage.ProductImage` and
+    # `services.save_product` uploads it and writes the public URL into `image_url`.
+    photo = forms.FileField(
+        required=False,
+        label="Foto del producto",
+        widget=forms.FileInput(
+            attrs={
+                "class": "w-full text-ui",
+                "accept": "image/jpeg,image/png,image/webp",
+                "aria-describedby": "help-photo",
+            }
+        ),
+    )
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # The blank option of the select is the prompt of the design, not Django's dashes.
@@ -131,6 +147,27 @@ class ProductForm(forms.ModelForm):
         stock = self.initial.get("stock")
         if isinstance(stock, Decimal):
             self.initial["stock"] = format(stock.normalize(), "f")
+
+    def clean_photo(self):
+        """Accept a JPEG, PNG or WebP by its bytes (never by its name), up to 5 MB.
+
+        Returns a `storage.ProductImage`, or None when no file was sent. Without the server key
+        the photo is refused here, so the rest of the form still saves.
+        """
+        upload = self.cleaned_data.get("photo")
+        if not upload:
+            return None
+        if not storage.storage_configured():
+            raise ValidationError(
+                "La carga de fotos no está configurada: falta SUPABASE_SERVICE_ROLE_KEY en el "
+                "servidor. El resto del producto se puede guardar sin foto."
+            )
+        if upload.size > storage.MAX_BYTES:
+            raise ValidationError(storage.REJECTED_SIZE)
+        try:
+            return storage.inspect_image(upload.read())
+        except storage.ImageRejected as error:
+            raise ValidationError(str(error)) from error
 
     def clean_price_unit(self):
         return self.cleaned_data["price_unit"] or self.instance.price_unit

@@ -30,7 +30,7 @@
     {% endif %}
   </nav>
 
-  <form method="post" class="flex flex-col gap-5 lg:gap-6">
+  <form method="post" enctype="multipart/form-data" class="flex flex-col gap-5 lg:gap-6">
     {% csrf_token %}
 
     {% if product_form.errors or spec_form.errors %}
@@ -138,6 +138,15 @@
           </label>
           {% include "inventory/_field_error.html" with field=product_form.is_active %}
           <p class="text-meta text-text-muted">Si lo desactivas, deja de verse en la tienda.</p>
+        </div>
+        <div class="flex flex-col gap-2 lg:col-span-2">
+          <label for="{{ product_form.photo.id_for_label }}" class="text-ui font-semibold">Foto del producto</label>
+          {% if product_form.instance.image_src %}
+          <img src="{{ product_form.instance.image_src }}" alt="Foto actual de {{ product_form.instance.name|default:'este producto' }}" class="h-32 rounded-control border border-border object-cover" loading="lazy" />
+          {% endif %}
+          {{ product_form.photo }}
+          {% include "inventory/_field_error.html" with field=product_form.photo %}
+          <p id="help-photo" class="text-meta text-text-muted">JPG, PNG o WebP de hasta 5 MB. Si no eliges una foto, se conserva la actual.</p>
         </div>
         <div class="flex flex-col gap-2 lg:col-span-2">
           <label for="{{ product_form.image_url.id_for_label }}" class="text-ui font-semibold">Imagen (ruta)</label>

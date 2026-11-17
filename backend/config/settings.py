@@ -207,6 +207,12 @@ SUPABASE_URL = parse_http_url(require_env("SUPABASE_URL"), "SUPABASE_URL").rstri
 # sign-in page answers 503 and says it is not configured.
 SUPABASE_PUBLISHABLE_KEY = os.environ.get("SUPABASE_PUBLISHABLE_KEY", "").strip()
 
+# The server-only key that lets Django write product photos to Supabase Storage. Optional: without
+# it the rest of the panel works and the photo field answers that uploads are not configured. It is
+# a secret: never put it in a template, a context or a VITE_* variable. The bucket accepts writes
+# from this role only (supabase/migrations/20261117000001_product_images_bucket.sql).
+SUPABASE_SERVICE_ROLE_KEY = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "").strip()
+
 # How the signature is checked. Production signs with asymmetric keys that the
 # project publishes (JWKS); the local Supabase signs with a shared secret
 # (HS256). Exactly one mode is used: the JWKS URL when it is set, otherwise the
