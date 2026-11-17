@@ -43,8 +43,9 @@ uv run python -c "from django.core.management.utils import get_random_secret_key
 | `SUPABASE_URL` | URL of the Supabase project (`http://127.0.0.1:54321` locally). `<SUPABASE_URL>/auth/v1` is the issuer a panel token must carry. Required. |
 | `SUPABASE_JWKS_URL` | Where the project publishes its signing keys, `<SUPABASE_URL>/auth/v1/.well-known/jwks.json`, locally and in production. When it is set, tokens are checked against those keys and `SUPABASE_JWT_SECRET` is ignored. The local Supabase CLI (v2.84) signs user tokens with ES256 and publishes the key there, so local needs it too. |
 | `SUPABASE_JWT_SECRET` | Shared HS256 secret, for a Supabase project that still signs with it; `supabase status -o env` prints it as `JWT_SECRET`. Used only when `SUPABASE_JWKS_URL` is empty: a real local token is refused with `algorithm` in that mode. One of the two is required. |
-| `STORE_ORIGIN` | Origin of the store (`http://localhost:3002` locally). The panel sends people there to sign in and after signing out. Required. |
-| `PANEL_ALLOWED_ORIGINS` | Comma-separated origins that may post a token to `/panel/sesion/` (`http://localhost:3002` locally). Required. |
+| `SUPABASE_PUBLISHABLE_KEY` | The publishable (anon) key of the project, which the browser needs to sign in at `/acceso/`. It is public by design; never put the service key here. Optional at startup: without it `/acceso/` answers 503 and says it is not configured. Locally, `supabase status` prints it. |
+| `STORE_ORIGIN` | Origin of the store's static files (`http://localhost:3002` locally); `store_image_url()` joins product photos to it. The sign-in is no longer there: it is `/acceso/`, a page of Django (`STORE_LOGIN_URL`). Required. |
+| `PANEL_ALLOWED_ORIGINS` | Comma-separated origins that may post a token to `/panel/sesion/` (the origin of this site, `http://localhost:8000` locally: the sign-in page is served by Django, so the token comes from the same origin). Required. |
 | `PANEL_TOKEN_MAX_AGE_SECONDS` | The oldest a token may be, counted from when Supabase issued it, when it is handed over (`300` is five minutes). Required. |
 | `DJANGO_COOKIE_SECURE` | `True`/`False`. Marks the session and CSRF cookies `Secure`. Optional: on whenever `DJANGO_DEBUG` is off. |
 | `DJANGO_COOKIE_HTTPONLY` | `True`/`False`. Hides the session cookie from JavaScript. Optional: `True`. |
@@ -253,8 +254,8 @@ Behaviour worth knowing before touching it:
   of the `panel` app.
 - `panel:salir` is the one panel route that is not behind the decorator, so that
   an admin whose role was just revoked can still sign out. It ends the Django
-  session and redirects to `accessweb.html?salir=1`. The existing store handler
-  consumes this signal and signs out of Supabase before authentication initializes.
+  session and redirects to `/acceso/?salir=1`. That page (`static/tienda/acceso.js`)
+  consumes the signal and signs out of Supabase before the forms are usable.
   Protected panel views, access redirects and logout responses send `Cache-Control:
   no-store, private` through Django's `never_cache` decorator. This prevents HTTP
   cache reuse; browser back/forward restoration still needs browser acceptance.
@@ -281,8 +282,43 @@ Behaviour worth knowing before touching it:
 - Local values for `backend/.env`: `SUPABASE_URL=http://127.0.0.1:54321`,
   `SUPABASE_JWKS_URL=http://127.0.0.1:54321/auth/v1/.well-known/jwks.json`,
   `STORE_ORIGIN=http://localhost:3002`,
-  `PANEL_ALLOWED_ORIGINS=http://localhost:3002` and
+  `PANEL_ALLOWED_ORIGINS=http://localhost:8000` (the site's own origin) and
   `PANEL_TOKEN_MAX_AGE_SECONDS=300`.
+
+## Sign-in page (`/acceso/`)
+
+`accessweb.html` moved into Django: `ventas:acceso` (`ventas/views_acceso.py`,
+`ventas/templates/ventas/tienda/acceso.html`), inside the store frame. The old address answers
+301 to `/acceso/` and keeps the query (`?salir=1`).
+
+- **One page, two forms** (Iniciar sesión / Crear cuenta) and the slide between them. The state is
+  `data-modo` on `#acceso`; the animation is Tailwind variants, so the script only flips an
+  attribute. Don Carlos (`/img/recursos_web/carniLogin.png`, `carniRegistro.png`) fades into the
+  card with a mask. Without JavaScript the block stays `hidden` and a `<noscript>` message says
+  that JavaScript is needed.
+- **Supabase Auth runs in the browser** (`static/tienda/acceso.js`, one external ES module, no
+  inline script or style). The page hands it only public values as `data-*` attributes:
+  `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY`. Without the key the page answers 503.
+- **supabase-js is vendored**, not loaded from a CDN: `static/tienda/vendor/supabase-js.mjs` is
+  `createClient` bundled with esbuild 0.27.7 from `@supabase/supabase-js@2.103.0` (the version in
+  `package-lock.json`, MIT), built inside Docker with `--ignore-scripts`. To rebuild it, run in the
+  `.devcontainer` image: `npm install --ignore-scripts @supabase/supabase-js@2.103.0 esbuild@0.27.7`,
+  an entry file with `export { createClient } from "@supabase/supabase-js";` and
+  `esbuild entry.mjs --bundle --format=esm --minify --target=es2020 --platform=browser --legal-comments=none`.
+- **After signing in**, an admin (`profiles.role = 'admin'`) gets the panel: the script refreshes
+  the session and POSTs the access token to `/panel/sesion/` (same origin, so the origin must be on
+  `PANEL_ALLOWED_ORIGINS`), then goes to `/panel/`. Anyone else goes to `/productos/`. With
+  `?admin=true` a non-admin is signed out and refused.
+- **Signing out**: `POST /panel/salir/` ends the Django session and redirects to `/acceso/?salir=1`;
+  the page closes the Supabase session of the browser and removes the parameter from the address.
+  Protected panel pages are `never_cache`, so Back after signing out asks the server again and is
+  sent to `/acceso/`.
+- `STORE_LOGIN_URL` is `/acceso/` (a path, not `STORE_ORIGIN` + `/accessweb.html`).
+- Left out of the static page, on purpose: the Google / Facebook / Twitter buttons (no provider is
+  configured), "Recuérdame" and "¿Olvidaste tu contraseña?" (dead links), and the delivery-address
+  block and the "verify" buttons of the sign-up (they only showed an alert and sent nothing).
+- The page uses new Tailwind classes: after changing the template run
+  `backend/scripts/build_panel_css.sh` and commit `static/tienda/tienda.css`.
 
 ## Enlaces de invitado para revisión
 
@@ -468,7 +504,8 @@ ellas: se cambian en la pestaña Environment del servicio.
 | `SUPABASE_URL` | La URL del proyecto, `https://<project_ref>.supabase.co`. |
 | `SUPABASE_JWKS_URL` | `<SUPABASE_URL>/auth/v1/.well-known/jwks.json`. |
 | `STORE_ORIGIN` | El origen de la tienda del demo, donde un administrador inicia sesión. |
-| `PANEL_ALLOWED_ORIGINS` | Ese mismo origen. |
+| `SUPABASE_PUBLISHABLE_KEY` | La llave publicable (anon) del proyecto, la que el navegador usa en `/acceso/`. Es pública; nunca la service key. Hay que agregarla a `render.yaml` como `sync: false` si se quiere acceso en el demo. |
+| `PANEL_ALLOWED_ORIGINS` | El origen del propio servicio (`https://<servicio>.onrender.com`): el acceso ya lo sirve Django, así que el token sale del mismo origen. |
 
 No están en `render.yaml`, y casi nunca hacen falta: `DJANGO_CSRF_TRUSTED_ORIGINS` (otro
 dominio que publique formularios, o el origen https del servicio si el proxy no manda

@@ -205,6 +205,12 @@ LOGIN_URL = "panel:acceso"
 # issuer a token must carry.
 SUPABASE_URL = parse_http_url(require_env("SUPABASE_URL"), "SUPABASE_URL").rstrip("/")
 
+# The publishable (anon) key the browser needs to sign in at /acceso/. It is public by design: it
+# only identifies the project, and what a person may read stays behind RLS. The service key never
+# goes here. Not required at import (the rest of the site works without it); without it the
+# sign-in page answers 503 and says it is not configured.
+SUPABASE_PUBLISHABLE_KEY = os.environ.get("SUPABASE_PUBLISHABLE_KEY", "").strip()
+
 # How the signature is checked. Production signs with asymmetric keys that the
 # project publishes (JWKS); the local Supabase signs with a shared secret
 # (HS256). Exactly one mode is used: the JWKS URL when it is set, otherwise the
@@ -224,7 +230,11 @@ elif not SUPABASE_JWT_SECRET:
 # Where the store lives, and which origins may post a token to the panel. They
 # are separate on purpose: the second list is a security allow-list.
 STORE_ORIGIN = parse_origin(require_env("STORE_ORIGIN"), "STORE_ORIGIN")
-STORE_LOGIN_URL = f"{STORE_ORIGIN}/accessweb.html"
+# The sign-in is a page of Django itself now (ventas:acceso), so the handoff to the panel is
+# same-origin: the page posts the token to /panel/sesion/ from the same site. The path is written
+# out because settings cannot reverse a URL; ventas/tests/test_acceso.py pins it to
+# reverse("ventas:acceso"). PANEL_ALLOWED_ORIGINS must list the site's own origin.
+STORE_LOGIN_URL = "/acceso/"
 PANEL_ALLOWED_ORIGINS = parse_origins(require_env("PANEL_ALLOWED_ORIGINS"), "PANEL_ALLOWED_ORIGINS")
 
 # The oldest a token may be (counted from its `iat`) when it is handed over.

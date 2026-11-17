@@ -733,7 +733,7 @@ class AccessBridgeTests(TestCase):
         response = self.client.get(reverse("panel:acceso"))
 
         self.assertRedirects(response, settings.STORE_LOGIN_URL, fetch_redirect_response=False)
-        self.assertEqual(settings.STORE_LOGIN_URL, "http://store.test/accessweb.html")
+        self.assertEqual(settings.STORE_LOGIN_URL, reverse("ventas:acceso"))
 
     def test_a_handed_off_admin_goes_straight_to_the_panel(self):
         self.client.post(

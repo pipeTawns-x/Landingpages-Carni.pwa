@@ -1,4 +1,131 @@
 {% extends "ventas/tienda/base.html" %}
-{% comment %}Sign in and sign up (accessweb.html migrated into Django). Placeholder until its migration lands.{% endcomment %}
+{% load static %}
+{% comment %}
+  Sign in and sign up: accessweb.html, migrated into Django (ventas:acceso, /acceso/). One page, two
+  forms and the slide between them, as before. Supabase Auth signs people in from the browser
+  (static/tienda/acceso.js, one external module: no inline script or style, so the page needs no
+  CSP exception). The page hands the script only public values, as data-* attributes of #acceso.
+
+  The state lives in `data-modo` ("ingresar" or "registro") on #acceso; every visual change is a
+  `group-data-[modo=...]` variant of Tailwind, so the script only flips one attribute. Without
+  JavaScript the whole block stays `hidden` and a <noscript> message says why.
+{% endcomment %}
 {% block title %}<title>Acceso · {{ negocio.nombre }}</title>{% endblock %}
-{% block contenido %}<h1 class="sr-only">Iniciar sesión o crear cuenta</h1>{% endblock %}
+{% block descripcion %}Inicia sesión o crea tu cuenta en {{ negocio.nombre }} para pedir tus cortes.{% endblock %}
+{% block head_extra %}{% if configurado %}<script type="module" src="{% static 'tienda/acceso.js' %}"></script>{% endif %}{% endblock %}
+
+{% block contenido %}
+<h1 class="sr-only">Iniciar sesión o crear cuenta</h1>
+
+{% if not configurado %}
+<section class="mx-auto w-full max-w-xl px-5 py-20 text-center">
+  <h2 class="font-display text-seccion font-normal">El acceso no está disponible</h2>
+  <p class="mt-4 text-lead text-text-muted">El acceso no está configurado en este sitio todavía. Puedes seguir viendo los <a href="{% url 'ventas:catalogo' %}" class="text-sand underline underline-offset-4">productos</a>.</p>
+</section>
+{% else %}
+<noscript>
+  <p role="alert" class="mx-auto my-16 max-w-xl rounded-control border border-border-control bg-surface-1 px-5 py-4 text-center text-ui">Para iniciar sesión o crear tu cuenta necesitas activar JavaScript en tu navegador. Mientras tanto puedes ver los <a href="{% url 'ventas:catalogo' %}" class="text-sand underline underline-offset-4">productos</a>.</p>
+</noscript>
+
+<div id="acceso" hidden data-modo="ingresar"
+     data-supabase-url="{{ supabase_url }}"
+     data-supabase-key="{{ supabase_key }}"
+     data-supabase-js="{{ supabase_js }}"
+     data-sesion-url="{{ sesion_url }}"
+     data-panel-url="{{ panel_url }}"
+     data-tienda-url="{{ tienda_url }}"
+     class="group mx-auto w-full max-w-5xl px-5 py-10 lg:py-16">
+
+  <p id="acceso-aviso" role="status" aria-live="polite"{% if admin %} data-admin="true"{% endif %} class="mb-4 rounded-control border border-border-control bg-surface-1 px-4 py-3 text-ui empty:hidden">{% if salir %}Cerraste tu sesión.{% elif admin %}Acceso solo para personal autorizado.{% endif %}</p>
+
+  <div class="relative flex flex-col overflow-hidden rounded-dialog border border-border bg-surface-1 lg:grid lg:min-h-[41rem] lg:grid-cols-2">
+
+    <!-- The two forms. Wide screens: login on the left, sign-up on the right, and Don Carlos
+         slides over the one that is not in use. Narrow screens: only the active form shows. -->
+    <form id="form-ingresar" method="post" action="{% url 'ventas:acceso' %}" novalidate aria-labelledby="titulo-ingresar"
+          class="flex flex-col justify-center gap-5 px-6 py-10 sm:px-10 lg:col-start-1 lg:row-start-1 lg:px-12 max-lg:group-data-[modo=registro]:hidden lg:transition-[opacity,visibility] lg:duration-300 lg:group-data-[modo=registro]:invisible lg:group-data-[modo=registro]:opacity-0">
+      <div>
+        <p class="text-meta tracking-[0.16em] text-sand">BIENVENIDO DE VUELTA</p>
+        <h2 id="titulo-ingresar" class="mt-2 font-display text-seccion font-normal">Iniciar sesión</h2>
+      </div>
+      <div class="grid gap-2">
+        <label for="ingresar-correo" class="text-meta text-text-muted">Correo electrónico</label>
+        <input id="ingresar-correo" name="email" type="email" autocomplete="email" required class="min-h-12 w-full rounded-control border border-border-control bg-surface-2 px-4 text-ui text-text placeholder:text-text-muted focus:border-sand" placeholder="tucorreo@ejemplo.com" />
+      </div>
+      <div class="grid gap-2">
+        <label for="ingresar-clave" class="text-meta text-text-muted">Contraseña</label>
+        <input id="ingresar-clave" name="password" type="password" autocomplete="current-password" required class="min-h-12 w-full rounded-control border border-border-control bg-surface-2 px-4 text-ui text-text focus:border-sand" />
+      </div>
+      <p data-error role="alert" class="text-ui text-red-text empty:hidden"></p>
+      <button type="submit" class="min-h-12 rounded-pill bg-red px-6 text-ui font-medium text-text transition-colors duration-150 hover:bg-red-hover disabled:opacity-60">Entrar a la carnicería</button>
+      <p class="text-ui text-text-muted lg:hidden">¿No tienes cuenta? <button type="button" data-accion="ver-registro" class="min-h-11 text-sand underline underline-offset-4">Regístrate aquí</button></p>
+    </form>
+
+    <form id="form-registro" method="post" action="{% url 'ventas:acceso' %}" novalidate aria-labelledby="titulo-registro"
+          class="flex flex-col justify-center gap-4 px-6 py-10 sm:px-10 lg:col-start-2 lg:row-start-1 lg:px-12 max-lg:group-data-[modo=ingresar]:hidden lg:transition-[opacity,visibility] lg:duration-300 lg:group-data-[modo=ingresar]:invisible lg:group-data-[modo=ingresar]:opacity-0">
+      <div>
+        <p class="text-meta tracking-[0.16em] text-sand">PRIMERA VEZ POR AQUÍ</p>
+        <h2 id="titulo-registro" class="mt-2 font-display text-seccion font-normal">Crear cuenta</h2>
+      </div>
+      <div class="grid gap-2">
+        <label for="registro-nombre" class="text-meta text-text-muted">Nombre completo</label>
+        <input id="registro-nombre" name="full_name" type="text" autocomplete="name" required class="min-h-12 w-full rounded-control border border-border-control bg-surface-2 px-4 text-ui text-text focus:border-sand" />
+      </div>
+      <div class="grid gap-2">
+        <label for="registro-correo" class="text-meta text-text-muted">Correo electrónico</label>
+        <input id="registro-correo" name="email" type="email" autocomplete="email" required class="min-h-12 w-full rounded-control border border-border-control bg-surface-2 px-4 text-ui text-text placeholder:text-text-muted focus:border-sand" placeholder="tucorreo@ejemplo.com" />
+      </div>
+      <div class="grid gap-2">
+        <label for="registro-telefono" class="text-meta text-text-muted">Teléfono (10 dígitos)</label>
+        <input id="registro-telefono" name="phone" type="tel" inputmode="numeric" autocomplete="tel" required class="min-h-12 w-full rounded-control border border-border-control bg-surface-2 px-4 text-ui text-text focus:border-sand" />
+      </div>
+      <div class="grid gap-4 sm:grid-cols-2">
+        <div class="grid gap-2">
+          <label for="registro-clave" class="text-meta text-text-muted">Contraseña (mínimo 8)</label>
+          <input id="registro-clave" name="password" type="password" autocomplete="new-password" required class="min-h-12 w-full rounded-control border border-border-control bg-surface-2 px-4 text-ui text-text focus:border-sand" />
+        </div>
+        <div class="grid gap-2">
+          <label for="registro-clave2" class="text-meta text-text-muted">Confirmar contraseña</label>
+          <input id="registro-clave2" name="password_confirm" type="password" autocomplete="new-password" required class="min-h-12 w-full rounded-control border border-border-control bg-surface-2 px-4 text-ui text-text focus:border-sand" />
+        </div>
+      </div>
+      <label class="flex min-h-11 items-center gap-3 text-ui">
+        <input id="registro-terminos" name="terms" type="checkbox" required class="size-5 accent-red" />
+        <span>Acepto los términos y condiciones</span>
+      </label>
+      <label class="flex min-h-11 items-center gap-3 text-ui">
+        <input id="registro-ofertas" name="newsletter" type="checkbox" class="size-5 accent-red" />
+        <span>Quiero recibir ofertas por correo</span>
+      </label>
+      <p data-error role="alert" class="text-ui text-red-text empty:hidden"></p>
+      <button type="submit" class="min-h-12 rounded-pill bg-red px-6 text-ui font-medium text-text transition-colors duration-150 hover:bg-red-hover disabled:opacity-60">Crear mi cuenta</button>
+      <p class="text-ui text-text-muted lg:hidden">¿Ya tienes cuenta? <button type="button" data-accion="ver-ingresar" class="min-h-11 text-sand underline underline-offset-4">Inicia sesión</button></p>
+    </form>
+
+    <!-- Don Carlos. Wide: a half that slides from the right (login) to the left (sign-up) over the
+         unused form. Narrow: a banner above the form. The image fades into the card with a mask
+         instead of sitting on it as a box; the login picture is scaled up so its dark frame and
+         the corner sparkle fall outside the card. -->
+    <aside aria-label="Don Carlos, tu carnicero" class="order-first relative h-48 shrink-0 overflow-hidden sm:h-60 lg:absolute lg:inset-y-0 lg:left-1/2 lg:order-none lg:h-auto lg:w-1/2 lg:transition-transform lg:duration-500 lg:ease-out-strong lg:group-data-[modo=registro]:-translate-x-full motion-reduce:transition-none">
+      <img src="/img/recursos_web/carniLogin.png" alt="Don Carlos saluda desde su carnicería" width="992" height="1056" decoding="async"
+           class="absolute inset-0 size-full scale-[1.25] object-cover object-[50%_38%] transition-opacity duration-300 max-lg:[mask-image:linear-gradient(to_bottom,black_55%,transparent)] lg:[mask-image:linear-gradient(to_right,transparent,black_42%)] group-data-[modo=registro]:opacity-0" />
+      <img src="/img/recursos_web/carniRegistro.png" alt="Don Carlos te da la bienvenida con los brazos abiertos" width="1024" height="1024" loading="lazy" decoding="async"
+           class="absolute inset-0 size-full object-cover object-[50%_30%] opacity-0 transition-opacity duration-300 max-lg:[mask-image:linear-gradient(to_bottom,black_55%,transparent)] lg:[mask-image:linear-gradient(to_left,transparent,black_42%)] group-data-[modo=registro]:opacity-100" />
+
+      <div class="absolute inset-x-0 bottom-0 hidden bg-linear-to-t from-bg via-bg/80 to-transparent px-10 pb-10 pt-24 lg:block">
+        <div class="group-data-[modo=registro]:hidden">
+          <h2 class="font-display text-titulo">¿Primera vez por aquí?</h2>
+          <p class="mt-2 text-ui text-text-muted">Crea tu cuenta en minutos y pide sin filas ni vueltas.</p>
+          <button type="button" data-accion="ver-registro" class="mt-4 min-h-12 rounded-pill border border-sand px-6 text-ui font-medium text-sand transition-colors duration-150 hover:bg-sand hover:text-bg">Registrarme</button>
+        </div>
+        <div class="hidden group-data-[modo=registro]:block">
+          <h2 class="font-display text-titulo">¿Ya compras con nosotros?</h2>
+          <p class="mt-2 text-ui text-text-muted">Entra, revisa tus favoritos y vuelve a pedir tus cortes de siempre.</p>
+          <button type="button" data-accion="ver-ingresar" class="mt-4 min-h-12 rounded-pill border border-sand px-6 text-ui font-medium text-sand transition-colors duration-150 hover:bg-sand hover:text-bg">Iniciar sesión</button>
+        </div>
+      </div>
+    </aside>
+  </div>
+</div>
+{% endif %}
+{% endblock %}
