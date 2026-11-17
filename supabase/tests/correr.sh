@@ -1,7 +1,12 @@
 #!/usr/bin/env bash
-# Rebuilds the work database, applies the comercio-v1 migrations that exist (1-5) in order,
-# proves every -- DOWN block (apply, revert, apply) and runs every SQL test. A missing number is
-# skipped and the run says so right before the TOTAL line.
+# Rebuilds the work database, applies the comercio-v1 migrations that exist (1-5) in order and
+# then the later ones (see `posteriores`), proves every -- DOWN block (apply, revert, apply) and
+# runs every SQL test. A missing number is skipped and the run says so right before the TOTAL line.
+#
+# A later migration that touches the `storage` schema does not exist in this work database (it
+# lives in the local Supabase stack): it is skipped here, and its test runs with
+# `supabase test db --local`. The test of a later migration is named after it without the
+# timestamp: 20261117000002_create_order_web.sql is tested by create_order_web.sql.
 #
 # Last line of the output:   TOTAL: N pruebas, F fallas
 # Exit code is non-zero when F > 0.
@@ -51,8 +56,19 @@ paso() { # $1 = exit code, $2 = description
   fi
 }
 
-# The 9 migrations that exist before comercio-v1, and the comercio-v1 ones.
-base_migrations() { ls "$MIG"/*.sql | grep -v '/2026111300000[0-9]_'; }
+# The 9 migrations that exist before comercio-v1, the comercio-v1 ones, and the later ones that
+# run in this work database, in order.
+base_migrations() {
+  local f
+  for f in "$MIG"/*.sql; do [[ "$(basename "$f")" < "20261113" ]] && echo "$f"; done
+}
+posteriores() {
+  local f
+  for f in "$MIG"/*.sql; do
+    [[ "$(basename "$f")" > "20261114" ]] && ! grep -q 'storage\.' "$f" && echo "$f"
+  done
+}
+prueba_de() { local b; b="$(basename "$1")"; echo "$AQUI/${b#*_}"; }
 migracion() { ls "$MIG"/2026111300000"$1"_*.sql 2>/dev/null | head -1; }
 
 # The DOWN block is the commented tail of each migration: strip the leading "-- ".
@@ -171,6 +187,12 @@ case "$cmd" in
       [ -n "$(migracion "$n")" ] || continue
       subir "$n";    paso $? "migration $n applies on top of the previous ones"
     done
+    for f in $(posteriores); do
+      pgu -1 -d "$DB" -f - < "$f"; paso $? "$(basename "$f") applies on top of the previous ones"
+    done
+    for f in $(posteriores | sort -r); do
+      down_sql "$f" | pgu -1 -d "$DB" -f -; paso $? "DOWN of $(basename "$f") runs"
+    done
     for n in 5 4 3 2 1; do
       [ -n "$(migracion "$n")" ] || continue
       bajar "$n";    paso $? "DOWN of migration $n runs"
@@ -186,10 +208,17 @@ case "$cmd" in
       [ -n "$(migracion "$n")" ] || continue
       subir "$n";    paso $? "migration $n applies again after the revert"
     done
+    for f in $(posteriores); do
+      pgu -1 -d "$DB" -f - < "$f"; paso $? "$(basename "$f") applies again after the revert"
+    done
 
     instalar_ayudas; paso $? "test helpers installed"
     for f in "$AQUI"/comercio_v1_*.sql; do
       [ -e "$f" ] && correr_prueba "$f"
+    done
+    for f in $(posteriores); do
+      t="$(prueba_de "$f")"
+      if [ -e "$t" ]; then correr_prueba "$t"; else echo "-- AVISO: $(basename "$f") no tiene prueba"; fi
     done
     FALTAN=""
     for n in 1 2 3 4 5; do [ -n "$(migracion "$n")" ] || FALTAN="$FALTAN $n"; done
