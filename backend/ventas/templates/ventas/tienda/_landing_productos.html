@@ -20,6 +20,13 @@
           <h3 class="mt-4 font-display text-titulo font-normal transition-colors duration-150 group-hover:text-sand">{{ producto.name }}</h3>
           <p class="mt-1 text-ui font-medium text-sand">${{ producto.price_per_kg }} / {{ producto.unit_label }}</p>
         </a>
+        <form method="post" action="{% url 'ventas:tienda_agregar' producto.pk %}" class="mt-3">
+          {% csrf_token %}
+          <input type="hidden" name="next" value="{% url 'ventas:landing' %}" />
+          <input type="hidden" name="amount" value="1" />
+          {% if producto.unit_label == "kg" %}<input type="hidden" name="mode" value="weight" /><input type="hidden" name="unit" value="kg" />{% else %}<input type="hidden" name="mode" value="pieces" />{% endif %}
+          <button type="submit" class="min-h-11 rounded-pill border border-sand px-4 text-ui text-sand transition-colors duration-150 hover:bg-sand hover:text-bg">Agregar 1 {% if producto.unit_label == "kg" %}kg{% else %}pieza{% endif %}</button>
+        </form>
       </li>
       {% endfor %}
     </ul>

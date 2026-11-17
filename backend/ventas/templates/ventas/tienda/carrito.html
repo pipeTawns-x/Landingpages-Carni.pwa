@@ -1,0 +1,13 @@
+{% extends "ventas/tienda/base.html" %}
+{% load static %}
+{% comment %}
+  The cart of the customer (ventas:carrito, /carrito/): plain forms, no script needed. The quote
+  is asked to the store on every visit; the page never trusts a number from the browser.
+  static/tienda/carrito.js (one external module, loaded only here) only enhances: it hides the
+  address for a pickup and re-quotes when the currency changes.
+{% endcomment %}
+{% block title %}<title>Tu carrito · {{ negocio.nombre }}</title>{% endblock %}
+{% block head_extra %}<script type="module" src="{% static 'tienda/carrito.js' %}"></script>{% endblock %}
+{% block contenido %}
+{% include "ventas/tienda/_carrito.html" %}
+{% endblock %}

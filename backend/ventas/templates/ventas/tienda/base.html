@@ -32,9 +32,19 @@
         <a href="{% url 'ventas:catalogo' %}#buscar" aria-label="Buscar un corte" class="inline-grid size-11 place-items-center text-text transition-colors duration-150 hover:text-sand">
           {% include "ventas/tienda/_icono.html" with nombre="buscar" clase="size-5" %}
         </a>
+        <a href="{% url 'ventas:carrito' %}" aria-label="Carrito, {{ request.session.tienda_cart|length }} productos" class="inline-flex min-h-11 items-center gap-2 px-2 text-ui text-text transition-colors duration-150 hover:text-sand">
+          Carrito
+          <span data-cart-count class="inline-grid min-w-6 place-items-center rounded-pill bg-red px-2 text-meta">{{ request.session.tienda_cart|length }}</span>
+        </a>
       </div>
     </div>
   </header>
+
+  {% if messages %}
+  <ul role="status" aria-live="polite" class="mx-auto w-full max-w-7xl px-5 pt-4 lg:px-6">
+    {% for message in messages %}<li class="text-ui {% if message.level_tag == 'error' %}text-red{% else %}text-sand{% endif %}">{{ message }}</li>{% endfor %}
+  </ul>
+  {% endif %}
 
   <main id="contenido">
     {% block contenido %}{% endblock %}

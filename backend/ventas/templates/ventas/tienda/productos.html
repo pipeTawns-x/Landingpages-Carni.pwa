@@ -49,6 +49,31 @@
       <h2 class="mt-1 font-display text-lead font-normal">{{ product.name }}</h2>
       {% if product.description %}<p class="mt-2 line-clamp-2 text-ui text-text-muted">{{ product.description }}</p>{% endif %}
       <p class="mt-3 text-ui font-medium text-sand">${{ product.price_per_kg }} / {{ product.unit_label }}</p>
+      <form method="post" action="{% url 'ventas:tienda_agregar' product.pk %}" class="mt-4 grid gap-2">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.get_full_path }}" />
+        <label class="grid gap-1 text-meta text-text-muted">Cómo lo quieres
+          <select name="mode" class="min-h-11 rounded-control border border-border bg-surface-1 px-3 text-ui text-text">
+            {% for value, label in product.modes %}<option value="{{ value }}">{{ label }}</option>{% endfor %}
+          </select>
+        </label>
+        <label class="grid gap-1 text-meta text-text-muted">Cantidad (pesos, peso o piezas)
+          <input type="number" name="amount" value="1" min="0.001" step="any" inputmode="decimal" required class="min-h-11 rounded-control border border-border bg-surface-1 px-3 text-ui text-text" />
+        </label>
+        {% if product.unit_label == "kg" %}
+        <label class="grid gap-1 text-meta text-text-muted">Unidad (solo por peso)
+          <select name="unit" class="min-h-11 rounded-control border border-border bg-surface-1 px-3 text-ui text-text">
+            {% for unit in units %}<option value="{{ unit }}">{{ unit }}</option>{% endfor %}
+          </select>
+        </label>
+        {% endif %}
+        {% if product.asks_thickness %}
+        <label class="grid gap-1 text-meta text-text-muted">Grosor en pulgadas (solo por piezas)
+          <input type="number" name="thickness_in" min="0.01" step="0.01" inputmode="decimal" class="min-h-11 rounded-control border border-border bg-surface-1 px-3 text-ui text-text" />
+        </label>
+        {% endif %}
+        <button type="submit" class="min-h-11 rounded-pill bg-red px-5 text-ui font-medium text-text transition-colors duration-150 hover:bg-red-hover">Agregar al carrito</button>
+      </form>
     </li>
     {% endfor %}
   </ul>
