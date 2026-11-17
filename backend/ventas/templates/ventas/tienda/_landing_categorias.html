@@ -1,0 +1,24 @@
+{% comment %}Categories strip: the active categories of the catalogue, each a link to its filtered list.{% endcomment %}
+{% if categorias %}
+<section aria-labelledby="categorias-titulo" class="border-b border-border py-14 lg:py-20">
+  <div class="mx-auto w-full max-w-7xl px-5 lg:px-6">
+    <div class="entrada flex items-end justify-between gap-6">
+      <h2 id="categorias-titulo" class="text-seccion">Nuestras categorías</h2>
+      <a href="{% url 'ventas:catalogo' %}" class="hidden min-h-11 items-center text-ui text-sand underline underline-offset-4 transition-colors duration-150 hover:text-text sm:inline-flex">Ver todo el catálogo</a>
+    </div>
+    <ul role="list" class="mt-8 grid grid-cols-2 gap-px overflow-hidden rounded-card border border-border bg-border sm:grid-cols-3 lg:mt-12 lg:grid-cols-4">
+      {% for categoria in categorias %}
+      <li class="bg-bg">
+        <a href="{% url 'ventas:catalogo' %}?category={{ categoria.pk }}" class="group flex min-h-28 flex-col justify-between gap-6 p-5 transition-colors duration-200 ease-out-strong hover:bg-surface-2 lg:min-h-36">
+          <span class="text-meta tabular-nums tracking-[0.16em] text-text-muted">{{ forloop.counter|stringformat:"02d" }}</span>
+          <span class="flex items-end justify-between gap-3">
+            <span class="font-display text-titulo">{{ categoria.name }}</span>
+            <span aria-hidden="true" class="text-sand transition-transform duration-200 ease-out-strong group-hover:translate-x-1 motion-reduce:transition-none">&rarr;</span>
+          </span>
+        </a>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+</section>
+{% endif %}

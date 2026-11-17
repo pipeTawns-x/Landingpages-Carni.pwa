@@ -1,0 +1,52 @@
+{% comment %}
+  Schedule and contact: hairline rows, one red button (src/landing/Contacto.tsx and
+  HorariosPuntaje.tsx). No e-mail (the business answers by phone and WhatsApp) and no embedded
+  map: "Cómo llegar" opens Maps.
+{% endcomment %}<section id="contacto" aria-labelledby="contacto-titulo" class="scroll-mt-20 border-t border-border py-16 lg:py-24">
+  <div class="mx-auto w-full max-w-7xl px-5 lg:px-6">
+    <div class="flex flex-col items-start gap-6 lg:flex-row lg:items-end lg:justify-between">
+      <h2 id="contacto-titulo" class="text-seccion">Horarios, contacto y dirección</h2>
+      <a href="{{ negocio.whatsapp_href }}?text=Hola%2C%20quiero%20hacer%20un%20pedido." target="_blank" rel="noopener noreferrer" class="inline-flex h-12 w-full touch-manipulation items-center justify-center gap-2.5 rounded-pill bg-red px-8 text-ui font-medium text-white transition-[background-color,scale] duration-150 ease-out-strong hover:bg-red-hover active:scale-[0.97] motion-reduce:transition-none sm:w-auto">
+        {% include "ventas/tienda/_icono.html" with nombre="whatsapp" clase="size-5 shrink-0" %}Escribir por WhatsApp
+      </a>
+    </div>
+
+    <div class="mt-8 grid gap-10 lg:mt-12 lg:grid-cols-2 lg:gap-x-16">
+      <div>
+        <h3 class="font-sans text-meta font-medium text-text-muted">Horario</h3>
+        <dl class="mt-3 border-t border-border">
+          <div class="flex min-h-16 flex-wrap items-center justify-between gap-x-6 gap-y-1 border-b border-border py-4">
+            <dt class="text-ui text-text-muted">{{ horario.dias }}</dt>
+            <dd class="text-lead font-medium tabular-nums">{{ horario.abre }} a {{ horario.cierra }}</dd>
+          </div>
+          <div class="flex min-h-16 flex-wrap items-center justify-between gap-x-6 gap-y-1 border-b border-border py-4">
+            <dt class="text-ui text-text-muted">{{ horario.cerrado }}</dt>
+          </div>
+        </dl>
+      </div>
+
+      <div>
+        <h3 class="font-sans text-meta font-medium text-text-muted">Contacto</h3>
+        <ul role="list" class="mt-3 border-t border-border">
+          <li><a href="{{ negocio.telefono_href }}" class="group flex min-h-16 items-center gap-4 border-b border-border py-3 transition-colors duration-150 ease-out-strong hover:bg-surface-1 lg:px-2">
+            {% include "ventas/tienda/_icono.html" with nombre="telefono" clase="size-5 shrink-0 text-text-muted" %}
+            <span class="min-w-0 flex-1"><span class="block text-meta text-text-muted">Teléfono</span><span class="block text-lead tabular-nums">{{ negocio.telefono }}</span></span>
+          </a></li>
+          <li><a href="{{ negocio.mapa_href }}" target="_blank" rel="noopener noreferrer" class="group flex min-h-16 items-center gap-4 border-b border-border py-3 transition-colors duration-150 ease-out-strong hover:bg-surface-1 lg:px-2">
+            {% include "ventas/tienda/_icono.html" with nombre="ubicacion" clase="size-5 shrink-0 text-text-muted" %}
+            <span class="min-w-0 flex-1"><span class="block text-meta text-text-muted">Dirección</span><span class="block text-lead">{{ negocio.direccion.0 }}</span><span class="block text-ui text-text-muted">{{ negocio.direccion.1 }}</span></span>
+            <span class="shrink-0 text-ui text-sand">Cómo llegar</span>
+          </a></li>
+          <li><a href="{{ negocio.facebook }}" target="_blank" rel="noopener noreferrer" class="group flex min-h-16 items-center gap-4 border-b border-border py-3 transition-colors duration-150 ease-out-strong hover:bg-surface-1 lg:px-2">
+            {% include "ventas/tienda/_icono.html" with nombre="facebook" clase="size-5 shrink-0 text-text-muted" %}
+            <span class="min-w-0 flex-1"><span class="block text-meta text-text-muted">Facebook</span><span class="block text-lead">{{ negocio.nombre }}</span></span>
+          </a></li>
+          <li><a href="{{ negocio.instagram }}" target="_blank" rel="noopener noreferrer" class="group flex min-h-16 items-center gap-4 border-b border-border py-3 transition-colors duration-150 ease-out-strong hover:bg-surface-1 lg:px-2">
+            {% include "ventas/tienda/_icono.html" with nombre="instagram" clase="size-5 shrink-0 text-text-muted" %}
+            <span class="min-w-0 flex-1"><span class="block text-meta text-text-muted">Instagram</span><span class="block text-lead">{{ instagram_usuario }}</span></span>
+          </a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>

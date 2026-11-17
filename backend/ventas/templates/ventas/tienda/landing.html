@@ -1,3 +1,17 @@
 {% extends "ventas/tienda/base.html" %}
-{% comment %}The landing page (index.html migrated into Django). Placeholder until its migration lands.{% endcomment %}
-{% block contenido %}<h1 class="sr-only">{{ negocio.nombre }}</h1>{% endblock %}
+{% comment %}
+  The landing page of the store: the static index.html migrated into Django (ventas:landing, /).
+  Hero with the looping video, categories, a selection of the real catalogue, the family section,
+  reviews, FAQ, schedule and contact. Real data only: the products come from the catalogue, the
+  business facts from ventas/negocio.py and the reviews are the real ones of the Google profile.
+  Motion is CSS only (scroll-driven entrances under @supports, off with prefers-reduced-motion).
+{% endcomment %}
+{% block contenido %}
+{% include "ventas/tienda/_landing_hero.html" %}
+{% include "ventas/tienda/_landing_categorias.html" %}
+{% include "ventas/tienda/_landing_productos.html" %}
+{% include "ventas/tienda/_landing_familia.html" %}
+{% include "ventas/tienda/_landing_resenas.html" %}
+{% include "ventas/tienda/_landing_preguntas.html" %}
+{% include "ventas/tienda/_landing_contacto.html" %}
+{% endblock %}

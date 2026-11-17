@@ -1,0 +1,20 @@
+{% comment %}"Preguntas frecuentes": native <details> rows (keyboard, state and screen reader for free, no JavaScript).{% endcomment %}
+<section id="preguntas" aria-labelledby="preguntas-titulo" class="scroll-mt-20 border-t border-border py-16 lg:py-24">
+  <div class="mx-auto w-full max-w-7xl px-5 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.6fr)] lg:gap-16 lg:px-6">
+    <div class="lg:sticky lg:top-28 lg:self-start">
+      <h2 id="preguntas-titulo" class="text-seccion">Preguntas frecuentes</h2>
+      <a href="{{ negocio.whatsapp_href }}?text=Hola%2C%20tengo%20una%20pregunta." target="_blank" rel="noopener noreferrer" class="mt-4 inline-flex min-h-11 items-center text-ui text-sand underline underline-offset-4 transition-colors duration-150 ease-out-strong hover:text-text">Escribir por WhatsApp</a>
+    </div>
+    <div class="mt-8 border-t border-border lg:mt-0">
+      {% for pregunta, respuesta in preguntas %}
+      <details name="preguntas" class="group border-b border-border"{% if forloop.first %} open{% endif %}>
+        <summary class="flex min-h-14 cursor-pointer list-none items-center justify-between gap-4 py-3 text-lead font-medium transition-colors duration-150 ease-out-strong hover:text-sand [&::-webkit-details-marker]:hidden">
+          {{ pregunta }}
+          <svg class="shrink-0 text-sand transition-transform duration-200 ease-out-strong group-open:rotate-180 motion-reduce:transition-none" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m6 9 6 6 6-6"/></svg>
+        </summary>
+        <p class="max-w-[64ch] pb-5 pr-10 text-ui text-text-muted">{{ respuesta }}</p>
+      </details>
+      {% endfor %}
+    </div>
+  </div>
+</section>

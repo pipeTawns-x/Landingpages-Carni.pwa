@@ -1,0 +1,22 @@
+{% comment %}
+  Hero: the looping muted video (webm first, mp4 after; the poster is its first real frame). With
+  prefers-reduced-motion the video is hidden and the poster stays as the section background.
+{% endcomment %}<section class="relative isolate flex min-h-[calc(100dvh-4.5rem)] items-end overflow-hidden bg-surface-1 bg-[url('/img/Videos/VideoCarniwebP01-poster.jpg')] bg-cover bg-center">
+  <video class="absolute inset-0 -z-20 size-full object-cover motion-reduce:hidden" autoplay muted loop playsinline preload="metadata" poster="/img/Videos/VideoCarniwebP01-poster.jpg" aria-hidden="true" tabindex="-1">
+    <source src="/img/Videos/VideoCarniwebP01.webm" type="video/webm" />
+    <source src="/img/Videos/VideoCarniwebP01.mp4" type="video/mp4" />
+  </video>
+  <div aria-hidden="true" class="absolute inset-0 -z-10 bg-linear-to-t from-bg via-bg/55 to-bg/20"></div>
+
+  <div class="mx-auto w-full max-w-7xl px-5 pb-14 pt-24 lg:px-6 lg:pb-24">
+    <p class="text-meta tracking-[0.16em] text-sand">CARNICERÍA FAMILIAR · SAN LUIS POTOSÍ</p>
+    <h1 class="mt-4 max-w-[16ch] font-display text-portada font-normal">Carne fresca, cortada como la pides</h1>
+    <p class="mt-5 max-w-[44ch] text-lead text-text-muted">{{ negocio.lema }}.</p>
+    <div class="mt-8 flex flex-col gap-3 sm:flex-row">
+      <a href="{% url 'ventas:catalogo' %}" class="inline-flex h-12 touch-manipulation items-center justify-center rounded-pill bg-red px-8 text-ui font-medium text-white transition-[background-color,scale] duration-150 ease-out-strong hover:bg-red-hover active:scale-[0.97] motion-reduce:transition-none">Ver productos</a>
+      <a href="{{ negocio.whatsapp_href }}?text=Hola%2C%20quiero%20hacer%20un%20pedido." target="_blank" rel="noopener noreferrer" class="inline-flex h-12 items-center justify-center gap-2.5 rounded-pill border border-border-control px-8 text-ui font-medium text-text transition-colors duration-150 ease-out-strong hover:border-sand hover:text-sand">
+        {% include "ventas/tienda/_icono.html" with nombre="whatsapp" clase="size-5 shrink-0" %}Pedir por WhatsApp
+      </a>
+    </div>
+  </div>
+</section>

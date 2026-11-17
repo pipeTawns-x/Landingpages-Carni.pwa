@@ -22,9 +22,10 @@
   <header class="sticky top-0 z-30 border-b border-border bg-bg/85 backdrop-blur-md">
     <div class="mx-auto grid h-18 w-full max-w-7xl grid-cols-[1fr_auto_1fr] items-center px-5 lg:px-6">
       <nav aria-label="Principal" class="flex items-center gap-1">
+        <a href="{% url 'ventas:landing' %}" class="inline-flex min-h-11 items-center px-2 text-ui text-text-muted transition-colors duration-150 hover:text-text{% if request.resolver_match.url_name == 'landing' %} text-text{% endif %}">Inicio</a>
         <a href="{% url 'ventas:catalogo' %}" class="inline-flex min-h-11 items-center px-2 text-ui text-text-muted transition-colors duration-150 hover:text-text{% if request.resolver_match.url_name == 'catalogo' %} text-text{% endif %}">Productos</a>
       </nav>
-      <a href="{% url 'ventas:catalogo' %}" aria-label="{{ negocio.nombre }}, ir a los productos" class="justify-self-center">
+      <a href="{% url 'ventas:landing' %}" aria-label="{{ negocio.nombre }}, ir al inicio" class="justify-self-center">
         {% include "ventas/tienda/_logotipo.html" %}
       </a>
       <div class="flex items-center justify-end gap-1">
