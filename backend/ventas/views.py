@@ -54,13 +54,35 @@ def catalogo(request):
     return render(request, "ventas/tienda/productos.html", _listing(request, CATALOG_PER_PAGE))
 
 
+def _moved_to(name):
+    """A view for an old static address of the store: a 301 to its Django page, query kept."""
+
+    @require_safe
+    def view(request):
+        target = reverse(name)
+        if request.GET:
+            target = f"{target}?{request.GET.urlencode()}"
+        return HttpResponsePermanentRedirect(target)
+
+    view.__name__ = f"moved_to_{name.replace(':', '_')}"
+    return view
+
+
+products_html = _moved_to("ventas:catalogo")
+index_html = _moved_to("ventas:landing")
+accessweb_html = _moved_to("ventas:acceso")
+
+
 @require_safe
-def products_html(request):
-    """The old static address of the catalogue: a permanent redirect that keeps the search."""
-    target = reverse("ventas:catalogo")
-    if request.GET:
-        target = f"{target}?{request.GET.urlencode()}"
-    return HttpResponsePermanentRedirect(target)
+def landing(request):
+    """The store's landing page (the static index.html, migrated into Django)."""
+    return render(request, "ventas/tienda/landing.html")
+
+
+@require_safe
+def acceso(request):
+    """Sign in and sign up, one page (the static accessweb.html, migrated into Django)."""
+    return render(request, "ventas/tienda/acceso.html")
 
 
 # --- The sale at the counter -------------------------------------------------------------------

@@ -169,6 +169,11 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 # and runserver would publish it. See "Panel stylesheet" in backend/README.md.
 STATICFILES_DIRS = [BASE_DIR / "static"]
 
+# Django is the store: the store's public/ folder (product photos, the hero video, icons) is
+# served at the root of the site, as Vite served it, so /img/... keeps working. WhiteNoise serves
+# these files as they are; they are not collected or hashed.
+WHITENOISE_ROOT = BASE_DIR.parent / "public"
+
 # `collectstatic` writes every static file to STATIC_ROOT with a hash in its name and a gzip copy,
 # and WhiteNoise serves them with a cache that never expires: the hash changes with the content.
 # The manifest that maps a name to its hashed name only exists after `collectstatic` (the Render

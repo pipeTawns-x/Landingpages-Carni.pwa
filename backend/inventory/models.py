@@ -13,9 +13,8 @@ table.
 import json
 from decimal import ROUND_HALF_UP, Decimal
 from typing import NoReturn
-from urllib.parse import urljoin, urlsplit
+from urllib.parse import urlsplit
 
-from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from django.db import models
@@ -91,16 +90,23 @@ def default_sale_modes() -> list[str]:
 
 
 def store_image_url(image_url: str | None) -> str:
-    """Return the address the panel can load a product picture from, or "" when it has none.
+    """Return the address a page can load a product picture from, or "" when it has none.
 
-    `image_url` is a path of the store (`/img/products/tomahawk.webp`) and Django does not serve
-    those files, so it is joined to STORE_ORIGIN. An absolute http(s) address is kept as it is.
-    Anything else (`javascript:`, `data:`...) is not a picture the panel will point an <img> at.
+    Django is the store: it serves the store's public/ folder at the root (WHITENOISE_ROOT), so a
+    path such as `/img/products/tomahawk.webp` is a path of this same site and is returned as a
+    root-relative path. An absolute http(s) address is kept as it is. Anything else
+    (`javascript:`, `data:`, a protocol-relative `//host`, a path that climbs with `..`) is not a
+    picture a page will point an <img> at.
     """
     if not image_url or not image_url.strip():
         return ""
-    address = urljoin(f"{settings.STORE_ORIGIN}/", image_url.strip())
-    return address if urlsplit(address).scheme in {"http", "https"} else ""
+    address = image_url.strip()
+    scheme = urlsplit(address).scheme
+    if scheme in {"http", "https"}:
+        return address
+    if scheme or address.startswith("//") or ".." in address.split("/"):
+        return ""
+    return "/" + address.lstrip("/")
 
 
 class Category(models.Model):

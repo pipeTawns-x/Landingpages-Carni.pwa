@@ -235,3 +235,25 @@ class OldStorePathsTests(TestCase):
 
     def test_the_parallel_tienda_route_is_gone(self):
         self.assertEqual(self.client.get("/tienda/").status_code, 404)
+
+
+class MigratedStorePagesTests(TestCase):
+    """index.html and accessweb.html moved into Django: the old addresses answer with a 301."""
+
+    def test_the_old_index_redirects_for_good_to_the_landing(self):
+        response = self.client.get("/index.html")
+
+        self.assertRedirects(response, "/", status_code=301, fetch_redirect_response=False)
+
+    def test_the_old_access_page_redirects_and_keeps_the_logout_signal(self):
+        response = self.client.get("/accessweb.html", {"salir": "1"})
+
+        self.assertEqual(response.status_code, 301)
+        self.assertEqual(response["Location"], "/acceso/?salir=1")
+
+    def test_the_landing_and_the_access_page_use_the_store_frame(self):
+        for url in ("/", "/acceso/"):
+            with self.subTest(url=url):
+                response = self.client.get(url)
+                self.assertEqual(response.status_code, 200)
+                self.assertTemplateUsed(response, "ventas/tienda/base.html")

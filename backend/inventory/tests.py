@@ -19,13 +19,15 @@ import uuid
 from decimal import Decimal
 from html import unescape
 from html.parser import HTMLParser
+from pathlib import Path
 from unittest import mock
 
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.messages import get_messages
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, connection
-from django.test import Client, SimpleTestCase, TestCase, override_settings
+from django.test import Client, SimpleTestCase, TestCase
 from django.test.utils import CaptureQueriesContext
 from django.urls import reverse
 from django.utils.html import strip_tags
@@ -1263,21 +1265,19 @@ class ProductListPageTests(TestCase):
 
 
 class StoreImageUrlTests(SimpleTestCase):
-    """The panel loads the pictures from the store: `store.test` is STORE_ORIGIN under test."""
+    """Django is the store now: it serves the store's public/ folder at the root (WHITENOISE_ROOT),
+    so a product picture is a path of this same site."""
 
-    def test_a_path_of_the_store_is_joined_to_its_origin(self):
+    def test_a_path_of_the_store_is_served_by_this_site(self):
         self.assertEqual(
-            store_image_url("/img/products/tomahawk.webp"),
-            "http://store.test/img/products/tomahawk.webp",
+            store_image_url("/img/products/tomahawk.webp"), "/img/products/tomahawk.webp"
         )
 
-    def test_a_path_without_the_leading_slash_is_joined_too(self):
-        self.assertEqual(
-            store_image_url("img/products/res.webp"), "http://store.test/img/products/res.webp"
-        )
+    def test_a_path_without_the_leading_slash_gets_one(self):
+        self.assertEqual(store_image_url("img/products/res.webp"), "/img/products/res.webp")
 
     def test_whitespace_around_the_path_is_ignored(self):
-        self.assertEqual(store_image_url("  /img/a.webp \n"), "http://store.test/img/a.webp")
+        self.assertEqual(store_image_url("  /img/a.webp \n"), "/img/a.webp")
 
     def test_an_absolute_http_address_is_kept(self):
         self.assertEqual(store_image_url("https://cdn.example/a.png"), "https://cdn.example/a.png")
@@ -1287,22 +1287,26 @@ class StoreImageUrlTests(SimpleTestCase):
             with self.subTest(empty=empty):
                 self.assertEqual(store_image_url(empty), "")
 
-    def test_an_address_that_is_not_http_is_not_a_picture(self):
+    def test_an_address_that_is_not_a_picture_is_refused(self):
         for address in (
             "javascript:alert(1)",
             "data:image/png;base64,AAAA",
             "ftp://x.example/a.png",
+            "//evil.example/a.png",
+            "/../../etc/passwd",
         ):
             with self.subTest(address=address):
                 self.assertEqual(store_image_url(address), "")
 
-    @override_settings(STORE_ORIGIN="https://tienda.example")
-    def test_it_follows_the_origin_of_the_store(self):
-        self.assertEqual(store_image_url("/img/a.webp"), "https://tienda.example/img/a.webp")
-
     def test_the_product_exposes_it_as_image_src(self):
-        self.assertEqual(Product(image_url="/img/a.webp").image_src, "http://store.test/img/a.webp")
+        self.assertEqual(Product(image_url="/img/a.webp").image_src, "/img/a.webp")
         self.assertEqual(Product(image_url=None).image_src, "")
+
+
+class StorePublicFolderTests(SimpleTestCase):
+    def test_django_serves_the_store_public_folder_at_the_root(self):
+        self.assertEqual(Path(settings.WHITENOISE_ROOT).name, "public")
+        self.assertTrue((Path(settings.WHITENOISE_ROOT) / "img").is_dir())
 
 
 class ProductDetailPageTests(TestCase):
@@ -1407,7 +1411,7 @@ class ProductDetailPageTests(TestCase):
     def test_the_picture_comes_from_the_store(self):
         response = self.page()
 
-        self.assertContains(response, '<img src="http://store.test/img/products/tomahawk.webp"')
+        self.assertContains(response, '<img src="/img/products/tomahawk.webp"')
         self.assertIn("Imagen registrada: /img/products/tomahawk.webp", self.text(response))
 
     def test_a_product_without_a_picture_says_so_and_draws_no_img(self):
