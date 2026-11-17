@@ -14,6 +14,7 @@ from functools import wraps
 from django.contrib.auth import get_user_model, login, logout
 from django.contrib.auth.hashers import make_password
 from django.shortcuts import redirect
+from django.views.decorators.cache import never_cache
 
 from panel.models import Profile, ReviewInvite
 from panel.supabase_auth import VerifiedToken
@@ -128,6 +129,7 @@ def panel_admin_required(view):
     """
 
     @wraps(view)
+    @never_cache
     def wrapper(request, *args, **kwargs):
         if not is_panel_admin(request):
             if PANEL_SESSION_KEY in request.session:

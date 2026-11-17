@@ -219,20 +219,22 @@ def invitado_sin_barra(request, token):
 # Not behind `panel_admin_required` on purpose: whoever has a session has to be
 # able to end it, including an admin whose role was just taken away. A POST with
 # Django's CSRF check, so another site cannot sign anyone out.
+@never_cache
 @require_POST
 def salir(request):
     """End the session and send the person to the store login.
 
-    This closes the Django session only. The Supabase one lives in the store's
-    browser storage, so the store has to sign out of Supabase as well.
+    The store's existing exit handler consumes `salir=1` and signs out of
+    Supabase before initializing authentication. Django closes its session here.
     """
     supabase_user_id = request.session.get(PANEL_SESSION_KEY)
     logout(request)
     if supabase_user_id:
         logger.info("Panel session closed for Supabase user %s.", supabase_user_id)
-    return redirect(settings.STORE_LOGIN_URL)
+    return redirect(f"{settings.STORE_LOGIN_URL}?salir=1")
 
 
+@never_cache
 @require_safe
 def acceso(request):
     """The bridge anonymous visitors land on: the sign-in lives in the store.

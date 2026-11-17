@@ -253,8 +253,11 @@ Behaviour worth knowing before touching it:
   of the `panel` app.
 - `panel:salir` is the one panel route that is not behind the decorator, so that
   an admin whose role was just revoked can still sign out. It ends the Django
-  session only: the Supabase one lives in the store's browser storage, so the
-  store has to sign out of Supabase as well.
+  session and redirects to `accessweb.html?salir=1`. The existing store handler
+  consumes this signal and signs out of Supabase before authentication initializes.
+  Protected panel views, access redirects and logout responses send `Cache-Control:
+  no-store, private` through Django's `never_cache` decorator. This prevents HTTP
+  cache reuse; browser back/forward restoration still needs browser acceptance.
 - The view is `csrf_exempt` because the form that posts to it lives on the
   store, another origin, which cannot read Django's CSRF token. The origin
   allow-list and the token itself stand in for it.

@@ -940,7 +940,9 @@ class LogoutTests(TestCase):
     def test_it_ends_the_session_and_goes_to_the_store_login(self):
         response = self.client.post(self.url)
 
-        self.assertRedirects(response, settings.STORE_LOGIN_URL, fetch_redirect_response=False)
+        self.assertRedirects(
+            response, f"{settings.STORE_LOGIN_URL}?salir=1", fetch_redirect_response=False
+        )
         self.assertNotIn("_auth_user_id", self.client.session)
         self.assertNotIn(PANEL_SESSION_KEY, self.client.session)
 
@@ -971,7 +973,9 @@ class LogoutTests(TestCase):
 
         response = client.post(self.url, HTTP_X_CSRFTOKEN=token)
 
-        self.assertRedirects(response, settings.STORE_LOGIN_URL, fetch_redirect_response=False)
+        self.assertRedirects(
+            response, f"{settings.STORE_LOGIN_URL}?salir=1", fetch_redirect_response=False
+        )
         self.assertNotIn("_auth_user_id", client.session)
 
     def test_a_null_origin_fails_the_csrf_check(self):
@@ -992,13 +996,17 @@ class LogoutTests(TestCase):
 
         response = self.client.post(self.url)
 
-        self.assertRedirects(response, settings.STORE_LOGIN_URL, fetch_redirect_response=False)
+        self.assertRedirects(
+            response, f"{settings.STORE_LOGIN_URL}?salir=1", fetch_redirect_response=False
+        )
         self.assertNotIn("_auth_user_id", self.client.session)
 
     def test_a_visitor_without_a_session_is_just_sent_to_the_store(self):
         response = Client().post(self.url)
 
-        self.assertRedirects(response, settings.STORE_LOGIN_URL, fetch_redirect_response=False)
+        self.assertRedirects(
+            response, f"{settings.STORE_LOGIN_URL}?salir=1", fetch_redirect_response=False
+        )
 
     def test_a_django_user_made_some_other_way_can_log_out_too(self):
         client = Client()
@@ -1013,6 +1021,34 @@ class LogoutTests(TestCase):
             self.client.post(self.url)
 
         self.assertIn(str(self.admin_id), "\n".join(logs.output))
+
+
+class LogoutCacheRegressionTests(TestCase):
+    """The store logout signal and protected responses form one exit contract."""
+
+    def setUp(self):
+        sign_in_as_panel_admin(self.client)
+
+    def test_logout_redirect_is_not_cacheable(self):
+        response = self.client.post(reverse("panel:salir"))
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("no-store", response.get("Cache-Control", ""))
+        self.assertIn("private", response.get("Cache-Control", ""))
+
+    def test_protected_page_and_denial_are_not_cacheable(self):
+        url = reverse("panel:mas")
+        before = self.client.get(url)
+        self.assertEqual(before.status_code, 200)
+        self.assertIn("no-store", before.get("Cache-Control", ""))
+        self.client.post(reverse("panel:salir"))
+        after = self.client.get(url)
+        self.assertRedirects(after, reverse("panel:acceso"), fetch_redirect_response=False)
+        self.assertIn("no-store", after.get("Cache-Control", ""))
+
+    def test_access_bridge_does_not_cache_or_request_logout(self):
+        response = Client().get(reverse("panel:acceso"))
+        self.assertRedirects(response, settings.STORE_LOGIN_URL, fetch_redirect_response=False)
+        self.assertIn("no-store", response.get("Cache-Control", ""))
 
 
 class CookieAndHeaderTests(TestCase):

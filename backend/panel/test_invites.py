@@ -853,7 +853,9 @@ class InviteSessionLifetimeTests(TestCase):
 
         response = self.client.post(reverse("panel:salir"))
 
-        self.assertRedirects(response, settings.STORE_LOGIN_URL, fetch_redirect_response=False)
+        self.assertRedirects(
+            response, f"{settings.STORE_LOGIN_URL}?salir=1", fetch_redirect_response=False
+        )
         self.assertFalse(has_session(self.client))
 
 
