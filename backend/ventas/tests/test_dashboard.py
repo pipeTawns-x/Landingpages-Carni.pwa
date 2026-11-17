@@ -278,6 +278,15 @@ class BoardTests(SalesTestCase):
         self.assertRedirects(response, reverse("panel:acceso"), fetch_redirect_response=False)
         self.assertEqual(self.gateway.moves, [])
 
+    def test_a_name_typed_by_a_web_customer_is_drawn_as_text(self):
+        # A web order carries the name a stranger typed on the store, and the board shows it.
+        make_order("pending", "<script>alert(1)</script>", channel="web")
+
+        html = self.client.get(self.url).content.decode()
+
+        self.assertIn("&lt;script&gt;alert(1)&lt;/script&gt;", html)
+        self.assertNotIn("<script>alert(1)", html)
+
     def test_it_works_without_javascript(self):
         make_order("pending")
 
