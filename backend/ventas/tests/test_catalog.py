@@ -200,7 +200,9 @@ class OldStorePathsTests(TestCase):
     def test_the_old_products_page_redirects_for_good_to_the_django_one(self):
         response = self.client.get("/products.html")
 
-        self.assertRedirects(response, "/productos/", status_code=301, fetch_redirect_response=False)
+        self.assertRedirects(
+            response, "/productos/", status_code=301, fetch_redirect_response=False
+        )
 
     def test_the_old_redirect_keeps_the_search(self):
         response = self.client.get("/products.html", {"q": "ribeye"})
