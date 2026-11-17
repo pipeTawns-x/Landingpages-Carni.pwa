@@ -1,8 +1,8 @@
 """Tests of the styles of the sales pages.
 
 The panel stylesheet is compiled with Tailwind inside Docker and committed, so a class that it
-does not define draws nothing. The sales pages use what it already defines plus
-`static/ventas/ventas.css`, written by hand on the same tokens, and these tests keep both honest.
+does not define draws nothing. The sales pages use Tailwind utilities only: the hand-written
+`static/ventas/ventas.css` and its `v-` classes are gone; these tests keep them gone.
 """
 
 import re
@@ -16,7 +16,9 @@ from panel.test_stylesheet import classes_missing_from
 
 TEMPLATES = Path(settings.BASE_DIR) / "ventas" / "templates" / "ventas"
 PANEL_CSS = "panel/panel.css"
-VENTAS_CSS = "ventas/ventas.css"
+# The public store templates live in ventas/tienda/ and have their own tests.
+PANEL_TEMPLATES = sorted(TEMPLATES.glob("*.html"))
+V_CLASS = re.compile(r"""class="[^"]*(?<![\w-])v-[a-z]""")
 
 
 def read_static(path):
@@ -27,23 +29,30 @@ def read_static(path):
 
 
 class SalesStylesTests(SimpleTestCase):
-    def test_the_stylesheet_is_served(self):
-        self.assertIsNotNone(finders.find(VENTAS_CSS))
+    def test_the_hand_written_stylesheet_is_gone(self):
+        self.assertIsNone(finders.find("ventas/ventas.css"))
 
-    def test_it_uses_the_tokens_of_the_store_and_nothing_remote(self):
-        css = read_static(VENTAS_CSS)
+    def test_no_template_of_the_sales_pages_links_it_or_uses_a_v_class(self):
+        self.assertGreaterEqual(len(PANEL_TEMPLATES), 4)
+        for template in PANEL_TEMPLATES:
+            html = template.read_text(encoding="utf-8")
+            with self.subTest(template=template.name):
+                self.assertNotIn("ventas.css", html)
+                self.assertIsNone(V_CLASS.search(html))
 
-        self.assertIn("var(--color-", css)
-        self.assertNotRegex(css, r"@import|https?://")
-        # No colour of its own: every colour is a token of the palette.
-        self.assertEqual(re.findall(r"#[0-9a-fA-F]{3,8}\b", css), [])
+    def test_every_class_of_every_template_is_defined_in_the_panel_stylesheet(self):
+        css = read_static(PANEL_CSS)
 
-    def test_every_class_of_every_template_is_defined_in_one_of_the_two_stylesheets(self):
-        css = read_static(PANEL_CSS) + read_static(VENTAS_CSS)
-        templates = sorted(TEMPLATES.glob("*.html"))
-
-        self.assertGreaterEqual(len(templates), 3)
-        for template in templates:
+        for template in PANEL_TEMPLATES:
             with self.subTest(template=template.name):
                 missing = classes_missing_from(css, template.read_text(encoding="utf-8"))
                 self.assertEqual(missing, [])
+
+    def test_the_steps_of_the_bars_are_classes_of_the_stylesheet(self):
+        css = read_static(PANEL_CSS)
+        for template in ("_step_h.html", "_step_w.html"):
+            prefix = "h" if template == "_step_h.html" else "w"
+            for step in range(1, 11):
+                with self.subTest(template=template, step=step):
+                    name = f".{prefix}-\\[{step * 10}\\%\\]"
+                    self.assertIn(name, css)

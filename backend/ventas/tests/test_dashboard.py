@@ -102,7 +102,7 @@ class HomeTests(SalesTestCase):
 
         html = self.client.get(self.url).content.decode()
 
-        bars = re.findall(r'class="v-bar v-bar--(\d+)"', html)
+        bars = re.findall(r'data-bar="height" data-step="(\d+)"', html)
         self.assertEqual(len(bars), 7)
         self.assertEqual(bars[-1], "10")
         self.assertEqual(bars[0], "0")

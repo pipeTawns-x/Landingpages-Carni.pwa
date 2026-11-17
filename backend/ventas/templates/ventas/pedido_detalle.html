@@ -1,60 +1,58 @@
 {% extends "panel/base.html" %}
-{% load static %}
 {% comment %}
   One order as the store registered it (/panel/ventas/pedidos/<uuid>/, ventas:pedido_detalle). It
   reads the `panel_orders` view and never writes: the status changes from the orders board.
 {% endcomment %}
 {% block title %}<title>Pedido {{ order.short_id }} · Panel · Carnicería El Señor de La Misericordia</title>{% endblock %}
-{% block head_extra %}<link rel="stylesheet" href="{% static 'ventas/ventas.css' %}" />{% endblock %}
 {% block titulo %}Pedido {{ order.short_id }}{% endblock %}
-{% block accion %}<a class="v-chip" href="{% url 'ventas:nueva' %}">Nueva venta</a>{% endblock %}
+{% block accion %}<a class="inline-flex min-h-11 items-center justify-center gap-2 whitespace-nowrap rounded-control border border-border-control bg-surface-2 px-3 text-ui text-text transition-[background-color,scale] duration-160 ease-out-strong hover:bg-surface-3 active:scale-[0.97] motion-reduce:transition-none" href="{% url 'ventas:nueva' %}">Nueva venta</a>{% endblock %}
 {% block contenido %}
-<div class="v-grid">
-  <section class="v-card" aria-labelledby="cliente-titulo">
-    <h2 id="cliente-titulo" class="v-card__title">Cliente y entrega</h2>
-    <dl class="v-dl">
-      <div><dt>Estado</dt><dd><span class="v-badge">{{ status_label }}</span></dd></div>
-      <div><dt>Cliente</dt><dd>{{ order.customer_name|default:"Sin nombre" }}</dd></div>
-      <div><dt>Teléfono</dt><dd>{{ order.customer_phone|default:"Sin teléfono" }}</dd></div>
-      <div><dt>Canal</dt><dd>{{ channel_label }}</dd></div>
-      <div><dt>Pago</dt><dd>{{ payment_label }}</dd></div>
-      <div><dt>Entrega</dt><dd>{{ delivery_label }}{% if address %} · {{ address }}{% endif %}</dd></div>
-      <div><dt>Notas</dt><dd>{{ order.notes|default:"Sin notas" }}</dd></div>
-      <div><dt>Registrado</dt><dd>{{ order.created_at|date:"d/m/Y H:i" }}</dd></div>
+<div class="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-6">
+  <section class="flex min-w-0 flex-col gap-4 rounded-card border border-border bg-surface-1 p-4 lg:p-6" aria-labelledby="cliente-titulo">
+    <h2 id="cliente-titulo" class="font-display text-titulo">Cliente y entrega</h2>
+    <dl class="flex flex-col divide-y divide-border">
+      <div class="flex flex-col gap-0.5 py-2 sm:flex-row sm:gap-4"><dt class="text-meta text-text-muted sm:w-32 sm:shrink-0">Estado</dt><dd class="min-w-0 break-words text-ui text-text"><span class="inline-flex h-6 items-center rounded-control border border-border bg-surface-2 px-2 text-meta font-semibold">{{ status_label }}</span></dd></div>
+      <div class="flex flex-col gap-0.5 py-2 sm:flex-row sm:gap-4"><dt class="text-meta text-text-muted sm:w-32 sm:shrink-0">Cliente</dt><dd class="min-w-0 break-words text-ui text-text">{{ order.customer_name|default:"Sin nombre" }}</dd></div>
+      <div class="flex flex-col gap-0.5 py-2 sm:flex-row sm:gap-4"><dt class="text-meta text-text-muted sm:w-32 sm:shrink-0">Teléfono</dt><dd class="min-w-0 break-words text-ui text-text">{{ order.customer_phone|default:"Sin teléfono" }}</dd></div>
+      <div class="flex flex-col gap-0.5 py-2 sm:flex-row sm:gap-4"><dt class="text-meta text-text-muted sm:w-32 sm:shrink-0">Canal</dt><dd class="min-w-0 break-words text-ui text-text">{{ channel_label }}</dd></div>
+      <div class="flex flex-col gap-0.5 py-2 sm:flex-row sm:gap-4"><dt class="text-meta text-text-muted sm:w-32 sm:shrink-0">Pago</dt><dd class="min-w-0 break-words text-ui text-text">{{ payment_label }}</dd></div>
+      <div class="flex flex-col gap-0.5 py-2 sm:flex-row sm:gap-4"><dt class="text-meta text-text-muted sm:w-32 sm:shrink-0">Entrega</dt><dd class="min-w-0 break-words text-ui text-text">{{ delivery_label }}{% if address %} · {{ address }}{% endif %}</dd></div>
+      <div class="flex flex-col gap-0.5 py-2 sm:flex-row sm:gap-4"><dt class="text-meta text-text-muted sm:w-32 sm:shrink-0">Notas</dt><dd class="min-w-0 break-words text-ui text-text">{{ order.notes|default:"Sin notas" }}</dd></div>
+      <div class="flex flex-col gap-0.5 py-2 sm:flex-row sm:gap-4"><dt class="text-meta text-text-muted sm:w-32 sm:shrink-0">Registrado</dt><dd class="min-w-0 break-words text-ui text-text">{{ order.created_at|date:"d/m/Y H:i" }}</dd></div>
     </dl>
     {% if order.moves %}
-    <div class="v-moves">
+    <div class="flex flex-wrap gap-2">
       {% for to, label in order.moves %}
-      <form class="v-inline" method="post" action="{% url 'orders:mover' order.pk %}">
+      <form method="post" action="{% url 'orders:mover' order.pk %}">
         {% csrf_token %}
         <input type="hidden" name="status" value="{{ to }}">
         <input type="hidden" name="next" value="{{ request.path }}">
-        <button class="v-btn {% if to == 'cancelled' %}v-btn--danger{% else %}v-btn--primary{% endif %}" type="submit">{{ label }}</button>
+        <button class="{% if to == 'cancelled' %}inline-flex items-center justify-center gap-2 rounded-pill text-ui font-semibold transition-[background-color,scale] duration-160 ease-out-strong active:scale-[0.97] motion-reduce:transition-none shrink-0 min-h-11 px-4 border border-danger text-red-text hover:bg-surface-2{% else %}inline-flex items-center justify-center gap-2 rounded-pill text-ui font-semibold transition-[background-color,scale] duration-160 ease-out-strong active:scale-[0.97] motion-reduce:transition-none shrink-0 min-h-11 px-4 bg-red text-white hover:bg-red-hover{% endif %}" type="submit">{{ label }}</button>
       </form>
       {% endfor %}
     </div>
     {% endif %}
   </section>
 
-  <section class="v-card" aria-labelledby="lineas-titulo">
-    <h2 id="lineas-titulo" class="v-card__title">Productos</h2>
-    <ul class="v-cart" role="list">
+  <section class="flex min-w-0 flex-col gap-4 rounded-card border border-border bg-surface-1 p-4 lg:p-6" aria-labelledby="lineas-titulo">
+    <h2 id="lineas-titulo" class="font-display text-titulo">Productos</h2>
+    <ul role="list" class="flex flex-col gap-3">
       {% for line in order.lines %}
-      <li class="v-cart__line">
-        <div class="v-product__head">
-          <span class="v-product__name">{{ line.product_name }}</span>
-          <span class="v-num">${{ line.subtotal }}</span>
+      <li class="flex flex-col gap-2 rounded-control border border-border bg-surface-2 p-3">
+        <div class="flex items-start justify-between gap-3">
+          <span class="min-w-0 font-semibold text-text">{{ line.product_name }}</span>
+          <span class="font-semibold tabular-nums">${{ line.subtotal }}</span>
         </div>
-        <p class="v-muted">{{ line.quantity_kg }} kg{% if line.pieces %} · {{ line.pieces }} piezas{% endif %} · ${{ line.unit_price }} el kilo</p>
-        {% if line.note %}<p class="v-muted">Nota: {{ line.note }}</p>{% endif %}
+        <p class="text-meta text-text-muted">{{ line.quantity_kg }} kg{% if line.pieces %} · {{ line.pieces }} piezas{% endif %} · ${{ line.unit_price }} el kilo</p>
+        {% if line.note %}<p class="text-meta text-text-muted">Nota: {{ line.note }}</p>{% endif %}
       </li>
       {% endfor %}
     </ul>
-    <dl class="v-totals">
-      <div class="v-total"><dt>Total</dt><dd class="v-num">${{ order.total_mxn }} MXN</dd></div>
+    <dl class="flex flex-col gap-2 border-t border-border pt-3">
+      <div class="flex items-baseline justify-between gap-3 text-lead"><dt>Total</dt><dd class="font-semibold tabular-nums">${{ order.total_mxn }} MXN</dd></div>
       {% if order.currency == "USD" %}
-      <div class="v-total"><dt>Cobro en USD</dt><dd class="v-num">US${{ order.total_usd }}</dd></div>
-      {% if order.fx_rate_used %}<div class="v-total"><dt>Tipo de cambio</dt><dd class="v-num">{{ order.fx_rate_used }}</dd></div>{% endif %}
+      <div class="flex items-baseline justify-between gap-3 text-lead"><dt>Cobro en USD</dt><dd class="font-semibold tabular-nums">US${{ order.total_usd }}</dd></div>
+      {% if order.fx_rate_used %}<div class="flex items-baseline justify-between gap-3 text-lead"><dt>Tipo de cambio</dt><dd class="font-semibold tabular-nums">{{ order.fx_rate_used }}</dd></div>{% endif %}
       {% endif %}
     </dl>
   </section>

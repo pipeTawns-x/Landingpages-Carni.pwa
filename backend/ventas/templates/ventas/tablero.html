@@ -1,38 +1,36 @@
 {% extends "panel/base.html" %}
-{% load static %}
 {% comment %}
   The orders board (/panel/pedidos/, orders:board): one column per status. Each card offers only
   the moves `set_order_status` allows from its status; the function checks them again and moves
   the stock when an order is confirmed.
 {% endcomment %}
 {% block title %}<title>Pedidos · Panel · Carnicería El Señor de La Misericordia</title>{% endblock %}
-{% block head_extra %}<link rel="stylesheet" href="{% static 'ventas/ventas.css' %}" />{% endblock %}
 {% block titulo %}Pedidos{% endblock %}
-{% block accion %}<a class="v-btn v-btn--primary" href="{% url 'ventas:nueva' %}">Nueva venta</a>{% endblock %}
+{% block accion %}<a class="inline-flex items-center justify-center gap-2 rounded-pill text-ui font-semibold transition-[background-color,scale] duration-160 ease-out-strong active:scale-[0.97] motion-reduce:transition-none shrink-0 min-h-12 px-6 bg-red text-white hover:bg-red-hover" href="{% url 'ventas:nueva' %}">Nueva venta</a>{% endblock %}
 {% block contenido %}
-<div class="v-board">
+<div class="grid grid-cols-1 gap-4 pb-2 md:grid-cols-[repeat(auto-fill,minmax(15rem,1fr))]">
   {% for column in columns %}
-  <section class="v-column" aria-labelledby="col-{{ column.status }}">
-    <h2 id="col-{{ column.status }}" class="v-column__head">
+  <section class="flex min-w-0 flex-col gap-3 rounded-card border border-border bg-surface-1 p-3.5" aria-labelledby="col-{{ column.status }}">
+    <h2 id="col-{{ column.status }}" class="flex items-center justify-between gap-2 font-sans text-ui font-semibold">
       <span>{{ column.label }}</span>
-      <span class="v-badge">{{ column.orders|length }}</span>
+      <span class="inline-flex h-6 items-center rounded-control border border-border bg-surface-2 px-2 text-meta font-semibold">{{ column.orders|length }}</span>
     </h2>
     {% if column.orders %}
-    <ul class="v-cart" role="list">
+    <ul role="list" class="flex flex-col gap-3 md:max-h-[60vh] md:overflow-y-auto md:overscroll-contain">
       {% for order in column.orders %}
-      <li class="v-order-card">
-        <div class="v-product__head">
-          <a class="v-link" href="{% url 'ventas:pedido_detalle' order.pk %}">{{ order.customer_name|default:"Sin nombre" }}</a>
-          <span class="v-num">${{ order.total_mxn }}</span>
+      <li class="flex flex-col gap-2 rounded-control border border-border bg-surface-2 p-3">
+        <div class="flex items-start justify-between gap-3">
+          <a class="font-semibold text-text underline decoration-transparent underline-offset-4 transition-colors duration-160 hover:decoration-sand" href="{% url 'ventas:pedido_detalle' order.pk %}">{{ order.customer_name|default:"Sin nombre" }}</a>
+          <span class="font-semibold tabular-nums">${{ order.total_mxn }}</span>
         </div>
-        <p class="v-muted">{{ order.short_id }} · {{ order.channel_label }} · {{ order.created_at|date:"d/m H:i" }}</p>
+        <p class="text-meta text-text-muted">{{ order.short_id }} · {{ order.channel_label }} · {{ order.created_at|date:"d/m H:i" }}</p>
         {% if order.moves %}
-        <div class="v-moves">
+        <div class="flex flex-wrap gap-2">
           {% for to, label in order.moves %}
-          <form class="v-inline" method="post" action="{% url 'orders:mover' order.pk %}">
+          <form method="post" action="{% url 'orders:mover' order.pk %}">
             {% csrf_token %}
             <input type="hidden" name="status" value="{{ to }}">
-            <button class="v-btn {% if to == 'cancelled' %}v-btn--danger{% else %}v-btn--ghost{% endif %}" type="submit">{{ label }}</button>
+            <button class="{% if to == 'cancelled' %}inline-flex items-center justify-center gap-2 rounded-pill text-ui font-semibold transition-[background-color,scale] duration-160 ease-out-strong active:scale-[0.97] motion-reduce:transition-none shrink-0 min-h-11 px-4 border border-danger text-red-text hover:bg-surface-2{% else %}inline-flex items-center justify-center gap-2 rounded-pill text-ui font-semibold transition-[background-color,scale] duration-160 ease-out-strong active:scale-[0.97] motion-reduce:transition-none shrink-0 min-h-11 px-4 border border-sand text-text hover:bg-surface-2{% endif %}" type="submit">{{ label }}</button>
           </form>
           {% endfor %}
         </div>
@@ -41,7 +39,7 @@
       {% endfor %}
     </ul>
     {% else %}
-    <p class="v-muted">Sin pedidos.</p>
+    <p class="text-meta text-text-muted">Sin pedidos.</p>
     {% endif %}
   </section>
   {% endfor %}
