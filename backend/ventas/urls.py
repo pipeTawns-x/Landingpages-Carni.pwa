@@ -7,7 +7,10 @@ from ventas import views
 app_name = "ventas"
 
 urlpatterns = [
-    path("tienda/", views.catalogo, name="catalogo"),
+    # The store's products.html, migrated into Django. The old address answers with a 301 so
+    # links, bookmarks and the service worker of the PWA land on the new page.
+    path("productos/", views.catalogo, name="catalogo"),
+    path("products.html", views.products_html, name="products_html"),
     path("panel/ventas/nueva/", views.nueva, name="nueva"),
     path("panel/ventas/carrito/agregar/<int:pk>/", views.carrito_agregar, name="carrito_agregar"),
     path(

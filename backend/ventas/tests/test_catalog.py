@@ -1,4 +1,6 @@
-"""Tests of the public catalogue (`ventas:catalogo`, /tienda/): what a common user sees.
+"""Tests of the public catalogue (`ventas:catalogo`, /productos/): what a common user sees.
+
+It is the store's products.html, migrated into Django: the same page, served by the M16 view.
 
 Anyone may open it, signed in or not. It lists the active products of the real catalogue, never
 shows what the store keeps private (the cost, the inactive products) and never talks to the
@@ -53,14 +55,14 @@ class PublicCatalogTests(TestCase):
         patcher.start()
         self.addCleanup(patcher.stop)
 
-    def test_it_lives_at_tienda(self):
-        self.assertEqual(self.url, "/tienda/")
+    def test_it_lives_at_productos(self):
+        self.assertEqual(self.url, "/productos/")
 
     def test_an_anonymous_visitor_sees_the_active_products_with_their_price_and_unit(self):
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "ventas/catalogo.html")
+        self.assertTemplateUsed(response, "ventas/tienda/productos.html")
         for name in ("Bistec", "Molida", "Camiseta", "Ribeye"):
             self.assertContains(response, name)
         self.assertContains(response, "200.00")
@@ -89,7 +91,7 @@ class PublicCatalogTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Bistec")
-        self.assertTemplateUsed(response, "ventas/catalogo.html")
+        self.assertTemplateUsed(response, "ventas/tienda/productos.html")
 
     def test_the_page_is_not_the_panel_and_does_not_point_to_it(self):
         response = self.client.get(self.url)
@@ -158,3 +160,53 @@ class PublicCatalogTests(TestCase):
 
     def test_only_a_read_is_allowed(self):
         self.assertEqual(self.client.post(self.url).status_code, 405)
+
+
+class StoreFrameTests(TestCase):
+    """The frame every public page shares: the header with the brand and the elegant footer."""
+
+    def setUp(self):
+        make_store()
+        self.response = self.client.get(reverse("ventas:catalogo"))
+
+    def test_the_page_extends_the_store_frame(self):
+        self.assertTemplateUsed(self.response, "ventas/tienda/base.html")
+
+    def test_the_header_carries_the_brand_title(self):
+        self.assertContains(self.response, "CARNICERÍA")
+        self.assertContains(self.response, "EL SEÑOR DE LA MISERICORDIA")
+
+    def test_the_footer_carries_the_contact_of_the_business(self):
+        for text in (
+            "+52 444 271 5470",
+            "https://wa.me/524442715470",
+            "Agua Marina 110, Manuel J. Othón",
+            "Siempre contando con la mejor calidad y frescura",
+            "© 2026 Carnicería El Señor de La Misericordia",
+        ):
+            with self.subTest(text=text):
+                self.assertContains(self.response, text)
+
+    def test_the_footer_links_point_to_the_django_pages(self):
+        self.assertContains(self.response, f'href="{reverse("ventas:catalogo")}"')
+
+    def test_it_links_the_store_stylesheet_and_not_the_panel_one(self):
+        self.assertContains(self.response, "tienda/tienda.css")
+        self.assertNotContains(self.response, "panel/panel.css")
+        self.assertNotContains(self.response, "ventas/ventas.css")
+
+
+class OldStorePathsTests(TestCase):
+    def test_the_old_products_page_redirects_for_good_to_the_django_one(self):
+        response = self.client.get("/products.html")
+
+        self.assertRedirects(response, "/productos/", status_code=301, fetch_redirect_response=False)
+
+    def test_the_old_redirect_keeps_the_search(self):
+        response = self.client.get("/products.html", {"q": "ribeye"})
+
+        self.assertEqual(response.status_code, 301)
+        self.assertEqual(response["Location"], "/productos/?q=ribeye")
+
+    def test_the_parallel_tienda_route_is_gone(self):
+        self.assertEqual(self.client.get("/tienda/").status_code, 404)

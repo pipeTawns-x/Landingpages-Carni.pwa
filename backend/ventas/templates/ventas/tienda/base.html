@@ -1,0 +1,44 @@
+{% load static %}<!DOCTYPE html>
+{% comment %}
+  Frame of every public page of the store once it moved into Django: header with the written
+  brand, <main>, and the footer. Styled only by the store's Tailwind build (tienda/tienda.css,
+  compiled from backend/assets/tienda.css on the shared tokens). Pages fill the blocks `title`
+  (the whole <title> element), `descripcion` and `contenido`.
+{% endcomment %}
+<html lang="es-MX">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0B0B0C" />
+  <meta name="color-scheme" content="dark" />
+  {% block title %}<title>{{ negocio.nombre }}</title>{% endblock %}
+  <meta name="description" content="{% block descripcion %}{{ negocio.nombre }}: {{ negocio.lema|lower }}. Cortes de res, cerdo y pollo en San Luis Potosí.{% endblock %}" />
+  <link rel="stylesheet" href="{% static 'tienda/tienda.css' %}" />
+  {% block head_extra %}{% endblock %}
+</head>
+<body class="min-h-dvh bg-bg text-text">
+  <a href="#contenido" class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-control focus:bg-surface-1 focus:px-4 focus:py-2">Saltar al contenido</a>
+
+  <header class="sticky top-0 z-30 border-b border-border bg-bg/85 backdrop-blur-md">
+    <div class="mx-auto grid h-18 w-full max-w-7xl grid-cols-[1fr_auto_1fr] items-center px-5 lg:px-6">
+      <nav aria-label="Principal" class="flex items-center gap-1">
+        <a href="{% url 'ventas:catalogo' %}" class="inline-flex min-h-11 items-center px-2 text-ui text-text-muted transition-colors duration-150 hover:text-text{% if request.resolver_match.url_name == 'catalogo' %} text-text{% endif %}">Productos</a>
+      </nav>
+      <a href="{% url 'ventas:catalogo' %}" aria-label="{{ negocio.nombre }}, ir a los productos" class="justify-self-center">
+        {% include "ventas/tienda/_logotipo.html" %}
+      </a>
+      <div class="flex items-center justify-end gap-1">
+        <a href="{% url 'ventas:catalogo' %}#buscar" aria-label="Buscar un corte" class="inline-grid size-11 place-items-center text-text transition-colors duration-150 hover:text-sand">
+          {% include "ventas/tienda/_icono.html" with nombre="buscar" clase="size-5" %}
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main id="contenido">
+    {% block contenido %}{% endblock %}
+  </main>
+
+  {% include "ventas/tienda/_pie.html" %}
+</body>
+</html>

@@ -1,0 +1,65 @@
+{% extends "ventas/tienda/base.html" %}
+{% comment %}
+  The store's catalogue ("la web products"), migrated from the static products.html into Django:
+  the M16 product list of the `ventas` app (ventas:catalogo, /productos/). It reads the active
+  products of the real catalogue and nothing private (no cost, no inactive product), it never calls
+  the database functions, and it works without JavaScript: the search and the category filter are
+  a plain GET form.
+{% endcomment %}
+{% block title %}<title>Productos · {{ negocio.nombre }}</title>{% endblock %}
+{% block contenido %}
+<section class="border-b border-border">
+  <div class="mx-auto w-full max-w-7xl px-5 pb-10 pt-12 lg:px-6 lg:pb-14 lg:pt-20">
+    <p class="text-meta tracking-[0.16em] text-sand">NUESTROS CORTES</p>
+    <h1 class="mt-3 max-w-[18ch] font-display text-seccion font-normal">Productos frescos, pieza por pieza</h1>
+
+    <form id="buscar" method="get" action="{% url 'ventas:catalogo' %}" role="search" class="mt-8 grid gap-3 sm:grid-cols-[minmax(0,1fr)_14rem_auto]">
+      <label class="sr-only" for="buscar-q">Buscar</label>
+      <input id="buscar-q" type="search" name="q" value="{{ query }}" placeholder="Buscar corte o producto" autocomplete="off" class="min-h-12 w-full rounded-control border border-border bg-surface-1 px-4 text-ui text-text placeholder:text-text-muted focus:border-sand" />
+      <label class="sr-only" for="buscar-categoria">Categoría</label>
+      <select id="buscar-categoria" name="category" class="min-h-12 w-full rounded-control border border-border bg-surface-1 px-4 text-ui text-text">
+        <option value="">Todas las categorías</option>
+        {% for category in categories %}
+        <option value="{{ category.pk }}"{% if selected_category == category.pk|stringformat:"d" %} selected{% endif %}>{{ category.name }}</option>
+        {% endfor %}
+      </select>
+      <button type="submit" class="min-h-12 rounded-pill bg-red px-6 text-ui font-medium text-text transition-colors duration-150 hover:bg-red-hover">Buscar</button>
+    </form>
+
+    {% if categories %}
+    <nav aria-label="Categorías" class="mt-6 flex flex-wrap gap-2">
+      <a href="{% url 'ventas:catalogo' %}{% if query %}?q={{ query|urlencode }}{% endif %}" class="inline-flex min-h-10 items-center rounded-control border px-4 text-meta transition-colors duration-150 {% if not selected_category %}border-sand text-sand{% else %}border-border text-text-muted hover:text-text{% endif %}">Todas</a>
+      {% for category in categories %}
+      <a href="?category={{ category.pk }}{% if query %}&amp;q={{ query|urlencode }}{% endif %}" class="inline-flex min-h-10 items-center rounded-control border px-4 text-meta transition-colors duration-150 {% if selected_category == category.pk|stringformat:'d' %}border-sand text-sand{% else %}border-border text-text-muted hover:text-text{% endif %}">{{ category.name }}</a>
+      {% endfor %}
+    </nav>
+    {% endif %}
+  </div>
+</section>
+
+<section class="mx-auto w-full max-w-7xl px-5 py-12 lg:px-6 lg:py-16">
+  {% if page_obj %}
+  <ul role="list" class="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+    {% for product in page_obj %}
+    <li class="group flex flex-col">
+      <div class="aspect-[4/3] overflow-hidden rounded-control bg-surface-1">
+        {% if product.image_src %}<img src="{{ product.image_src }}" alt="{{ product.name }}" loading="lazy" width="480" height="360" class="size-full object-cover transition-transform duration-500 ease-out-strong group-hover:scale-[1.03]" />{% endif %}
+      </div>
+      <p class="mt-4 text-meta tracking-[0.12em] text-text-muted">{{ product.category.name|upper }}</p>
+      <h2 class="mt-1 font-display text-lead font-normal">{{ product.name }}</h2>
+      {% if product.description %}<p class="mt-2 line-clamp-2 text-ui text-text-muted">{{ product.description }}</p>{% endif %}
+      <p class="mt-3 text-ui font-medium text-sand">${{ product.price_per_kg }} / {{ product.unit_label }}</p>
+    </li>
+    {% endfor %}
+  </ul>
+
+  <nav aria-label="Páginas del catálogo" class="mt-14 flex items-center justify-between border-t border-border pt-6 text-meta">
+    {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}&amp;q={{ query|urlencode }}&amp;category={{ selected_category }}" class="inline-flex min-h-11 items-center text-text hover:text-sand">Anterior</a>{% else %}<span></span>{% endif %}
+    <span class="text-text-muted">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}&amp;q={{ query|urlencode }}&amp;category={{ selected_category }}" class="inline-flex min-h-11 items-center text-text hover:text-sand">Siguiente</a>{% else %}<span></span>{% endif %}
+  </nav>
+  {% else %}
+  <p class="py-16 text-center text-lead text-text-muted">No encontramos productos con esa búsqueda.</p>
+  {% endif %}
+</section>
+{% endblock %}

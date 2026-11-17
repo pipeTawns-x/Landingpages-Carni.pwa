@@ -99,6 +99,7 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "panel.context_processors.store_origin",
+                "ventas.context_processors.negocio",
             ],
         },
     },

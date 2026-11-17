@@ -1,0 +1,13 @@
+{% comment %}
+  The brand, written: text, no image, so it weighs one line and is never blurry. Moved from
+  src/ui/Logotipo.tsx. In the header the subtitle needs about 520 px next to the buttons, so below
+  that width it hides and "CARNICERÍA" stays alone (the full name stays in the link label). Pass
+  `en_pie` to keep the subtitle at every width.
+{% endcomment %}<span class="flex flex-col items-center gap-1 leading-none text-text">
+  <span class="pl-[0.22em] font-sans text-ui font-semibold tracking-[0.22em]">CARNICERÍA</span>
+  <span class="flex items-center gap-2 whitespace-nowrap text-meta tracking-[0.16em] text-text-muted{% if not en_pie %} max-[519px]:hidden{% endif %}">
+    <span aria-hidden="true" class="h-px w-4 bg-border"></span>
+    EL SEÑOR DE LA MISERICORDIA
+    <span aria-hidden="true" class="h-px w-4 bg-border"></span>
+  </span>
+</span>

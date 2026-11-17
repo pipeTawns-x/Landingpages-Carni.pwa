@@ -1,0 +1,46 @@
+{% comment %}
+  The footer of the store: rows and columns divided by hairlines, no boxes. Moved from
+  src/ui/Pie.tsx with its Tailwind classes, which Eduardo approved ("ese footer era muy elegante").
+  Every business fact comes from ventas/negocio.py through the `negocio` context processor.
+{% endcomment %}<footer class="border-t border-border bg-bg">
+  <div class="mx-auto w-full max-w-7xl px-5 py-12 lg:px-6 lg:py-16">
+    <div class="grid gap-10 lg:grid-cols-[1.3fr_1fr_1.2fr_1fr] lg:gap-12">
+      <div class="flex flex-col items-start gap-4">
+        <a href="{% url 'ventas:catalogo' %}" aria-label="{{ negocio.nombre }}, ir a los productos">
+          {% include "ventas/tienda/_logotipo.html" with en_pie=True %}
+        </a>
+        <p class="max-w-[28ch] text-ui text-text-muted">{{ negocio.lema }}</p>
+      </div>
+
+      <div>
+        <h2 class="font-sans text-meta font-medium text-text-muted">Tienda</h2>
+        <ul class="mt-2 flex flex-col">
+          <li><a href="{% url 'ventas:catalogo' %}" class="inline-flex min-h-11 items-center gap-2.5 text-ui text-text underline-offset-4 transition-colors duration-150 ease-out-strong hover:text-sand hover:underline">Productos</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h2 class="font-sans text-meta font-medium text-text-muted">Contacto</h2>
+        <ul class="mt-2 flex flex-col">
+          <li><a href="{{ negocio.telefono_href }}" class="inline-flex min-h-11 items-center gap-2.5 text-ui text-text underline-offset-4 transition-colors duration-150 ease-out-strong hover:text-sand hover:underline">{% include "ventas/tienda/_icono.html" with nombre="telefono" clase="shrink-0 text-text-muted" %}{{ negocio.telefono }}</a></li>
+          <li><a href="{{ negocio.whatsapp_href }}" target="_blank" rel="noopener noreferrer" class="inline-flex min-h-11 items-center gap-2.5 text-ui text-text underline-offset-4 transition-colors duration-150 ease-out-strong hover:text-sand hover:underline">{% include "ventas/tienda/_icono.html" with nombre="whatsapp" clase="shrink-0 text-text-muted" %}Escribir por WhatsApp</a></li>
+          <li class="mt-2 flex gap-2.5 text-ui text-text-muted">
+            {% include "ventas/tienda/_icono.html" with nombre="ubicacion" clase="mt-0.5 shrink-0" %}
+            <address class="not-italic">{{ negocio.direccion.0 }}<br />{{ negocio.direccion.1 }}</address>
+          </li>
+          <li><a href="{{ negocio.mapa_href }}" target="_blank" rel="noopener noreferrer" class="inline-flex min-h-11 items-center gap-2.5 pl-7 text-ui text-text underline-offset-4 transition-colors duration-150 ease-out-strong hover:text-sand hover:underline">Cómo llegar</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h2 class="font-sans text-meta font-medium text-text-muted">Redes</h2>
+        <ul class="mt-2 flex flex-col">
+          <li><a href="{{ negocio.facebook }}" target="_blank" rel="noopener noreferrer" class="inline-flex min-h-11 items-center gap-2.5 text-ui text-text underline-offset-4 transition-colors duration-150 ease-out-strong hover:text-sand hover:underline">{% include "ventas/tienda/_icono.html" with nombre="facebook" clase="shrink-0 text-text-muted" %}Facebook</a></li>
+          <li><a href="{{ negocio.instagram }}" target="_blank" rel="noopener noreferrer" class="inline-flex min-h-11 items-center gap-2.5 text-ui text-text underline-offset-4 transition-colors duration-150 ease-out-strong hover:text-sand hover:underline">{% include "ventas/tienda/_icono.html" with nombre="instagram" clase="shrink-0 text-text-muted" %}Instagram</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <p class="mt-12 border-t border-border pt-6 text-meta text-text-muted">© 2026 {{ negocio.nombre }}</p>
+  </div>
+</footer>

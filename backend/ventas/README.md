@@ -8,7 +8,7 @@ Every price, discount, stock check and exchange rate is decided by the Postgres 
 
 | Name | Path | Who |
 |---|---|---|
-| `ventas:catalogo` | `/tienda/` | anyone (read only) |
+| `ventas:catalogo` | `/productos/` (old `/products.html` answers 301) | anyone (read only) |
 | `ventas:nueva` | `/panel/ventas/nueva/` | panel admin |
 | `ventas:carrito_agregar` | `/panel/ventas/carrito/agregar/<pk>/` | panel admin, POST |
 | `ventas:carrito_actualizar` | `/panel/ventas/carrito/actualizar/<pk>/` | panel admin, POST |

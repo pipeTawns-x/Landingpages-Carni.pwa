@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
-# Builds the stylesheet of the panel that Django serves:
+# Builds the stylesheets Django serves, one per entry:
 #
-#   backend/assets/panel.css  --Tailwind v4-->  backend/static/panel/panel.css
+#   backend/assets/panel.css   --Tailwind v4-->  backend/static/panel/panel.css
+#   backend/assets/tienda.css  --Tailwind v4-->  backend/static/tienda/tienda.css
 #
 # Tailwind runs inside Docker, in the repo's .devcontainer image (AGENTS.md: npm
 # never runs on the host). The result is committed, because the Django runtime
@@ -45,7 +46,8 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BACKEND_DIR="$(dirname "$SCRIPT_DIR")"
 REPO_ROOT="$(git -C "$BACKEND_DIR" rev-parse --show-toplevel)"
 TOKENS_FILE="$BACKEND_DIR/assets/tokens.css"
-CSS_OUT="$BACKEND_DIR/static/panel/panel.css"
+# Each entry compiles backend/assets/<entry>.css into backend/static/<entry>/<entry>.css.
+ENTRIES=(panel tienda)
 COMPOSE_FILE="$REPO_ROOT/.devcontainer/docker-compose.yml"
 
 # What runs inside the container. The tailwindcss CLI resolves `@import
@@ -66,7 +68,10 @@ tar -C /workspace/backend --exclude=.venv --exclude=.env --exclude=staticfiles \
 npm install --prefix "$stage" --no-save --no-audit --no-fund --ignore-scripts \
     --loglevel=error "tailwindcss@$version" "@tailwindcss/cli@$version" >&2
 cd "$stage"
-./node_modules/.bin/tailwindcss --input assets/panel.css --output /out/panel.css --minify >&2
+shift
+for entry in "$@"; do
+  ./node_modules/.bin/tailwindcss --input "assets/$entry.css" --output "/out/$entry.css" --minify >&2
+done
 EOF
 
 usage() {
@@ -163,7 +168,7 @@ check_drift() {
   fi
 }
 
-# Compiles backend/assets/panel.css inside Docker and leaves panel.css in $1.
+# Compiles every entry inside Docker and leaves <entry>.css in $1.
 compile_css() {
   local out_dir="$1"
   docker info >/dev/null 2>&1 || die "Docker is not running"
@@ -172,9 +177,12 @@ compile_css() {
     -e HOME=/tmp -e npm_config_cache=/tmp/.npm -e npm_config_update_notifier=false \
     -v "$out_dir:/out" \
     --workdir /tmp \
-    app sh -euc "$CONTAINER_SCRIPT" sh "$TAILWIND_VERSION" ||
+    app sh -euc "$CONTAINER_SCRIPT" sh "$TAILWIND_VERSION" "${ENTRIES[@]}" ||
     die "the Docker build failed"
-  [[ -s "$out_dir/panel.css" ]] || die "the build produced no CSS"
+  local entry
+  for entry in "${ENTRIES[@]}"; do
+    [[ -s "$out_dir/$entry.css" ]] || die "the build produced no $entry.css"
+  done
 }
 
 mode="build"
@@ -205,21 +213,24 @@ check_drift
 
 work_dir="$(mktemp -d "${TMPDIR:-/tmp}/panel-css.XXXXXX")"
 trap 'rm -rf "$work_dir"' EXIT
-echo "Compiling backend/assets/panel.css with tailwindcss@$TAILWIND_VERSION in Docker..."
+echo "Compiling ${ENTRIES[*]} with tailwindcss@$TAILWIND_VERSION in Docker..."
 compile_css "$work_dir"
 
-if [[ "$mode" == "check" ]]; then
-  if [[ -f "$CSS_OUT" ]] && cmp -s "$work_dir/panel.css" "$CSS_OUT"; then
-    echo "ok     backend/static/panel/panel.css is up to date"
+stale=0
+for entry in "${ENTRIES[@]}"; do
+  out="$BACKEND_DIR/static/$entry/$entry.css"
+  rel="backend/static/$entry/$entry.css"
+  if [[ -f "$out" ]] && cmp -s "$work_dir/$entry.css" "$out"; then
+    echo "ok     $rel is up to date"
+  elif [[ "$mode" == "check" ]]; then
+    echo "STALE  $rel is not what the sources build" >&2
+    stale=1
   else
-    die "backend/static/panel/panel.css is stale: it is not what the sources build. Run backend/scripts/build_panel_css.sh and commit the result."
+    mkdir -p "$(dirname "$out")"
+    cp "$work_dir/$entry.css" "$out"
+    echo "built  $rel ($(wc -c <"$out" | tr -d ' ') bytes)"
   fi
-else
-  mkdir -p "$(dirname "$CSS_OUT")"
-  if [[ -f "$CSS_OUT" ]] && cmp -s "$work_dir/panel.css" "$CSS_OUT"; then
-    echo "ok     backend/static/panel/panel.css was already up to date"
-  else
-    cp "$work_dir/panel.css" "$CSS_OUT"
-    echo "built  backend/static/panel/panel.css ($(wc -c <"$CSS_OUT" | tr -d ' ') bytes)"
-  fi
+done
+if [[ "$stale" -ne 0 ]]; then
+  die "run backend/scripts/build_panel_css.sh and commit the result."
 fi

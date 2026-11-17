@@ -15,8 +15,9 @@ from decimal import Decimal
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django.db import DatabaseError
-from django.http import HttpResponseBadRequest
+from django.http import HttpResponseBadRequest, HttpResponsePermanentRedirect
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_POST, require_safe
 
@@ -50,7 +51,16 @@ def _listing(request, per_page):
 @require_safe
 def catalogo(request):
     """The public catalogue: what anyone can buy, with its price and unit. No database function."""
-    return render(request, "ventas/catalogo.html", _listing(request, CATALOG_PER_PAGE))
+    return render(request, "ventas/tienda/productos.html", _listing(request, CATALOG_PER_PAGE))
+
+
+@require_safe
+def products_html(request):
+    """The old static address of the catalogue: a permanent redirect that keeps the search."""
+    target = reverse("ventas:catalogo")
+    if request.GET:
+        target = f"{target}?{request.GET.urlencode()}"
+    return HttpResponsePermanentRedirect(target)
 
 
 # --- The sale at the counter -------------------------------------------------------------------

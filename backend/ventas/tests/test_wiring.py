@@ -18,7 +18,7 @@ class WiringTests(SimpleTestCase):
         self.assertIn("ventas.apps.VentasConfig", settings.INSTALLED_APPS)
 
     def test_the_routes_of_the_contract_have_their_names_and_paths(self):
-        self.assertEqual(reverse("ventas:catalogo"), "/tienda/")
+        self.assertEqual(reverse("ventas:catalogo"), "/productos/")
         self.assertEqual(reverse("ventas:nueva"), "/panel/ventas/nueva/")
         self.assertEqual(reverse("ventas:procesar"), "/panel/ventas/procesar/")
         self.assertEqual(
