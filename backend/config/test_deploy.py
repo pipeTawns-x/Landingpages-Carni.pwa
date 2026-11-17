@@ -417,6 +417,17 @@ class BlueprintTests(SimpleTestCase):
         self.assertTrue(start.endswith("--access-logfile /dev/null"), start)
         self.assertNotIn("--reload", start)
 
+    def test_it_runs_one_worker_so_the_checkout_throttle_counts_every_attempt(self):
+        # The checkout throttle counts in Django's per-process cache: with two workers each one
+        # would allow its own five orders an hour.
+        self.assertIn("--workers 1 ", self.service["startCommand"])
+
+    def test_the_store_keys_are_declared_and_typed_by_the_owner(self):
+        # The sign-in page needs the publishable key, the photo upload the service role key.
+        for key in ("SUPABASE_PUBLISHABLE_KEY", "SUPABASE_SERVICE_ROLE_KEY"):
+            with self.subTest(key=key):
+                self.assertEqual(self.by_key.get(key), {"key": key, "sync": "false"})
+
     def test_every_variable_the_settings_require_is_declared(self):
         source = (BACKEND_DIR / "config" / "settings.py").read_text(encoding="utf-8")
         required = set(re.findall(r'require_env\("([A-Z0-9_]+)"\)', source))

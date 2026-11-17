@@ -1,0 +1,12 @@
+# Findings of `gitleaks git` that are reviewed and accepted. One fingerprint per line, each with
+# the reason above it. A new finding is never added here without a reason.
+
+# False positive: a made-up invite token that the log-filter tests replace (no real credential).
+3a9747df6b674a763633ff6876892858fb99a058:backend/config/test_deploy.py:generic-api-key:293
+# False positive: the name of a localStorage key for recent searches, not a credential.
+f8bb65f11e2e58c854dc4d7ebf08eba3c6c4790c:src/components/Lupa/Lupa.tsx:generic-api-key:33
+# The Supabase publishable (anon) key, in history only since January 2026 and gone from the tree.
+# It is public by design (every frontend bundle ships it) and the data behind it is guarded by
+# RLS. Rotating it is the owner's call; until then it is accepted here.
+006aaa16885eff78372de524c0d5768d99607acf:README.md:generic-api-key:787
+006aaa16885eff78372de524c0d5768d99607acf:test-supabase.html:generic-api-key:49

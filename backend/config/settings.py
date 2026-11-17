@@ -76,6 +76,9 @@ MIDDLEWARE = [
     # needs no web server for them. It goes right after SecurityMiddleware.
     # https://whitenoise.readthedocs.io/en/stable/django.html
     "whitenoise.middleware.WhiteNoiseMiddleware",
+    # Refuses an oversized body from its Content-Length, before the session, CSRF or a form reads
+    # it (MAX_REQUEST_BODY_BYTES below).
+    "config.middleware.RequestBodyLimitMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -299,11 +302,17 @@ BEHIND_PROXY = parse_bool(
 if BEHIND_PROXY:
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
+# Largest request body accepted, in bytes (default 6 MiB: a 5 MB product photo plus its form).
+MAX_REQUEST_BODY_BYTES = parse_positive_int(
+    os.environ.get("MAX_REQUEST_BODY_BYTES", str(6 * 1024 * 1024)), "MAX_REQUEST_BODY_BYTES"
+)
+
 # Anonymous checkout throttle (POST /carrito/pedido/)
 #
 # At most CHECKOUT_THROTTLE_LIMIT order attempts per client IP and per session inside
-# CHECKOUT_THROTTLE_WINDOW_SECONDS, counted in Django's cache (the default cache is per process:
-# with several workers each one counts alone, so set a shared CACHES backend to make it exact).
+# CHECKOUT_THROTTLE_WINDOW_SECONDS, counted in Django's cache. The default cache is per
+# process, which is exact because render.yaml starts one gunicorn worker; more workers need a
+# shared CACHES backend.
 # Behind a proxy the client IP is the last X-Forwarded-For entry, the one the proxy itself added;
 # the earlier ones are written by the client and are never read. Without a proxy it is REMOTE_ADDR.
 CHECKOUT_THROTTLE_LIMIT = parse_positive_int(
