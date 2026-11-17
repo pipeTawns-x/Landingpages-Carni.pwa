@@ -2,7 +2,7 @@
 
 from django.urls import path
 
-from ventas import views
+from ventas import views, views_acceso, views_landing
 
 app_name = "ventas"
 
@@ -11,9 +11,9 @@ urlpatterns = [
     # links, bookmarks and the service worker of the PWA land on the new page.
     path("productos/", views.catalogo, name="catalogo"),
     path("products.html", views.products_html, name="products_html"),
-    path("", views.landing, name="landing"),
+    path("", views_landing.landing, name="landing"),
     path("index.html", views.index_html, name="index_html"),
-    path("acceso/", views.acceso, name="acceso"),
+    path("acceso/", views_acceso.acceso, name="acceso"),
     path("accessweb.html", views.accessweb_html, name="accessweb_html"),
     path("panel/ventas/nueva/", views.nueva, name="nueva"),
     path("panel/ventas/carrito/agregar/<int:pk>/", views.carrito_agregar, name="carrito_agregar"),

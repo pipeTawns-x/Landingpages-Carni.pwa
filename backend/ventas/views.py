@@ -73,18 +73,6 @@ index_html = _moved_to("ventas:landing")
 accessweb_html = _moved_to("ventas:acceso")
 
 
-@require_safe
-def landing(request):
-    """The store's landing page (the static index.html, migrated into Django)."""
-    return render(request, "ventas/tienda/landing.html")
-
-
-@require_safe
-def acceso(request):
-    """Sign in and sign up, one page (the static accessweb.html, migrated into Django)."""
-    return render(request, "ventas/tienda/acceso.html")
-
-
 # --- The sale at the counter -------------------------------------------------------------------
 
 
