@@ -30,6 +30,4 @@ urlpatterns = [
     # /tienda/ and /panel/ventas/...: the sales of the store (ventas/urls.py).
     path("", include("ventas.urls")),
     path("panel/", include("panel.urls")),
-    # EBAC M15 practice, course-only: /my-products/ (see ecommerce/README.md).
-    path("", include("ecommerce.urls")),
 ]

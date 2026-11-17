@@ -36,16 +36,13 @@ class WiringTests(SimpleTestCase):
         self.assertEqual(reverse("panel:mas"), "/panel/mas/")
         self.assertEqual(reverse("inventory:list"), "/panel/productos/")
         self.assertEqual(reverse("inventory:create"), "/panel/productos/nuevo/")
-        self.assertEqual(reverse("ecommerce:my-products"), "/my-products/")
         self.assertEqual(resolve("/panel/productos/").view_name, "inventory:list")
         self.assertEqual(resolve("/panel/mas/").view_name, "panel:mas")
 
-    def test_the_course_app_is_still_installed_apart_from_the_store(self):
-        # D1: ventas is its own app on the real catalogue; the M14-M15 practice stays aside.
-        self.assertIn("ecommerce.apps.EcommerceConfig", settings.INSTALLED_APPS)
-        self.assertNotEqual(
-            apps.get_app_config("ventas").path, apps.get_app_config("ecommerce").path
-        )
+    def test_the_isolated_course_app_is_gone(self):
+        # The M14-M15 practice app had its own Product apart from the real catalogue: removed.
+        self.assertNotIn("ecommerce.apps.EcommerceConfig", settings.INSTALLED_APPS)
+        self.assertFalse(apps.is_installed("ecommerce"))
 
 
 class FrameKeepsWorkingTests(TestCase):

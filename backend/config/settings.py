@@ -68,8 +68,6 @@ INSTALLED_APPS = [
     "panel.apps.PanelConfig",
     # The store sales: public catalogue and the sale at the counter (EBAC M16 on the real store).
     "ventas.apps.VentasConfig",
-    # EBAC M14 practice: course-only, not part of the store (see ecommerce/README.md).
-    "ecommerce.apps.EcommerceConfig",
 ]
 
 MIDDLEWARE = [
@@ -185,11 +183,9 @@ STORAGES = {
 }
 
 
-# Where Django sends an anonymous visitor to a view that needs a login. Only the EBAC M15
-# practice (ecommerce.views.ProtectedListView) asks for one. It is the panel's access
-# bridge, so Django never asks for a password: the bridge sends the visitor to the store
-# login, where Supabase signs them in and the store hands the session over. The bridge
-# ignores the `?next=` that Django adds, so after signing in the visitor lands on the panel.
+# Where Django sends an anonymous visitor to a view that needs a login: the panel's access
+# bridge, so Django never asks for a password. The bridge sends the visitor to /acceso/,
+# where Supabase signs them in and the page hands the session over to the panel.
 # https://docs.djangoproject.com/en/5.2/ref/settings/#login-url
 LOGIN_URL = "panel:acceso"
 

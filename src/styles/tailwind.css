@@ -21,9 +21,6 @@
  * documentos de diseño y las páginas viejas, y genera CSS para ejemplos que
  * nadie renderiza. Solo cuentan las tres páginas y lo que importan sus entradas.
  */
-@source "../../landing.html";
-@source "../../catalogo.html";
-@source "../../panel.html";
 @source "../../src";
 @source not "../components";
 @source not "../pages";

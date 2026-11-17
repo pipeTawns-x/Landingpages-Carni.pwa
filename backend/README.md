@@ -188,23 +188,6 @@ Behaviour worth knowing before touching it:
 | Forms | `inventory/forms.py` (`ProductForm`, `CutSpecForm`) |
 | Search and protection | `Q` filter in `product_list`; `panel_admin_required` on the five views (it replaced `login_required` and `LOGIN_URL` when the views moved under `/panel/productos/`) |
 
-### EBAC practice M14 — Django Models & Admin
-
-The assigned practice (500 bulk-created products, fixture, admin) lives in the
-course-only app `ecommerce/`: see [`ecommerce/README.md`](ecommerce/README.md).
-Its adaptation to the store is the paginated product list and the test suite
-described in "Tests".
-
-### EBAC practice M15 — Django Class-based Views
-
-`ProtectedListView`, a `ListView` behind `LoginRequiredMixin`, lists the sample
-products of the signed-in user at `/my-products/`. It lives in the same course-only
-app, `ecommerce/`: see the "Práctica M15" section of
-[`ecommerce/README.md`](ecommerce/README.md). An anonymous visitor goes to
-`LOGIN_URL`, which is the panel's access bridge (`panel:acceso`), so Django never asks
-for a password. The bridge ignores the `?next=` that Django adds, and the view
-requires a login but not the admin role.
-
 ## Panel session handoff
 
 The panel is served by Django, but nobody signs in to Django: an admin signs in
@@ -421,8 +404,8 @@ Desde `backend/`, en el entorno donde corre el panel y con `REVIEW_INVITES_ENABL
 
 ```bash
 uv run python manage.py issue_review_invite \
-  --supabase-user <uuid> --label "Profesora M15" --days 7 \
-  --max-uses 5 --landing /my-products/ --base-url https://carni-demo.onrender.com
+  --supabase-user <uuid> --label "Revisión del panel" --days 7 \
+  --max-uses 5 --landing /panel/ --base-url https://carni-demo.onrender.com
 ```
 
 | Opción | Qué hace |
@@ -450,11 +433,6 @@ ahí, porque un formulario no puede mostrar el enlace una sola vez.
   daño es el vencimiento, la revocación y el límite de usos.
 - Quien reenvía el enlace da acceso: es una llave al portador.
 - No hay límite de intentos por IP. Con 256 bits de token no hace falta.
-- `/my-products/` (práctica M15) solo pide haber iniciado sesión, y la sesión de una
-  invitación lo cumple, sea o no administrador el usuario. Como esa vista no pasa por
-  `panel_admin_required`, una sesión cuya invitación ya se revocó o venció sigue entrando ahí
-  hasta que toque una página del panel, que es la petición que la cierra.
-
 ## Despliegue del entorno de revisión (demo)
 
 El demo es este backend desplegado en un servicio web **gratuito de Render** (`render.yaml`
@@ -584,7 +562,7 @@ a desplegar el demo. Los comandos:
    con una caché que no vence porque el hash cambia con el contenido; no hace falta otro
    servidor. `staticfiles/` no se versiona.
 3. `migrate` **por etiqueta, una app a la vez**: `contenttypes`, `auth`, `admin`, `sessions`,
-   `inventory`, `ecommerce` y `panel`, nunca un `migrate` sin etiqueta. Django es dueño de
+   `inventory` y `panel`, nunca un `migrate` sin etiqueta. Django es dueño de
    unas pocas tablas de la base compartida y la regla del proyecto es nombrar lo que se
    migra. Una prueba compara esa lista con las apps que tienen migraciones, para que una
    app nueva no se quede fuera. `migrate` corre antes el chequeo `config.E001`: si el

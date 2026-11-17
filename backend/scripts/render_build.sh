@@ -25,6 +25,6 @@ uv run --frozen --no-dev python manage.py collectstatic --noinput
 # the tables in the shared database (the rest belong to supabase/migrations), and the rule of the
 # project is to name what is migrated. `contenttypes` and `auth` go first because the others
 # depend on them. These labels have to stay the apps that have migrations: a test compares them.
-for app in contenttypes auth admin sessions inventory ecommerce panel; do
+for app in contenttypes auth admin sessions inventory panel; do
   uv run --frozen --no-dev python manage.py migrate "$app" --noinput
 done

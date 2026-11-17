@@ -12,7 +12,7 @@ export default defineConfig({
   root: '.',
   server: {
     port: 3002,
-    open: '/index.html',
+    open: '/offline.html',
     host: true,
     cors: true
   },
@@ -29,15 +29,9 @@ export default defineConfig({
     sourcemap: true,
     rollupOptions: {
       input: {
-        home: resolve(__dirname, 'index.html'),
-        products: resolve(__dirname, 'products.html'),
-        accessweb: resolve(__dirname, 'accessweb.html'),
         adminCustomers: resolve(__dirname, 'admin-customers.html'),
         adminOrders: resolve(__dirname, 'admin-orders.html'),
-        offline: resolve(__dirname, 'offline.html'),
-        landing: resolve(__dirname, 'landing.html'),
-        catalogo: resolve(__dirname, 'catalogo.html'),
-        panel: resolve(__dirname, 'panel.html')
+        offline: resolve(__dirname, 'offline.html')
       }
     }
   },
