@@ -11,13 +11,14 @@ import uuid
 from decimal import Decimal
 from unittest import mock
 
-from django.db import InternalError
+from django.db import InternalError, ProgrammingError
 from django.test import SimpleTestCase
 
 from ventas import domain
 from ventas.services import (
     ERROR_CODES,
     GatewayError,
+    GatewayFunctionMissing,
     GatewayUnavailable,
     PostgresGateway,
     get_gateway,
@@ -132,6 +133,12 @@ class RaisedByTheStore(Exception):
     """Stands for the psycopg error of a `RAISE EXCEPTION` (SQLSTATE P0001)."""
 
     sqlstate = "P0001"
+
+
+class MissingFunction(Exception):
+    """Stands for the psycopg `UndefinedFunction` error (SQLSTATE 42883)."""
+
+    sqlstate = "42883"
 
 
 class RecordingCursor:
@@ -335,6 +342,92 @@ class PostgresGatewayTests(SimpleTestCase):
         )
 
         self.assertEqual(result, new_id)
+
+    def test_create_order_web_sends_every_value_as_a_parameter_and_names_no_channel(self):
+        new_id = uuid.uuid4()
+        gateway, cursor = self.open_gateway(result=new_id)
+        hostile = "Robert'); DROP TABLE orders;--"
+
+        result = gateway.create_order_web(
+            items=[LINE],
+            customer_name=hostile,
+            customer_phone="4441234567",
+            delivery_type="delivery",
+            delivery_address={"address": "Calle 1"},
+            notes="",
+            currency="USD",
+            payment_method="efectivo",
+        )
+
+        self.assertEqual(result, new_id)
+        ((sql, params),) = cursor.calls
+        self.assertIn("public.create_order_web", sql)
+        self.assertNotIn("DROP TABLE", sql)
+        self.assertNotIn("channel", sql)
+        self.assertNotIn("staff", sql)
+        self.assertEqual(sql.count("%s"), 8)
+        self.assertEqual(json.loads(params[0]), [LINE])
+        self.assertEqual(json.loads(params[4]), {"address": "Calle 1"})
+        self.assertEqual(
+            [params[1], params[2], params[3], params[5], params[6], params[7]],
+            [hostile, "4441234567", "delivery", None, "USD", "efectivo"],
+        )
+
+    def test_create_order_web_reads_the_id_when_the_driver_gives_text(self):
+        new_id = uuid.uuid4()
+        gateway, _ = self.open_gateway(result=str(new_id))
+        result = gateway.create_order_web(
+            items=[LINE],
+            customer_name="Ana",
+            customer_phone="4441234567",
+            delivery_type="pickup",
+            delivery_address={},
+            notes=None,
+            currency="MXN",
+            payment_method=None,
+        )
+        self.assertEqual(result, new_id)
+
+    def test_too_many_pending_of_create_order_web_is_a_rule_of_the_store(self):
+        error = InternalError("too_many_pending: at most 3 pending orders for the same phone")
+        error.__cause__ = RaisedByTheStore(str(error))
+        gateway, _ = self.open_gateway(error=error)
+        with self.assertRaises(GatewayError) as caught:
+            gateway.create_order_web(
+                items=[LINE],
+                customer_name="Ana",
+                customer_phone="4441234567",
+                delivery_type="pickup",
+                delivery_address={},
+                notes=None,
+                currency="MXN",
+                payment_method=None,
+            )
+        self.assertEqual(caught.exception.code, "too_many_pending")
+
+    def test_a_function_missing_in_the_database_is_told_apart_and_is_still_unavailable(self):
+        error = ProgrammingError(
+            "function public.create_order_web(p_items => jsonb, p_customer_name => text) "
+            "does not exist"
+        )
+        error.__cause__ = MissingFunction(str(error))
+        gateway, _ = self.open_gateway(error=error)
+        with (
+            self.assertLogs("ventas.services", level="ERROR"),
+            self.assertRaises(GatewayFunctionMissing) as caught,
+        ):
+            gateway.create_order_web(
+                items=[LINE],
+                customer_name="Ana",
+                customer_phone="4441234567",
+                delivery_type="pickup",
+                delivery_address={},
+                notes=None,
+                currency="MXN",
+                payment_method=None,
+            )
+        self.assertEqual(caught.exception.function, "public.create_order_web")
+        self.assertIsInstance(caught.exception, GatewayUnavailable)
 
     def test_the_double_offers_what_the_real_gateway_offers(self):
         public = {

@@ -1,8 +1,9 @@
 """The only door from `ventas` to the Postgres functions of the store.
 
 Prices, discounts, stock and the exchange rate are decided by `public.quote_cart` and
-`public.create_order_staff` (migration A2), never in Python. This module sends them what the staff
-asked for, as parameters and never as SQL text, and reads back what they answer. The views reach
+`public.create_order_staff` and `public.create_order_web` (migrations A2 and 20261117000002),
+never in Python. This module sends them what the staff asked for, as parameters and never as
+SQL text, and reads back what they answer. The views reach
 it through `get_gateway()`, which the tests replace with a double that applies the same cases file
 as the SQL tests.
 
@@ -53,6 +54,8 @@ ERROR_CODES = (
 )
 _CODE_PATTERN = re.compile(r"\b(" + "|".join(ERROR_CODES) + r")\b")
 RULE_SQLSTATE = "P0001"
+UNDEFINED_FUNCTION_SQLSTATE = "42883"
+_MISSING_FUNCTION = re.compile(r"function ([\w.]+)\(")
 
 
 class GatewayError(Exception):
@@ -68,6 +71,19 @@ class GatewayUnavailable(Exception):
 
     def __init__(self):
         super().__init__("the database of the store is unavailable")
+
+
+class GatewayFunctionMissing(GatewayUnavailable):
+    """The database has no such function: a migration has not been applied there yet.
+
+    It is an unavailable database for every caller that does not care, so the views that only
+    catch `GatewayUnavailable` keep working; `function` names the missing one for the caller that
+    has a fallback (the public checkout and `create_order_web`).
+    """
+
+    def __init__(self, function=""):
+        super().__init__()
+        self.function = function
 
 
 @dataclass(frozen=True)
@@ -134,6 +150,10 @@ def _error_from(exc):
         code = text.split(":", 1)[0].strip()
         if code:
             return GatewayError(code)
+    if getattr(cause, "sqlstate", None) == UNDEFINED_FUNCTION_SQLSTATE:
+        named = _MISSING_FUNCTION.search(text)
+        logger.error("The database of the store has no such function: %s", text.splitlines()[0])
+        return GatewayFunctionMissing(named.group(1) if named else "")
     logger.error("The database of the store failed: %s", type(exc).__name__, exc_info=exc)
     return GatewayUnavailable()
 
@@ -189,6 +209,41 @@ class PostgresGateway:
                 currency,
                 _blank_to_none(payment_method),
                 staff_ref,
+            ],
+        )
+        return result if isinstance(result, uuid.UUID) else uuid.UUID(str(result))
+
+    def create_order_web(
+        self,
+        *,
+        items,
+        customer_name,
+        customer_phone,
+        delivery_type,
+        delivery_address,
+        notes,
+        currency,
+        payment_method,
+    ):
+        """A guest order of the public store (channel web, no user): `public.create_order_web`.
+
+        Refuses with `too_many_pending` when the same phone already has three pending orders.
+        Raises `GatewayFunctionMissing` while the migration that creates it is not applied.
+        """
+        result = self._call(
+            "SELECT public.create_order_web("
+            "p_items => %s::jsonb, p_customer_name => %s, p_customer_phone => %s, "
+            "p_delivery_type => %s, p_delivery_address => %s::jsonb, p_notes => %s, "
+            "p_currency => %s, p_payment_method => %s)",
+            [
+                json.dumps(list(items)),
+                customer_name,
+                customer_phone,
+                delivery_type,
+                json.dumps(delivery_address or {}),
+                _blank_to_none(notes),
+                currency,
+                _blank_to_none(payment_method),
             ],
         )
         return result if isinstance(result, uuid.UUID) else uuid.UUID(str(result))

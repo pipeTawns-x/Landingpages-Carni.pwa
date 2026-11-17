@@ -48,12 +48,6 @@ def _listing(request, per_page):
     }
 
 
-@require_safe
-def catalogo(request):
-    """The public catalogue: what anyone can buy, with its price and unit. No database function."""
-    return render(request, "ventas/tienda/productos.html", _listing(request, CATALOG_PER_PAGE))
-
-
 def _moved_to(name):
     """A view for an old static address of the store: a 301 to its Django page, query kept."""
 

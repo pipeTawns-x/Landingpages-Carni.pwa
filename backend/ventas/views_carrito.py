@@ -8,15 +8,19 @@ The cart lives under its own session key, apart from the counter cart of the pan
 member selling at the counter and a customer browsing the store never share lines. Every page
 works with plain forms; `static/tienda/carrito.js` only enhances the cart page.
 
-The order is placed with `create_order_staff`, the only order function the `django` role may run
-today. `create_order_v2` (channel `web`) answers to `auth.uid()` and is granted to the browser
-role `authenticated` only, and the table ties `web` to a `user_id`. Until a function for the
-store exists, `STORE_CHANNEL` is the channel the order is saved under, and the notes say where
-it came from. When that function exists, only `_place_order` changes.
+The order is placed with `create_order_web` (channel `web`, no user, the rule of three pending
+orders per phone), the one function of the store for a customer without a session. Until the
+migration that creates it is applied, `create_order_staff` with the channel `whatsapp` takes its
+place and a warning is logged, so the store keeps selling. Anonymous checkout is throttled per
+client IP and per session (`CHECKOUT_THROTTLE_*` in settings).
 """
 
+import logging
+
 from django import forms
+from django.conf import settings
 from django.contrib import messages
+from django.core.cache import cache
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_POST, require_safe
@@ -25,10 +29,24 @@ from ventas import cart, catalog, domain, services, views
 from ventas.forms import CartLineForm, phone_validator
 from ventas.models import PanelOrder
 
+logger = logging.getLogger("ventas.checkout")
+
 PUBLIC_CART_KEY = "tienda_cart"
 LAST_ORDER_KEY = "tienda_ultimo_pedido"
-# `create_order_staff` accepts `mostrador` and `whatsapp` only: see the module docstring.
-STORE_CHANNEL = "whatsapp"
+STORE_CHANNEL = "web"
+# Only for the fallback: `create_order_staff` accepts `mostrador` and `whatsapp` only.
+FALLBACK_CHANNEL = "whatsapp"
+# What a customer reads where `domain.ERROR_MESSAGES` is worded for the staff.
+STORE_MESSAGES = {
+    "too_many_pending": (
+        "Este teléfono ya tiene 3 pedidos pendientes. Espera a que la carnicería los "
+        "atienda o escríbenos por WhatsApp."
+    ),
+}
+THROTTLED_MESSAGE = (
+    "Hiciste demasiados intentos de pedido en poco tiempo. "
+    "Espera un rato e inténtalo de nuevo, o escríbenos por WhatsApp."
+)
 STORE_NOTE = "[Tienda en línea]"
 NOTES_MAX = 450  # what is left of the 500 of the database after the marker above
 
@@ -111,7 +129,6 @@ class StoreOrderForm(forms.Form):
             "delivery_type": data["delivery_type"],
             "delivery_address": {"address": data["delivery_address"]} if delivery else {},
             "notes": notes,
-            "channel": STORE_CHANNEL,
             "currency": data["currency"],
             "payment_method": data["payment_method"] or None,
         }
@@ -248,14 +265,58 @@ def carrito(request):
     return render(request, "ventas/tienda/carrito.html", _cart_context(request, currency))
 
 
+def _client_ip(request):
+    """The address the throttle counts: the proxy's own entry behind one, else REMOTE_ADDR."""
+    if settings.CHECKOUT_TRUST_FORWARDED_FOR:
+        forwarded = request.META.get("HTTP_X_FORWARDED_FOR", "")
+        last = forwarded.rsplit(",", 1)[-1].strip()
+        if last:
+            return last
+    return request.META.get("REMOTE_ADDR", "")
+
+
+def _throttled(request):
+    """Count this attempt against the IP and the session; True when either is over the limit.
+
+    The cache increments are atomic and the window is fixed when a counter is created, so a
+    blocked client cannot keep its window open by insisting.
+    """
+    keys = [f"checkout-throttle:ip:{_client_ip(request)}"]
+    if request.session.session_key:
+        keys.append(f"checkout-throttle:session:{request.session.session_key}")
+    over = False
+    for key in keys:
+        cache.add(key, 0, settings.CHECKOUT_THROTTLE_WINDOW_SECONDS)
+        try:
+            count = cache.incr(key)
+        except ValueError:  # the counter expired between the two calls
+            cache.set(key, 1, settings.CHECKOUT_THROTTLE_WINDOW_SECONDS)
+            count = 1
+        over = over or count > settings.CHECKOUT_THROTTLE_LIMIT
+    return over
+
+
 def _place_order(request, lines, form):
     """Create the order in the database. Return its id, or None after queuing the reason."""
+    gateway = services.get_gateway()
+    values = form.order_values()
     try:
-        return services.get_gateway().create_order_staff(
-            items=lines, staff_ref=None, **form.order_values()
-        )
+        try:
+            return gateway.create_order_web(items=lines, **values)
+        except services.GatewayFunctionMissing as missing:
+            if not missing.function.endswith("create_order_web"):
+                raise
+            logger.warning(
+                "create_order_web is missing in the database (apply the migration "
+                "20261117000002_create_order_web.sql): saving the order as %s through "
+                "create_order_staff",
+                FALLBACK_CHANNEL,
+            )
+            return gateway.create_order_staff(
+                items=lines, staff_ref=None, channel=FALLBACK_CHANNEL, **values
+            )
     except services.GatewayError as error:
-        messages.error(request, domain.message_for(error.code))
+        messages.error(request, STORE_MESSAGES.get(error.code) or domain.message_for(error.code))
     except services.GatewayUnavailable:
         messages.error(request, domain.UNAVAILABLE_MESSAGE)
     return None
@@ -270,6 +331,11 @@ def pedido(request):
 
     form = StoreOrderForm(request.POST)
     if form.is_valid():
+        if _throttled(request):
+            messages.error(request, THROTTLED_MESSAGE)
+            currency = views._currency_of(form.cleaned_data["currency"])
+            context = _cart_context(request, currency, form)
+            return render(request, "ventas/tienda/carrito.html", context, status=429)
         order_id = _place_order(request, lines, form)
         if order_id is not None:
             cart.clear(_slot(request))

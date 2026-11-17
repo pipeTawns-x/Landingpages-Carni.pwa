@@ -9,14 +9,21 @@ import re
 from decimal import Decimal
 from unittest import mock
 
-from django.test import Client, TestCase
+from django.core.cache import cache
+from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 
 from inventory.models import Product
 from ventas import services
 from ventas.models import PanelOrder
 from ventas.tests.support import FakeGateway, make_store, messages_of
-from ventas.views_carrito import LAST_ORDER_KEY, PUBLIC_CART_KEY, STORE_CHANNEL
+from ventas.views_carrito import (
+    FALLBACK_CHANNEL,
+    LAST_ORDER_KEY,
+    PUBLIC_CART_KEY,
+    STORE_CHANNEL,
+    THROTTLED_MESSAGE,
+)
 
 PRICE_KEYS = {"price", "unit_price", "total", "subtotal", "line_total", "total_mxn", "total_usd"}
 ORDER = {
@@ -43,6 +50,9 @@ class StoreTestCase(TestCase):
         patcher = mock.patch("ventas.services.get_gateway", return_value=self.gateway)
         patcher.start()
         self.addCleanup(patcher.stop)
+        # The throttle counts in the cache, which outlives a test: start each one with none.
+        cache.clear()
+        self.addCleanup(cache.clear)
 
     def add(self, key="bistec", **fields):
         data = {"mode": "weight", "amount": "1", "unit": "kg"}
@@ -307,6 +317,30 @@ class CheckoutTests(StoreTestCase):
         self.assertEqual(PanelOrder.objects.get().status, "pending")
         self.assertEqual(self.cart(), [])
 
+    def test_the_order_is_a_guest_web_order_saved_by_create_order_web(self):
+        self.add()
+        self.client.post(self.url, ORDER)
+        self.assertEqual(STORE_CHANNEL, "web")
+        row = PanelOrder.objects.get()
+        self.assertEqual(row.channel, "web")
+        self.assertIsNone(row.staff_ref)
+        self.assertEqual(row.customer_phone, "444 123 4567")
+
+    def test_a_phone_with_three_pending_orders_is_refused_in_spanish_and_keeps_the_cart(self):
+        for _ in range(3):
+            self.add()
+            self.assertEqual(self.client.post(self.url, ORDER).status_code, 302)
+        other = Client()
+        other.post(
+            reverse("ventas:tienda_agregar", args=[self.store["bistec"].pk]),
+            {"mode": "weight", "amount": "1", "unit": "kg"},
+        )
+        refused = other.post(self.url, ORDER)
+        self.assertEqual(refused.status_code, 200)
+        self.assertContains(refused, "Este teléfono ya tiene 3 pedidos pendientes")
+        self.assertEqual(PanelOrder.objects.count(), 3)
+        self.assertEqual(len(other.session.get(PUBLIC_CART_KEY, [])), 1)
+
     def test_a_tampered_channel_status_or_price_is_ignored(self):
         self.add()
         self.client.post(
@@ -314,6 +348,7 @@ class CheckoutTests(StoreTestCase):
             {**ORDER, "channel": "mostrador", "status": "delivered", "total": "1", "price": "1"},
         )
         self.assertEqual(self.gateway.orders[0]["channel"], STORE_CHANNEL)
+        self.assertEqual(PanelOrder.objects.get().channel, "web")
         row = PanelOrder.objects.get()
         self.assertEqual(row.status, "pending")
         self.assertEqual(row.total_mxn, Decimal("200.00"))
@@ -335,7 +370,7 @@ class CheckoutTests(StoreTestCase):
 
     def test_a_refusal_of_the_store_keeps_the_cart_and_says_why(self):
         self.add()
-        self.gateway.errors["create_order_staff"] = services.GatewayError("below_minimum_order")
+        self.gateway.errors["create_order_web"] = services.GatewayError("below_minimum_order")
         response = self.client.post(
             self.url, {**ORDER, "delivery_type": "delivery", "delivery_address": "Calle 1"}
         )
@@ -345,7 +380,7 @@ class CheckoutTests(StoreTestCase):
 
     def test_an_unavailable_database_keeps_the_cart(self):
         self.add()
-        self.gateway.errors["create_order_staff"] = services.GatewayUnavailable()
+        self.gateway.errors["create_order_web"] = services.GatewayUnavailable()
         response = self.client.post(self.url, ORDER)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(self.cart()), 1)
@@ -369,3 +404,126 @@ class CheckoutTests(StoreTestCase):
         self.add()
         html = self.page().content.decode()
         self.assertGreaterEqual(len(re.findall(r'name="csrfmiddlewaretoken"', html)), 3)
+
+
+class MissingFunctionFallbackTests(StoreTestCase):
+    """Until the migration of `create_order_web` is applied the store keeps selling."""
+
+    def missing(self, function="public.create_order_web"):
+        self.gateway.errors["create_order_web"] = services.GatewayFunctionMissing(function)
+
+    def test_without_the_function_the_order_is_saved_as_whatsapp_and_a_warning_is_logged(self):
+        self.missing()
+        self.add()
+        with self.assertLogs("ventas.checkout", level="WARNING") as logged:
+            response = self.client.post(reverse("ventas:tienda_pedido"), ORDER)
+        self.assertRedirects(response, reverse("ventas:pedido_confirmado"))
+        self.assertIn("20261117000002_create_order_web.sql", logged.output[0])
+        self.assertEqual(self.gateway.orders[0]["channel"], FALLBACK_CHANNEL)
+        self.assertEqual(PanelOrder.objects.get().channel, "whatsapp")
+        self.assertEqual(self.cart(), [])
+
+    def test_a_different_missing_function_is_not_the_fallback(self):
+        self.missing("public.quote_cart")
+        self.add()
+        response = self.client.post(reverse("ventas:tienda_pedido"), ORDER)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(PanelOrder.objects.count(), 0)
+        self.assertEqual(len(self.cart()), 1)
+
+    def test_the_fallback_still_reports_what_the_store_refuses(self):
+        self.missing()
+        self.gateway.errors["create_order_staff"] = services.GatewayError("below_minimum_order")
+        self.add()
+        with self.assertLogs("ventas.checkout", level="WARNING"):
+            response = self.client.post(
+                reverse("ventas:tienda_pedido"),
+                {**ORDER, "delivery_type": "delivery", "delivery_address": "Calle 1"},
+            )
+        self.assertContains(response, "no llega al mínimo")
+        self.assertEqual(len(self.cart()), 1)
+
+
+@override_settings(CHECKOUT_THROTTLE_LIMIT=2, CHECKOUT_THROTTLE_WINDOW_SECONDS=3600)
+class CheckoutThrottleTests(StoreTestCase):
+    url = "/carrito/pedido/"
+
+    def order_from(self, client, **extra):
+        pk = self.store["bistec"].pk
+        client.post(
+            reverse("ventas:tienda_agregar", args=[pk]),
+            {"mode": "weight", "amount": "1", "unit": "kg"},
+            **extra,
+        )
+        return client.post(self.url, {**ORDER, "customer_phone": "555 000 0000"}, **extra)
+
+    def test_the_attempt_after_the_limit_is_refused_in_spanish_and_creates_no_order(self):
+        client = Client()
+        # Different phones keep the rule of pending orders out of the way.
+        for number in ("5550000001", "5550000002"):
+            client.post(
+                reverse("ventas:tienda_agregar", args=[self.store["bistec"].pk]),
+                {"mode": "weight", "amount": "1", "unit": "kg"},
+            )
+            self.assertEqual(
+                client.post(self.url, {**ORDER, "customer_phone": number}).status_code, 302
+            )
+        client.post(
+            reverse("ventas:tienda_agregar", args=[self.store["bistec"].pk]),
+            {"mode": "weight", "amount": "1", "unit": "kg"},
+        )
+        response = client.post(self.url, {**ORDER, "customer_phone": "5550000003"})
+        self.assertEqual(response.status_code, 429)
+        self.assertContains(response, THROTTLED_MESSAGE, status_code=429)
+        self.assertEqual(PanelOrder.objects.count(), 2)
+        self.assertEqual(len(client.session.get(PUBLIC_CART_KEY, [])), 1)
+
+    def test_the_limit_is_per_client_ip_even_with_a_new_session(self):
+        for _ in range(2):
+            self.assertEqual(self.order_from(Client(), REMOTE_ADDR="10.0.0.9").status_code, 302)
+        # The third attempt from the address, in a brand-new session, is refused.
+        response = self.order_from(Client(), REMOTE_ADDR="10.0.0.9")
+        self.assertEqual(response.status_code, 429)
+
+    def test_another_ip_and_another_session_are_not_affected(self):
+        for _ in range(2):
+            self.order_from(Client(), REMOTE_ADDR="10.0.0.9")
+        response = self.order_from(Client(), REMOTE_ADDR="10.0.0.10")
+        self.assertNotEqual(response.status_code, 429)
+
+    def test_the_limit_is_per_session_even_from_another_ip(self):
+        client = Client()
+        for _ in range(2):
+            self.order_from(client, REMOTE_ADDR="10.0.1.1")
+        response = self.order_from(client, REMOTE_ADDR="10.0.1.2")
+        self.assertEqual(response.status_code, 429)
+
+    def test_a_form_with_errors_does_not_use_up_an_attempt(self):
+        client = Client()
+        client.post(
+            reverse("ventas:tienda_agregar", args=[self.store["bistec"].pk]),
+            {"mode": "weight", "amount": "1", "unit": "kg"},
+        )
+        for _ in range(5):
+            self.assertEqual(client.post(self.url, {**ORDER, "customer_name": ""}).status_code, 200)
+        self.assertEqual(client.post(self.url, ORDER).status_code, 302)
+
+    @override_settings(CHECKOUT_TRUST_FORWARDED_FOR=True)
+    def test_behind_a_proxy_the_client_is_the_last_forwarded_address(self):
+        # A client that writes its own X-Forwarded-For cannot dodge the limit: only the entry
+        # the proxy appended counts.
+        for index in range(2):
+            self.order_from(
+                Client(), REMOTE_ADDR="10.9.9.9", HTTP_X_FORWARDED_FOR=f"6.6.6.{index}, 203.0.113.5"
+            )
+        response = self.order_from(
+            Client(), REMOTE_ADDR="10.9.9.9", HTTP_X_FORWARDED_FOR="7.7.7.7, 203.0.113.5"
+        )
+        self.assertEqual(response.status_code, 429)
+
+    def test_the_gateway_is_never_called_for_a_refused_attempt(self):
+        for _ in range(2):
+            self.order_from(Client(), REMOTE_ADDR="10.0.2.2")
+        before = len(self.gateway.orders)
+        self.order_from(Client(), REMOTE_ADDR="10.0.2.2")
+        self.assertEqual(len(self.gateway.orders), before)

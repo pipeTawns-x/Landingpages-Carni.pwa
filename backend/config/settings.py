@@ -293,8 +293,26 @@ SECURE_REFERRER_POLICY = "same-origin"
 # with the scheme of the request, refuses every POST. It is off unless asked for, because Django
 # believes that header: it has to be one that a proxy sets and a client cannot, and with the app
 # reachable some other way anyone could send it.
-if parse_bool(os.environ.get("DJANGO_BEHIND_PROXY"), "DJANGO_BEHIND_PROXY", default=False):
+BEHIND_PROXY = parse_bool(
+    os.environ.get("DJANGO_BEHIND_PROXY"), "DJANGO_BEHIND_PROXY", default=False
+)
+if BEHIND_PROXY:
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
+# Anonymous checkout throttle (POST /carrito/pedido/)
+#
+# At most CHECKOUT_THROTTLE_LIMIT order attempts per client IP and per session inside
+# CHECKOUT_THROTTLE_WINDOW_SECONDS, counted in Django's cache (the default cache is per process:
+# with several workers each one counts alone, so set a shared CACHES backend to make it exact).
+# Behind a proxy the client IP is the last X-Forwarded-For entry, the one the proxy itself added;
+# the earlier ones are written by the client and are never read. Without a proxy it is REMOTE_ADDR.
+CHECKOUT_THROTTLE_LIMIT = parse_positive_int(
+    os.environ.get("CHECKOUT_THROTTLE_LIMIT", "5"), "CHECKOUT_THROTTLE_LIMIT"
+)
+CHECKOUT_THROTTLE_WINDOW_SECONDS = parse_positive_int(
+    os.environ.get("CHECKOUT_THROTTLE_WINDOW_SECONDS", "3600"), "CHECKOUT_THROTTLE_WINDOW_SECONDS"
+)
+CHECKOUT_TRUST_FORWARDED_FOR = BEHIND_PROXY
 
 # Other origins that may post a form here, comma-separated (optional). The host the request came to
 # is always trusted, so this is only for a second domain.

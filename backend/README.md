@@ -52,6 +52,8 @@ uv run python -c "from django.core.management.utils import get_random_secret_key
 | `DJANGO_COOKIE_HTTPONLY` | `True`/`False`. Hides the session cookie from JavaScript. Optional: `True`. |
 | `DJANGO_COOKIE_SAMESITE` | `Lax` or `None` (which needs `Secure`). Optional: `Lax`. `Strict` is refused because it would break the panel handoff. |
 | `DJANGO_BEHIND_PROXY` | `True`/`False`. Trust the `X-Forwarded-Proto` header that a proxy sets (`SECURE_PROXY_SSL_HEADER`). Optional: off. Turn it on only behind a proxy that ends TLS, such as Render: see "Despliegue del entorno de revisión (demo)". |
+| `CHECKOUT_THROTTLE_LIMIT` | Order attempts allowed per client IP and per session in the window, on the public checkout (`POST /carrito/pedido/`). Optional: `5`. The counter lives in Django's cache, which is per process unless `CACHES` points at a shared backend. |
+| `CHECKOUT_THROTTLE_WINDOW_SECONDS` | The window of the throttle above, in seconds. Optional: `3600`. Behind a proxy (`DJANGO_BEHIND_PROXY`) the client IP is the last `X-Forwarded-For` entry, the one the proxy added. |
 | `DJANGO_CSRF_TRUSTED_ORIGINS` | Comma-separated origins, besides the host itself, that may post a form (`CSRF_TRUSTED_ORIGINS`). Optional: none. |
 | `REVIEW_INVITES_ENABLED` | `True`/`False`. Turns on the review invite links (`/panel/invitado/<token>/`), which open the panel without signing in at the store. Optional: off, and every request to the route answers 404, whatever its method. Only for a deployment with fake data: see "Enlaces de invitado para revisión". |
 
@@ -215,6 +217,34 @@ The migration is `supabase/migrations/20261117000001_product_images_bucket.sql` 
 5 MB, `image/jpeg`, `image/png`, `image/webp`, writes for `service_role` only). Its pgTAP test is
 `supabase/tests/product_images_bucket.sql`; it needs the `storage` schema of the local stack, so
 `supabase/tests/correr.sh` does not run it. Then add `SUPABASE_SERVICE_ROLE_KEY` to `backend/.env`.
+
+## Guest orders of the public store (`create_order_web`)
+
+The public checkout saves its orders with channel `web` through the database function
+`public.create_order_web` (migration `supabase/migrations/20261117000002_create_order_web.sql`):
+`SECURITY DEFINER`, fixed `search_path`, `EXECUTE` for `django` only, same quotes and totals as
+`create_order_staff`, name and phone required, no user. The same phone cannot hold 3 or more
+pending orders (`too_many_pending`, compared by digits). The migration also relaxes the CHECK
+`orders_web_requires_user`: a `web` order may have no `user_id` when it has a phone. Orders placed
+by signed-in customers with `create_order_v2` are unchanged.
+
+Until the migration is applied, the store keeps working: when the database answers that
+`create_order_web` does not exist, `_place_order` saves the order as `whatsapp` through
+`create_order_staff` (the old behaviour) and logs a warning in `ventas.checkout`. Eduardo applies it
+locally (it is not applied to the remote project):
+
+```bash
+supabase migration up --local
+```
+
+Its SQL test is `supabase/tests/create_order_web.sql` (it needs the helpers of
+`supabase/tests/ayudas.sql`; `correr.sh` only globs `comercio_v1_*.sql`, so it does not run it).
+The DOWN block at the end of the migration moves any guest `web` order to `whatsapp` before it
+restores the old CHECK; it deletes nothing.
+
+Anonymous checkout is also throttled in Django: `CHECKOUT_THROTTLE_LIMIT` attempts per client IP
+and per session every `CHECKOUT_THROTTLE_WINDOW_SECONDS`; the attempt over the limit answers 429
+with a Spanish message and creates no order.
 
 ## Panel session handoff
 

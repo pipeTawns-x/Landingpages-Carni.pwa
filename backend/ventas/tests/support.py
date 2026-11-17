@@ -35,6 +35,7 @@ KG_PER = {
     "lb": Decimal(CASES["meta"]["lb_kg"]),
 }
 MAX_LINES = 50
+WEB_PENDING_LIMIT = 3  # create_order_web: pending orders one phone may hold
 STALE_AFTER_DAYS = 4
 # set_order_status (A2): where an order can go from each status.
 TRANSITIONS = {
@@ -66,6 +67,10 @@ def q3(value):
 
 def ceil_cents(value):
     return ((value * 100).to_integral_value(rounding=ROUND_CEILING) / 100).quantize(CENT)
+
+
+def _digits(value):
+    return "".join(ch for ch in value or "" if ch.isdigit())
 
 
 class FakeGateway:
@@ -191,6 +196,36 @@ class FakeGateway:
 
     def create_order_staff(self, **order):
         self._fail_if_asked("create_order_staff")
+        return self._store_order(order)
+
+    def create_order_web(self, **order):
+        """`create_order_web`: a guest order, channel web, with the checks of the function."""
+        self._fail_if_asked("create_order_web")
+        name = (order["customer_name"] or "").strip()
+        phone = (order["customer_phone"] or "").strip()
+        if not name or len(name) > 120:
+            raise GatewayError("invalid_customer_name")
+        digits = _digits(phone)
+        if not phone or len(phone) > 20 or len(digits) < 7:
+            raise GatewayError("invalid_customer_phone")
+        pending = [
+            row
+            for row in PanelOrder.objects.filter(status="pending")
+            if _digits(row.customer_phone) == digits
+        ]
+        if len(pending) >= WEB_PENDING_LIMIT:
+            raise GatewayError("too_many_pending")
+        return self._store_order(
+            {
+                **order,
+                "customer_name": name,
+                "customer_phone": phone,
+                "channel": "web",
+                "staff_ref": None,
+            }
+        )
+
+    def _store_order(self, order):
         quote = self.quote_cart(order["items"], order["currency"])
         self.orders.append(order)
         ids = [item["product_id"] for item in order["items"]]
