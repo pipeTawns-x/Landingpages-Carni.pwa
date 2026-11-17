@@ -540,13 +540,28 @@
   gap: 0.5rem;
 }
 
+/*
+  The board never scrolls sideways (Eduardo: "ni se puede dar scroll ... no es responsivo"): on a
+  phone the six columns stack one under the other, and from 768 px they wrap into rows that fit
+  the screen. A long column scrolls inside itself, so the other columns stay in view.
+*/
 .v-board {
   display: grid;
-  grid-auto-columns: minmax(16rem, 1fr);
-  grid-auto-flow: column;
+  grid-template-columns: minmax(0, 1fr);
   gap: 1rem;
-  overflow-x: auto;
   padding-bottom: 0.5rem;
+}
+
+@media (min-width: 768px) {
+  .v-board {
+    grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  }
+
+  .v-board .v-cart {
+    max-height: 60vh;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
 }
 
 .v-column {
