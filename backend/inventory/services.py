@@ -13,7 +13,7 @@ from django.db import IntegrityError, transaction
 
 from inventory import storage
 from inventory.forms import CutSpecForm, ProductForm
-from inventory.models import Favorite, OrderItem, Product
+from inventory.models import CutSpec, Favorite, OrderItem, Product, StoreCutSpec
 
 
 @dataclass(frozen=True)
@@ -145,9 +145,42 @@ def save_product(product_form: ProductForm, spec_form: CutSpecForm) -> Product:
         if spec.pk or _spec_form_has_data(spec_form):
             spec.product = product
             spec.save()
+        sync_store_spec(product)
 
         if photo:
             product.image_url = storage.upload_product_image(photo, product.pk)
             product.save(update_fields=["image_url"])
 
     return product
+
+
+def _weight_or_none(value):
+    """A weight of zero means "no weight", as in the store's table."""
+    return value if value else None
+
+
+def sync_store_spec(product: Product) -> None:
+    """Copy the cut spec of `product` to the store and set how the store may sell it.
+
+    `quote_cart` reads `product_cut_specs` and accepts "pieces" only when `sale_modes` lists it.
+    A product priced per kilo sells by pieces when a piece has a weight; one priced per piece or
+    package always sells by pieces (`Product.save` keeps that). Without a spec, nothing is copied.
+    """
+    spec = CutSpec.objects.filter(product=product).first()
+    if spec is not None:
+        StoreCutSpec.objects.update_or_create(
+            product=product,
+            defaults={
+                "avg_piece_weight_kg": _weight_or_none(spec.avg_piece_weight_kg),
+                "thickness_min_in": _weight_or_none(spec.thickness_min_in),
+                "thickness_max_in": _weight_or_none(spec.thickness_max_in),
+                "thickness_default_in": _weight_or_none(spec.thickness_default_in),
+            },
+        )
+    if product.price_unit != Product.PriceUnit.KG:
+        return
+    has_weight = spec is not None and bool(spec.avg_piece_weight_kg)
+    modes = ["money", "weight", "pieces"] if has_weight else ["money", "weight"]
+    if product.sale_modes != modes:
+        product.sale_modes = modes
+        product.save(update_fields=["sale_modes"])

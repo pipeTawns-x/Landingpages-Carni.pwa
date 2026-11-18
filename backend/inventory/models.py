@@ -543,3 +543,32 @@ class ProductCost(models.Model):
 
     def __str__(self) -> str:
         return f"cost of {self.product_id}"
+
+
+class StoreCutSpec(models.Model):
+    """The store's copy of a cut spec (`public.product_cut_specs`, owned by Supabase).
+
+    `quote_cart` reads the weight of a piece from here, not from `CutSpec` (Django's own table,
+    which the product form edits). `inventory.services.sync_store_spec` keeps the two equal.
+    """
+
+    product = models.OneToOneField(
+        Product,
+        on_delete=models.CASCADE,
+        primary_key=True,
+        related_name="store_spec",
+        db_column="product_id",
+    )
+    avg_piece_weight_kg = models.DecimalField(max_digits=6, decimal_places=3, null=True)
+    thickness_min_in = models.DecimalField(max_digits=4, decimal_places=2, null=True)
+    thickness_max_in = models.DecimalField(max_digits=4, decimal_places=2, null=True)
+    thickness_default_in = models.DecimalField(max_digits=4, decimal_places=2, null=True)
+
+    class Meta:
+        managed = False
+        db_table = "product_cut_specs"
+        verbose_name = "especificación de corte de la tienda"
+        verbose_name_plural = "especificaciones de corte de la tienda"
+
+    def __str__(self) -> str:
+        return f"store spec of {self.product_id}"
