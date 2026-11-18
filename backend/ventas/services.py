@@ -17,7 +17,7 @@ import logging
 import re
 import uuid
 from dataclasses import dataclass, field
-from datetime import date
+from datetime import date, datetime
 from decimal import Decimal
 
 from django.db import Error as DatabaseError
@@ -51,6 +51,8 @@ ERROR_CODES = (
     "invalid_payment_method",
     "invalid_staff_ref",
     "below_minimum_quantity",
+    "note_too_long",
+    "reason_required",
 )
 _CODE_PATTERN = re.compile(r"\b(" + "|".join(ERROR_CODES) + r")\b")
 RULE_SQLSTATE = "P0001"
@@ -288,6 +290,58 @@ class PostgresGateway:
         return self._call(
             "SELECT public.set_manual_fx_rate(%s, %s, %s)", [rate, buffer_pct, staff_ref]
         )
+
+    def register_purchase(self, product_id, qty, total_cost, note=None, staff_ref=None):
+        """Record a purchase lot; the function applies the yield, the cost and the stock."""
+        return self._call(
+            "SELECT public.register_purchase(%s, %s, %s, %s, %s)",
+            [product_id, qty, total_cost, _blank_to_none(note), staff_ref],
+        )
+
+    def adjust_stock(self, product_id, new_stock, reason, staff_ref=None):
+        """Set the stock to a physical count; the function records the difference and why."""
+        return self._call(
+            "SELECT public.adjust_stock(%s, %s, %s, %s)",
+            [product_id, new_stock, reason, staff_ref],
+        )
+
+    def recent_purchases(self, limit=20):
+        """The latest lots against what their product sold since, newest first.
+
+        Read from the view `panel_purchase_performance`. Numbers travel as text so they come
+        back as exact decimals, never as floats.
+        """
+        result = self._call(
+            "SELECT coalesce(jsonb_agg(row ORDER BY row->>'created_at' DESC), '[]'::jsonb) FROM ("
+            "SELECT jsonb_build_object('lot_id', v.lot_id, 'product_name', v.product_name, "
+            "'created_at', v.created_at, 'qty', v.qty::text, 'total_cost', v.total_cost::text, "
+            "'unit_cost', v.unit_cost::text, 'expected_revenue', v.expected_revenue::text, "
+            "'expected_margin', v.expected_margin::text, "
+            "'expected_margin_pct', v.expected_margin_pct::text, "
+            "'sold_qty', v.sold_qty::text, 'sold_revenue', v.sold_revenue::text) AS row "
+            "FROM public.panel_purchase_performance v "
+            "ORDER BY v.created_at DESC, v.lot_id DESC LIMIT %s) t",
+            [limit],
+        )
+        rows = json.loads(result) if isinstance(result, str | bytes) else result
+        numbers = (
+            "qty",
+            "total_cost",
+            "unit_cost",
+            "expected_revenue",
+            "expected_margin",
+            "expected_margin_pct",
+            "sold_qty",
+            "sold_revenue",
+        )
+        return [
+            {
+                **row,
+                **{key: _decimal(row.get(key)) for key in numbers},
+                "created_at": datetime.fromisoformat(row["created_at"]),
+            }
+            for row in rows
+        ]
 
 
 _gateway = None

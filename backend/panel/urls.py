@@ -2,7 +2,7 @@
 
 from django.urls import path
 
-from panel import views
+from panel import views, views_compras
 
 app_name = "panel"
 
@@ -13,6 +13,7 @@ urlpatterns = [
     path("salir/", views.salir, name="salir"),
     path("mas/", views.mas, name="mas"),
     path("clientes/", views.clientes, name="clientes"),
+    path("compras/", views_compras.compras, name="compras"),
     path("ajustes/", views.ajustes, name="ajustes"),
     path("buildads/", views.buildads, name="buildads"),
     path("productads/", views.productads, name="productads"),

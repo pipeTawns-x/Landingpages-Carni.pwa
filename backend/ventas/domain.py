@@ -67,6 +67,8 @@ ERROR_MESSAGES = {
     "invalid_payment_method": "La forma de pago no es válida.",
     "invalid_staff_ref": "No se pudo identificar a quién registra la venta.",
     "below_minimum_quantity": "La cantidad está por debajo del mínimo de este producto.",
+    "note_too_long": "La nota es demasiado larga (el máximo es 500 caracteres).",
+    "reason_required": "Escribe por qué cambia el stock (máximo 200 caracteres).",
 }
 WARNING_MESSAGES = {"low_stock": "Poco stock: puede que no alcance."}
 GENERIC_REFUSAL = "La tienda no pudo registrar esto. Revisa los datos e inténtalo de nuevo."

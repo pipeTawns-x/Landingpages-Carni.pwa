@@ -113,6 +113,8 @@ class ErrorCodesTests(SimpleTestCase):
                     "invalid_payment_method",
                     "invalid_staff_ref",
                     "below_minimum_quantity",
+                    "note_too_long",
+                    "reason_required",
                 ]
             ),
         )

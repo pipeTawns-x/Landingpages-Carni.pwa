@@ -92,6 +92,26 @@ class FakeGateway:
         self.moves = []
         self.kpis = None
         self.manual_rates = []
+        self.purchases = []
+        self.counts = []
+        self.lots = []
+
+    def register_purchase(self, product_id, qty, total_cost, note=None, staff_ref=None):
+        """Record the purchase the way `register_purchase` receives it; return the lot id."""
+        self._fail_if_asked("register_purchase")
+        self.purchases.append((product_id, qty, total_cost, note, staff_ref))
+        return len(self.purchases)
+
+    def adjust_stock(self, product_id, new_stock, reason, staff_ref=None):
+        """Record the count the way `adjust_stock` receives it; return the new stock."""
+        self._fail_if_asked("adjust_stock")
+        self.counts.append((product_id, new_stock, reason, staff_ref))
+        return new_stock
+
+    def recent_purchases(self, limit=20):
+        """The lots the test put in `lots`, as `panel_purchase_performance` would give them."""
+        self._fail_if_asked("recent_purchases")
+        return self.lots[:limit]
 
     def current_fx(self):
         """The exchange rate the settings page shows, like the `current_fx` view."""

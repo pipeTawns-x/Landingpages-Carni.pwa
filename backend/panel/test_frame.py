@@ -130,7 +130,13 @@ class MasPageTests(TestCase):
         links = [a["href"] for a in anchors(page)]
         self.assertEqual(
             links,
-            ["/panel/clientes/", "/panel/buildads/", "/panel/productads/", "/panel/ajustes/"],
+            [
+                "/panel/compras/",
+                "/panel/clientes/",
+                "/panel/buildads/",
+                "/panel/productads/",
+                "/panel/ajustes/",
+            ],
         )
 
     def test_the_mas_tab_is_the_current_page_and_no_sidebar_entry_is_current(self):
@@ -205,7 +211,7 @@ class NavigationStateTests(SimpleTestCase):
         self.assertEqual(current_links(sidebar_of(html)), {})
         self.assertEqual(current_links(tab_bar_of(html)), {})
 
-    def test_the_sidebar_has_seven_entries_and_the_tab_bar_five(self):
+    def test_the_sidebar_has_eight_entries_and_the_tab_bar_five(self):
         html = render_frame("panel:inicio", "panel")
 
         self.assertEqual(
@@ -214,6 +220,7 @@ class NavigationStateTests(SimpleTestCase):
                 "/panel/",
                 "/panel/pedidos/",
                 "/panel/productos/",
+                "/panel/compras/",
                 "/panel/clientes/",
                 "/panel/buildads/",
                 "/panel/productads/",
