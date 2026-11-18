@@ -2,15 +2,14 @@
 {% comment %}
   One page for the two ad products that are not built yet (/panel/buildads/ and /panel/productads/,
   panel:buildads and panel:productads). Context of the view: product, the name to show. There is
-  nothing to do here: it only says the product is under development.
+  nothing to do here: the clock and one line, "Página en desarrollo".
 {% endcomment %}
 {% block title %}<title>{{ product }} · Panel · Carnicería El Señor de La Misericordia</title>{% endblock %}
 {% block titulo %}{{ product }}{% endblock %}
 {% block contenido %}
 <section aria-labelledby="proximamente-titulo" class="flex flex-col items-center gap-3 rounded-card border border-border bg-surface-1 px-4 py-12 text-center">
   <span class="grid size-12 place-items-center rounded-control bg-surface-2 text-sand"><svg class="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18ZM12 7.5V12l3 2" /></svg></span>
-  <h2 id="proximamente-titulo" class="font-sans text-ui font-semibold">Próximamente · funcionalidad en desarrollo</h2>
-  <p class="max-w-prose text-meta text-text-muted">{{ product }} está en desarrollo y todavía no se puede usar desde el panel.</p>
+  <h2 id="proximamente-titulo" class="font-sans text-ui font-semibold">Página en desarrollo</h2>
   <a href="{% url 'panel:inicio' %}" class="mt-2 inline-flex min-h-12 items-center justify-center gap-2 rounded-pill border border-sand px-6 text-ui font-semibold text-text transition-[background-color,scale] duration-160 ease-out-strong hover:bg-surface-2 active:scale-[0.97] motion-reduce:transition-none">Volver al inicio</a>
 </section>
 {% endblock %}

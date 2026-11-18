@@ -110,7 +110,12 @@ class InDevelopmentTests(TestCase):
                 self.assertEqual(
                     re.findall(r"<h1[^>]*>(.*?)</h1>", html, flags=re.DOTALL)[0].strip(), product
                 )
-                self.assertContains(response, "Próximamente · funcionalidad en desarrollo")
+                self.assertEqual(
+                    re.findall(r"<h2[^>]*>(.*?)</h2>", html, flags=re.DOTALL)[0].strip(),
+                    "Página en desarrollo",
+                )
+                self.assertNotContains(response, "Próximamente")
+                self.assertIn('viewBox="0 0 24 24"', html.split('id="proximamente-titulo"')[0])
                 self.assertContains(response, product, count=html.count(product))
 
     def test_the_sidebar_and_the_phone_menu_list_them_and_not_publicidad(self):
