@@ -150,6 +150,7 @@ def landing(request):
     """The landing page of the store."""
     instagram = urlsplit(NEGOCIO["instagram"]).path.strip("/")
     context = {
+        "cabecera": "sobre",
         "titular": HEADLINE.split(),
         "bento": _bento(Category.objects.filter(is_active=True).order_by("order", "name")),
         "productos": _showcase(),

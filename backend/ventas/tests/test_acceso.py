@@ -11,7 +11,7 @@ from pathlib import Path
 
 from django.conf import settings
 from django.contrib.staticfiles import finders
-from django.test import SimpleTestCase, override_settings
+from django.test import SimpleTestCase, TestCase, override_settings
 from django.urls import reverse
 
 
@@ -39,7 +39,7 @@ def parse(html):
     return parser
 
 
-class AccessPageTests(SimpleTestCase):
+class AccessPageTests(TestCase):
     def get(self, **query):
         return self.client.get(reverse("ventas:acceso"), query)
 
@@ -98,7 +98,8 @@ class AccessPageTests(SimpleTestCase):
         # The browser talks to Supabase from the script. Without it a submit must not put a
         # password in an address: both forms post, and Django refuses the post (405 below).
         tags = parse(self.get().content.decode())
-        forms = tags.named("form")
+        # The search of the header is the one GET form of every page, and it has no password.
+        forms = [attrs for attrs in tags.named("form") if attrs.get("role") != "search"]
 
         self.assertEqual(len(forms), 2)
         for attrs in forms:
@@ -131,10 +132,14 @@ class AccessPageTests(SimpleTestCase):
         html = self.get().content.decode()
         tags = parse(html)
         scripts = tags.named("script")
+        modules = [s for s in scripts if s.get("type") == "module"]
 
-        self.assertEqual(len(scripts), 1)
-        self.assertEqual(scripts[0].get("type"), "module")
-        self.assertRegex(scripts[0].get("src", ""), r"^/static/tienda/acceso(\.[0-9a-f]+)?\.js$")
+        # The header script of every page, and the one module of this page.
+        self.assertEqual(len(scripts), 2)
+        self.assertEqual(len(modules), 1)
+        self.assertRegex(modules[0].get("src", ""), r"^/static/tienda/acceso(\.[0-9a-f]+)?\.js$")
+        for script in scripts:
+            self.assertTrue(script.get("src", "").startswith("/static/tienda/"))
         self.assertNotIn("<style", html)
         for _, attrs in tags.tags:
             self.assertNotIn("style", attrs)
@@ -183,7 +188,9 @@ class AccessPageTests(SimpleTestCase):
         html = response.content.decode()
         self.assertIn("no está configurado", html)
         self.assertNotIn("data-supabase-key", html)
-        self.assertEqual(parse(html).named("script"), [])
+        # Only the header script of every page: the sign-in module is not loaded.
+        sources = [attrs.get("src") for attrs in parse(html).named("script")]
+        self.assertEqual(sources, ["/static/tienda/tienda.js"])
 
     def test_salir_is_accepted_and_the_page_is_never_cached(self):
         response = self.get(salir="1")

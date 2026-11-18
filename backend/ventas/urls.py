@@ -10,6 +10,9 @@ urlpatterns = [
     # The store's products.html, migrated into Django. The old address answers with a 301 so
     # links, bookmarks and the service worker of the PWA land on the new page.
     path("productos/", productos.catalogo, name="catalogo"),
+    path("productos/<int:pk>/", productos.producto, name="producto"),
+    path("productos/<int:pk>/cotizar/", productos.cotizar, name="producto_cotizar"),
+    path("buscar/", productos.buscar, name="buscar"),
     path("products.html", productos.products_html, name="products_html"),
     path("", landing.landing, name="landing"),
     path("privacidad/", landing.privacidad, name="privacidad"),

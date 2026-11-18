@@ -4,7 +4,8 @@
   the M16 product list of the `ventas` app (ventas:catalogo, /productos/). It reads the active
   products of the real catalogue and nothing private (no cost, no inactive product), it never calls
   the database functions, and it works without JavaScript: the search and the category filter are
-  a plain GET form.
+  a plain GET form. Each card opens the page of its product (producto.html), where the order is
+  configured.
 {% endcomment %}
 {% block title %}<title>Productos · {{ negocio.nombre }}</title>{% endblock %}
 {% block contenido %}
@@ -39,43 +40,8 @@
 
 <section class="mx-auto w-full max-w-7xl px-5 py-12 lg:px-6 lg:py-16">
   {% if page_obj %}
-  <ul role="list" class="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-    {% for product in page_obj %}
-    <li class="group flex flex-col">
-      <div class="aspect-[4/3] overflow-hidden rounded-control bg-surface-1">
-        {% if product.image_src %}<img src="{{ product.image_src }}" alt="{{ product.name }}" loading="lazy" width="480" height="360" class="size-full object-cover transition-transform duration-500 ease-out-strong group-hover:scale-[1.03]" />{% endif %}
-      </div>
-      <p class="mt-4 text-meta tracking-[0.12em] text-text-muted">{{ product.category.name|upper }}</p>
-      <h2 class="mt-1 font-display text-lead font-normal">{{ product.name }}</h2>
-      {% if product.description %}<p class="mt-2 line-clamp-2 text-ui text-text-muted">{{ product.description }}</p>{% endif %}
-      <p class="mt-3 text-ui font-medium text-sand">${{ product.price_per_kg }} / {{ product.unit_label }}</p>
-      <form method="post" action="{% url 'ventas:tienda_agregar' product.pk %}" class="mt-4 grid gap-2">
-        {% csrf_token %}
-        <input type="hidden" name="next" value="{{ request.get_full_path }}" />
-        <label class="grid gap-1 text-meta text-text-muted">Cómo lo quieres
-          <select name="mode" class="min-h-11 rounded-control border border-border bg-surface-1 px-3 text-ui text-text">
-            {% for value, label in product.modes %}<option value="{{ value }}">{{ label }}</option>{% endfor %}
-          </select>
-        </label>
-        <label class="grid gap-1 text-meta text-text-muted">Cantidad (pesos, peso o piezas)
-          <input type="number" name="amount" value="1" min="0.001" step="any" inputmode="decimal" required class="min-h-11 rounded-control border border-border bg-surface-1 px-3 text-ui text-text" />
-        </label>
-        {% if product.unit_label == "kg" %}
-        <label class="grid gap-1 text-meta text-text-muted">Unidad (solo por peso)
-          <select name="unit" class="min-h-11 rounded-control border border-border bg-surface-1 px-3 text-ui text-text">
-            {% for unit in units %}<option value="{{ unit }}">{{ unit }}</option>{% endfor %}
-          </select>
-        </label>
-        {% endif %}
-        {% if product.asks_thickness %}
-        <label class="grid gap-1 text-meta text-text-muted">Grosor en pulgadas (solo por piezas)
-          <input type="number" name="thickness_in" min="0.01" step="0.01" inputmode="decimal" class="min-h-11 rounded-control border border-border bg-surface-1 px-3 text-ui text-text" />
-        </label>
-        {% endif %}
-        <button type="submit" class="min-h-11 rounded-pill bg-red px-5 text-ui font-medium text-text transition-colors duration-150 hover:bg-red-hover">Agregar al carrito</button>
-      </form>
-    </li>
-    {% endfor %}
+  <ul role="list" class="grid grid-cols-2 gap-x-4 gap-y-10 lg:grid-cols-3 lg:gap-x-6 xl:grid-cols-4">
+    {% for producto in page_obj %}{% include "ventas/tienda/_tarjeta_producto.html" %}{% endfor %}
   </ul>
 
   <nav aria-label="Páginas del catálogo" class="mt-14 flex items-center justify-between border-t border-border pt-6 text-meta">

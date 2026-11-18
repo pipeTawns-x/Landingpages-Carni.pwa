@@ -1,0 +1,117 @@
+{% comment %}
+  The panels the header opens (_cabecera.html), with the native `popover` attribute: Esc and a
+  click outside close the four "auto" ones; the cart is "manual" (Engram #541: on a tablet or a
+  computer the catalogue behind it keeps scrolling and stays clickable), so it closes with its
+  button only. Each panel has its own close button. The cart lists the lines of the session
+  (`bolsa`, from ventas.context_processors.tienda) without prices: the store quotes them on the
+  cart page. The favourites live in the browser (localStorage), drawn by static/tienda/tienda.js.
+{% endcomment %}
+<aside id="menu" popover aria-label="Menú" class="cajon cajon-izquierda">
+  <div class="cajon-cabeza">
+    <p class="text-meta tracking-[0.16em] text-text-muted">MENÚ</p>
+    <button type="button" popovertarget="menu" popovertargetaction="hide" aria-label="Cerrar el menú" class="boton-cabecera">{% include "ventas/tienda/_icono.html" with nombre="cerrar" clase="size-5" %}</button>
+  </div>
+  <nav aria-label="Secciones" class="cajon-cuerpo">
+    <ul role="list" class="flex flex-col">
+      <li><a href="{% url 'ventas:landing' %}" class="enlace-cajon font-display text-titulo">Inicio</a></li>
+      <li><a href="{% url 'ventas:catalogo' %}" class="enlace-cajon font-display text-titulo">Productos</a></li>
+      <li><a href="{% url 'ventas:landing' %}#preguntas" class="enlace-cajon font-display text-titulo">Preguntas frecuentes</a></li>
+      <li><a href="{% url 'ventas:acceso' %}" class="enlace-cajon font-display text-titulo">Mi cuenta</a></li>
+    </ul>
+    {% if menu_categorias %}
+    <p class="mt-10 text-meta tracking-[0.16em] text-text-muted">CATEGORÍAS</p>
+    <ul role="list" class="mt-2 flex flex-col">
+      {% for categoria in menu_categorias %}<li><a href="{% url 'ventas:catalogo' %}?category={{ categoria.pk }}" class="enlace-cajon text-ui text-text-muted">{{ categoria.name }}</a></li>{% endfor %}
+    </ul>
+    {% endif %}
+    <a href="{% url 'ventas:privacidad' %}" class="mt-10 inline-flex min-h-11 items-center text-meta text-text-muted underline underline-offset-4 hover:text-text">Aviso de privacidad</a>
+  </nav>
+</aside>
+
+<div id="buscador" popover aria-labelledby="buscador-titulo" class="cajon cajon-arriba">
+  <div class="mx-auto w-full max-w-3xl px-5 pb-8 pt-5">
+    <div class="flex items-center justify-between">
+      <p id="buscador-titulo" class="text-meta tracking-[0.16em] text-text-muted">BUSCAR</p>
+      <button type="button" popovertarget="buscador" popovertargetaction="hide" aria-label="Cerrar la búsqueda" class="boton-cabecera">{% include "ventas/tienda/_icono.html" with nombre="cerrar" clase="size-5" %}</button>
+    </div>
+    <form method="get" action="{% url 'ventas:catalogo' %}" role="search" class="mt-3 flex items-center gap-3 border-b border-border-control pb-3 focus-within:border-sand">
+      {% include "ventas/tienda/_icono.html" with nombre="buscar" clase="size-6 shrink-0 text-text-muted" %}
+      <label for="buscador-q" class="sr-only">Busca un corte o producto</label>
+      <input id="buscador-q" type="search" name="q" data-buscador-q autofocus placeholder="Rib eye, arrachera, chorizo…" autocomplete="off" maxlength="80" class="min-h-12 w-full bg-transparent font-display text-seccion text-text placeholder:text-text-muted/60 focus:outline-none" />
+      <button type="submit" class="sr-only">Buscar</button>
+    </form>
+    <ul data-buscador-resultados role="list" aria-live="polite" class="mt-6 grid gap-2 sm:grid-cols-2"></ul>
+    <p class="mt-4 text-meta text-text-muted">Enter para ver todos los resultados en el catálogo.</p>
+  </div>
+</div>
+
+<aside id="contactar" popover aria-label="Contacto" class="cajon cajon-derecha">
+  <div class="cajon-cabeza">
+    <p class="text-meta tracking-[0.16em] text-text-muted">CONTACTO</p>
+    <button type="button" popovertarget="contactar" popovertargetaction="hide" aria-label="Cerrar contacto" class="boton-cabecera">{% include "ventas/tienda/_icono.html" with nombre="cerrar" clase="size-5" %}</button>
+  </div>
+  <div class="cajon-cuerpo">
+    <h2 class="font-display text-seccion">¿Cómo te ayudamos?</h2>
+    <p class="mt-3 text-ui text-text-muted">Pide tus cortes, pregunta por existencias o aparta tu paquete. Te atienden los dueños.</p>
+    <ul role="list" class="mt-8 flex flex-col gap-2">
+      <li><a href="{{ negocio.whatsapp_href }}" target="_blank" rel="noopener noreferrer" class="flex min-h-14 items-center gap-3 rounded-control bg-red px-5 text-ui font-medium text-white transition-colors duration-150 hover:bg-red-hover">{% include "ventas/tienda/_icono.html" with nombre="whatsapp" clase="size-5 shrink-0" %}Escribir por WhatsApp</a></li>
+      <li><a href="{{ negocio.telefono_href }}" class="flex min-h-14 items-center gap-3 rounded-control border border-border px-5 text-ui text-text transition-colors duration-150 hover:border-sand hover:text-sand">{% include "ventas/tienda/_icono.html" with nombre="telefono" clase="size-5 shrink-0" %}Llamar al {{ negocio.telefono }}</a></li>
+    </ul>
+    <dl class="mt-10 grid gap-6 border-t border-border pt-8 text-ui">
+      <div>
+        <dt class="text-meta tracking-[0.12em] text-text-muted">DIRECCIÓN</dt>
+        <dd class="mt-2"><address class="not-italic">{{ negocio.direccion.0 }}<br />{{ negocio.direccion.1 }}</address><a href="{{ negocio.mapa_href }}" target="_blank" rel="noopener noreferrer" class="mt-1 inline-flex min-h-11 items-center text-sand underline underline-offset-4">Cómo llegar</a></dd>
+      </div>
+      <div>
+        <dt class="text-meta tracking-[0.12em] text-text-muted">HORARIO</dt>
+        <dd class="mt-2">{{ horario.dias }}, {{ horario.abre }} a {{ horario.cierra }}<br /><span class="text-text-muted">{{ horario.cerrado }}</span></dd>
+      </div>
+    </dl>
+  </div>
+</aside>
+
+<aside id="favoritos" popover aria-label="Favoritos" class="cajon cajon-derecha">
+  <div class="cajon-cabeza">
+    <p class="text-meta tracking-[0.16em] text-text-muted">FAVORITOS</p>
+    <button type="button" popovertarget="favoritos" popovertargetaction="hide" aria-label="Cerrar favoritos" class="boton-cabecera">{% include "ventas/tienda/_icono.html" with nombre="cerrar" clase="size-5" %}</button>
+  </div>
+  <div class="cajon-cuerpo">
+    <ul data-favoritos-lista role="list" class="flex flex-col divide-y divide-border"></ul>
+    <p data-favoritos-vacio class="text-ui text-text-muted">Aún no guardas favoritos. Toca el corazón de un corte para tenerlo aquí.</p>
+    <noscript><p class="mt-4 text-meta text-text-muted">Los favoritos se guardan en tu navegador y necesitan JavaScript.</p></noscript>
+  </div>
+</aside>
+
+<aside id="bolsa" popover="manual" aria-label="Tu carrito" class="cajon cajon-derecha">
+  <div class="cajon-cabeza">
+    <p class="text-meta tracking-[0.16em] text-text-muted">TU CARRITO</p>
+    <button type="button" popovertarget="bolsa" popovertargetaction="hide" aria-label="Cerrar el carrito" class="boton-cabecera">{% include "ventas/tienda/_icono.html" with nombre="cerrar" clase="size-5" %}</button>
+  </div>
+  <div class="cajon-cuerpo flex flex-col">
+    {% if bolsa %}
+    <ul role="list" class="flex flex-col divide-y divide-border">
+      {% for linea in bolsa %}
+      <li class="flex gap-4 py-4">
+        <div class="size-18 shrink-0 overflow-hidden rounded-control bg-surface-1">{% if linea.product.image_src %}<img src="{{ linea.product.image_src }}" alt="" width="72" height="72" loading="lazy" class="size-full object-cover" />{% endif %}</div>
+        <div class="min-w-0 flex-1">
+          <a href="{% url 'ventas:producto' linea.product.pk %}" class="font-display text-lead hover:text-sand">{{ linea.product.name }}</a>
+          <p class="mt-1 text-ui text-text-muted">{{ linea.amount }}</p>
+          {% if linea.note %}<p class="mt-1 text-meta text-text-muted">“{{ linea.note }}”</p>{% endif %}
+        </div>
+        <form method="post" action="{% url 'ventas:tienda_quitar' linea.product.pk %}" class="shrink-0">
+          {% csrf_token %}
+          <button type="submit" class="min-h-11 text-meta text-text-muted underline underline-offset-4 hover:text-red-text">Quitar</button>
+        </form>
+      </li>
+      {% endfor %}
+    </ul>
+    <p class="mt-6 text-meta text-text-muted">El precio final lo calcula la carnicería con el peso real; lo ves antes de pedir.</p>
+    {% else %}
+    <p class="text-ui text-text-muted">Tu carrito está vacío.</p>
+    {% endif %}
+    <div class="mt-8 flex flex-col gap-2">
+      <a href="{% url 'ventas:carrito' %}" class="inline-flex min-h-12 items-center justify-center rounded-pill bg-red px-6 text-ui font-medium text-white transition-colors duration-150 hover:bg-red-hover">Ver carrito y pagar</a>
+      <a href="{% url 'ventas:catalogo' %}" class="inline-flex min-h-12 items-center justify-center rounded-pill border border-border-control px-6 text-ui text-text transition-colors duration-150 hover:border-sand hover:text-sand">Seguir comprando</a>
+    </div>
+  </div>
+</aside>

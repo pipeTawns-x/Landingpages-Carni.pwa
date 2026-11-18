@@ -136,7 +136,7 @@ class StoreOrderForm(forms.Form):
         }
 
 
-def _line_data(post):
+def line_data(post):
     """The fields of the line form with the ones that do not apply to the mode dropped.
 
     The forms of the store show the weight unit and the thickness together, so a customer who
@@ -173,7 +173,7 @@ def _quote_ok(request, line):
 
 
 def _save_line(request, product, success_text):
-    form = CartLineForm(_line_data(request.POST))
+    form = CartLineForm(line_data(request.POST))
     if not form.is_valid():
         messages.error(request, form.first_error())
         return False
@@ -255,7 +255,7 @@ def carrito(request):
     return render(request, "ventas/tienda/carrito.html", _cart_context(request, currency))
 
 
-def _client_ip(request):
+def client_ip(request):
     """The address the throttle counts: the proxy's own entry behind one, else REMOTE_ADDR."""
     if settings.CHECKOUT_TRUST_FORWARDED_FOR:
         forwarded = request.META.get("HTTP_X_FORWARDED_FOR", "")
@@ -271,7 +271,7 @@ def _throttled(request):
     The cache increments are atomic and the window is fixed when a counter is created, so a
     blocked client cannot keep its window open by insisting.
     """
-    keys = [f"checkout-throttle:ip:{_client_ip(request)}"]
+    keys = [f"checkout-throttle:ip:{client_ip(request)}"]
     if request.session.session_key:
         keys.append(f"checkout-throttle:session:{request.session.session_key}")
     over = False

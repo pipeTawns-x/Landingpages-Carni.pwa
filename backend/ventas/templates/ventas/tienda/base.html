@@ -1,7 +1,8 @@
 {% load static %}<!DOCTYPE html>
 {% comment %}
-  Frame of every public page of the store once it moved into Django: header with the written
-  brand, <main>, and the footer. Styled only by the store's Tailwind build (tienda/tienda.css,
+  Frame of every public page of the store once it moved into Django: the header with its panels
+  (_cabecera.html, _paneles.html), <main>, and the footer. static/tienda/tienda.js runs the
+  parts of the header that need a script; every page works without it. Styled only by the store's Tailwind build (tienda/tienda.css,
   compiled from backend/assets/tienda.css on the shared tokens). Pages fill the blocks `title`
   (the whole <title> element), `descripcion` and `contenido`.
 {% endcomment %}
@@ -14,34 +15,17 @@
   {% block title %}<title>{{ negocio.nombre }}</title>{% endblock %}
   <meta name="description" content="{% block descripcion %}{{ negocio.nombre }}: {{ negocio.lema|lower }}. Cortes de res, cerdo y pollo en San Luis Potosí.{% endblock %}" />
   <link rel="stylesheet" href="{% static 'tienda/tienda.css' %}" />
+  <script defer src="{% static 'tienda/tienda.js' %}"></script>
   {% block head_extra %}{% endblock %}
 </head>
 <body class="min-h-dvh bg-bg text-text">
   <a href="#contenido" class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-control focus:bg-surface-1 focus:px-4 focus:py-2">Saltar al contenido</a>
 
-  <header class="sticky top-0 z-30 border-b border-border bg-bg/85 backdrop-blur-md">
-    <div class="mx-auto grid h-18 w-full max-w-7xl grid-cols-[1fr_auto_1fr] items-center px-5 lg:px-6">
-      <nav aria-label="Principal" class="flex items-center gap-1">
-        <a href="{% url 'ventas:landing' %}" class="max-sm:hidden inline-flex min-h-11 items-center px-2 text-ui text-text-muted transition-colors duration-150 hover:text-text{% if request.resolver_match.url_name == 'landing' %} text-text{% endif %}">Inicio</a>
-        <a href="{% url 'ventas:catalogo' %}" class="inline-flex min-h-11 items-center px-2 text-ui text-text-muted transition-colors duration-150 hover:text-text{% if request.resolver_match.url_name == 'catalogo' %} text-text{% endif %}">Productos</a>
-      </nav>
-      <a href="{% url 'ventas:landing' %}" aria-label="{{ negocio.nombre }}, ir al inicio" class="justify-self-center">
-        {% include "ventas/tienda/_logotipo.html" %}
-      </a>
-      <div class="flex items-center justify-end gap-1">
-        <a href="{% url 'ventas:catalogo' %}#buscar" aria-label="Buscar un corte" class="inline-grid size-11 place-items-center text-text transition-colors duration-150 hover:text-sand">
-          {% include "ventas/tienda/_icono.html" with nombre="buscar" clase="size-5" %}
-        </a>
-        <a href="{% url 'ventas:carrito' %}" aria-label="Carrito, {{ request.session.tienda_cart|length }} productos" class="inline-flex min-h-11 items-center gap-2 px-2 text-ui text-text transition-colors duration-150 hover:text-sand">
-          <span class="max-sm:hidden">Carrito</span>{% include "ventas/tienda/_icono.html" with nombre="carrito" clase="size-5 sm:hidden" %}
-          <span data-cart-count class="inline-grid min-w-6 place-items-center rounded-pill bg-red px-2 text-meta">{{ request.session.tienda_cart|length }}</span>
-        </a>
-      </div>
-    </div>
-  </header>
+  {% include "ventas/tienda/_cabecera.html" %}
+  {% include "ventas/tienda/_paneles.html" %}
 
   {% if messages %}
-  <ul role="status" aria-live="polite" class="mx-auto w-full max-w-7xl px-5 pt-4 lg:px-6">
+  <ul role="status" aria-live="polite" class="mensajes mx-auto w-full max-w-7xl px-5 pt-4 lg:px-6">
     {% for message in messages %}<li class="text-ui {% if message.level_tag == 'error' %}text-red{% else %}text-sand{% endif %}">{{ message }}</li>{% endfor %}
   </ul>
   {% endif %}

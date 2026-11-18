@@ -67,22 +67,26 @@ class StoreTestCase(TestCase):
 
 
 class AddToCartTests(StoreTestCase):
-    def test_the_catalogue_has_an_add_form_per_product_with_its_modes(self):
-        html = self.page("ventas:catalogo").content.decode()
-        bistec = reverse("ventas:tienda_agregar", args=[self.store["bistec"].pk])
-        camiseta = reverse("ventas:tienda_agregar", args=[self.store["camiseta"].pk])
-        self.assertIn(f'action="{bistec}"', html)
-        self.assertIn(f'action="{camiseta}"', html)
+    def test_every_add_goes_through_the_page_of_the_product(self):
+        """Engram #541: the whole card opens the configuration; no card adds by itself."""
+        for name in ("ventas:catalogo", "ventas:landing"):
+            html = self.page(name).content.decode()
+            for key in ("bistec", "camiseta"):
+                with self.subTest(page=name, product=key):
+                    page = reverse("ventas:producto", args=[self.store[key].pk])
+                    action = reverse("ventas:tienda_agregar", args=[self.store[key].pk])
+                    self.assertIn(f'href="{page}"', html)
+                    self.assertNotIn(f'action="{action}"', html)
+
+    def test_the_page_of_a_product_offers_its_modes_and_its_thickness(self):
+        bistec = self.client.get(reverse("ventas:producto", args=[self.store["bistec"].pk]))
+        html = bistec.content.decode()
         for value in ('value="money"', 'value="weight"', 'value="pieces"', 'value="lb"'):
             self.assertIn(value, html)
         # Only the bistec has a cut spec with a thickness to ask.
         self.assertEqual(html.count('name="thickness_in"'), 1)
-
-    def test_the_landing_cards_can_add_a_product(self):
-        html = self.page("ventas:landing").content.decode()
-        for key in ("bistec", "camiseta"):
-            action = reverse("ventas:tienda_agregar", args=[self.store[key].pk])
-            self.assertIn(f'action="{action}"', html)
+        molida = reverse("ventas:producto", args=[self.store["molida"].pk])
+        self.assertNotIn('name="thickness_in"', self.client.get(molida).content.decode())
 
     def test_each_way_of_buying_is_kept_as_the_shared_line_without_a_price(self):
         for key, fields in (
@@ -156,6 +160,20 @@ class AddToCartTests(StoreTestCase):
 
 
 class CartPageTests(StoreTestCase):
+    def test_the_note_of_a_line_is_shown_and_survives_an_update(self):
+        """Engram #541: the notes travel with the line to the panel; "Actualizar" keeps them."""
+        self.add("bistec", note="Sin tanta grasa")
+
+        html = self.page().content.decode()
+
+        self.assertIn("Sin tanta grasa", html)
+        self.assertRegex(html, r'<textarea [^>]*name="note"[^>]*>Sin tanta grasa</textarea>')
+        self.client.post(
+            reverse("ventas:tienda_actualizar", args=[self.store["bistec"].pk]),
+            {"mode": "weight", "amount": "2", "unit": "kg", "note": "Sin tanta grasa"},
+        )
+        self.assertEqual(self.cart()[0]["note"], "Sin tanta grasa")
+
     def test_an_empty_cart_says_so_and_has_no_order_form(self):
         html = self.page().content.decode()
         self.assertIn("Tu carrito está vacío", html)
@@ -253,8 +271,10 @@ class CartPageTests(StoreTestCase):
         self.assertRegex(html, r"data-cart-count[^>]*>\s*2\s*<")
         self.assertIn(f'href="{reverse("ventas:carrito")}"', html)
 
-    def test_the_catalogue_stays_free_of_scripts(self):
-        self.assertNotIn("<script", self.page("ventas:catalogo").content.decode())
+    def test_the_catalogue_runs_no_inline_script(self):
+        html = self.page("ventas:catalogo").content.decode()
+
+        self.assertNotRegex(html, r"<script(?![^>]*\bsrc=\"/static/)[^>]*>")
 
 
 class CheckoutTests(StoreTestCase):

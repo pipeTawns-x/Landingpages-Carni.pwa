@@ -13,6 +13,8 @@
 
 /* Only the store templates count. */
 @source "../ventas/templates/ventas/tienda";
+/* tienda.js draws the search results and the favourites with these utilities. */
+@source "../static/tienda/tienda.js";
 
 @layer base {
   html {
@@ -162,5 +164,212 @@
         linear-gradient(rgb(11 11 12 / 0.55), rgb(11 11 12 / 0.82)),
         url("/img/comercio-v1/textura-talavera-oscura.webp");
     }
+  }
+}
+
+/*
+ * The header of the store (_cabecera.html) and the panels it opens (_paneles.html). The header
+ * is sticky on every page; on the landing (the page with the hero video) it floats over the
+ * video, transparent while the video is under it (data-cabecera="sobre", set by tienda.js) and
+ * solid after. Without the script it stays solid. The panels are native popovers: they slide in
+ * from their side; the backdrop never takes a click, so the cart (popover="manual") leaves the
+ * catalogue behind it clickable and scrollable (Engram #541).
+ */
+@layer components {
+  .cabecera {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    color: var(--color-text);
+    background-color: rgb(11 11 12 / 0.9);
+    border-bottom: 1px solid var(--color-border);
+    backdrop-filter: blur(12px);
+    transition: background-color 300ms var(--ease-out-strong), border-color 300ms var(--ease-out-strong);
+  }
+  body:has([data-hero]) .cabecera {
+    position: fixed;
+    inset-inline: 0;
+  }
+  body:has([data-hero]) .mensajes {
+    padding-top: 5.5rem;
+  }
+  :root.js .cabecera[data-cabecera="sobre"] {
+    color: #fff;
+    background-color: transparent;
+    background-image: linear-gradient(rgb(0 0 0 / 0.55), transparent);
+    border-bottom-color: transparent;
+    backdrop-filter: none;
+  }
+  .cabecera[data-cabecera="sobre"] .contador {
+    outline: 1px solid rgb(255 255 255 / 0.35);
+  }
+
+  .boton-cabecera {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    min-width: 2.75rem;
+    justify-content: center;
+    padding-inline: 0.5rem;
+    font-size: var(--text-ui);
+    line-height: var(--text-ui--line-height);
+    color: inherit;
+    transition: color 150ms var(--ease-out-strong);
+  }
+  .boton-cabecera:hover {
+    color: var(--color-sand);
+  }
+  .contador {
+    position: absolute;
+    top: 0.25rem;
+    right: 0;
+    display: inline-grid;
+    place-items: center;
+    min-width: 1.125rem;
+    height: 1.125rem;
+    padding-inline: 0.25rem;
+    border-radius: var(--radius-pill);
+    background-color: var(--color-red);
+    color: #fff;
+    font-size: 0.6875rem;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+  }
+  .contador[hidden] {
+    display: none;
+  }
+
+  .cajon {
+    position: fixed;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    color: var(--color-text);
+    background-color: var(--color-bg);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    transition:
+      translate 420ms var(--ease-drawer),
+      opacity 420ms var(--ease-drawer),
+      overlay 420ms allow-discrete,
+      display 420ms allow-discrete;
+  }
+  .cajon::backdrop {
+    pointer-events: none;
+    background-color: rgb(0 0 0 / 0);
+    transition: background-color 420ms var(--ease-drawer), overlay 420ms allow-discrete, display 420ms allow-discrete;
+  }
+  .cajon:popover-open::backdrop {
+    background-color: rgb(0 0 0 / 0.45);
+  }
+  #bolsa:popover-open::backdrop {
+    background-color: transparent;
+  }
+  .cajon-izquierda,
+  .cajon-derecha {
+    inset-block: 0;
+    width: min(28rem, 100vw);
+    height: 100dvh;
+    max-height: none;
+  }
+  .cajon-izquierda {
+    inset-inline: 0 auto;
+    border-right: 1px solid var(--color-border);
+    translate: -100% 0;
+  }
+  .cajon-derecha {
+    inset-inline: auto 0;
+    border-left: 1px solid var(--color-border);
+    translate: 100% 0;
+  }
+  .cajon-arriba {
+    inset-inline: 0;
+    top: 0;
+    width: 100%;
+    max-width: none;
+    border-bottom: 1px solid var(--color-border);
+    translate: 0 -100%;
+  }
+  .cajon:popover-open {
+    translate: 0 0;
+  }
+  @starting-style {
+    .cajon-izquierda:popover-open { translate: -100% 0; }
+    .cajon-derecha:popover-open { translate: 100% 0; }
+    .cajon-arriba:popover-open { translate: 0 -100%; }
+    .cajon:popover-open::backdrop { background-color: rgb(0 0 0 / 0); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .cajon,
+    .cajon::backdrop {
+      transition: none;
+    }
+  }
+  .cajon-cabeza {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 4.5rem;
+    padding-inline: 1.25rem 0.5rem;
+    background-color: var(--color-bg);
+    border-bottom: 1px solid var(--color-border);
+  }
+  .cajon-cuerpo {
+    padding: 1.5rem 1.25rem 2.5rem;
+  }
+  @media (width >= 48rem) {
+    .cajon-cuerpo { padding-inline: 2rem; }
+    .cajon-cabeza { padding-inline: 2rem 1rem; }
+  }
+  .enlace-cajon {
+    display: flex;
+    align-items: center;
+    min-height: 3rem;
+    transition: color 150ms var(--ease-out-strong), translate 300ms var(--ease-out-strong);
+  }
+  .enlace-cajon:hover {
+    color: var(--color-sand);
+    translate: 0.25rem 0;
+  }
+
+  /* The ways of ordering and the weight units of the product page: a segmented control. */
+  .opcion-segmento {
+    position: relative;
+    display: flex;
+    flex: 1 1 0;
+    align-items: center;
+    justify-content: center;
+    min-height: 2.75rem;
+    padding-inline: 0.75rem;
+    border-radius: var(--radius-pill);
+    font-size: var(--text-ui);
+    color: var(--color-text-muted);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background-color 200ms var(--ease-out-strong), color 200ms var(--ease-out-strong);
+  }
+  .opcion-segmento:hover {
+    color: var(--color-text);
+  }
+  .opcion-segmento:has(input:checked) {
+    background-color: var(--color-sand);
+    color: var(--color-bg);
+    font-weight: 500;
+  }
+  .opcion-segmento:has(input:focus-visible) {
+    outline: 2px solid var(--color-sand);
+    outline-offset: 2px;
+  }
+
+  /* The thickness slider. */
+  .rango {
+    width: 100%;
+    height: 2.75rem;
+    accent-color: var(--color-sand);
+    cursor: pointer;
   }
 }

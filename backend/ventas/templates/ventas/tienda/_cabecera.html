@@ -1,0 +1,24 @@
+{% comment %}
+  The header of every public page, in the order Eduardo asked for (2026-11-18, after the Louis
+  Vuitton site): "Menú" and the search on the left, the title in the centre, "Contacto", the
+  favourites, the account and the cart on the right. Each button opens its panel
+  (_paneles.html) with the native `popover` attribute, so the panels work without JavaScript.
+  `data-cabecera` is "sobre" on the landing, where the header floats over the video until the
+  video scrolls away (static/tienda/tienda.js), and "solida" on every other page.
+{% endcomment %}<header data-cabecera="{{ cabecera|default:'solida' }}" class="cabecera">
+  <div class="mx-auto grid h-18 w-full max-w-7xl grid-cols-[1fr_auto_1fr] items-center px-2 sm:px-5 lg:px-6">
+    <div class="flex items-center">
+      <button type="button" popovertarget="menu" class="boton-cabecera">{% include "ventas/tienda/_icono.html" with nombre="menu" clase="size-5 shrink-0" %}<span class="max-md:sr-only">Menú</span></button>
+      <button type="button" popovertarget="buscador" class="boton-cabecera">{% include "ventas/tienda/_icono.html" with nombre="buscar" clase="size-5 shrink-0" %}<span class="max-lg:sr-only">Buscar</span></button>
+    </div>
+    <a href="{% url 'ventas:landing' %}" aria-label="{{ negocio.nombre }}, ir al inicio" class="justify-self-center">
+      {% include "ventas/tienda/_logotipo.html" %}
+    </a>
+    <div class="flex items-center justify-end">
+      <button type="button" popovertarget="contactar" class="boton-cabecera">{% include "ventas/tienda/_icono.html" with nombre="telefono" clase="size-5 shrink-0 md:hidden" %}<span class="max-md:sr-only">Contacto</span></button>
+      <button type="button" popovertarget="favoritos" aria-label="Favoritos" class="boton-cabecera relative">{% include "ventas/tienda/_icono.html" with nombre="corazon" clase="size-5 shrink-0" %}<span data-fav-count hidden class="contador">0</span></button>
+      <a href="{% url 'ventas:acceso' %}" aria-label="Mi cuenta" class="boton-cabecera max-sm:hidden">{% include "ventas/tienda/_icono.html" with nombre="usuario" clase="size-5 shrink-0" %}</a>
+      <button type="button" popovertarget="bolsa" aria-label="Carrito, {{ request.session.tienda_cart|length }} productos" class="boton-cabecera relative">{% include "ventas/tienda/_icono.html" with nombre="carrito" clase="size-5 shrink-0" %}<span data-cart-count class="contador">{{ request.session.tienda_cart|length }}</span></button>
+    </div>
+  </div>
+</header>

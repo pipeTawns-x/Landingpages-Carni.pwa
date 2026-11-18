@@ -175,9 +175,12 @@ class PublicCatalogTests(TestCase):
         self.assertEqual(self.client.get(self.url, {"page": "999"}).status_code, 200)
 
     def test_it_works_without_javascript(self):
+        """The search and the cards are plain HTML; the only scripts are the site's own files."""
         html = self.client.get(self.url).content.decode()
 
-        for forbidden in ("<script", " style=", " onclick=", "javascript:"):
+        self.assertRegex(html, r'<form [^>]*method="get" action="/productos/"')
+        self.assertNotRegex(html, r"<script(?![^>]*\bsrc=\"/static/)[^>]*>")
+        for forbidden in (" style=", " onclick=", "javascript:"):
             with self.subTest(forbidden=forbidden):
                 self.assertNotIn(forbidden, html)
 

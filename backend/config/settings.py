@@ -101,6 +101,7 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
                 "panel.context_processors.store_origin",
                 "ventas.context_processors.negocio",
+                "ventas.context_processors.tienda",
             ],
         },
     },

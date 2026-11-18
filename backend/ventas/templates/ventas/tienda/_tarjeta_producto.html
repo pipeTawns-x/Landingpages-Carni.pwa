@@ -1,0 +1,22 @@
+{% comment %}
+  The card of a product, the same in the catalogue and on the landing: the whole card opens the
+  page of the product, where the order is configured (Engram #541: "la tarjeta entera abre la
+  configuración"). Price per kilo and per pound, as the CodePen shows them. The heart, beside
+  the link and not inside it, saves the product in the favourites of this browser (tienda.js; it
+  stays hidden without the script). Pass `producto` and, optionally, `aspecto` and `entrada`.
+{% endcomment %}<li data-producto="{{ producto.pk }}" class="group relative{% if entrada %} entrada{% endif %}">
+  <a href="{% url 'ventas:producto' producto.pk %}" class="block rounded-card focus-visible:outline-offset-4">
+    <div class="relative {{ aspecto|default:'aspect-[4/5]' }} overflow-hidden rounded-card bg-surface-1">
+      {% if producto.image_src %}<img src="{{ producto.image_src }}" alt="{{ producto.name }}" loading="lazy" width="480" height="600" class="{% if entrada %}entrada-foto {% endif %}size-full object-cover transition-transform duration-700 ease-out-strong group-hover:scale-[1.04] motion-reduce:transition-none" />{% endif %}
+      <span aria-hidden="true" class="absolute bottom-3 right-3 grid size-10 translate-y-1 place-items-center rounded-pill bg-bg/80 text-sand opacity-0 backdrop-blur-sm transition-[opacity,translate] duration-300 ease-out-strong group-hover:translate-y-0 group-hover:opacity-100 motion-reduce:transition-none">{% include "ventas/tienda/_icono.html" with nombre="flecha" clase="size-4" %}</span>
+    </div>
+    <p class="mt-4 text-meta tracking-[0.12em] text-text-muted">{{ producto.category.name|upper }}</p>
+    <h3 class="mt-1 font-display text-titulo font-normal transition-colors duration-150 group-hover:text-sand">{{ producto.name }}</h3>
+    <p class="mt-2 flex flex-wrap items-baseline gap-x-3 tabular-nums">
+      <span class="text-ui font-medium text-sand">${{ producto.price_per_kg }} / {{ producto.unit_label }}</span>
+      {% if producto.unit_label == "kg" %}<span class="text-meta text-text-muted">${{ producto.price_per_lb }} / lb</span>{% endif %}
+    </p>
+    <p class="mt-1 text-meta text-text-muted">Haz clic para personalizar tu pedido</p>
+  </a>
+  <button type="button" data-favorito="{{ producto.pk }}" data-nombre="{{ producto.name }}" data-url="{% url 'ventas:producto' producto.pk %}" data-imagen="{{ producto.image_src }}" data-precio="{{ producto.price_per_kg }} / {{ producto.unit_label }}" aria-pressed="false" aria-label="Guardar {{ producto.name }} en favoritos" hidden class="absolute right-3 top-3 grid size-11 place-items-center rounded-pill bg-bg/70 text-text backdrop-blur-sm transition-colors duration-150 hover:text-sand aria-pressed:text-red">{% include "ventas/tienda/_icono.html" with nombre="corazon" clase="size-5" %}</button>
+</li>
