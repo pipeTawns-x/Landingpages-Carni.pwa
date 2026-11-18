@@ -466,3 +466,49 @@ class CutSpec(models.Model):
 
         if errors:
             raise ValidationError(errors)
+
+
+class Promotion(models.Model):
+    """A discount on one product for a window of time. Owned by Supabase (`product_promotions`).
+
+    The `django` role has full access to the table. Postgres refuses two active windows of the
+    same product that overlap (an exclusion constraint); the panel checks it first to explain why.
+    `quote_cart` applies the price: a promotion counts while `starts_at <= now() < ends_at`.
+    """
+
+    class Kind(models.TextChoices):
+        PERCENT = "percent", "Porcentaje"
+        AMOUNT_OFF = "amount_off", "Monto menos"
+        FIXED_PRICE = "fixed_price", "Precio fijo"
+
+    product = models.ForeignKey(
+        Product, on_delete=models.CASCADE, related_name="promotions", db_column="product_id"
+    )
+    kind = models.TextField(choices=Kind.choices)
+    value = models.DecimalField(max_digits=12, decimal_places=2)
+    starts_at = models.DateTimeField()
+    ends_at = models.DateTimeField()
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        managed = False
+        db_table = "product_promotions"
+        verbose_name = "descuento"
+        verbose_name_plural = "descuentos"
+
+    def __str__(self) -> str:
+        return f"{self.get_kind_display()} {self.value} · {self.product_id}"
+
+    def price_for(self, base: Decimal) -> Decimal:
+        """The price `quote_cart` charges with this promotion, for display in the panel.
+
+        Same rule as the SQL: percent rounds to cents, a fixed price never goes above the list
+        price, and nothing goes below one cent.
+        """
+        if self.kind == self.Kind.PERCENT:
+            price = (base * (1 - self.value / 100)).quantize(Decimal("0.01"))
+        elif self.kind == self.Kind.AMOUNT_OFF:
+            price = base - self.value
+        else:
+            price = min(self.value, base)
+        return max(price, Decimal("0.01"))

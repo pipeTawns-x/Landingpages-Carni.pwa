@@ -1,0 +1,58 @@
+{% extends "panel/base.html" %}
+{% comment %}
+  Descuentos (/panel/descuentos/, panel:descuentos). A POST form with Django's CSRF token creates
+  a discount (action "create"); each active row has a POST button that switches it off (action
+  "off"). Dates are whole days and the last one counts complete. Context of the view: form and
+  rows (promo, state, first_day, last_day, list_price, price, unit).
+{% endcomment %}
+{% block title %}<title>Descuentos · Panel · Carnicería El Señor de La Misericordia</title>{% endblock %}
+{% block titulo %}Descuentos{% endblock %}
+{% block contenido %}
+<div class="flex flex-col gap-5 lg:gap-6">
+  <section aria-labelledby="nuevo-titulo" class="flex flex-col gap-4 rounded-card border border-border bg-surface-1 p-5 lg:max-w-2xl lg:p-8">
+    <h2 id="nuevo-titulo" class="font-display text-titulo font-medium">Nuevo descuento</h2>
+    <p class="text-meta text-text-muted">La tienda cobra el precio con descuento desde las 00:00 del primer día hasta el final del último. Un producto no puede tener dos descuentos activos en las mismas fechas.</p>
+    <form method="post" action="{% url 'panel:descuentos' %}" novalidate class="flex flex-col gap-3">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="create" />
+      {% if form.non_field_errors %}<p role="alert" class="text-ui font-semibold text-red-text">{{ form.non_field_errors.0 }}</p>{% endif %}
+      {% for field in form %}
+      <div class="flex flex-col gap-2">
+        <label for="{{ field.id_for_label }}" class="text-ui font-semibold">{{ field.label }}<span class="font-normal text-text-muted"> · obligatorio</span></label>
+        {{ field }}
+        {% include "inventory/_field_error.html" with field=field %}
+        {% if field.help_text %}<p class="text-meta text-text-muted">{{ field.help_text }}</p>{% endif %}
+      </div>
+      {% endfor %}
+      <div class="flex"><button type="submit" class="inline-flex min-h-12 items-center justify-center gap-2 rounded-pill bg-red px-6 text-ui font-semibold text-white transition-[background-color,scale] duration-160 ease-out-strong hover:bg-red-hover active:scale-[0.97] motion-reduce:transition-none">Guardar descuento</button></div>
+    </form>
+  </section>
+
+  <section aria-labelledby="lista-titulo" class="flex flex-col gap-4 rounded-card border border-border bg-surface-1 p-5 lg:p-8">
+    <h2 id="lista-titulo" class="font-display text-titulo font-medium">Descuentos</h2>
+    {% if rows %}
+    <ul role="list" class="flex flex-col divide-y divide-border">
+      {% for row in rows %}
+      <li class="flex flex-col gap-2 py-4 sm:flex-row sm:items-center sm:justify-between">
+        <div class="flex flex-col gap-1">
+          <p class="text-ui font-semibold">{{ row.promo.product.name }} <span class="ml-2 inline-flex items-center rounded-pill border border-border px-2 text-meta font-normal text-text-muted">{{ row.state }}</span></p>
+          <p class="text-meta text-text-muted tabular-nums">{% if row.promo.kind == "percent" %}{{ row.promo.value|floatformat:"-2" }} %{% elif row.promo.kind == "amount_off" %}${{ row.promo.value|floatformat:"2g" }} menos{% else %}Precio fijo{% endif %} · del {{ row.first_day|date:"d/m/Y" }} al {{ row.last_day|date:"d/m/Y" }}</p>
+          <p class="text-ui tabular-nums"><s class="text-text-muted">${{ row.list_price|floatformat:"2g" }}</s> → <strong>${{ row.price|floatformat:"2g" }}</strong><span class="text-meta text-text-muted"> / {{ row.unit }}</span></p>
+        </div>
+        {% if row.promo.is_active and row.state != "Terminado" %}
+        <form method="post" action="{% url 'panel:descuentos' %}">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="off" />
+          <input type="hidden" name="promotion" value="{{ row.promo.pk }}" />
+          <button type="submit" class="inline-flex min-h-11 items-center justify-center rounded-pill border border-border-control px-5 text-ui text-text transition-[background-color,scale] duration-160 ease-out-strong hover:bg-surface-2 active:scale-[0.97] motion-reduce:transition-none">Desactivar</button>
+        </form>
+        {% endif %}
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p class="text-ui text-text-muted">Todavía no hay descuentos.</p>
+    {% endif %}
+  </section>
+</div>
+{% endblock %}

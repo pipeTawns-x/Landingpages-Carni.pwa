@@ -132,6 +132,7 @@ class MasPageTests(TestCase):
             links,
             [
                 "/panel/compras/",
+                "/panel/descuentos/",
                 "/panel/clientes/",
                 "/panel/buildads/",
                 "/panel/productads/",
@@ -211,7 +212,7 @@ class NavigationStateTests(SimpleTestCase):
         self.assertEqual(current_links(sidebar_of(html)), {})
         self.assertEqual(current_links(tab_bar_of(html)), {})
 
-    def test_the_sidebar_has_eight_entries_and_the_tab_bar_five(self):
+    def test_the_sidebar_has_nine_entries_and_the_tab_bar_five(self):
         html = render_frame("panel:inicio", "panel")
 
         self.assertEqual(
@@ -221,6 +222,7 @@ class NavigationStateTests(SimpleTestCase):
                 "/panel/pedidos/",
                 "/panel/productos/",
                 "/panel/compras/",
+                "/panel/descuentos/",
                 "/panel/clientes/",
                 "/panel/buildads/",
                 "/panel/productads/",

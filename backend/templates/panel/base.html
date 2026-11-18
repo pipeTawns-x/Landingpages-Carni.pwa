@@ -60,6 +60,12 @@
           </a>
         </li>
         <li>
+          <a href="{% url 'panel:descuentos' %}"{% if view_name == 'panel:descuentos' %} aria-current="page"{% endif %} class="group flex min-h-11 items-center gap-3 rounded-control px-3 text-ui text-text-muted transition-transform duration-160 ease-out-strong hover:bg-surface-2 hover:text-text active:scale-[0.97] motion-reduce:transition-none aria-[current]:bg-surface-2 aria-[current]:font-semibold aria-[current]:text-text">
+            <svg class="size-5 shrink-0 group-aria-[current]:text-red-text" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M19 5 5 19M7.5 9a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3ZM16.5 18a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z" /></svg>
+            <span>Descuentos</span>
+          </a>
+        </li>
+        <li>
           <a href="{% url 'panel:clientes' %}"{% if view_name == 'panel:clientes' %} aria-current="page"{% endif %} class="group flex min-h-11 items-center gap-3 rounded-control px-3 text-ui text-text-muted transition-transform duration-160 ease-out-strong hover:bg-surface-2 hover:text-text active:scale-[0.97] motion-reduce:transition-none aria-[current]:bg-surface-2 aria-[current]:font-semibold aria-[current]:text-text">
             <svg class="size-5 shrink-0 group-aria-[current]:text-red-text" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7ZM3 20a6 6 0 0 1 12 0M16 4.3a3.5 3.5 0 0 1 0 6.4M21 20a6 6 0 0 0-3.5-5.4" /></svg>
             <span>Clientes</span>
@@ -149,7 +155,7 @@
         </a>
       </li>
       <li>
-        <a href="{% url 'panel:mas' %}"{% if view_name == 'panel:mas' %} aria-current="page"{% elif view_name == 'panel:compras' or view_name == 'panel:buildads' or view_name == 'panel:productads' or view_name == 'panel:ajustes' %} aria-current="true"{% endif %} class="flex min-h-14 flex-col items-center justify-center gap-1 rounded-control text-meta text-text-muted transition-transform duration-160 ease-out-strong hover:text-text active:scale-[0.97] motion-reduce:transition-none aria-[current]:font-semibold aria-[current]:text-red-text">
+        <a href="{% url 'panel:mas' %}"{% if view_name == 'panel:mas' %} aria-current="page"{% elif view_name == 'panel:compras' or view_name == 'panel:descuentos' or view_name == 'panel:buildads' or view_name == 'panel:productads' or view_name == 'panel:ajustes' %} aria-current="true"{% endif %} class="flex min-h-14 flex-col items-center justify-center gap-1 rounded-control text-meta text-text-muted transition-transform duration-160 ease-out-strong hover:text-text active:scale-[0.97] motion-reduce:transition-none aria-[current]:font-semibold aria-[current]:text-red-text">
           <svg class="size-5.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h.01M12 12h.01M19 12h.01" /></svg>
           <span>Más</span>
         </a>
