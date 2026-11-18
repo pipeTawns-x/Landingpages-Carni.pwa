@@ -15,6 +15,7 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 
+from inventory.models import ProductCost
 from panel.access import PANEL_SESSION_KEY
 from panel.tests import sign_in_as_panel_admin
 from ventas.domain import UNAVAILABLE_MESSAGE, message_for
@@ -230,3 +231,70 @@ class CountTests(PurchasesTestCase):
 
         self.assertEqual(response.status_code, 400)
         self.assertEqual((self.gateway.purchases, self.gateway.counts), ([], []))
+
+
+class YieldTests(PurchasesTestCase):
+    """The yield of the cut: what is left to sell from each kilo bought (`product_costs.yield_pct`).
+
+    `register_purchase` reads it to grow the stock by the sellable kilos, and the cost of a sale
+    divides the cost per kilo bought by it: 10 kg for $1,500 at 80 % is 8 kg at $187.50 a kilo.
+    """
+
+    def post(self, **data):
+        payload = {"action": "purchase", "product": self.store["bistec"].pk, "qty": "10"}
+        payload.update({"total_cost": "1500", **data})
+        return self.client.post(self.url, payload)
+
+    def test_a_yield_is_saved_before_the_purchase_is_sent(self):
+        response = self.post(yield_pct="80")
+
+        self.assertRedirects(response, self.url, fetch_redirect_response=False)
+        cost = ProductCost.objects.get(product=self.store["bistec"])
+        self.assertEqual(cost.yield_pct, Decimal("80"))
+        self.assertEqual(cost.updated_by, self.client.session[PANEL_SESSION_KEY])
+        self.assertEqual(len(self.gateway.purchases), 1)
+        self.assertEqual(
+            self.messages_of(response), ["Compra registrada: Bistec (rendimiento 80 %)."]
+        )
+
+    def test_a_new_yield_keeps_the_cost_already_known(self):
+        ProductCost.objects.create(
+            product=self.store["bistec"], cost_per_kg=Decimal("150"), yield_pct=Decimal("100")
+        )
+
+        self.post(yield_pct="75.5")
+
+        cost = ProductCost.objects.get(product=self.store["bistec"])
+        self.assertEqual((cost.cost_per_kg, cost.yield_pct), (Decimal("150"), Decimal("75.5")))
+
+    def test_without_a_yield_the_known_one_stays(self):
+        ProductCost.objects.create(product=self.store["bistec"], yield_pct=Decimal("80"))
+
+        self.post(yield_pct="")
+
+        self.assertEqual(ProductCost.objects.get().yield_pct, Decimal("80"))
+        self.assertEqual(len(self.gateway.purchases), 1)
+
+    def test_a_yield_out_of_range_is_refused(self):
+        for value in ("0", "100.01", "-5"):
+            with self.subTest(value=value):
+                response = self.post(yield_pct=value)
+
+                self.assertContains(response, "El rendimiento va de más de 0 a 100 %.")
+        self.assertFalse(ProductCost.objects.exists())
+        self.assertEqual(self.gateway.purchases, [])
+
+    def test_a_piece_product_takes_no_yield(self):
+        response = self.post(product=self.store["camiseta"].pk, qty="12", yield_pct="80")
+
+        self.assertContains(response, "El rendimiento solo aplica a productos por kilo.")
+        self.assertFalse(ProductCost.objects.exists())
+        self.assertEqual(self.gateway.purchases, [])
+
+    def test_when_the_store_refuses_the_yield_is_not_kept(self):
+        self.gateway.errors["register_purchase"] = GatewayError("invalid_amount")
+
+        response = self.post(yield_pct="80")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(ProductCost.objects.exists())

@@ -512,3 +512,34 @@ class Promotion(models.Model):
         else:
             price = min(self.value, base)
         return max(price, Decimal("0.01"))
+
+
+class ProductCost(models.Model):
+    """The private cost of a product (`product_costs`, owned by Supabase; never shown in the store).
+
+    `register_purchase` writes the cost per kilo bought; the panel writes the yield of the cut,
+    the share of each kilo bought that can be sold. The `django` role may insert and update it.
+    """
+
+    product = models.OneToOneField(
+        Product,
+        on_delete=models.CASCADE,
+        primary_key=True,
+        related_name="cost",
+        db_column="product_id",
+    )
+    cost_per_kg = models.DecimalField(max_digits=12, decimal_places=4, null=True, blank=True)
+    cost_per_piece = models.DecimalField(max_digits=12, decimal_places=4, null=True, blank=True)
+    yield_pct = models.DecimalField(max_digits=5, decimal_places=2, default=Decimal("100"))
+    updated_at = models.DateTimeField(auto_now=True)
+    # Nullable text mirrors a real Supabase column; not our schema to redesign.
+    updated_by = models.TextField(null=True, blank=True)  # noqa: DJ001
+
+    class Meta:
+        managed = False
+        db_table = "product_costs"
+        verbose_name = "costo de producto"
+        verbose_name_plural = "costos de producto"
+
+    def __str__(self) -> str:
+        return f"cost of {self.product_id}"

@@ -8,12 +8,13 @@ gateway, then redirect (POST/redirect/GET). The lots come from `panel_purchase_p
 
 from django import forms
 from django.contrib import messages
+from django.db import transaction
 from django.http import HttpResponseBadRequest
 from django.shortcuts import redirect, render
 from django.views.decorators.http import require_http_methods
 
 from inventory.forms import NUMBER, SELECT, TEXT
-from inventory.models import Product
+from inventory.models import Product, ProductCost
 from panel.access import PANEL_SESSION_KEY, panel_admin_required
 from ventas import domain, services
 
@@ -60,6 +61,24 @@ class PurchaseForm(forms.Form):
         "Cantidad comprada", 3, "En kilos, o en piezas si el producto es por pieza."
     )
     total_cost = _amount_field("Costo total (MXN)", 2, "Lo que pagaste por todo el lote.")
+    yield_pct = forms.DecimalField(
+        label="Rendimiento del corte (%)",
+        required=False,
+        max_digits=5,
+        decimal_places=2,
+        help_text=(
+            "Lo que queda para vender de cada kilo comprado. Vacío: se queda el que ya tenía."
+        ),
+        widget=forms.NumberInput(
+            attrs={"class": NUMBER, "step": "any", "inputmode": "decimal", "min": "0", "max": "100"}
+        ),
+        error_messages={
+            "invalid": "Escribe un número, por ejemplo 80.",
+            "max_decimal_places": "Usa como máximo 2 decimales.",
+            "max_digits": "El rendimiento va de más de 0 a 100 %.",
+            "max_whole_digits": "El rendimiento va de más de 0 a 100 %.",
+        },
+    )
     note = forms.CharField(
         label="Nota",
         required=False,
@@ -73,6 +92,19 @@ class PurchaseForm(forms.Form):
         if qty <= 0:
             raise forms.ValidationError("La cantidad debe ser mayor que cero.")
         return qty
+
+    def clean_yield_pct(self):
+        value = self.cleaned_data["yield_pct"]
+        if value is not None and not (0 < value <= 100):
+            raise forms.ValidationError("El rendimiento va de más de 0 a 100 %.")
+        return value
+
+    def clean(self):
+        data = super().clean()
+        product = data.get("product")
+        if data.get("yield_pct") is not None and product and product.price_unit != "kg":
+            self.add_error("yield_pct", "El rendimiento solo aplica a productos por kilo.")
+        return data
 
     def clean_total_cost(self):
         cost = self.cleaned_data["total_cost"]
@@ -141,13 +173,22 @@ def compras(request):
     if action == "purchase" and purchase.is_valid():
         data = purchase.cleaned_data
         product = data["product"]
-        if _send(
-            request,
-            lambda: gateway.register_purchase(
-                product.pk, data["qty"], data["total_cost"], data["note"] or None, staff_ref
-            ),
-            f"Compra registrada: {product.name}.",
-        ):
+        yield_pct = data["yield_pct"]
+
+        def register():
+            # One transaction: when the store refuses the purchase, the new yield is not kept.
+            with transaction.atomic():
+                if yield_pct is not None:
+                    ProductCost.objects.update_or_create(
+                        product=product,
+                        defaults={"yield_pct": yield_pct, "updated_by": staff_ref},
+                    )
+                gateway.register_purchase(
+                    product.pk, data["qty"], data["total_cost"], data["note"] or None, staff_ref
+                )
+
+        detail = f" (rendimiento {yield_pct.normalize():f} %)" if yield_pct is not None else ""
+        if _send(request, register, f"Compra registrada: {product.name}{detail}."):
             return redirect("panel:compras")
     if action == "count" and count.is_valid():
         data = count.cleaned_data
