@@ -137,7 +137,8 @@ def descuentos(request):
         return HttpResponseBadRequest("Acción desconocida.")
 
     if action == "off":
-        promo = get_object_or_404(Promotion, pk=request.POST.get("promotion") or 0)
+        raw_id = request.POST.get("promotion", "")
+        promo = get_object_or_404(Promotion, pk=int(raw_id) if raw_id.isdigit() else 0)
         promo.is_active = False
         promo.save(update_fields=["is_active"])
         messages.success(request, f"Descuento desactivado: {promo.product.name}.")

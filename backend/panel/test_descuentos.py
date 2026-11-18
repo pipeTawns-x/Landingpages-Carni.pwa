@@ -194,6 +194,11 @@ class SwitchOffTests(DiscountsTestCase):
 
         self.assertEqual(response.status_code, 404)
 
+    def test_a_discount_id_that_is_not_a_number_is_a_404(self):
+        response = self.client.post(self.url, {"action": "off", "promotion": "abc"})
+
+        self.assertEqual(response.status_code, 404)
+
     def test_once_off_a_new_one_may_take_its_dates(self):
         self.create()
         self.client.post(self.url, {"action": "off", "promotion": Promotion.objects.get().pk})
