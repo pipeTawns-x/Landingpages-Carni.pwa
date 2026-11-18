@@ -22,7 +22,7 @@
   <header class="sticky top-0 z-30 border-b border-border bg-bg/85 backdrop-blur-md">
     <div class="mx-auto grid h-18 w-full max-w-7xl grid-cols-[1fr_auto_1fr] items-center px-5 lg:px-6">
       <nav aria-label="Principal" class="flex items-center gap-1">
-        <a href="{% url 'ventas:landing' %}" class="inline-flex min-h-11 items-center px-2 text-ui text-text-muted transition-colors duration-150 hover:text-text{% if request.resolver_match.url_name == 'landing' %} text-text{% endif %}">Inicio</a>
+        <a href="{% url 'ventas:landing' %}" class="max-sm:hidden inline-flex min-h-11 items-center px-2 text-ui text-text-muted transition-colors duration-150 hover:text-text{% if request.resolver_match.url_name == 'landing' %} text-text{% endif %}">Inicio</a>
         <a href="{% url 'ventas:catalogo' %}" class="inline-flex min-h-11 items-center px-2 text-ui text-text-muted transition-colors duration-150 hover:text-text{% if request.resolver_match.url_name == 'catalogo' %} text-text{% endif %}">Productos</a>
       </nav>
       <a href="{% url 'ventas:landing' %}" aria-label="{{ negocio.nombre }}, ir al inicio" class="justify-self-center">
@@ -33,7 +33,7 @@
           {% include "ventas/tienda/_icono.html" with nombre="buscar" clase="size-5" %}
         </a>
         <a href="{% url 'ventas:carrito' %}" aria-label="Carrito, {{ request.session.tienda_cart|length }} productos" class="inline-flex min-h-11 items-center gap-2 px-2 text-ui text-text transition-colors duration-150 hover:text-sand">
-          Carrito
+          <span class="max-sm:hidden">Carrito</span>{% include "ventas/tienda/_icono.html" with nombre="carrito" clase="size-5 sm:hidden" %}
           <span data-cart-count class="inline-grid min-w-6 place-items-center rounded-pill bg-red px-2 text-meta">{{ request.session.tienda_cart|length }}</span>
         </a>
       </div>

@@ -16,6 +16,75 @@ from ventas import catalog
 from ventas.negocio import NEGOCIO
 
 SHOWCASE_SIZE = 8
+HEADLINE = "Carne fresca, cortada como la pides"
+
+# The bento of the categories: a 6 x 6 grid on wide screens, nine tiles of nine different sizes
+# (columns x rows), all in one section. The geometry lives in assets/tienda.css (.bento-a ...
+# .bento-i); this table only says which category takes which slot and with which photo.
+BENTO_SLOTS = {
+    "a": {"cols": 3, "rows": 3},
+    "b": {"cols": 2, "rows": 2},
+    "c": {"cols": 1, "rows": 3},
+    "d": {"cols": 2, "rows": 1},
+    "e": {"cols": 2, "rows": 3},
+    "f": {"cols": 1, "rows": 1},
+    "g": {"cols": 1, "rows": 2},
+    "h": {"cols": 3, "rows": 1},
+    "i": {"cols": 3, "rows": 2},
+}
+BENTO_TILES = {
+    "carnes-rojas": (
+        "a",
+        "res",
+        "Bistec, diezmillo, molida y para caldo",
+        "Bistec de res marmoleado sobre la tabla",
+    ),
+    "cortes-especiales": (
+        "b",
+        "tomahawk",
+        "Tomahawk, rib eye, arrachera",
+        "Corte grueso de res con pimienta",
+    ),
+    "pollo": (
+        "c",
+        "pollo",
+        "Pechuga, pierna y muslo, alas",
+        "Piernas de pollo crudas con especias",
+    ),
+    "embutidos": (
+        "d",
+        "embutidos",
+        "Chorizo, longaniza y salchicha",
+        "Chorizo y salchichas sobre tabla",
+    ),
+    "cerdo": ("e", "cerdo", "Chuleta, costilla, lomo y carnitas", "Chuletas de cerdo frescas"),
+    "otros": ("f", "otrosproductos", "Carbón, hielo y más", "Productos para la carne asada"),
+    "merch": ("g", "merch", "Gorra, delantal y hielera", "Artículos de la carnicería"),
+    "ofertas": ("h", "premium", "Paquetes para 4 a 10 personas", "Paquete de cortes para asar"),
+    "preparadas": ("i", "preparadas", "Adobados y marinados listos", "Carne adobada con especias"),
+}
+
+
+def _bento(categorias):
+    """The tiles of the bento: every active category, the known ones in their slot first."""
+    tiles = []
+    for categoria in categorias:
+        known = BENTO_TILES.get(categoria.slug)
+        if known is None:
+            # A category the table does not know yet still shows, after the nine, in a plain tile.
+            known = ("x", "premium", "", categoria.name)
+        slot, photo, description, alt = known
+        tiles.append(
+            {
+                "categoria": categoria,
+                "slot": slot,
+                "foto": f"/img/products/{photo}-alto.webp",
+                "descripcion": description,
+                "alt": alt,
+            }
+        )
+    return sorted(tiles, key=lambda tile: tile["slot"])
+
 
 # The three questions the business can answer today. Two more of the design (weight policy and
 # payment) are not published until the butcher shop validates them: an answer it cannot keep is
@@ -78,7 +147,8 @@ def landing(request):
     """The landing page of the store."""
     instagram = urlsplit(NEGOCIO["instagram"]).path.strip("/")
     context = {
-        "categorias": Category.objects.filter(is_active=True).order_by("order", "name"),
+        "titular": HEADLINE.split(),
+        "bento": _bento(Category.objects.filter(is_active=True).order_by("order", "name")),
         "productos": _showcase(),
         "preguntas": FAQ,
         "resenas": REVIEWS,

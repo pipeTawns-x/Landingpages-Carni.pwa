@@ -95,7 +95,50 @@
 @keyframes velo { from { scale: 1.08; } to { scale: 1; } }
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
-    .entrada { animation: entrada linear both; animation-timeline: view(); animation-range: entry 0% entry 45%; }
-    .entrada-foto { animation: velo linear both; animation-timeline: view(); animation-range: entry 0% cover 40%; }
+    /* landing.js marks <html class="gsap"> when GSAP drives the motion; then these step aside. */
+    :root:not(.gsap) .entrada { animation: entrada linear both; animation-timeline: view(); animation-range: entry 0% entry 45%; }
+    :root:not(.gsap) .entrada-foto { animation: velo linear both; animation-timeline: view(); animation-range: entry 0% cover 40%; }
+  }
+}
+
+/*
+ * Bento of the landing (_landing_categorias.html): nine tiles of nine different sizes. Phones: two
+ * columns, packed densely. Wide screens: a 6 x 6 grid, every tile in its own area (columns x rows:
+ * a 3x3, b 2x2, c 1x3, d 2x1, e 2x3, f 1x1, g 1x2, h 3x1, i 3x2).
+ */
+@layer components {
+  .bento {
+    display: grid;
+    gap: 0.75rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-rows: 9rem;
+    grid-auto-flow: dense;
+  }
+  .bento-a { grid-column: span 2; grid-row: span 2; }
+  .bento-c, .bento-e, .bento-g { grid-row: span 2; }
+  .bento-h, .bento-i, .bento-x { grid-column: span 2; }
+  .bento-f .bento-desc { display: none; }
+  @media (width < 64rem) {
+    .bento-b .bento-desc, .bento-c .bento-desc, .bento-d .bento-desc, .bento-g .bento-desc {
+      display: none;
+    }
+  }
+  @media (width >= 64rem) {
+    .bento {
+      gap: 1rem;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      grid-template-rows: repeat(6, 8.5rem);
+      grid-auto-rows: 8.5rem;
+      grid-auto-flow: row;
+    }
+    .bento-a { grid-area: 1 / 1 / 4 / 4; }
+    .bento-b { grid-area: 1 / 4 / 3 / 6; }
+    .bento-c { grid-area: 1 / 6 / 4 / 7; }
+    .bento-d { grid-area: 3 / 4 / 4 / 6; }
+    .bento-e { grid-area: 4 / 1 / 7 / 3; }
+    .bento-f { grid-area: 4 / 3 / 5 / 4; }
+    .bento-g { grid-area: 5 / 3 / 7 / 4; }
+    .bento-h { grid-area: 4 / 4 / 5 / 7; }
+    .bento-i { grid-area: 5 / 4 / 7 / 7; }
   }
 }

@@ -4,10 +4,14 @@
   Hero with the looping video, categories, a selection of the real catalogue, the family section,
   reviews, FAQ, schedule and contact. Real data only: the products come from the catalogue, the
   business facts from ventas/negocio.py and the reviews are the real ones of the Google profile.
-  Motion is CSS only (scroll-driven entrances under @supports, off with prefers-reduced-motion).
+  Motion: static/tienda/landing.js with GSAP and ScrollTrigger (served by the site, no inline
+  script). Without it, or with prefers-reduced-motion, the page is complete and still.
 {% endcomment %}
+{% load static %}
+{% block head_extra %}<script defer src="{% static 'tienda/vendor/gsap/gsap.min.js' %}"></script><script defer src="{% static 'tienda/vendor/gsap/ScrollTrigger.min.js' %}"></script><script defer src="{% static 'tienda/landing.js' %}"></script>{% endblock %}
 {% block contenido %}
 {% include "ventas/tienda/_landing_hero.html" %}
+{% include "ventas/tienda/_landing_cinta.html" %}
 {% include "ventas/tienda/_landing_categorias.html" %}
 {% include "ventas/tienda/_landing_productos.html" %}
 {% include "ventas/tienda/_landing_familia.html" %}

@@ -1,24 +1,34 @@
-{% comment %}Categories strip: the active categories of the catalogue, each a link to its filtered list.{% endcomment %}
-{% if categorias %}
-<section aria-labelledby="categorias-titulo" class="border-b border-border py-14 lg:py-20">
+{% comment %}
+  Bento of the categories: each active category as a photo tile, nine tiles of nine different
+  sizes in one section (the geometry is .bento-a ... .bento-i in assets/tienda.css). Each tile
+  links to its filtered list. landing.js reveals the tiles with a wipe and moves the photos on
+  scroll; without JavaScript, or with reduced motion, everything is already in place.
+{% endcomment %}
+{% if bento %}
+<section id="bento" aria-labelledby="bento-titulo" class="py-16 lg:py-24">
   <div class="mx-auto w-full max-w-7xl px-5 lg:px-6">
-    <div class="entrada flex items-end justify-between gap-6">
-      <h2 id="categorias-titulo" class="text-seccion">Nuestras categorías</h2>
+    <div class="flex items-end justify-between gap-6" data-reveal>
+      <div>
+        <p class="text-meta tracking-[0.16em] text-sand">EL MOSTRADOR COMPLETO</p>
+        <h2 id="bento-titulo" class="mt-3 text-seccion">Todo lo del mostrador</h2>
+      </div>
       <a href="{% url 'ventas:catalogo' %}" class="hidden min-h-11 items-center text-ui text-sand underline underline-offset-4 transition-colors duration-150 hover:text-text sm:inline-flex">Ver todo el catálogo</a>
     </div>
-    <ul role="list" class="mt-8 grid grid-cols-2 gap-px overflow-hidden rounded-card border border-border bg-border sm:grid-cols-3 lg:mt-12 lg:grid-cols-4">
-      {% for categoria in categorias %}
-      <li class="bg-bg">
-        <a href="{% url 'ventas:catalogo' %}?category={{ categoria.pk }}" class="group flex min-h-28 flex-col justify-between gap-6 p-5 transition-colors duration-200 ease-out-strong hover:bg-surface-2 lg:min-h-36">
-          <span class="text-meta tabular-nums tracking-[0.16em] text-text-muted">{{ forloop.counter|stringformat:"02d" }}</span>
-          <span class="flex items-end justify-between gap-3">
-            <span class="font-display text-titulo">{{ categoria.name }}</span>
-            <span aria-hidden="true" class="text-sand transition-transform duration-200 ease-out-strong group-hover:translate-x-1 motion-reduce:transition-none">&rarr;</span>
+    <div class="bento mt-8 lg:mt-12">
+      {% for tile in bento %}
+      <a href="{% url 'ventas:catalogo' %}?category={{ tile.categoria.pk }}" class="bento-tile bento-{{ tile.slot }} group relative isolate flex overflow-hidden rounded-card bg-surface-1" data-bento-tile>
+        <img src="{{ tile.foto }}" alt="{{ tile.alt }}" width="1114" height="1114" loading="lazy" decoding="async" class="absolute inset-0 -z-20 size-full object-cover transition-[scale] duration-700 ease-out-strong group-hover:scale-[1.06] motion-reduce:transition-none" data-bento-photo />
+        <span aria-hidden="true" class="absolute inset-0 -z-10 bg-linear-to-t from-bg/90 via-bg/25 to-transparent"></span>
+        <span class="mt-auto flex w-full items-end justify-between gap-3 p-4 lg:p-5">
+          <span class="flex flex-col gap-1">
+            <span class="font-display text-titulo leading-tight text-text">{{ tile.categoria.name }}</span>
+            {% if tile.descripcion %}<span class="bento-desc text-meta text-text-muted">{{ tile.descripcion }}</span>{% endif %}
           </span>
-        </a>
-      </li>
+          <span aria-hidden="true" class="grid size-10 shrink-0 place-items-center rounded-pill border border-text/30 text-text transition-[background-color,border-color,translate] duration-200 ease-out-strong group-hover:-translate-y-0.5 group-hover:border-sand group-hover:bg-sand group-hover:text-bg motion-reduce:transition-none">&rarr;</span>
+        </span>
+      </a>
       {% endfor %}
-    </ul>
+    </div>
   </div>
 </section>
 {% endif %}
