@@ -76,6 +76,16 @@ class PageTests(ProductTestCase):
             re.findall(r'name="mode" value="([a-z]+)"', self.html("camiseta")), ["pieces"]
         )
 
+    def test_pieces_are_offered_only_when_the_panel_says_so(self):
+        bistec = self.store["bistec"]
+        bistec.sale_modes = ["money", "weight"]
+        bistec.save()
+
+        html = self.html()
+
+        self.assertEqual(re.findall(r'name="mode" value="([a-z]+)"', html), ["weight", "money"])
+        self.assertNotIn('name="thickness_in"', html)
+
     def test_the_weight_unit_offers_kg_g_and_lb(self):
         units = re.findall(r'name="unit" value="([a-z]+)"', self.html())
 

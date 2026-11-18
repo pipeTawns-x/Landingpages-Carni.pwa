@@ -385,12 +385,18 @@ def messages_of(response):
 def make_store():
     """Create the catalogue of the cases file in the database and return it by key.
 
-    The products are `bistec` (per kilo, with a cut spec: 150 g a piece, 1 in thick), `molida`
+    The products are `bistec` (per kilo, sold by pieces too, with a cut spec: 150 g a piece,
+    1 in thick), `molida`
     (per kilo, no spec) and `camiseta` (merchandise, sold by the piece).
     """
     meat = Category.objects.create(name="Res", slug="res")
     merch = Category.objects.create(name="Merch", slug="merch")
-    bistec = Product.objects.create(category=meat, name="Bistec", price_per_kg=Decimal("200.00"))
+    bistec = Product.objects.create(
+        category=meat,
+        name="Bistec",
+        price_per_kg=Decimal("200.00"),
+        sale_modes=["money", "weight", "pieces"],
+    )
     molida = Product.objects.create(category=meat, name="Molida", price_per_kg=Decimal("140.00"))
     camiseta = Product.objects.create(
         category=merch, name="Camiseta", price_per_kg=Decimal("250.00"), price_unit="piece"

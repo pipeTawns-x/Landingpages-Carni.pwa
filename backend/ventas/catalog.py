@@ -1,10 +1,11 @@
 """What the sales pages know about a product before asking the store: how it can be sold.
 
 The store decides the price and refuses a way of selling it does not allow (`quote_line`). This
-module only decides which choices a form offers, so the staff is not offered a choice the store
-would refuse: a product priced per piece or package is sold by pieces; a product priced per kilo
-by money and by weight, and also by pieces when its cut spec says what a piece weighs. The
-thickness is only asked for when the spec has a default thickness to compare it with.
+module only decides which choices a form offers, so nobody is offered a choice the store would
+refuse: a product priced per piece or package is sold by pieces; a product priced per kilo by
+money and by weight, and also by pieces when the owner turned "Se vende por pieza" on in the
+panel (`products.sale_modes` lists it) and its cut spec says what a piece weighs. The thickness
+is only asked for when the spec has a default thickness to compare it with.
 """
 
 from django.db.models import Q
@@ -28,7 +29,7 @@ def sale_modes(product):
         return ["pieces"]
     spec = spec_of(product)
     modes = ["money", "weight"]
-    if spec is not None and spec.avg_piece_weight_kg:
+    if "pieces" in (product.sale_modes or []) and spec is not None and spec.avg_piece_weight_kg:
         modes.append("pieces")
     return modes
 

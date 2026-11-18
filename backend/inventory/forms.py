@@ -190,12 +190,22 @@ class ProductForm(forms.ModelForm):
 
 
 class CutSpecForm(forms.ModelForm):
-    """Optional cut/packaging specification for a product.
+    """Optional cut/packaging specification for a product, and whether it sells by pieces.
 
     All fields are optional so a product can be created or edited without a
     spec. When any field is filled in, `CutSpec.clean()` (thickness range
     validation) still runs through the ModelForm's `_post_clean` step.
+
+    `sells_by_piece` is the owner's own choice (Eduardo, 2026-11-18: "no asumas"): a weight of a
+    piece alone never makes the store sell a product by pieces. Turning it on needs that weight,
+    because the store estimates the kilos of an order by pieces from it.
     """
+
+    sells_by_piece = forms.BooleanField(
+        required=False,
+        label="Se vende por pieza",
+        widget=forms.CheckboxInput(attrs={"class": "size-5 accent-sand"}),
+    )
 
     class Meta:
         model = CutSpec
@@ -230,3 +240,20 @@ class CutSpecForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         # "Sin definir" is how the design calls the blank choice.
         self.fields["presentation"].choices = [("", "Sin definir"), *CutSpec.Presentation.choices]
+        if self.instance.product_id and not self.is_bound:
+            self.initial["sells_by_piece"] = "pieces" in (self.instance.product.sale_modes or [])
+
+    def clean(self):
+        data = super().clean()
+        if data.get("sells_by_piece") and not data.get("avg_piece_weight_kg"):
+            self.add_error(
+                "avg_piece_weight_kg", "Para venderlo por pieza escribe cuánto pesa una pieza."
+            )
+        return data
+
+    def has_spec_data(self):
+        """True when a field of the spec itself was filled in (a zero counts as filled in)."""
+        return any(
+            self.cleaned_data.get(name) not in (None, "", [])
+            for name in self._meta.fields
+        )

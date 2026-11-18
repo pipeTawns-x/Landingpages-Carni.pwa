@@ -159,6 +159,10 @@
 
     <fieldset class="min-w-0 rounded-card border border-border bg-surface-1 p-4 lg:p-6">
       <legend class="float-left mb-4 w-full p-0 font-sans text-ui font-semibold">Especificación de corte (opcional)</legend>
+      <div class="mb-5 flex flex-col gap-1">
+        <label for="{{ spec_form.sells_by_piece.id_for_label }}" class="inline-flex min-h-11 items-center gap-3 text-ui font-semibold">{{ spec_form.sells_by_piece }}Se vende por pieza</label>
+        <p class="text-meta text-text-muted">Actívalo solo si este corte se vende por pieza. Pide el peso promedio de una pieza; el grosor mínimo, máximo y por defecto definen el control del grosor en la tienda.</p>
+      </div>
       <p class="clear-both mb-4 text-meta text-text-muted">Déjala en blanco si no aplica. Si llenas algún campo, se guarda junto con el producto.</p>
       <div class="clear-both grid gap-5 lg:grid-cols-3">
         <div class="flex flex-col gap-2">
@@ -168,7 +172,7 @@
             <span aria-hidden="true" class="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-text-muted">kg</span>
           </div>
           {% include "inventory/_field_error.html" with field=spec_form.avg_piece_weight_kg %}
-          <p id="help-avg_piece_weight_kg" class="text-meta text-text-muted">Con este dato la tienda puede ofrecer pedir por pieza.</p>
+          <p id="help-avg_piece_weight_kg" class="text-meta text-text-muted">Lo necesita la tienda para calcular los kilos de un pedido por piezas.</p>
         </div>
         <div class="flex flex-col gap-2">
           <label for="{{ spec_form.thickness_min_in.id_for_label }}" class="text-ui font-semibold">Grosor mínimo (in)</label>

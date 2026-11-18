@@ -121,11 +121,6 @@ def delete_or_deactivate(product: Product) -> DeleteOutcome:
     return DeleteOutcome(deactivated=False, favorites_removed=references.favorites)
 
 
-def _spec_form_has_data(spec_form: CutSpecForm) -> bool:
-    """Return True if the staff member filled in at least one spec field."""
-    return any(value not in (None, "", []) for value in spec_form.cleaned_data.values())
-
-
 def save_product(product_form: ProductForm, spec_form: CutSpecForm) -> Product:
     """Save a validated product form and, when it applies, its cut spec and its photo.
 
@@ -142,10 +137,10 @@ def save_product(product_form: ProductForm, spec_form: CutSpecForm) -> Product:
         product = product_form.save()
         spec = spec_form.save(commit=False)
 
-        if spec.pk or _spec_form_has_data(spec_form):
+        if spec.pk or spec_form.has_spec_data():
             spec.product = product
             spec.save()
-        sync_store_spec(product)
+        sync_store_spec(product, by_piece=spec_form.cleaned_data.get("sells_by_piece", False))
 
         if photo:
             product.image_url = storage.upload_product_image(photo, product.pk)
@@ -159,11 +154,12 @@ def _weight_or_none(value):
     return value if value else None
 
 
-def sync_store_spec(product: Product) -> None:
+def sync_store_spec(product: Product, by_piece: bool | None = None) -> None:
     """Copy the cut spec of `product` to the store and set how the store may sell it.
 
     `quote_cart` reads `product_cut_specs` and accepts "pieces" only when `sale_modes` lists it.
-    A product priced per kilo sells by pieces when a piece has a weight; one priced per piece or
+    A product priced per kilo sells by pieces when the owner said so (`by_piece`, the switch of
+    the product form; None keeps what it was) and a piece has a weight; one priced per piece or
     package always sells by pieces (`Product.save` keeps that). Without a spec, nothing is copied.
     """
     spec = CutSpec.objects.filter(product=product).first()
@@ -179,8 +175,10 @@ def sync_store_spec(product: Product) -> None:
         )
     if product.price_unit != Product.PriceUnit.KG:
         return
+    if by_piece is None:
+        by_piece = "pieces" in (product.sale_modes or [])
     has_weight = spec is not None and bool(spec.avg_piece_weight_kg)
-    modes = ["money", "weight", "pieces"] if has_weight else ["money", "weight"]
+    modes = ["money", "weight", "pieces"] if by_piece and has_weight else ["money", "weight"]
     if product.sale_modes != modes:
         product.sale_modes = modes
         product.save(update_fields=["sale_modes"])
