@@ -6,7 +6,8 @@ the same pieces as the counter sale of the panel: the session cart holds only wh
 
 The cart lives under its own session key, apart from the counter cart of the panel, so a staff
 member selling at the counter and a customer browsing the store never share lines. Every page
-works with plain forms; `static/tienda/carrito.js` only enhances the cart page.
+works with plain forms; `static/tienda/carrito.js` only enhances the cart page. The catalogue
+that feeds it is `ventas.views.productos`.
 
 The order is placed with `create_order_web` (channel `web`, no user, the rule of three pending
 orders per phone), the one function of the store for a customer without a session. Until the
@@ -25,9 +26,10 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_POST, require_safe
 
-from ventas import cart, catalog, domain, services, views
+from ventas import cart, catalog, domain, services
 from ventas.forms import CartLineForm, phone_validator
 from ventas.models import PanelOrder
+from ventas.views.comun import currency_of, modes_of, quote_rows
 
 logger = logging.getLogger("ventas.checkout")
 
@@ -213,21 +215,9 @@ def quitar(request, pk):
     return redirect("ventas:carrito")
 
 
-@require_safe
-def catalogo(request):
-    """The public catalogue with a form to add each product: the ways it can be sold come from
-    `ventas.catalog`, the same source the counter sale uses. Reads only; no database function."""
-    context = views._listing(request, views.CATALOG_PER_PAGE)
-    for product in context["page_obj"]:
-        product.modes = views._modes(product)
-        product.asks_thickness = catalog.asks_thickness(product)
-    context["units"] = domain.UNITS
-    return render(request, "ventas/tienda/productos.html", context)
-
-
 def _cart_context(request, currency, order_form=None):
     lines = public_lines(request)
-    rows, quote, currency, blocked = views._quote(request, lines, currency)
+    rows, quote, currency, blocked = quote_rows(request, lines, currency)
     products = {
         product.pk: product
         for product in catalog.active_products().filter(
@@ -237,7 +227,7 @@ def _cart_context(request, currency, order_form=None):
     for row in rows:
         product = products.get(row["line"]["product_id"])
         row["product"] = product
-        row["modes"] = views._modes(product) if product else []
+        row["modes"] = modes_of(product) if product else []
         row["asks_thickness"] = bool(product) and catalog.asks_thickness(product)
         row["warnings"] = [
             domain.WARNING_MESSAGES.get(code, code)
@@ -261,7 +251,7 @@ def _cart_context(request, currency, order_form=None):
 
 @require_safe
 def carrito(request):
-    currency = views._currency_of(request.GET.get("currency"))
+    currency = currency_of(request.GET.get("currency"))
     return render(request, "ventas/tienda/carrito.html", _cart_context(request, currency))
 
 
@@ -333,7 +323,7 @@ def pedido(request):
     if form.is_valid():
         if _throttled(request):
             messages.error(request, THROTTLED_MESSAGE)
-            currency = views._currency_of(form.cleaned_data["currency"])
+            currency = currency_of(form.cleaned_data["currency"])
             context = _cart_context(request, currency, form)
             return render(request, "ventas/tienda/carrito.html", context, status=429)
         order_id = _place_order(request, lines, form)
@@ -342,7 +332,7 @@ def pedido(request):
             request.session[LAST_ORDER_KEY] = str(order_id)
             return redirect("ventas:pedido_confirmado")
 
-    currency = views._currency_of(form.data.get("currency"))
+    currency = currency_of(form.data.get("currency"))
     return render(request, "ventas/tienda/carrito.html", _cart_context(request, currency, form))
 
 

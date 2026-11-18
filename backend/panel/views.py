@@ -34,7 +34,7 @@ from panel.models import Profile, ReviewInvite, is_valid_landing_path
 from ventas import domain, services
 from ventas.models import PanelOrder
 from ventas.negocio import HORARIO, NEGOCIO
-from ventas.views import home
+from ventas.views.tablero import home
 
 logger = logging.getLogger(__name__)
 
@@ -261,7 +261,7 @@ def inicio(request):
     """Landing page of the panel: the dashboard with the metrics of the store.
 
     The page belongs to `ventas`, which owns the door to the database functions that compute
-    the metrics (`ventas.views.home`).
+    the metrics (`ventas.views.tablero.home`).
     """
     return home(request)
 

@@ -7,6 +7,10 @@ from django.urls import reverse
 from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_safe
 
+from ventas.views.comun import moved_to
+
+accessweb_html = moved_to("ventas:acceso")
+
 
 @never_cache
 @require_safe

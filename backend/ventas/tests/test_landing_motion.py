@@ -12,7 +12,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from inventory.models import Category
-from ventas.views_landing import BENTO_SLOTS
+from ventas.views.landing import BENTO_SLOTS
 
 SLUGS = (
     "carnes-rojas",

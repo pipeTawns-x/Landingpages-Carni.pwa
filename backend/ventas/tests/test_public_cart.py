@@ -17,7 +17,7 @@ from inventory.models import Product
 from ventas import services
 from ventas.models import PanelOrder
 from ventas.tests.support import FakeGateway, make_store, messages_of
-from ventas.views_carrito import (
+from ventas.views.carrito import (
     FALLBACK_CHANNEL,
     LAST_ORDER_KEY,
     PUBLIC_CART_KEY,

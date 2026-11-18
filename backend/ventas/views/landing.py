@@ -14,6 +14,9 @@ from django.views.decorators.http import require_safe
 from inventory.models import Category
 from ventas import catalog
 from ventas.negocio import NEGOCIO
+from ventas.views.comun import moved_to
+
+index_html = moved_to("ventas:landing")
 
 SHOWCASE_SIZE = 8
 HEADLINE = "Carne fresca, cortada como la pides"

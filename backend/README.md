@@ -328,7 +328,7 @@ Behaviour worth knowing before touching it:
 
 ## Sign-in page (`/acceso/`)
 
-`accessweb.html` moved into Django: `ventas:acceso` (`ventas/views_acceso.py`,
+`accessweb.html` moved into Django: `ventas:acceso` (`ventas/views/acceso.py`,
 `ventas/templates/ventas/tienda/acceso.html`), inside the store frame. The old address answers
 301 to `/acceso/` and keeps the query (`?salir=1`).
 
