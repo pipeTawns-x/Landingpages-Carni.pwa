@@ -43,6 +43,9 @@
       </div>
     </div>
 
-    <p class="mt-12 border-t border-border pt-6 text-meta text-text-muted">© 2026 {{ negocio.nombre }}</p>
+    <div class="mt-12 flex flex-col gap-2 border-t border-border pt-6 text-meta text-text-muted sm:flex-row sm:items-center sm:justify-between">
+      <p>© 2026 {{ negocio.nombre }}</p>
+      <a href="{% url 'ventas:privacidad' %}" class="inline-flex min-h-11 items-center underline-offset-4 transition-colors duration-150 ease-out-strong hover:text-sand hover:underline">Aviso de privacidad</a>
+    </div>
   </div>
 </footer>

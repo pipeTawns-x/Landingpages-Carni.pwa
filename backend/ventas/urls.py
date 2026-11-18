@@ -12,6 +12,7 @@ urlpatterns = [
     path("productos/", views_carrito.catalogo, name="catalogo"),
     path("products.html", views.products_html, name="products_html"),
     path("", views_landing.landing, name="landing"),
+    path("privacidad/", views_landing.privacidad, name="privacidad"),
     path("index.html", views.index_html, name="index_html"),
     path("acceso/", views_acceso.acceso, name="acceso"),
     path("accessweb.html", views.accessweb_html, name="accessweb_html"),

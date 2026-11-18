@@ -88,3 +88,9 @@ def landing(request):
         "instagram_usuario": f"@{instagram}",
     }
     return render(request, "ventas/tienda/landing.html", context)
+
+
+@require_safe
+def privacidad(request):
+    """The privacy notice of the store (ventas:privacidad, /privacidad/): static text, no data."""
+    return render(request, "ventas/tienda/privacidad.html")
