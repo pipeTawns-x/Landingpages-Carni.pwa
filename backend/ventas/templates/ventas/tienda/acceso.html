@@ -102,15 +102,15 @@
       <p class="text-ui text-text-muted lg:hidden">¿Ya tienes cuenta? <button type="button" data-accion="ver-ingresar" class="min-h-11 text-sand underline underline-offset-4">Inicia sesión</button></p>
     </form>
 
-    <!-- Don Carlos. Wide: a half that slides from the right (login) to the left (sign-up) over the
-         unused form. Narrow: a banner above the form. The image fades into the card with a mask
-         instead of sitting on it as a box; the login picture is scaled up so its dark frame and
-         the corner sparkle fall outside the card. -->
+    <!-- Don Carlos, cut out without a background, standing on the star tiles (.azulejo). Wide: a
+         half that slides from the right (login) to the left (sign-up) over the unused form.
+         Narrow: a banner above the form. Each mode has its own pose, which rises into place. -->
     <aside aria-label="Don Carlos, tu carnicero" class="order-first relative h-48 shrink-0 overflow-hidden sm:h-60 lg:absolute lg:inset-y-0 lg:left-1/2 lg:order-none lg:h-auto lg:w-1/2 lg:transition-transform lg:duration-500 lg:ease-out-strong lg:group-data-[modo=registro]:-translate-x-full motion-reduce:transition-none">
-      <img src="/img/recursos_web/carniLogin.png" alt="Don Carlos saluda desde su carnicería" width="992" height="1056" decoding="async"
-           class="absolute inset-0 size-full scale-[1.25] object-cover object-[50%_38%] transition-opacity duration-300 max-lg:[mask-image:linear-gradient(to_bottom,black_55%,transparent)] lg:[mask-image:linear-gradient(to_right,transparent,black_42%)] group-data-[modo=registro]:opacity-0" />
-      <img src="/img/recursos_web/carniRegistro.png" alt="Don Carlos te da la bienvenida con los brazos abiertos" width="1024" height="1024" loading="lazy" decoding="async"
-           class="absolute inset-0 size-full object-cover object-[50%_30%] opacity-0 transition-opacity duration-300 max-lg:[mask-image:linear-gradient(to_bottom,black_55%,transparent)] lg:[mask-image:linear-gradient(to_left,transparent,black_42%)] group-data-[modo=registro]:opacity-100" />
+      <div aria-hidden="true" class="azulejo absolute inset-0"></div>
+      <img src="/img/mascota/don-carlos-login.webp" srcset="/img/mascota/don-carlos-login@2x.webp 2x" alt="Don Carlos saluda con su cuchilla junto a un corte sobre el tronco" width="640" height="768" decoding="async"
+           class="absolute inset-x-0 bottom-0 mx-auto h-[92%] w-auto max-w-none object-contain object-bottom drop-shadow-[0_24px_40px_rgb(0_0_0/0.55)] transition-[opacity,translate] duration-500 ease-out-strong group-data-[modo=registro]:translate-y-6 group-data-[modo=registro]:opacity-0 motion-reduce:transition-none" />
+      <img src="/img/mascota/don-carlos-register.webp" srcset="/img/mascota/don-carlos-register@2x.webp 2x" alt="Don Carlos te da la bienvenida con los brazos abiertos" width="640" height="640" loading="lazy" decoding="async"
+           class="absolute inset-x-0 bottom-0 mx-auto h-[86%] w-auto max-w-none translate-y-6 object-contain object-bottom opacity-0 drop-shadow-[0_24px_40px_rgb(0_0_0/0.55)] transition-[opacity,translate] duration-500 ease-out-strong group-data-[modo=registro]:translate-y-0 group-data-[modo=registro]:opacity-100 motion-reduce:transition-none" />
 
       <div class="absolute inset-x-0 bottom-0 hidden bg-linear-to-t from-bg via-bg/80 to-transparent px-10 pb-10 pt-24 lg:block">
         <div class="group-data-[modo=registro]:hidden">

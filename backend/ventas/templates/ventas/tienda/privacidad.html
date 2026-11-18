@@ -10,17 +10,17 @@
 {% block contenido %}
 <article class="mx-auto flex w-full max-w-3xl flex-col gap-8 px-5 py-12 lg:px-6 lg:py-16">
   <header class="flex flex-col gap-3">
-    <h1 class="font-display text-titulo font-medium lg:text-4xl">Aviso de privacidad</h1>
+    <h1 class="font-display text-seccion font-medium">Aviso de privacidad</h1>
     <p class="text-meta text-text-muted">Última actualización: 18 de noviembre de 2026.</p>
   </header>
 
   <section aria-labelledby="responsable" class="flex flex-col gap-3 text-ui">
-    <h2 id="responsable" class="font-display text-xl font-medium">Quién es responsable de tus datos</h2>
+    <h2 id="responsable" class="font-display text-titulo font-medium">Quién es responsable de tus datos</h2>
     <p>{{ negocio.nombre }}, con domicilio en {% for line in negocio.direccion %}{{ line }}{% if not forloop.last %}, {% endif %}{% endfor %}, es responsable de los datos personales que nos das al hacer un pedido o crear tu cuenta.</p>
   </section>
 
   <section aria-labelledby="datos" class="flex flex-col gap-3 text-ui">
-    <h2 id="datos" class="font-display text-xl font-medium">Qué datos guardamos</h2>
+    <h2 id="datos" class="font-display text-titulo font-medium">Qué datos guardamos</h2>
     <ul role="list" class="flex list-disc flex-col gap-1 pl-5">
       <li>Nombre.</li>
       <li>Teléfono.</li>
@@ -32,13 +32,13 @@
   </section>
 
   <section aria-labelledby="para-que" class="flex flex-col gap-3 text-ui">
-    <h2 id="para-que" class="font-display text-xl font-medium">Para qué los usamos</h2>
+    <h2 id="para-que" class="font-display text-titulo font-medium">Para qué los usamos</h2>
     <p>Para preparar y entregar tus pedidos, avisarte del estado de tu pedido y atender tus dudas sobre él. No vendemos ni compartimos tus datos con nadie para publicidad.</p>
     <p>Tus datos se guardan en los servicios que hacen funcionar la tienda en línea (la base de datos y el alojamiento de la página), que solo los procesan por nuestra cuenta.</p>
   </section>
 
   <section aria-labelledby="arco" class="flex flex-col gap-3 text-ui">
-    <h2 id="arco" class="font-display text-xl font-medium">Tus derechos ARCO</h2>
+    <h2 id="arco" class="font-display text-titulo font-medium">Tus derechos ARCO</h2>
     <dl class="flex flex-col gap-3">
       <div><dt class="font-semibold">Acceso</dt><dd class="text-text-muted">Saber qué datos tuyos tenemos.</dd></div>
       <div><dt class="font-semibold">Rectificación</dt><dd class="text-text-muted">Corregirlos si están mal o incompletos.</dd></div>
@@ -49,7 +49,7 @@
   </section>
 
   <section aria-labelledby="cambios" class="flex flex-col gap-3 text-ui">
-    <h2 id="cambios" class="font-display text-xl font-medium">Cambios a este aviso</h2>
+    <h2 id="cambios" class="font-display text-titulo font-medium">Cambios a este aviso</h2>
     <p>Si este aviso cambia, publicamos la versión nueva en esta misma página con su fecha.</p>
   </section>
 </article>

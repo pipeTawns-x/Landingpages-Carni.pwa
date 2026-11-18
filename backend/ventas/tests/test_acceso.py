@@ -119,10 +119,13 @@ class AccessPageTests(SimpleTestCase):
         tags = parse(self.get().content.decode())
         sources = {attrs["src"]: attrs for attrs in tags.named("img") if "src" in attrs}
 
-        for image in ("/img/recursos_web/carniLogin.png", "/img/recursos_web/carniRegistro.png"):
+        for pose in ("login", "register"):
+            image = f"/img/mascota/don-carlos-{pose}.webp"
             self.assertIn(image, sources)
-            self.assertTrue(sources[image].get("alt"))
-            self.assertTrue(sources[image].get("width") and sources[image].get("height"))
+            attrs = sources[image]
+            self.assertTrue(attrs.get("alt"))
+            self.assertTrue(attrs.get("width") and attrs.get("height"))
+            self.assertIn(f"/img/mascota/don-carlos-{pose}@2x.webp 2x", attrs.get("srcset", ""))
 
     def test_the_script_is_one_external_module_and_nothing_runs_inline(self):
         html = self.get().content.decode()

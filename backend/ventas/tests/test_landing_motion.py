@@ -47,7 +47,7 @@ class BentoTests(TestCase):
         self.assertEqual(sum(cols * rows for cols, rows in sizes), 6 * 6)
 
     def test_each_active_category_is_a_photo_tile_with_its_link(self):
-        tiles = re.findall(r'<a [^>]*class="bento-tile bento-([a-i]) ', self.section)
+        tiles = re.findall(r'<a [^>]*class="bento-([a-i]) ', self.section)
 
         self.assertEqual(sorted(tiles), list("abcdefghi"))
         for slug in SLUGS:
@@ -67,9 +67,7 @@ class BentoTests(TestCase):
 
         html = self.client.get(reverse("ventas:landing")).content.decode()
 
-        self.assertRegex(
-            html, rf'<a href="/productos/\?category={nueva.pk}" class="bento-tile bento-x '
-        )
+        self.assertRegex(html, rf'<a href="/productos/\?category={nueva.pk}" class="bento-x ')
 
     def test_the_old_tile_mosaic_is_gone(self):
         self.assertNotIn("gap-px", self.section)

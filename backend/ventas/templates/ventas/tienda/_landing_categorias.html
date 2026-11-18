@@ -16,7 +16,7 @@
     </div>
     <div class="bento mt-8 lg:mt-12">
       {% for tile in bento %}
-      <a href="{% url 'ventas:catalogo' %}?category={{ tile.categoria.pk }}" class="bento-tile bento-{{ tile.slot }} group relative isolate flex overflow-hidden rounded-card bg-surface-1" data-bento-tile>
+      <a href="{% url 'ventas:catalogo' %}?category={{ tile.categoria.pk }}" class="bento-{{ tile.slot }} group relative isolate flex overflow-hidden rounded-card bg-surface-1" data-bento-tile>
         <img src="{{ tile.foto }}" alt="{{ tile.alt }}" width="1114" height="1114" loading="lazy" decoding="async" class="absolute inset-0 -z-20 size-full object-cover transition-[scale] duration-700 ease-out-strong group-hover:scale-[1.06] motion-reduce:transition-none" data-bento-photo />
         <span aria-hidden="true" class="absolute inset-0 -z-10 bg-linear-to-t from-bg/90 via-bg/25 to-transparent"></span>
         <span class="mt-auto flex w-full items-end justify-between gap-3 p-4 lg:p-5">

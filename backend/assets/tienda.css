@@ -142,3 +142,25 @@
     .bento-i { grid-area: 5 / 4 / 7 / 7; }
   }
 }
+
+/*
+ * The dark star tiles Eduardo liked under the family section and behind Don Carlos on the access
+ * page, with a veil so the text and the mascot stay on top. Phones load the 800px file.
+ */
+@layer components {
+  .azulejo {
+    background-color: var(--color-bg);
+    background-image:
+      linear-gradient(rgb(11 11 12 / 0.55), rgb(11 11 12 / 0.82)),
+      url("/img/comercio-v1/textura-talavera-oscura-800.webp");
+    background-position: center;
+    background-size: cover;
+  }
+  @media (width >= 48rem) {
+    .azulejo {
+      background-image:
+        linear-gradient(rgb(11 11 12 / 0.55), rgb(11 11 12 / 0.82)),
+        url("/img/comercio-v1/textura-talavera-oscura.webp");
+    }
+  }
+}

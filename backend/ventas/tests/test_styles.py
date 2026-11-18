@@ -56,3 +56,21 @@ class SalesStylesTests(SimpleTestCase):
                 with self.subTest(template=template, step=step):
                     name = f".{prefix}-\\[{step * 10}\\%\\]"
                     self.assertIn(name, css)
+
+
+STORE_TEMPLATES = sorted((TEMPLATES / "tienda").glob("*.html"))
+STORE_CSS = "tienda/tienda.css"
+
+
+class StoreStylesTests(SimpleTestCase):
+    """The store pages compile their own stylesheet: a class it does not define draws nothing."""
+
+    def test_every_class_of_every_store_template_is_defined_in_the_store_stylesheet(self):
+        css = read_static(STORE_CSS)
+        self.assertGreaterEqual(len(STORE_TEMPLATES), 10)
+
+        for template in STORE_TEMPLATES:
+            with self.subTest(template=template.name):
+                missing = classes_missing_from(css, template.read_text(encoding="utf-8"))
+                # `bento-{{ tile.slot }}` leaves `bento-` once the template tag is dropped.
+                self.assertEqual([name for name in missing if not name.endswith("-")], [])
