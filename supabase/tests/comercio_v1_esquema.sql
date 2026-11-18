@@ -6,7 +6,8 @@
 --   * every new table has RLS on and the exact privileges of each role;
 --   * private data (costs, lots, movements, logs) is invisible to customers and anon;
 --   * the price_history trigger, the promotion overlap rule and the current_fx view;
---   * the legacy create_order_with_items still works for a customer.
+--   * the legacy create_order_with_items still fills the new columns with their defaults (a
+--     customer can no longer call it since 20261118000001; the body is checked as the owner).
 --
 -- Users: admin ...a1, customers ...c1 and ...c2. Seed ids used: 1 Bistec de Res (kg),
 -- 2 Molida de Res Especial (kg), 41 Paquete Asador (package), 43 Paquete Carnitas por
@@ -491,10 +492,15 @@ SELECT is((SELECT count(*) FROM public.order_status_log WHERE order_id = 'aaaaaa
 SELECT is((SELECT count(*) FROM public.order_item_costs WHERE order_item_id = 900001), 0::bigint,
           'deleting an order deletes the frozen costs of its items');
 
--- ============================================= the legacy RPC keeps working
+-- ============================================= the legacy RPC keeps its columns right
+-- 20261118000001 took EXECUTE away from customers; the body still runs for its owner, with the
+-- claims of a customer so that auth.uid() names who the order is for.
 SELECT t.as_user('00000000-0000-0000-0000-0000000000c1');
+SELECT is(t.code($$SELECT public.create_order_with_items('pickup', '{}'::jsonb, NULL, '[{"product_id": 1, "quantity_kg": 5}]'::jsonb)$$), '42501',
+          'a customer can no longer call the legacy create_order_with_items');
+RESET ROLE;
 SELECT is(t.code($$SELECT public.create_order_with_items('pickup', '{}'::jsonb, NULL, '[{"product_id": 1, "quantity_kg": 5}]'::jsonb)$$), '',
-          'the legacy create_order_with_items still creates an order for a customer');
+          'the legacy create_order_with_items still creates an order when its owner runs it');
 SELECT t.reset();
 SELECT is((SELECT count(*) FROM public.orders
            WHERE user_id = '00000000-0000-0000-0000-0000000000c1' AND channel = 'web' AND currency = 'MXN'
