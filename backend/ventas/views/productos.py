@@ -50,11 +50,17 @@ def _thickness(product):
         value = getattr(spec, field, None) if spec is not None else None
         return value if value else THICKNESS_DEFAULTS[key]
 
+    low, high = pick("thickness_min_in", "min"), pick("thickness_max_in", "max")
+    marks, mark = [], low
+    while mark <= high:
+        marks.append(mark)
+        mark += Decimal("0.5")
     return {
-        "min": pick("thickness_min_in", "min"),
-        "max": pick("thickness_max_in", "max"),
+        "min": low,
+        "max": high,
         "default": pick("thickness_default_in", "default"),
         "step": THICKNESS_STEP,
+        "marcas": marks,
     }
 
 

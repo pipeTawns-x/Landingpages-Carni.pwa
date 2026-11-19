@@ -120,6 +120,20 @@
   .bento-c, .bento-e, .bento-g { grid-row: span 2; }
   .bento-h, .bento-i, .bento-x { grid-column: span 2; }
   .bento-f .bento-desc { display: none; }
+  /* At rest a tile shows its photo and its name only; the description comes in on hover or on
+     keyboard focus. Touch screens, with no hover, keep it visible. */
+  @media (hover: hover) {
+    .bento-desc {
+      opacity: 0;
+      translate: 0 0.5rem;
+      transition: opacity 300ms var(--ease-out-strong), translate 300ms var(--ease-out-strong);
+    }
+    [data-bento-tile]:hover .bento-desc,
+    [data-bento-tile]:focus-visible .bento-desc {
+      opacity: 1;
+      translate: 0 0;
+    }
+  }
   @media (width < 64rem) {
     .bento-b .bento-desc, .bento-c .bento-desc, .bento-d .bento-desc, .bento-g .bento-desc {
       display: none;
@@ -200,6 +214,14 @@
     border-bottom-color: transparent;
     backdrop-filter: none;
   }
+  @media (prefers-reduced-transparency: reduce) {
+    .cabecera,
+    :root.js .cabecera[data-cabecera="sobre"] {
+      backdrop-filter: none;
+      background-image: none;
+      background-color: var(--color-bg);
+    }
+  }
   .cabecera[data-cabecera="sobre"] .contador {
     outline: 1px solid rgb(255 255 255 / 0.35);
   }
@@ -232,7 +254,7 @@
     border-radius: var(--radius-pill);
     background-color: var(--color-red);
     color: #fff;
-    font-size: 0.6875rem;
+    font-size: 0.75rem;
     font-variant-numeric: tabular-nums;
     line-height: 1;
   }
@@ -249,11 +271,12 @@
     background-color: var(--color-bg);
     overflow-y: auto;
     overscroll-behavior: contain;
+    /* Closing (260ms) is faster than opening (420ms, on :popover-open below). */
     transition:
-      translate 420ms var(--ease-drawer),
-      opacity 420ms var(--ease-drawer),
-      overlay 420ms allow-discrete,
-      display 420ms allow-discrete;
+      translate 260ms var(--ease-drawer),
+      opacity 260ms var(--ease-drawer),
+      overlay 260ms allow-discrete,
+      display 260ms allow-discrete;
   }
   .cajon::backdrop {
     pointer-events: none;
@@ -269,7 +292,8 @@
   .cajon-izquierda,
   .cajon-derecha {
     inset-block: 0;
-    width: min(28rem, 100vw);
+    /* On a phone a strip of the page stays visible, so a tap outside closes the panel. */
+    width: min(28rem, 100vw - 3rem);
     height: 100dvh;
     max-height: none;
   }
@@ -293,6 +317,11 @@
   }
   .cajon:popover-open {
     translate: 0 0;
+    transition-duration: 420ms;
+  }
+  /* The menu and the search take the page while open; the cart never does (Engram #541). */
+  body:has(#menu:popover-open, #buscador:popover-open) {
+    overflow: hidden;
   }
   @starting-style {
     .cajon-izquierda:popover-open { translate: -100% 0; }
@@ -331,9 +360,15 @@
     min-height: 3rem;
     transition: color 150ms var(--ease-out-strong), translate 300ms var(--ease-out-strong);
   }
-  .enlace-cajon:hover {
-    color: var(--color-sand);
-    translate: 0.25rem 0;
+  @media (hover: hover) {
+    .enlace-cajon:hover {
+      color: var(--color-sand);
+    }
+  }
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    .enlace-cajon:hover {
+      translate: 0.25rem 0;
+    }
   }
 
   /* The ways of ordering and the weight units of the product page: a segmented control. */
@@ -373,3 +408,31 @@
     cursor: pointer;
   }
 }
+
+/*
+ * The fields of the store's forms. The border is the control one (>= 3:1, WCAG 1.4.11); the
+ * hairline border of the tokens is never a control border.
+ */
+@layer components {
+  .campo {
+    min-height: 2.75rem;
+    width: 100%;
+    border: 1px solid var(--color-border-control);
+    border-radius: var(--radius-control);
+    background-color: var(--color-surface-1);
+    padding-inline: 0.75rem;
+    font-size: var(--text-ui);
+    line-height: var(--text-ui--line-height);
+    color: var(--color-text);
+    transition: border-color 150ms var(--ease-out-strong);
+  }
+  .campo::placeholder {
+    color: var(--color-text-muted);
+  }
+  .campo:focus-visible {
+    border-color: var(--color-sand);
+    outline: 2px solid var(--color-sand);
+    outline-offset: 1px;
+  }
+}
+

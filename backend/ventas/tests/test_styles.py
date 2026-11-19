@@ -74,3 +74,25 @@ class StoreStylesTests(SimpleTestCase):
                 missing = classes_missing_from(css, template.read_text(encoding="utf-8"))
                 # `bento-{{ tile.slot }}` leaves `bento-` once the template tag is dropped.
                 self.assertEqual([name for name in missing if not name.endswith("-")], [])
+
+
+class StoreTokenContractTests(SimpleTestCase):
+    """The tokens say how each colour may be used (assets/tokens.css): the hairline border is
+    never the border of a control (1.88:1, below the 3:1 of WCAG 1.4.11) and the fill red is
+    never text (about 4.1:1 on the background; `red-text` is the red for words)."""
+
+    CONTROL = re.compile(r"<(?:input|select|textarea)\b[^>]*>")
+
+    def test_no_control_uses_the_hairline_border(self):
+        for template in STORE_TEMPLATES:
+            html = template.read_text(encoding="utf-8")
+            for tag in self.CONTROL.findall(html):
+                with self.subTest(template=template.name, tag=tag[:60]):
+                    self.assertNotRegex(tag, r"\bborder-border(?![-\w])")
+
+    def test_red_is_never_used_as_a_text_colour(self):
+        for template in STORE_TEMPLATES:
+            with self.subTest(template=template.name):
+                self.assertNotRegex(
+                    template.read_text(encoding="utf-8"), r"(?<![-\w:])text-red(?![-\w])"
+                )

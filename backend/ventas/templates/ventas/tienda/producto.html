@@ -49,7 +49,7 @@
 
         <fieldset>
           <legend class="text-ui font-medium">¿Cómo lo quieres?</legend>
-          <div class="mt-3 flex gap-1 rounded-pill border border-border p-1">
+          <div class="mt-3 flex gap-1 rounded-pill border border-border-control p-1">
             {% for value, label in modes %}
             <label class="opcion-segmento">
               <input type="radio" name="mode" value="{{ value }}" data-modo{% if forloop.first %} checked{% endif %} class="sr-only" />
@@ -62,10 +62,10 @@
         <div class="grid gap-4">
           <label for="cantidad" class="text-ui font-medium" data-etiqueta-cantidad>Cantidad <span class="font-normal text-text-muted">(kilos, pesos o piezas, según cómo lo quieras)</span></label>
           <div class="flex flex-wrap items-stretch gap-3">
-            <input id="cantidad" type="number" name="amount" min="0.001" step="any" inputmode="decimal" required placeholder="0" data-cantidad class="min-h-14 w-40 rounded-control border border-border-control bg-surface-1 px-4 font-display text-titulo tabular-nums text-text focus:border-sand" />
+            <input id="cantidad" type="number" name="amount" min="0.001" step="any" inputmode="decimal" required placeholder="0" data-cantidad class="campo min-h-14 w-40 px-4 font-display text-titulo tabular-nums" />
             <fieldset data-grupo="weight" class="flex items-center">
               <legend class="sr-only">Unidad del peso</legend>
-              <div class="flex gap-1 rounded-pill border border-border p-1">
+              <div class="flex gap-1 rounded-pill border border-border-control p-1">
                 {% for unit in units %}
                 <label class="opcion-segmento px-4">
                   <input type="radio" name="unit" value="{{ unit }}"{% if forloop.first %} checked{% endif %} class="sr-only" />
@@ -84,7 +84,8 @@
             <label for="grosor" class="text-ui font-medium">Grosor del corte</label>
             <output for="grosor" data-grosor-valor class="font-display text-titulo tabular-nums text-sand">{{ thickness.default }}"</output>
           </div>
-          <input id="grosor" type="range" name="thickness_in" min="{{ thickness.min }}" max="{{ thickness.max }}" step="{{ thickness.step }}" value="{{ thickness.default }}" data-grosor class="rango" />
+          <input id="grosor" type="range" name="thickness_in" min="{{ thickness.min }}" max="{{ thickness.max }}" step="{{ thickness.step }}" value="{{ thickness.default }}" data-grosor list="grosores" aria-valuetext="{{ thickness.default }} pulgadas" class="rango" />
+          <datalist id="grosores">{% for valor in thickness.marcas %}<option value="{{ valor }}"></option>{% endfor %}</datalist>
           <div class="flex justify-between text-meta text-text-muted tabular-nums"><span>{{ thickness.min }}"</span><span>{{ thickness.max }}"</span></div>
           <p class="text-meta text-text-muted">Solo para pedidos por piezas: a más grosor, más peso por pieza.</p>
         </div>
@@ -92,20 +93,20 @@
 
         <div class="grid gap-2">
           <label for="observaciones" class="text-ui font-medium">Observaciones <span class="font-normal text-text-muted">(opcional)</span></label>
-          <textarea id="observaciones" name="note" maxlength="200" rows="3" placeholder="Ej. sin tanta grasa, o el bistec de una pulgada con más grasa" class="rounded-control border border-border-control bg-surface-1 px-4 py-3 text-ui text-text placeholder:text-text-muted/70 focus:border-sand"></textarea>
+          <textarea id="observaciones" name="note" maxlength="200" rows="3" placeholder="Ej. sin tanta grasa, o el bistec de una pulgada con más grasa" class="campo px-4 py-3"></textarea>
           <p class="text-meta text-text-muted">Llegan con tu pedido al mostrador, para cortarlo como lo pides.</p>
         </div>
 
         <div data-resumen aria-live="polite" class="rounded-card border border-border bg-surface-1 p-5">
           <p class="text-meta tracking-[0.12em] text-text-muted">RESUMEN</p>
           <p data-resumen-texto class="mt-2 text-ui">Escribe la cantidad para ver tu subtotal.</p>
-          <p data-resumen-precio class="mt-1 font-display text-seccion tabular-nums text-sand"></p>
+          <p data-resumen-precio class="mt-1 min-h-[1.1em] font-display text-seccion tabular-nums text-sand"></p>
           <noscript><p class="mt-2 text-meta text-text-muted">El subtotal exacto lo ves en tu carrito.</p></noscript>
         </div>
 
-        <div class="flex flex-col gap-3 sm:flex-row">
+        <div class="sticky bottom-0 z-10 -mx-5 flex gap-3 border-t border-border bg-bg/95 px-5 py-3 backdrop-blur-md lg:static lg:mx-0 lg:border-0 lg:bg-transparent lg:p-0 lg:backdrop-blur-none">
           <button type="submit" class="inline-flex min-h-14 flex-1 items-center justify-center rounded-pill bg-red px-8 text-ui font-medium text-white transition-[background-color,scale] duration-150 ease-out-strong hover:bg-red-hover active:scale-[0.98] motion-reduce:transition-none">Agregar al carrito</button>
-          <button type="button" data-favorito="{{ product.pk }}" data-nombre="{{ product.name }}" data-url="{% url 'ventas:producto' product.pk %}" data-imagen="{{ product.image_src }}" data-precio="{{ product.price_per_kg }} / {{ product.unit_label }}" aria-pressed="false" hidden class="inline-flex min-h-14 items-center justify-center gap-2 rounded-pill border border-border-control px-6 text-ui text-text transition-colors duration-150 hover:border-sand aria-pressed:border-red aria-pressed:text-red">{% include "ventas/tienda/_icono.html" with nombre="corazon" clase="size-5" %}<span>Favorito</span></button>
+          <button type="button" data-favorito="{{ product.pk }}" data-nombre="{{ product.name }}" data-url="{% url 'ventas:producto' product.pk %}" data-imagen="{{ product.image_src }}" data-precio="{{ product.price_per_kg }} / {{ product.unit_label }}" aria-pressed="false" aria-label="Guardar {{ product.name }} en favoritos" hidden class="inline-flex min-h-14 min-w-14 items-center justify-center gap-2 rounded-pill border border-border-control px-4 sm:px-6 text-ui text-text transition-colors duration-150 hover:border-sand aria-pressed:border-red aria-pressed:text-red">{% include "ventas/tienda/_icono.html" with nombre="corazon" clase="size-5" %}<span class="max-sm:sr-only">Favorito</span></button>
         </div>
       </form>
     </div>

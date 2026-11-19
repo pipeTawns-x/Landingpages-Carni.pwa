@@ -160,6 +160,24 @@ class AddToCartTests(StoreTestCase):
 
 
 class CartPageTests(StoreTestCase):
+    def test_the_summary_stands_apart_with_the_total_and_the_order_button(self):
+        self.add("bistec", mode="weight", amount="1", unit="kg")
+
+        html = self.page().content.decode()
+        summary = html[html.index('aria-labelledby="resumen-titulo"') :]
+        summary = summary[: summary.index("</aside>")]
+
+        self.assertIn("$200.00", summary)
+        self.assertRegex(summary, r'<button [^>]*type="submit"[^>]*form="pedido"')
+        self.assertIn('id="pedido"', html)
+
+    def test_changing_a_line_is_folded_until_asked_for(self):
+        self.add("bistec", mode="weight", amount="1", unit="kg")
+
+        html = self.page().content.decode()
+
+        self.assertRegex(html, r"<details[^>]*>\s*<summary[^>]*>Cambiar cantidad</summary>")
+
     def test_the_note_of_a_line_is_shown_and_survives_an_update(self):
         """Engram #541: the notes travel with the line to the panel; "Actualizar" keeps them."""
         self.add("bistec", note="Sin tanta grasa")

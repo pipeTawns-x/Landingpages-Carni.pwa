@@ -75,7 +75,13 @@
   if (input && results) {
     let timer = 0;
     let asked = "";
-    const draw = (items) => {
+    const draw = (items, query) => {
+      if (!items.length) {
+        results.replaceChildren(
+          make("li", "px-2 py-3 text-ui text-text-muted", `Sin resultados para «${query}».`),
+        );
+        return;
+      }
       results.replaceChildren(
         ...items.map((item) => {
           const link = make(
@@ -111,11 +117,21 @@
           });
           if (!response.ok) return;
           const data = await response.json();
-          if (asked === query) draw(data.resultados || []);
+          if (asked === query) draw(data.resultados || [], query);
         } catch {
           /* offline: the form still submits to the catalogue */
         }
       }, 220);
+    });
+  }
+
+  // ------------------------------------------------------- cart panel and Esc
+  // The cart panel is popover="manual" so the page behind it stays usable (Engram #541); a
+  // manual popover ignores Esc, so Esc closes it here.
+  const bag = document.getElementById("bolsa");
+  if (bag) {
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && bag.matches(":popover-open")) bag.hidePopover();
     });
   }
 

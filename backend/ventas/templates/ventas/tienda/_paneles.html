@@ -37,7 +37,7 @@
     <form method="get" action="{% url 'ventas:catalogo' %}" role="search" class="mt-3 flex items-center gap-3 border-b border-border-control pb-3 focus-within:border-sand">
       {% include "ventas/tienda/_icono.html" with nombre="buscar" clase="size-6 shrink-0 text-text-muted" %}
       <label for="buscador-q" class="sr-only">Busca un corte o producto</label>
-      <input id="buscador-q" type="search" name="q" data-buscador-q autofocus placeholder="Rib eye, arrachera, chorizo…" autocomplete="off" maxlength="80" class="min-h-12 w-full bg-transparent font-display text-seccion text-text placeholder:text-text-muted/60 focus:outline-none" />
+      <input id="buscador-q" type="search" name="q" data-buscador-q autofocus placeholder="Rib eye, arrachera, chorizo…" autocomplete="off" maxlength="80" class="min-h-12 w-full bg-transparent font-display text-seccion text-text placeholder:text-text-muted focus:outline-none" />
       <button type="submit" class="sr-only">Buscar</button>
     </form>
     <ul data-buscador-resultados role="list" aria-live="polite" class="mt-6 grid gap-2 sm:grid-cols-2"></ul>

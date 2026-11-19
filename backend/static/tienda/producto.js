@@ -48,6 +48,8 @@
       return;
     }
     summaryText.textContent = text;
+    summaryPrice.textContent = "…";
+    summaryPrice.setAttribute("aria-busy", "true");
     timer = setTimeout(async () => {
       const ticket = ++asked;
       const params = new URLSearchParams({ mode: mode(), amount: amount.value.trim() });
@@ -59,6 +61,7 @@
         });
         const data = await response.json();
         if (ticket !== asked) return;
+        summaryPrice.removeAttribute("aria-busy");
         if (!response.ok) {
           summaryPrice.textContent = "";
           summaryText.textContent = data.error || "No pudimos calcularlo ahora.";
@@ -68,7 +71,10 @@
         summaryText.textContent = mode() === "weight" ? text : `${text} · aprox. ${kilos} kg`;
         summaryPrice.textContent = money(data.total);
       } catch {
-        if (ticket === asked) summaryPrice.textContent = "";
+        if (ticket === asked) {
+          summaryPrice.removeAttribute("aria-busy");
+          summaryPrice.textContent = "";
+        }
       }
     }, 250);
   };
@@ -94,6 +100,7 @@
   if (thickness && thicknessValue) {
     thickness.addEventListener("input", () => {
       thicknessValue.textContent = `${thickness.value}"`;
+      thickness.setAttribute("aria-valuetext", `${thickness.value} pulgadas`);
       quote();
     });
   }

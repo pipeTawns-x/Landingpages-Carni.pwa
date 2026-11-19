@@ -16,22 +16,22 @@
 
     <form id="buscar" method="get" action="{% url 'ventas:catalogo' %}" role="search" class="mt-8 grid gap-3 sm:grid-cols-[minmax(0,1fr)_14rem_auto]">
       <label class="sr-only" for="buscar-q">Buscar</label>
-      <input id="buscar-q" type="search" name="q" value="{{ query }}" placeholder="Buscar corte o producto" autocomplete="off" class="min-h-12 w-full rounded-control border border-border bg-surface-1 px-4 text-ui text-text placeholder:text-text-muted focus:border-sand" />
+      <input id="buscar-q" type="search" name="q" value="{{ query }}" placeholder="Buscar corte o producto" autocomplete="off" class="campo min-h-12 px-4" />
       <label class="sr-only" for="buscar-categoria">Categoría</label>
-      <select id="buscar-categoria" name="category" class="min-h-12 w-full rounded-control border border-border bg-surface-1 px-4 text-ui text-text">
+      <select id="buscar-categoria" name="category" class="campo min-h-12 px-4">
         <option value="">Todas las categorías</option>
         {% for category in categories %}
         <option value="{{ category.pk }}"{% if selected_category == category.pk|stringformat:"d" %} selected{% endif %}>{{ category.name }}</option>
         {% endfor %}
       </select>
-      <button type="submit" class="min-h-12 rounded-pill bg-red px-6 text-ui font-medium text-text transition-colors duration-150 hover:bg-red-hover">Buscar</button>
+      <button type="submit" class="min-h-12 rounded-pill bg-red px-6 text-ui font-medium text-white transition-colors duration-150 hover:bg-red-hover">Buscar</button>
     </form>
 
     {% if categories %}
     <nav aria-label="Categorías" class="mt-6 flex flex-wrap gap-2">
-      <a href="{% url 'ventas:catalogo' %}{% if query %}?q={{ query|urlencode }}{% endif %}" class="inline-flex min-h-10 items-center rounded-control border px-4 text-meta transition-colors duration-150 {% if not selected_category %}border-sand text-sand{% else %}border-border text-text-muted hover:text-text{% endif %}">Todas</a>
+      <a href="{% url 'ventas:catalogo' %}{% if query %}?q={{ query|urlencode }}{% endif %}"{% if not selected_category %} aria-current="page"{% endif %} class="inline-flex min-h-11 items-center rounded-control border px-4 text-meta transition-colors duration-150 {% if not selected_category %}border-sand text-sand{% else %}border-border text-text-muted hover:text-text{% endif %}">Todas</a>
       {% for category in categories %}
-      <a href="?category={{ category.pk }}{% if query %}&amp;q={{ query|urlencode }}{% endif %}" class="inline-flex min-h-10 items-center rounded-control border px-4 text-meta transition-colors duration-150 {% if selected_category == category.pk|stringformat:'d' %}border-sand text-sand{% else %}border-border text-text-muted hover:text-text{% endif %}">{{ category.name }}</a>
+      <a href="?category={{ category.pk }}{% if query %}&amp;q={{ query|urlencode }}{% endif %}"{% if selected_category == category.pk|stringformat:'d' %} aria-current="page"{% endif %} class="inline-flex min-h-11 items-center rounded-control border px-4 text-meta transition-colors duration-150 {% if selected_category == category.pk|stringformat:'d' %}border-sand text-sand{% else %}border-border text-text-muted hover:text-text{% endif %}">{{ category.name }}</a>
       {% endfor %}
     </nav>
     {% endif %}

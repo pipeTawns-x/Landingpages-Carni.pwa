@@ -26,7 +26,7 @@
 
   {% if messages %}
   <ul role="status" aria-live="polite" class="mensajes mx-auto w-full max-w-7xl px-5 pt-4 lg:px-6">
-    {% for message in messages %}<li class="text-ui {% if message.level_tag == 'error' %}text-red{% else %}text-sand{% endif %}">{{ message }}</li>{% endfor %}
+    {% for message in messages %}<li class="text-ui {% if message.level_tag == 'error' %}text-red-text{% else %}text-sand{% endif %}">{{ message }}</li>{% endfor %}
   </ul>
   {% endif %}
 
