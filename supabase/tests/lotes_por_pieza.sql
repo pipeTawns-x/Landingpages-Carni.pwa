@@ -72,6 +72,13 @@ SELECT is(t.code($$SELECT public.register_lot(999999, 3, 1.5, 0)$$), 'product_no
 SELECT t.reset();
 SELECT is((SELECT count(*)::int FROM public.purchase_lots WHERE product_id IN (9401, 9402, 9403)), 2, 'rejected lots left no row');
 
+SELECT is(t.col('purchase_lots', 'price_per_kg'), 'numeric(10,2)|NULL|', 'lots keep the price per kilo of the day they came');
+SELECT is((SELECT array_agg(price_per_kg ORDER BY id)::text FROM public.purchase_lots WHERE product_id = 9401), '{75.00,75.00}',
+          'both chicken lots were registered at $75/kg');
+SELECT t.as_django();
+SELECT is(t.code($$SELECT public.register_lot(9401, 3, 0.0004, 0)$$), 'invalid_amount', 'a piece that rounds to 0 kg is rejected as an amount');
+SELECT t.reset();
+
 SELECT t.as_anon();
 SELECT is(t.code($$SELECT public.register_lot(9401, 3, 1.5, 0)$$), '42501', 'anon cannot register a lot');
 SELECT t.reset();
@@ -125,6 +132,18 @@ SELECT results_eq(
     $$SELECT line_total_mxn FROM public.quote_line(9401, 'pieces', 1)$$,
     $$VALUES (187.50::numeric)$$,
     'when the old lot runs out, the next chicken costs 187.50');
+SELECT t.reset();
+
+-- One lot only and the order is bigger: the missing pieces are not a second lot.
+SELECT t.mk_product(9406, 'Pollo solo L', 75, 'kg', ARRAY['pieces'], 0, false, 'piece');
+SELECT t.as_django();
+SELECT public.register_lot(9406, 3, 1.5, 300);
+SELECT t.reset();
+SELECT t.as_anon();
+SELECT results_eq(
+    $$SELECT line_total_mxn, warnings FROM public.quote_line(9406, 'pieces', 4)$$,
+    $$VALUES (450.00::numeric, ARRAY['low_stock']::text[])$$,
+    'one lot of 3 and 4 asked: 4 x 112.50, low stock, and no mixed_lots warning');
 SELECT t.reset();
 
 -- ---------------------------------------------------------------- the paths that did not change

@@ -19,6 +19,7 @@ ALTER TABLE public.purchase_lots
     ADD COLUMN piece_weight_kg numeric(6,3),
     ADD COLUMN pieces_left     integer,
     ADD COLUMN source_lot_id   bigint REFERENCES public.purchase_lots (id) ON DELETE RESTRICT,
+    ADD COLUMN price_per_kg    numeric(10,2),
     ADD CONSTRAINT purchase_lots_piece_weight_positive CHECK (piece_weight_kg IS NULL OR piece_weight_kg > 0),
     ADD CONSTRAINT purchase_lots_pieces_left_non_negative CHECK (pieces_left IS NULL OR pieces_left >= 0),
     ADD CONSTRAINT purchase_lots_piece_lot_complete CHECK ((piece_weight_kg IS NULL) = (pieces_left IS NULL));
@@ -26,6 +27,8 @@ COMMENT ON COLUMN public.purchase_lots.piece_weight_kg IS
     'Standard weight of one piece of this lot (one piece weighed when the bag arrived). NULL: not a piece lot.';
 COMMENT ON COLUMN public.purchase_lots.pieces_left IS
     'Pieces of this lot not sold or cut yet. NULL: not a piece lot.';
+COMMENT ON COLUMN public.purchase_lots.price_per_kg IS
+    'Price per kilo of the product the day the lot came, for the record. Quotes use the current price.';
 COMMENT ON COLUMN public.purchase_lots.source_lot_id IS
     'The lot these pieces were cut from (despiece). NULL: bought from a supplier.';
 CREATE INDEX idx_purchase_lots_open_pieces ON public.purchase_lots (product_id, created_at, id)
@@ -124,7 +127,7 @@ BEGIN
         RAISE EXCEPTION 'invalid_amount: the pieces are a whole number between 1 and 10000';
     END IF;
     IF p_piece_weight_kg IS NULL OR p_piece_weight_kg = 'NaN'::numeric
-       OR p_piece_weight_kg <= 0 OR p_piece_weight_kg >= 100 THEN
+       OR round(p_piece_weight_kg, 3) <= 0 OR p_piece_weight_kg >= 100 THEN
         RAISE EXCEPTION 'invalid_amount: one piece weighs more than 0 and less than 100 kg';
     END IF;
     IF p_total_cost IS NULL OR p_total_cost = 'NaN'::numeric OR p_total_cost < 0 THEN
@@ -142,11 +145,11 @@ BEGIN
 
     INSERT INTO public.purchase_lots
         (product_id, qty, total_cost, unit_cost, expected_revenue, note, staff_ref,
-         piece_weight_kg, pieces_left)
+         piece_weight_kg, pieces_left, price_per_kg)
     VALUES
         (v_p.id, v_qty, p_total_cost, round(p_total_cost / v_qty, 4),
          round(v_kg * v_p.price_per_kg, 2), p_note, p_staff_ref,
-         round(p_piece_weight_kg, 3), p_pieces::integer)
+         round(p_piece_weight_kg, 3), p_pieces::integer, v_p.price_per_kg)
     RETURNING id INTO v_lot;
 
     INSERT INTO public.product_costs (product_id, cost_per_kg, yield_pct, updated_at, updated_by)
@@ -319,7 +322,9 @@ BEGIN
                   INTO v_kg
                   FROM jsonb_array_elements(v_alloc) AS a;
                 v_kg := v_kg * v_factor;
-                IF jsonb_array_length(v_alloc) > 1 THEN
+                -- Mixed means two real lots; pieces nobody holds are not a lot.
+                IF (SELECT count(*) FROM jsonb_array_elements(v_alloc) AS a
+                     WHERE a ->> 'lot_id' IS NOT NULL) > 1 THEN
                     warnings := array_append(warnings, 'mixed_lots');
                 END IF;
             END IF;
@@ -574,6 +579,7 @@ GRANT EXECUTE ON FUNCTION public.register_lot(integer, numeric, numeric, numeric
 --     DROP CONSTRAINT purchase_lots_piece_lot_complete,
 --     DROP CONSTRAINT purchase_lots_pieces_left_non_negative,
 --     DROP CONSTRAINT purchase_lots_piece_weight_positive,
+--     DROP COLUMN price_per_kg,
 --     DROP COLUMN source_lot_id,
 --     DROP COLUMN pieces_left,
 --     DROP COLUMN piece_weight_kg;
