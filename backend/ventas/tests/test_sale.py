@@ -721,6 +721,16 @@ class OrderDetailTests(SaleTestCase):
         self.assertEqual(response.context["order"].lines[0]["lots"], [])
         self.assertIn(("error", domain.UNAVAILABLE_MESSAGE), messages_of(response))
 
+    def test_a_refused_lot_read_shows_its_message_and_the_order(self):
+        order = self.register()
+        self.gateway.errors["order_lots"] = GatewayError("lot_not_found")
+
+        response = self.client.get(reverse("ventas:pedido_detalle", args=[order.pk]))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["order"].lines[0]["lots"], [])
+        self.assertIn(("error", domain.message_for("lot_not_found")), messages_of(response))
+
     def test_what_the_staff_typed_is_drawn_as_text(self):
         order = self.register(customer_name="<script>alert(1)</script>", notes="<b>fuerte</b>")
 

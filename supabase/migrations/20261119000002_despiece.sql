@@ -66,9 +66,7 @@ BEGIN
     IF p_pieces IS NULL OR p_pieces = 'NaN'::numeric OR p_pieces <= 0 OR p_pieces <> trunc(p_pieces) THEN
         RAISE EXCEPTION 'invalid_amount: the pieces to cut are a whole number above zero';
     END IF;
-    IF p_pieces > v_src.pieces_left THEN
-        RAISE EXCEPTION 'insufficient_stock: the lot has % pieces left', v_src.pieces_left;
-    END IF;
+    -- pieces_left is checked after the lock: a cancel running now can still raise it.
     IF p_outputs IS NULL OR jsonb_typeof(p_outputs) <> 'array' OR jsonb_array_length(p_outputs) = 0 THEN
         RAISE EXCEPTION 'invalid_items: a cut produces at least one product';
     END IF;

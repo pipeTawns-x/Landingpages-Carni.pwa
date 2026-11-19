@@ -104,3 +104,12 @@ Base de lógica: `docs/carrito-trifasico.md` del worktree `carrito-trifasico-log
   - **Riesgo:** punto 4, por el orden de bloqueos entre `set_order_status`, `cut_lot` y `register_lot`.
   - **Pendiente para Eduardo:** un pedido en espera se cotizó con el lote viejo y al confirmarse salió del nuevo. Se cobra lo cotizado. Hay que decidir si eso está bien o si hay que avisar o recotizar.
 
+- **L12 (2026-11-19, verificador independiente de 68aceccd).**
+  - **Veredicto:** pasa, sin bloqueadores. S5 se cumple. S4 se cumple en lo que toca este cambio. S3, S11 y S12 no tienen regresión.
+  - **Diferencial:** productos sin lotes, `NO_DIFFERENCE` contra la base.
+  - **Concurrencia:** con dos sesiones reales no hubo interbloqueos.
+  - **A1 corregido:** `cut_lot` comprobaba `pieces_left` antes del bloqueo, así que un despiece hecho al mismo tiempo que una cancelación se rechazaba con una cuenta vieja. Ahora solo se comprueba después del bloqueo. Lo reprodujo el verificador con dos sesiones; pgTAP no puede reproducirlo en una sola sesión.
+  - **A4:** se agregó la prueba de la rama `GatewayError` del detalle del pedido. Pasó a la primera porque esa rama ya existía.
+  - **Pendiente para Eduardo (A2):** un producto con lote y stock en kilos también puede venderse por peso. Esas ventas bajan el stock pero no `pieces_left`, y el lote queda inflado. Opciones: que los productos con lote se vendan solo por pieza, o una regla para descontar kilos del lote.
+  - **Nota (A3):** el interbloqueo solo es posible si alguien apaga `track_stock` en un producto con lote, y ningún camino del código lo hace.
+  - **GREEN:** SQL con 965 pruebas y 0 fallas. Django: 1020 OK.
