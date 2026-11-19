@@ -443,3 +443,33 @@ class PostgresGatewayTests(SimpleTestCase):
 
     def test_get_gateway_gives_the_real_one(self):
         self.assertIsInstance(get_gateway(), PostgresGateway)
+
+
+class OrderLotsGatewayTests(SimpleTestCase):
+    def test_order_lots_reads_the_view_for_one_order_with_exact_weights(self):
+        order_id = uuid.uuid4()
+        rows = [
+            {
+                "line_no": 1,
+                "lot_id": 41,
+                "product_id": 7,
+                "product_name": "Pollo entero",
+                "pieces": 2,
+                "piece_weight_kg": "1.500",
+                "returned": False,
+            }
+        ]
+        cursor = RecordingCursor(result=json.dumps(rows))
+        gateway, patcher = gateway_over(cursor)
+        self.addCleanup(patcher.stop)
+
+        result = gateway.order_lots(order_id)
+
+        ((sql, params),) = cursor.calls
+        self.assertIn("FROM public.panel_order_lots", sql)
+        self.assertEqual(params, [str(order_id)])
+        self.assertEqual(result[0]["piece_weight_kg"], Decimal("1.500"))
+        self.assertEqual(
+            (result[0]["line_no"], result[0]["lot_id"], result[0]["pieces"]), (1, 41, 2)
+        )
+        self.assertIs(result[0]["returned"], False)

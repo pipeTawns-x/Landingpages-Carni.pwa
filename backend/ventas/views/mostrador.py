@@ -148,10 +148,29 @@ def procesar(request):
     return render(request, "ventas/ventas.html", _sale_context(request, currency, form))
 
 
+def _lots_by_line(request, order_id):
+    """The lots that served each line of the order, keyed by line number (1-based)."""
+    try:
+        rows = services.get_gateway().order_lots(order_id)
+    except services.GatewayError as error:
+        messages.error(request, domain.message_for(error.code))
+        return {}
+    except services.GatewayUnavailable:
+        messages.error(request, domain.UNAVAILABLE_MESSAGE)
+        return {}
+    by_line = {}
+    for row in rows:
+        by_line.setdefault(row["line_no"], []).append(row)
+    return by_line
+
+
 @panel_admin_required
 @require_safe
 def pedido_detalle(request, pk):
     order = with_labels(get_object_or_404(PanelOrder, pk=pk))
+    lots = _lots_by_line(request, order.pk)
+    for number, line in enumerate(order.lines, start=1):
+        line["lots"] = lots.get(number, [])
     address = order.delivery_address if isinstance(order.delivery_address, dict) else {}
     context = {
         "order": order,

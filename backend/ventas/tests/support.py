@@ -96,6 +96,8 @@ class FakeGateway:
         self.piece_lots = []
         self.cuts = []
         self.open_lot_rows = []
+        self.order_lot_rows = []
+        self.order_lot_asks = []
         self.counts = []
         self.lots = []
 
@@ -123,6 +125,12 @@ class FakeGateway:
         """The lots the test put in `open_lot_rows`, as `panel_open_lots` would give them."""
         self._fail_if_asked("open_lots")
         return list(self.open_lot_rows)
+
+    def order_lots(self, order_id):
+        """The rows the test put in `order_lot_rows`, as `panel_order_lots` would give them."""
+        self._fail_if_asked("order_lots")
+        self.order_lot_asks.append(order_id)
+        return list(self.order_lot_rows)
 
     def adjust_stock(self, product_id, new_stock, reason, staff_ref=None):
         """Record the count the way `adjust_stock` receives it; return the new stock."""

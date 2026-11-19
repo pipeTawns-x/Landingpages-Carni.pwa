@@ -24,7 +24,7 @@ Base de lógica: `docs/carrito-trifasico.md` del worktree `carrito-trifasico-log
 | ID | Specs | Ruta | Estado | Commit |
 |---|---|---|---|---|
 | T1 | S3, S4 | inline | hecho: `register_lot` + `action=lot` en `/panel/compras/` (falta que Codex pinte el formulario) | ver L9 |
-| T2 | S5 | inline | a medias: la cotización ya usa un solo lote (`_lot_allocation`, aviso `mixed_lots`); falta descontar el lote al confirmar | ver L9 |
+| T2 | S5 | inline | hecho: al confirmar se descuenta el lote (pedido completo por producto), cancelar lo devuelve, `panel_order_lots` + `line.lots` en el detalle (falta que Codex lo pinte) | ver L11 |
 | T2b | S11, S12 | inline | hecho: `cut_lot` + vista `panel_open_lots` + `action=cut` en `/panel/compras/` (falta que Codex lo pinte) | ver L10 |
 | T3 | S6 | inline | pendiente: umbral de stock bajo por producto, aviso al admin y "quedan N piezas" en la tienda | — |
 | T4 | S7 | inline | pendiente: retirar el freno por porcentaje; precio USD = MXN / tasa del día | — |
@@ -90,4 +90,17 @@ Base de lógica: `docs/carrito-trifasico.md` del worktree `carrito-trifasico-log
     - Un lote agotado vuelve a usar el peso de la especificación del corte.
     - El carrito completo debe asignarse de una vez al confirmar, porque hoy cada línea se cotiza por separado.
     - El total no es monótono: 21 pollos ($3,712.50) cuestan menos que 20 ($3,750) porque la mezcla toma primero los chicos. Hay que mostrárselo a Eduardo.
+- **L11 (2026-11-19, T2: descontar el lote al confirmar). Eduardo: "Sí, sigue con T2".**
+  - **Qué cambió:**
+    - Migración `20261119000003_lote_al_confirmar.sql`: tabla `order_item_lots` (línea, lote, piezas, peso servido, devuelto), `_take_order_lots` y `_return_order_lots`, y `set_order_status` con dos llamadas nuevas.
+    - Al confirmar, el pedido se reparte completo por producto con la regla de `_lot_allocation`. Dos líneas del mismo producto son una sola necesidad.
+    - Cancelar un pedido confirmado devuelve cada pieza a su lote, y las filas quedan marcadas como devueltas.
+    - El precio cotizado no cambia. La fila guarda el peso que de verdad se sirvió, para que el panel vea cuando un pedido en espera terminó saliendo de otro lote.
+    - Las piezas que no están en ningún lote (stock sin lote) no dejan fila.
+    - `cut_lot` ahora bloquea primero los productos por id ascendente y después el lote, el mismo orden de `set_order_status`, para no cruzarse en un interbloqueo. Además vuelve a comprobar `pieces_left` después del bloqueo.
+    - La vista `panel_order_lots` es aparte, para no tocar las nueve llaves fijas de `panel_orders.lines`. Django pega `line.lots` a cada línea del detalle del pedido.
+  - **RED:** la prueba SQL falló con la migración vacía (`order_item_lots` no existía). Django tuvo 1 falla y 3 errores en las pruebas nuevas.
+  - **GREEN:** SQL con 965 pruebas y 0 fallas (lote_al_confirmar 71). La reversa deja el esquema idéntico. Django: 1019 OK.
+  - **Riesgo:** punto 4, por el orden de bloqueos entre `set_order_status`, `cut_lot` y `register_lot`.
+  - **Pendiente para Eduardo:** un pedido en espera se cotizó con el lote viejo y al confirmarse salió del nuevo. Se cobra lo cotizado. Hay que decidir si eso está bien o si hay que avisar o recotizar.
 

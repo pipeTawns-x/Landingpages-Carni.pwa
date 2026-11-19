@@ -351,6 +351,24 @@ class PostgresGateway:
             [product_id, new_stock, reason, staff_ref],
         )
 
+    def order_lots(self, order_id):
+        """Which lots served each line of one order, from the view `panel_order_lots`.
+
+        `line_no` is the position of the line in `PanelOrder.lines`, starting at 1. Weights travel
+        as text so they come back as exact decimals.
+        """
+        result = self._call(
+            "SELECT coalesce(jsonb_agg(jsonb_build_object("
+            "'line_no', v.line_no, 'lot_id', v.lot_id, 'product_id', v.product_id, "
+            "'product_name', v.product_name, 'pieces', v.pieces, "
+            "'piece_weight_kg', v.piece_weight_kg::text, 'returned', v.returned) "
+            "ORDER BY v.line_no, v.lot_id), '[]'::jsonb) "
+            "FROM public.panel_order_lots v WHERE v.order_id = %s",
+            [str(order_id)],
+        )
+        rows = json.loads(result) if isinstance(result, str | bytes) else result
+        return [{**row, "piece_weight_kg": _decimal(row.get("piece_weight_kg"))} for row in rows]
+
     def recent_purchases(self, limit=20):
         """The latest lots against what their product sold since, newest first.
 

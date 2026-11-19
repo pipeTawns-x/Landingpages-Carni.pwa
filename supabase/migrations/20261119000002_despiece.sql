@@ -47,6 +47,7 @@ DECLARE
     v_qty      numeric;
     v_lot      bigint;
     v_ids      jsonb := '[]'::jsonb;
+    v_pids     integer[] := ARRAY[]::integer[];
 BEGIN
     IF char_length(p_note) > 500 THEN
         RAISE EXCEPTION 'note_too_long: at most 500 characters';
@@ -58,8 +59,7 @@ BEGIN
     SELECT l.id, l.product_id, l.unit_cost, l.piece_weight_kg, l.pieces_left
       INTO v_src
       FROM public.purchase_lots l
-     WHERE l.id = p_source_lot_id AND l.piece_weight_kg IS NOT NULL
-       FOR UPDATE;
+     WHERE l.id = p_source_lot_id AND l.piece_weight_kg IS NOT NULL;
     IF NOT FOUND THEN
         RAISE EXCEPTION 'lot_not_found: %', coalesce(p_source_lot_id::text, 'NULL');
     END IF;
@@ -90,6 +90,7 @@ BEGIN
         EXCEPTION WHEN invalid_text_representation OR numeric_value_out_of_range THEN
             RAISE EXCEPTION 'invalid_items: output % has a value that is not a valid number', i + 1;
         END;
+        v_pids := v_pids || v_pid;
         IF v_pid = v_src.product_id THEN
             RAISE EXCEPTION 'invalid_items: a lot is not cut into its own product';
         END IF;
@@ -109,6 +110,13 @@ BEGIN
         END IF;
         v_kg_total := v_kg_total + v_pieces * round(v_weight, 3);
     END LOOP;
+
+    -- Lock order shared with set_order_status: every product by ascending id, then the lot.
+    PERFORM 1 FROM public.products p WHERE p.id = ANY (v_pids || v_src.product_id) ORDER BY p.id FOR UPDATE;
+    SELECT l.pieces_left INTO v_src.pieces_left FROM public.purchase_lots l WHERE l.id = v_src.id FOR UPDATE;
+    IF p_pieces > v_src.pieces_left THEN
+        RAISE EXCEPTION 'insufficient_stock: the lot has % pieces left', v_src.pieces_left;
+    END IF;
 
     -- The pieces leave the source lot and its product.
     SELECT p.id, p.stock, p.stock_unit INTO v_sp FROM public.products p WHERE p.id = v_src.product_id FOR UPDATE;

@@ -686,6 +686,41 @@ class OrderDetailTests(SaleTestCase):
             self.client.get(reverse("ventas:pedido_detalle", args=[uuid.uuid4()])).status_code, 404
         )
 
+    def test_each_line_carries_the_lots_that_served_it(self):
+        order = self.register()
+        lot = {
+            "line_no": 1,
+            "lot_id": 41,
+            "product_id": 1,
+            "product_name": "Bistec",
+            "pieces": 2,
+            "piece_weight_kg": Decimal("1.500"),
+            "returned": False,
+        }
+        self.gateway.order_lot_rows = [lot, {**lot, "line_no": 2, "lot_id": 42}]
+
+        response = self.client.get(reverse("ventas:pedido_detalle", args=[order.pk]))
+
+        self.assertEqual(self.gateway.order_lot_asks, [order.pk])
+        self.assertEqual(response.context["order"].lines[0]["lots"], [lot])
+
+    def test_a_line_no_lot_served_has_no_lots(self):
+        order = self.register()
+
+        response = self.client.get(reverse("ventas:pedido_detalle", args=[order.pk]))
+
+        self.assertEqual(response.context["order"].lines[0]["lots"], [])
+
+    def test_the_order_still_shows_when_its_lots_cannot_be_read(self):
+        order = self.register()
+        self.gateway.errors["order_lots"] = GatewayUnavailable()
+
+        response = self.client.get(reverse("ventas:pedido_detalle", args=[order.pk]))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["order"].lines[0]["lots"], [])
+        self.assertIn(("error", domain.UNAVAILABLE_MESSAGE), messages_of(response))
+
     def test_what_the_staff_typed_is_drawn_as_text(self):
         order = self.register(customer_name="<script>alert(1)</script>", notes="<b>fuerte</b>")
 
