@@ -4,7 +4,8 @@ Three POST forms with Django's CSRF token share the page, told apart by `action`
 `purchase` calls `register_purchase` (the function applies the yield, the cost per kilo and the
 stock), `lot` calls `register_lot` (a bag counted by the piece with the weight of one piece: each
 piece costs that weight times the price per kilo) and `count` calls `adjust_stock` (a physical
-count with its reason). Both go through the
+count with its reason). `cut` calls `cut_lot` (despiece: pieces of a lot become lots of other
+products, listed in the formset `salida`). Both go through the
 gateway, then redirect (POST/redirect/GET). The lots come from `panel_purchase_performance`.
 """
 
@@ -172,15 +173,9 @@ class LotForm(forms.Form):
         product = data.get("product")
         if product is None:
             return data
-        if product.price_unit != "kg":
-            self.add_error(
-                "product", "Solo los productos con precio por kilo se registran por lote de piezas."
-            )
-        elif "pieces" not in (product.sale_modes or []):
-            self.add_error(
-                "product",
-                "Activa la venta por pieza de este producto antes de registrar un lote por pieza.",
-            )
+        error = _piece_lot_product_errors(product)
+        if error:
+            self.add_error("product", error)
         return data
 
 
@@ -189,6 +184,105 @@ def piece_price(product, piece_weight_kg):
     return (Decimal(piece_weight_kg) * product.price_per_kg).quantize(
         Decimal("0.01"), rounding=ROUND_HALF_UP
     )
+
+
+def _piece_lot_product_errors(product):
+    """Why a product cannot take a piece lot, or None when it can (same rule as `register_lot`)."""
+    if product.price_unit != "kg":
+        return "Solo los productos con precio por kilo se registran por lote de piezas."
+    if "pieces" not in (product.sale_modes or []):
+        return "Activa la venta por pieza de este producto antes de registrar un lote por pieza."
+    return None
+
+
+class CutForm(forms.Form):
+    """Despiece: which lot and how many of its pieces are cut (the products go in `salida`)."""
+
+    source_lot = forms.IntegerField(
+        label="Lote que se despieza",
+        min_value=1,
+        widget=forms.NumberInput(attrs={"class": NUMBER, "step": "1", "inputmode": "numeric"}),
+        error_messages={
+            "required": "Elige el lote que se despieza.",
+            "invalid": "Elige el lote que se despieza.",
+            "min_value": "Elige el lote que se despieza.",
+        },
+    )
+    pieces = forms.IntegerField(
+        label="Piezas que se despiezan",
+        widget=forms.NumberInput(
+            attrs={"class": NUMBER, "step": "1", "inputmode": "numeric", "min": "1"}
+        ),
+        error_messages={
+            "required": "Escribe cuántas piezas se despiezan.",
+            "invalid": "Las piezas son un número entero, por ejemplo 3.",
+        },
+    )
+    note = forms.CharField(
+        label="Nota",
+        required=False,
+        max_length=500,
+        widget=forms.TextInput(attrs={"class": TEXT, "maxlength": "500"}),
+        error_messages={"max_length": "La nota es demasiado larga (máximo 500 caracteres)."},
+    )
+
+    def clean_pieces(self):
+        pieces = self.cleaned_data["pieces"]
+        if pieces <= 0:
+            raise forms.ValidationError("Las piezas deben ser al menos 1.")
+        return pieces
+
+
+class CutOutputForm(forms.Form):
+    """One product that comes out of the cut: how many pieces and what one weighs."""
+
+    product = _product_field()
+    pieces = forms.IntegerField(
+        label="Piezas que salen",
+        widget=forms.NumberInput(
+            attrs={"class": NUMBER, "step": "1", "inputmode": "numeric", "min": "1"}
+        ),
+        error_messages={
+            "required": "Escribe cuántas piezas salen.",
+            "invalid": "Las piezas son un número entero, por ejemplo 6.",
+        },
+    )
+    piece_weight_kg = _amount_field("Peso de una pieza (kg)", 3)
+
+    def clean_pieces(self):
+        pieces = self.cleaned_data["pieces"]
+        if pieces <= 0:
+            raise forms.ValidationError("Las piezas deben ser al menos 1.")
+        return pieces
+
+    def clean_piece_weight_kg(self):
+        weight = self.cleaned_data["piece_weight_kg"]
+        if weight <= 0:
+            raise forms.ValidationError("El peso de la pieza debe ser mayor que cero.")
+        return weight
+
+    def clean(self):
+        data = super().clean()
+        product = data.get("product")
+        if product is not None:
+            error = _piece_lot_product_errors(product)
+            if error:
+                self.add_error("product", error)
+        return data
+
+
+class BaseCutOutputFormSet(forms.BaseFormSet):
+    def clean(self):
+        super().clean()
+        if any(self.errors):
+            return
+        if not any(form.cleaned_data for form in self.forms):
+            raise forms.ValidationError("Agrega al menos un producto que sale del despiece.")
+
+
+CutOutputFormSet = forms.formset_factory(
+    CutOutputForm, formset=BaseCutOutputFormSet, extra=3, max_num=20, validate_max=True
+)
 
 
 class StockCountForm(forms.Form):
@@ -223,6 +317,16 @@ def _recent_lots(request):
     return []
 
 
+def _open_lots(request):
+    try:
+        return services.get_gateway().open_lots()
+    except services.GatewayError as error:
+        messages.error(request, domain.message_for(error.code))
+    except services.GatewayUnavailable:
+        messages.error(request, domain.UNAVAILABLE_MESSAGE)
+    return []
+
+
 def _send(request, call, success):
     """Run one write of the gateway; True when the store took it."""
     try:
@@ -241,10 +345,12 @@ def _send(request, call, success):
 @require_http_methods(["GET", "HEAD", "POST"])
 def compras(request):
     action = request.POST.get("action") if request.method == "POST" else None
-    if action not in (None, "purchase", "lot", "count"):
+    if action not in (None, "purchase", "lot", "cut", "count"):
         return HttpResponseBadRequest("Acción desconocida.")
     purchase = PurchaseForm(request.POST if action == "purchase" else None, auto_id="compra_%s")
     lot = LotForm(request.POST if action == "lot" else None, auto_id="lote_%s")
+    cut = CutForm(request.POST if action == "cut" else None, auto_id="despiece_%s")
+    cut_outputs = CutOutputFormSet(request.POST if action == "cut" else None, prefix="salida")
     count = StockCountForm(request.POST if action == "count" else None, auto_id="conteo_%s")
     staff_ref = request.session.get(PANEL_SESSION_KEY)
     gateway = services.get_gateway()
@@ -290,6 +396,30 @@ def compras(request):
             success,
         ):
             return redirect("panel:compras")
+    if action == "cut" and cut.is_valid() and cut_outputs.is_valid():
+        data = cut.cleaned_data
+        rows = [form.cleaned_data for form in cut_outputs.forms if form.cleaned_data]
+        outputs = [
+            {
+                "product_id": row["product"].pk,
+                "pieces": row["pieces"],
+                "piece_weight_kg": f"{row['piece_weight_kg'].normalize():f}",
+            }
+            for row in rows
+        ]
+        names = ", ".join(f"{row['product'].name} ({row['pieces']})" for row in rows)
+        success = (
+            f"Despiece registrado: {data['pieces']} piezas del lote {data['source_lot']} "
+            f"pasaron a {names}."
+        )
+        if _send(
+            request,
+            lambda: gateway.cut_lot(
+                data["source_lot"], data["pieces"], outputs, data["note"] or None, staff_ref
+            ),
+            success,
+        ):
+            return redirect("panel:compras")
     if action == "count" and count.is_valid():
         data = count.cleaned_data
         product = data["product"]
@@ -302,5 +432,13 @@ def compras(request):
         ):
             return redirect("panel:compras")
 
-    context = {"purchase": purchase, "lot": lot, "count": count, "lots": _recent_lots(request)}
+    context = {
+        "purchase": purchase,
+        "lot": lot,
+        "cut": cut,
+        "cut_outputs": cut_outputs,
+        "count": count,
+        "lots": _recent_lots(request),
+        "open_lots": _open_lots(request),
+    }
     return render(request, "panel/compras.html", context)

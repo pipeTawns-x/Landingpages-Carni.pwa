@@ -457,3 +457,213 @@ class LotGatewayTests(TestCase):
             "SELECT public.register_lot(%s, %s, %s, %s, %s, %s)",
             [5, 20, Decimal("2.5"), Decimal("3000"), None, "staff-1"],
         )
+
+
+class CutTests(PurchasesTestCase):
+    """Despiece: pieces of a lot leave their product and become lots of other products.
+
+    Eduardo's example: the 3 chickens of last week's lot become 3 breasts for "pechuga para
+    bistec", 6 legs and 6 wings (odd/tasks/carrito-trifasico.md, S11). The store moves the
+    stock, the pieces and the cost (`cut_lot`); the page sends what was typed.
+    """
+
+    def setUp(self):
+        super().setUp()
+        category = self.store["bistec"].category
+        self.pechuga = Product.objects.create(
+            category=category,
+            name="Pechuga para bistec",
+            price_per_kg=Decimal("160.00"),
+            sale_modes=["money", "weight", "pieces"],
+        )
+        self.piernas = Product.objects.create(
+            category=category,
+            name="Piernas",
+            price_per_kg=Decimal("90.00"),
+            sale_modes=["money", "weight", "pieces"],
+        )
+        self.gateway.open_lot_rows = [
+            {
+                "lot_id": 41,
+                "product_id": 1,
+                "product_name": "Pollo entero",
+                "piece_weight_kg": Decimal("1.500"),
+                "pieces_left": 3,
+                "price_per_piece": Decimal("112.50"),
+                "source_lot_id": None,
+            }
+        ]
+
+    def post(self, outputs, **data):
+        payload = {
+            "action": "cut",
+            "source_lot": "41",
+            "pieces": "3",
+            "salida-TOTAL_FORMS": str(len(outputs)),
+            "salida-INITIAL_FORMS": "0",
+            "salida-MIN_NUM_FORMS": "0",
+            "salida-MAX_NUM_FORMS": "20",
+        }
+        for i, row in enumerate(outputs):
+            for key, value in row.items():
+                payload[f"salida-{i}-{key}"] = value
+        payload.update(data)
+        return self.client.post(self.url, payload)
+
+    def cut_errors(self, response):
+        form = response.context["cut"]
+        outputs = response.context["cut_outputs"]
+        errors = [e for errs in form.errors.values() for e in errs]
+        errors += list(outputs.non_form_errors())
+        for f in outputs.forms:
+            errors += [e for errs in f.errors.values() for e in errs]
+        return errors
+
+    def test_the_page_lists_the_open_lots_and_offers_the_cut_form(self):
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.context["open_lots"], self.gateway.open_lot_rows)
+        self.assertEqual(list(response.context["cut"].fields), ["source_lot", "pieces", "note"])
+        self.assertEqual(
+            list(response.context["cut_outputs"].forms[0].fields),
+            ["product", "pieces", "piece_weight_kg"],
+        )
+
+    def test_eduardos_cut_is_sent_to_the_store_and_redirects(self):
+        response = self.post(
+            [
+                {"product": self.pechuga.pk, "pieces": "3", "piece_weight_kg": "0.5"},
+                {"product": self.piernas.pk, "pieces": "6", "piece_weight_kg": "0.3"},
+                {"product": "", "pieces": "", "piece_weight_kg": ""},
+            ],
+            note="Despiece del lote viejo",
+        )
+
+        self.assertRedirects(response, self.url, fetch_redirect_response=False)
+        self.assertEqual(
+            self.gateway.cuts,
+            [
+                (
+                    41,
+                    3,
+                    [
+                        {"product_id": self.pechuga.pk, "pieces": 3, "piece_weight_kg": "0.5"},
+                        {"product_id": self.piernas.pk, "pieces": 6, "piece_weight_kg": "0.3"},
+                    ],
+                    "Despiece del lote viejo",
+                    self.client.session[PANEL_SESSION_KEY],
+                )
+            ],
+        )
+        self.assertEqual(
+            self.messages_of(response),
+            [
+                "Despiece registrado: 3 piezas del lote 41 pasaron a "
+                "Pechuga para bistec (3), Piernas (6)."
+            ],
+        )
+
+    def test_a_cut_needs_at_least_one_product(self):
+        response = self.post([{"product": "", "pieces": "", "piece_weight_kg": ""}])
+
+        self.assertIn(
+            "Agrega al menos un producto que sale del despiece.", self.cut_errors(response)
+        )
+        self.assertEqual(self.gateway.cuts, [])
+
+    def test_an_output_needs_its_pieces_and_its_weight(self):
+        response = self.post([{"product": self.piernas.pk, "pieces": "", "piece_weight_kg": "0.3"}])
+
+        self.assertIn("Escribe cuántas piezas salen.", self.cut_errors(response))
+        self.assertEqual(self.gateway.cuts, [])
+
+    def test_an_output_piece_must_weigh_something(self):
+        response = self.post([{"product": self.piernas.pk, "pieces": "6", "piece_weight_kg": "0"}])
+
+        self.assertIn("El peso de la pieza debe ser mayor que cero.", self.cut_errors(response))
+        self.assertEqual(self.gateway.cuts, [])
+
+    def test_an_output_not_sold_by_the_piece_is_refused_before_the_store(self):
+        response = self.post(
+            [{"product": self.store["molida"].pk, "pieces": "6", "piece_weight_kg": "0.3"}]
+        )
+
+        self.assertIn(
+            "Activa la venta por pieza de este producto antes de registrar un lote por pieza.",
+            self.cut_errors(response),
+        )
+        self.assertEqual(self.gateway.cuts, [])
+
+    def test_zero_pieces_to_cut_is_refused(self):
+        response = self.post(
+            [{"product": self.piernas.pk, "pieces": "6", "piece_weight_kg": "0.3"}], pieces="0"
+        )
+
+        self.assertIn("Las piezas deben ser al menos 1.", self.cut_errors(response))
+        self.assertEqual(self.gateway.cuts, [])
+
+    def test_a_refusal_of_the_store_is_shown(self):
+        self.gateway.errors["cut_lot"] = GatewayError("insufficient_stock")
+
+        response = self.post(
+            [{"product": self.piernas.pk, "pieces": "6", "piece_weight_kg": "0.3"}]
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(message_for("insufficient_stock"), self.messages_of(response))
+
+    def test_an_unknown_lot_has_its_own_message(self):
+        self.gateway.errors["cut_lot"] = GatewayError("lot_not_found")
+
+        response = self.post(
+            [{"product": self.piernas.pk, "pieces": "6", "piece_weight_kg": "0.3"}]
+        )
+
+        self.assertIn(
+            "Ese lote ya no tiene piezas o no es un lote por pieza.", self.messages_of(response)
+        )
+
+    def test_when_the_open_lots_cannot_be_read_the_page_still_works(self):
+        self.gateway.errors["open_lots"] = GatewayUnavailable()
+
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["open_lots"], [])
+
+
+class OpenLotsGatewayTests(TestCase):
+    def test_open_lots_reads_the_view_and_returns_exact_decimals(self):
+        from ventas.services import PostgresGateway
+
+        rows = [
+            {
+                "lot_id": 41,
+                "product_id": 1,
+                "product_name": "Pollo entero",
+                "piece_weight_kg": "1.500",
+                "pieces_left": 3,
+                "price_per_piece": "112.50",
+                "source_lot_id": None,
+                "created_at": "2026-11-19T09:30:00+00:00",
+            }
+        ]
+        with mock.patch.object(PostgresGateway, "_call", return_value=rows) as call:
+            result = PostgresGateway().open_lots()
+
+        self.assertIn("FROM public.panel_open_lots", call.call_args.args[0])
+        self.assertEqual(result[0]["piece_weight_kg"], Decimal("1.500"))
+        self.assertEqual(result[0]["price_per_piece"], Decimal("112.50"))
+        self.assertEqual(result[0]["pieces_left"], 3)
+
+    def test_cut_lot_sends_the_outputs_as_json(self):
+        from ventas.services import PostgresGateway
+
+        outputs = [{"product_id": 7, "pieces": 6, "piece_weight_kg": "0.3"}]
+        with mock.patch.object(PostgresGateway, "_call", return_value=[90]) as call:
+            PostgresGateway().cut_lot(41, 3, outputs, "", "staff-1")
+
+        call.assert_called_once_with(
+            "SELECT public.cut_lot(%s, %s, %s::jsonb, %s, %s)",
+            [41, 3, '[{"product_id": 7, "pieces": 6, "piece_weight_kg": "0.3"}]', None, "staff-1"],
+        )

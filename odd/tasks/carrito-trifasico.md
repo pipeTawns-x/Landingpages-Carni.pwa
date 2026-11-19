@@ -25,7 +25,7 @@ Base de lógica: `docs/carrito-trifasico.md` del worktree `carrito-trifasico-log
 |---|---|---|---|---|
 | T1 | S3, S4 | inline | hecho: `register_lot` + `action=lot` en `/panel/compras/` (falta que Codex pinte el formulario) | ver L9 |
 | T2 | S5 | inline | a medias: la cotización ya usa un solo lote (`_lot_allocation`, aviso `mixed_lots`); falta descontar el lote al confirmar | ver L9 |
-| T2b | S11, S12 | inline | pendiente: despiece de un lote a productos destino | — |
+| T2b | S11, S12 | inline | hecho: `cut_lot` + vista `panel_open_lots` + `action=cut` en `/panel/compras/` (falta que Codex lo pinte) | ver L10 |
 | T3 | S6 | inline | pendiente: umbral de stock bajo por producto, aviso al admin y "quedan N piezas" en la tienda | — |
 | T4 | S7 | inline | pendiente: retirar el freno por porcentaje; precio USD = MXN / tasa del día | — |
 | T5 | S8 | inline | pendiente: contenido del paquete y personas en el modelo y el panel | — |
@@ -74,4 +74,20 @@ Base de lógica: `docs/carrito-trifasico.md` del worktree `carrito-trifasico-log
   - Django: 1003 pruebas OK, 15 nuevas. RED observado: 17 fallas, solo en las pruebas nuevas.
   - Supuesto: un producto que se vende por pieza necesita el interruptor "se vende por pieza", y ese interruptor hoy pide el peso promedio del corte (`inventory/services.py:179`). Cuando hay lote, el peso del lote manda. Que el interruptor funcione solo con lotes queda pendiente.
   - Riesgo: punto 1 (migración y precio cobrado) y punto 3 (nuevo aviso en `quote_line`).
+- **L10 (2026-11-19, verificador independiente de 3d318b96 y despiece).**
+  - **Veredicto:**
+    - S3 se cumple.
+    - S4 y S5 se cumplen en parte.
+    - S12 se cumple.
+    - El chequeo diferencial no encontró diferencias en 169,920 combinaciones contra el `quote_line` anterior.
+  - **Bloqueadores corregidos en una sola tanda:**
+    - **B1:** salía `mixed_lots` falso cuando había un solo lote y el pedido lo superaba. Ahora solo cuentan las entradas con `lot_id`.
+    - **B2:** el lote no guardaba el precio por kilo vigente. Se agregó la columna `price_per_kg` en `purchase_lots`, que se llena en `register_lot` y en `cut_lot`.
+    - **Aviso 5:** un peso menor a 0.0005 kg ahora se rechaza como `invalid_amount`.
+  - **RED:** lotes dio 27 ok y 2 fallas; despiece, 1 falla con la migración vacía.
+  - **GREEN:** suite SQL con 891 pruebas y 0 fallas (lotes 52, despiece 37). Django: 1015 OK.
+  - **Avisos abiertos para T2 (descontar el lote):**
+    - Un lote agotado vuelve a usar el peso de la especificación del corte.
+    - El carrito completo debe asignarse de una vez al confirmar, porque hoy cada línea se cotiza por separado.
+    - El total no es monótono: 21 pollos ($3,712.50) cuestan menos que 20 ($3,750) porque la mezcla toma primero los chicos. Hay que mostrárselo a Eduardo.
 

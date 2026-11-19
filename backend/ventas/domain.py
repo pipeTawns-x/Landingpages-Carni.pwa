@@ -48,6 +48,7 @@ ERROR_MESSAGES = {
     "fx_unavailable": "No hay un tipo de cambio vigente para cobrar en dólares.",
     "product_not_found": "Un producto del carrito ya no está disponible.",
     "insufficient_stock": "No hay existencias suficientes para confirmar este pedido.",
+    "lot_not_found": "Ese lote ya no tiene piezas o no es un lote por pieza.",
     "invalid_transition": "Ese cambio de estado no está permitido.",
     "too_many_lines": "El pedido tiene demasiadas líneas (el máximo es 50).",
     "too_many_pending": "Hay demasiados pedidos pendientes.",

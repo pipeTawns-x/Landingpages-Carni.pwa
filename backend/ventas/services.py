@@ -307,6 +307,43 @@ class PostgresGateway:
             [product_id, pieces, piece_weight_kg, total_cost, _blank_to_none(note), staff_ref],
         )
 
+    def cut_lot(self, source_lot_id, pieces, outputs, note=None, staff_ref=None):
+        """Cut pieces of a lot into other products; return the ids of the new lots.
+
+        `outputs` is a list of {product_id, pieces, piece_weight_kg}; the weight travels as text
+        so the function receives the exact decimal that was typed.
+        """
+        return self._call(
+            "SELECT public.cut_lot(%s, %s, %s::jsonb, %s, %s)",
+            [source_lot_id, pieces, json.dumps(outputs), _blank_to_none(note), staff_ref],
+        )
+
+    def open_lots(self):
+        """The piece lots that still have pieces, with what one piece costs today.
+
+        Read from the view `panel_open_lots`, by product and oldest first. Numbers travel as text
+        so they come back as exact decimals.
+        """
+        result = self._call(
+            "SELECT coalesce(jsonb_agg(jsonb_build_object("
+            "'lot_id', v.lot_id, 'product_id', v.product_id, 'product_name', v.product_name, "
+            "'piece_weight_kg', v.piece_weight_kg::text, 'pieces_left', v.pieces_left, "
+            "'price_per_piece', v.price_per_piece::text, 'source_lot_id', v.source_lot_id, "
+            "'created_at', v.created_at) "
+            "ORDER BY v.product_name, v.created_at, v.lot_id), '[]'::jsonb) "
+            "FROM public.panel_open_lots v",
+            [],
+        )
+        rows = json.loads(result) if isinstance(result, str | bytes) else result
+        return [
+            {
+                **row,
+                "piece_weight_kg": _decimal(row.get("piece_weight_kg")),
+                "price_per_piece": _decimal(row.get("price_per_piece")),
+            }
+            for row in rows
+        ]
+
     def adjust_stock(self, product_id, new_stock, reason, staff_ref=None):
         """Set the stock to a physical count; the function records the difference and why."""
         return self._call(
