@@ -298,6 +298,15 @@ class PostgresGateway:
             [product_id, qty, total_cost, _blank_to_none(note), staff_ref],
         )
 
+    def register_lot(
+        self, product_id, pieces, piece_weight_kg, total_cost, note=None, staff_ref=None
+    ):
+        """Record a bag counted by the piece; the function prices each piece from its weight."""
+        return self._call(
+            "SELECT public.register_lot(%s, %s, %s, %s, %s, %s)",
+            [product_id, pieces, piece_weight_kg, total_cost, _blank_to_none(note), staff_ref],
+        )
+
     def adjust_stock(self, product_id, new_stock, reason, staff_ref=None):
         """Set the stock to a physical count; the function records the difference and why."""
         return self._call(

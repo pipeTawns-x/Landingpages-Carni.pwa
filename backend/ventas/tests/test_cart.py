@@ -105,3 +105,21 @@ class SessionCartTests(SimpleTestCase):
         self.session[cart.SESSION_KEY] = [line(1), {"product_id": "x"}, "junk", None, {"price": 1}]
 
         self.assertEqual(cart.lines(self.session), [line(1)])
+
+
+class LotWarningTests(SimpleTestCase):
+    """`quote_line` warns `mixed_lots` when no single lot covers a line sold by the piece."""
+
+    def test_the_mixed_lots_warning_reads_as_a_sentence(self):
+        from ventas import domain
+
+        self.assertEqual(
+            domain.WARNING_MESSAGES["mixed_lots"],
+            "No alcanzó un solo lote: esta línea junta piezas de dos lotes "
+            "y su tamaño puede variar.",
+        )
+
+    def test_the_low_stock_warning_did_not_change(self):
+        from ventas import domain
+
+        self.assertEqual(domain.WARNING_MESSAGES["low_stock"], "Poco stock: puede que no alcance.")

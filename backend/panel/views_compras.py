@@ -1,10 +1,14 @@
 """Compras y stock (/panel/compras/, panel:compras): what came in and what is on the shelf.
 
-Two POST forms with Django's CSRF token share the page, told apart by `action`:
+Three POST forms with Django's CSRF token share the page, told apart by `action`:
 `purchase` calls `register_purchase` (the function applies the yield, the cost per kilo and the
-stock) and `count` calls `adjust_stock` (a physical count with its reason). Both go through the
+stock), `lot` calls `register_lot` (a bag counted by the piece with the weight of one piece: each
+piece costs that weight times the price per kilo) and `count` calls `adjust_stock` (a physical
+count with its reason). Both go through the
 gateway, then redirect (POST/redirect/GET). The lots come from `panel_purchase_performance`.
 """
+
+from decimal import ROUND_HALF_UP, Decimal
 
 from django import forms
 from django.contrib import messages
@@ -113,6 +117,80 @@ class PurchaseForm(forms.Form):
         return cost
 
 
+class LotForm(forms.Form):
+    """A bag counted by the piece: how many pieces came and what one weighed piece weighs.
+
+    The weight becomes the standard weight of every piece of the lot, so one piece costs that
+    weight times the price per kilo (odd/tasks/carrito-trifasico.md, S3-S4). The store checks
+    every range again.
+    """
+
+    product = _product_field()
+    pieces = forms.IntegerField(
+        label="Piezas que llegaron",
+        help_text="Por ejemplo 20 pollos de la bolsa.",
+        widget=forms.NumberInput(
+            attrs={"class": NUMBER, "step": "1", "inputmode": "numeric", "min": "1"}
+        ),
+        error_messages={
+            "required": "Escribe cuántas piezas llegaron.",
+            "invalid": "Las piezas son un número entero, por ejemplo 20.",
+        },
+    )
+    piece_weight_kg = _amount_field(
+        "Peso de una pieza (kg)", 3, "Pesa una sola pieza: ese peso vale para todo el lote."
+    )
+    total_cost = _amount_field("Costo total (MXN)", 2, "Lo que pagaste por todo el lote.")
+    note = forms.CharField(
+        label="Nota",
+        required=False,
+        max_length=500,
+        widget=forms.TextInput(attrs={"class": TEXT, "maxlength": "500"}),
+        error_messages={"max_length": "La nota es demasiado larga (máximo 500 caracteres)."},
+    )
+
+    def clean_pieces(self):
+        pieces = self.cleaned_data["pieces"]
+        if pieces <= 0:
+            raise forms.ValidationError("Las piezas deben ser al menos 1.")
+        return pieces
+
+    def clean_piece_weight_kg(self):
+        weight = self.cleaned_data["piece_weight_kg"]
+        if weight <= 0:
+            raise forms.ValidationError("El peso de la pieza debe ser mayor que cero.")
+        return weight
+
+    def clean_total_cost(self):
+        cost = self.cleaned_data["total_cost"]
+        if cost < 0:
+            raise forms.ValidationError("El costo no puede ser negativo.")
+        return cost
+
+    def clean(self):
+        data = super().clean()
+        product = data.get("product")
+        if product is None:
+            return data
+        if product.price_unit != "kg":
+            self.add_error(
+                "product", "Solo los productos con precio por kilo se registran por lote de piezas."
+            )
+        elif "pieces" not in (product.sale_modes or []):
+            self.add_error(
+                "product",
+                "Activa la venta por pieza de este producto antes de registrar un lote por pieza.",
+            )
+        return data
+
+
+def piece_price(product, piece_weight_kg):
+    """What one piece of the lot costs: its weight times the price per kilo, to the cent."""
+    return (Decimal(piece_weight_kg) * product.price_per_kg).quantize(
+        Decimal("0.01"), rounding=ROUND_HALF_UP
+    )
+
+
 class StockCountForm(forms.Form):
     """A physical count: the stock there really is and why it differs."""
 
@@ -163,9 +241,10 @@ def _send(request, call, success):
 @require_http_methods(["GET", "HEAD", "POST"])
 def compras(request):
     action = request.POST.get("action") if request.method == "POST" else None
-    if action not in (None, "purchase", "count"):
+    if action not in (None, "purchase", "lot", "count"):
         return HttpResponseBadRequest("Acción desconocida.")
     purchase = PurchaseForm(request.POST if action == "purchase" else None, auto_id="compra_%s")
+    lot = LotForm(request.POST if action == "lot" else None, auto_id="lote_%s")
     count = StockCountForm(request.POST if action == "count" else None, auto_id="conteo_%s")
     staff_ref = request.session.get(PANEL_SESSION_KEY)
     gateway = services.get_gateway()
@@ -190,6 +269,27 @@ def compras(request):
         detail = f" (rendimiento {yield_pct.normalize():f} %)" if yield_pct is not None else ""
         if _send(request, register, f"Compra registrada: {product.name}{detail}."):
             return redirect("panel:compras")
+    if action == "lot" and lot.is_valid():
+        data = lot.cleaned_data
+        product = data["product"]
+        weight = data["piece_weight_kg"]
+        success = (
+            f"Lote registrado: {product.name}, {data['pieces']} piezas de "
+            f"{weight.normalize():f} kg. Cada pieza cuesta ${piece_price(product, weight)}."
+        )
+        if _send(
+            request,
+            lambda: gateway.register_lot(
+                product.pk,
+                data["pieces"],
+                weight,
+                data["total_cost"],
+                data["note"] or None,
+                staff_ref,
+            ),
+            success,
+        ):
+            return redirect("panel:compras")
     if action == "count" and count.is_valid():
         data = count.cleaned_data
         product = data["product"]
@@ -202,5 +302,5 @@ def compras(request):
         ):
             return redirect("panel:compras")
 
-    context = {"purchase": purchase, "count": count, "lots": _recent_lots(request)}
+    context = {"purchase": purchase, "lot": lot, "count": count, "lots": _recent_lots(request)}
     return render(request, "panel/compras.html", context)

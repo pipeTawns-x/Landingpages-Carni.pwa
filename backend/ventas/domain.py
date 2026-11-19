@@ -70,7 +70,12 @@ ERROR_MESSAGES = {
     "note_too_long": "La nota es demasiado larga (el máximo es 500 caracteres).",
     "reason_required": "Escribe por qué cambia el stock (máximo 200 caracteres).",
 }
-WARNING_MESSAGES = {"low_stock": "Poco stock: puede que no alcance."}
+WARNING_MESSAGES = {
+    "low_stock": "Poco stock: puede que no alcance.",
+    "mixed_lots": (
+        "No alcanzó un solo lote: esta línea junta piezas de dos lotes y su tamaño puede variar."
+    ),
+}
 GENERIC_REFUSAL = "La tienda no pudo registrar esto. Revisa los datos e inténtalo de nuevo."
 UNAVAILABLE_MESSAGE = (
     "No se pudo hablar con la base de datos de la tienda. Inténtalo de nuevo en un momento."

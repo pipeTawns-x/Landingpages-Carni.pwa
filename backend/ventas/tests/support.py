@@ -93,6 +93,7 @@ class FakeGateway:
         self.kpis = None
         self.manual_rates = []
         self.purchases = []
+        self.piece_lots = []
         self.counts = []
         self.lots = []
 
@@ -101,6 +102,14 @@ class FakeGateway:
         self._fail_if_asked("register_purchase")
         self.purchases.append((product_id, qty, total_cost, note, staff_ref))
         return len(self.purchases)
+
+    def register_lot(
+        self, product_id, pieces, piece_weight_kg, total_cost, note=None, staff_ref=None
+    ):
+        """Record the lot the way `register_lot` receives it; return the lot id."""
+        self._fail_if_asked("register_lot")
+        self.piece_lots.append((product_id, pieces, piece_weight_kg, total_cost, note, staff_ref))
+        return len(self.piece_lots)
 
     def adjust_stock(self, product_id, new_stock, reason, staff_ref=None):
         """Record the count the way `adjust_stock` receives it; return the new stock."""

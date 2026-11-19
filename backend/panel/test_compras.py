@@ -15,7 +15,7 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 
-from inventory.models import ProductCost
+from inventory.models import Product, ProductCost
 from panel.access import PANEL_SESSION_KEY
 from panel.tests import sign_in_as_panel_admin
 from ventas.domain import UNAVAILABLE_MESSAGE, message_for
@@ -298,3 +298,162 @@ class YieldTests(PurchasesTestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertFalse(ProductCost.objects.exists())
+
+
+class LotTests(PurchasesTestCase):
+    """Registrar lote: a bag counted by the piece, with the weight of one piece weighed.
+
+    Eduardo's example: whole chicken at $75/kg; a bag of 20 chickens of 2.5 kg makes each
+    chicken $187.50 (odd/tasks/carrito-trifasico.md, S3-S4). The store does the arithmetic and
+    keeps the lot (`register_lot`); the page sends what was typed and says what one piece costs.
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.pollo = Product.objects.create(
+            category=self.store["bistec"].category,
+            name="Pollo entero",
+            price_per_kg=Decimal("75.00"),
+            sale_modes=["money", "weight", "pieces"],
+        )
+
+    def lot_errors(self, response):
+        """Every error of the lot form, flattened (the template that draws it is Codex's)."""
+        return [e for errors in response.context["lot"].errors.values() for e in errors]
+
+    def post(self, **data):
+        payload = {"action": "lot", "product": self.pollo.pk}
+        payload.update(data)
+        return self.client.post(self.url, payload)
+
+    def test_the_page_offers_the_lot_form(self):
+        response = self.client.get(self.url)
+
+        self.assertIn("lot", response.context)
+        self.assertEqual(
+            list(response.context["lot"].fields),
+            ["product", "pieces", "piece_weight_kg", "total_cost", "note"],
+        )
+
+    def test_a_valid_lot_is_sent_to_the_store_and_says_what_one_piece_costs(self):
+        response = self.post(
+            pieces="20", piece_weight_kg="2.5", total_cost="3000", note="Bolsa nueva"
+        )
+
+        self.assertRedirects(response, self.url, fetch_redirect_response=False)
+        self.assertEqual(
+            self.gateway.piece_lots,
+            [
+                (
+                    self.pollo.pk,
+                    20,
+                    Decimal("2.5"),
+                    Decimal("3000"),
+                    "Bolsa nueva",
+                    self.client.session[PANEL_SESSION_KEY],
+                )
+            ],
+        )
+        self.assertEqual(
+            self.messages_of(response),
+            ["Lote registrado: Pollo entero, 20 piezas de 2.5 kg. Cada pieza cuesta $187.50."],
+        )
+
+    def test_the_old_lot_of_the_example_costs_112_50_a_piece(self):
+        response = self.post(pieces="3", piece_weight_kg="1.5", total_cost="300")
+
+        self.assertEqual(
+            self.messages_of(response),
+            ["Lote registrado: Pollo entero, 3 piezas de 1.5 kg. Cada pieza cuesta $112.50."],
+        )
+
+    def test_an_empty_note_is_sent_as_none(self):
+        self.post(pieces="3", piece_weight_kg="1.5", total_cost="300")
+
+        self.assertIsNone(self.gateway.piece_lots[0][4])
+
+    def test_pieces_must_be_a_whole_number_above_zero(self):
+        for pieces in ("0", "2.5", "-3", ""):
+            with self.subTest(pieces=pieces):
+                response = self.post(pieces=pieces, piece_weight_kg="1.5", total_cost="300")
+
+                self.assertEqual(response.status_code, 200)
+        self.assertEqual(self.gateway.piece_lots, [])
+
+    def test_the_weighed_piece_must_weigh_something(self):
+        response = self.post(pieces="3", piece_weight_kg="0", total_cost="300")
+
+        self.assertIn("El peso de la pieza debe ser mayor que cero.", self.lot_errors(response))
+        self.assertEqual(self.gateway.piece_lots, [])
+
+    def test_a_negative_cost_is_refused(self):
+        response = self.post(pieces="3", piece_weight_kg="1.5", total_cost="-1")
+
+        self.assertIn("El costo no puede ser negativo.", self.lot_errors(response))
+        self.assertEqual(self.gateway.piece_lots, [])
+
+    def test_a_product_not_sold_by_the_piece_is_refused_before_the_store(self):
+        response = self.post(
+            product=self.store["molida"].pk, pieces="3", piece_weight_kg="1.5", total_cost="1"
+        )
+
+        self.assertIn(
+            "Activa la venta por pieza de este producto antes de registrar un lote por pieza.",
+            self.lot_errors(response),
+        )
+        self.assertEqual(self.gateway.piece_lots, [])
+
+    def test_a_product_priced_per_piece_is_refused_before_the_store(self):
+        response = self.post(
+            product=self.store["camiseta"].pk, pieces="3", piece_weight_kg="1.5", total_cost="1"
+        )
+
+        self.assertIn(
+            "Solo los productos con precio por kilo se registran por lote de piezas.",
+            self.lot_errors(response),
+        )
+        self.assertEqual(self.gateway.piece_lots, [])
+
+    def test_a_refusal_of_the_store_is_shown_and_nothing_redirects(self):
+        self.gateway.errors["register_lot"] = GatewayError("sale_mode_not_allowed")
+
+        response = self.post(pieces="3", piece_weight_kg="1.5", total_cost="300")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(message_for("sale_mode_not_allowed"), self.messages_of(response))
+
+    def test_an_unavailable_store_is_shown(self):
+        self.gateway.errors["register_lot"] = GatewayUnavailable()
+
+        response = self.post(pieces="3", piece_weight_kg="1.5", total_cost="300")
+
+        self.assertIn(UNAVAILABLE_MESSAGE, self.messages_of(response))
+
+    def test_the_purchase_and_count_forms_still_work_beside_it(self):
+        self.client.post(
+            self.url,
+            {
+                "action": "purchase",
+                "product": self.store["bistec"].pk,
+                "qty": "10",
+                "total_cost": "1500",
+            },
+        )
+
+        self.assertEqual(len(self.gateway.purchases), 1)
+        self.assertEqual(self.gateway.piece_lots, [])
+
+
+class LotGatewayTests(TestCase):
+    def test_register_lot_calls_the_store_function_with_every_value(self):
+        from ventas.services import PostgresGateway
+
+        gateway = PostgresGateway()
+        with mock.patch.object(PostgresGateway, "_call", return_value=7) as call:
+            result = gateway.register_lot(5, 20, Decimal("2.5"), Decimal("3000"), "", "staff-1")
+
+        self.assertEqual(result, 7)
+        call.assert_called_once_with(
+            "SELECT public.register_lot(%s, %s, %s, %s, %s, %s)",
+            [5, 20, Decimal("2.5"), Decimal("3000"), None, "staff-1"],
+        )
