@@ -44,6 +44,21 @@ def directives(header):
     return parsed
 
 
+class SearchThrottleTests(TestCase):
+    def test_the_live_search_is_limited_per_client_address(self):
+        from django.core.cache import cache
+
+        from ventas.views.productos import SEARCHES_PER_MINUTE
+
+        cache.clear()
+        self.addCleanup(cache.clear)
+        url = reverse("ventas:buscar")
+        for _ in range(SEARCHES_PER_MINUTE):
+            self.assertEqual(self.client.get(url, {"q": "bis"}).status_code, 200)
+
+        self.assertEqual(self.client.get(url, {"q": "bis"}).status_code, 429)
+
+
 class HeadersTests(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -89,6 +104,18 @@ class HeadersTests(TestCase):
         self.assertEqual(response.headers["Cross-Origin-Resource-Policy"], "same-origin")
         self.assertEqual(response.headers["X-Content-Type-Options"], "nosniff")
 
+    def test_a_refused_oversized_body_carries_them_too(self):
+        with self.settings(MAX_REQUEST_BODY_BYTES=10):
+            response = self.client.post(
+                "/carrito/pedido/", data="x", content_type="text/plain", CONTENT_LENGTH="5000"
+            )
+
+        self.assertEqual(response.status_code, 413)
+        self.assertIn("Content-Security-Policy", response.headers)
+
+    def test_the_headers_wrap_every_other_middleware(self):
+        self.assertEqual(settings.MIDDLEWARE[0], "config.middleware.SecurityHeadersMiddleware")
+
     def test_a_json_answer_carries_them_too(self):
         response = self.client.get(reverse("ventas:buscar"), {"q": "bis"})
 
@@ -97,6 +124,11 @@ class HeadersTests(TestCase):
 
 class HttpsSettingsTests(SimpleTestCase):
     def loaded(self, **environment):
+        result = self.run_settings(**environment)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        return json.loads(result.stdout)
+
+    def run_settings(self, **environment):
         inherited = {
             name: os.environ[name] for name in ("PATH", "HOME", "LANG") if name in os.environ
         }
@@ -109,11 +141,10 @@ class HttpsSettingsTests(SimpleTestCase):
             timeout=60,
             check=False,
         )
-        self.assertEqual(result.returncode, 0, result.stderr)
-        return json.loads(result.stdout)
+        return result
 
-    def test_with_secure_cookies_hsts_and_the_redirect_are_on(self):
-        loaded = self.loaded(DJANGO_COOKIE_SECURE="true")
+    def test_with_secure_cookies_behind_the_proxy_hsts_and_the_redirect_are_on(self):
+        loaded = self.loaded(DJANGO_COOKIE_SECURE="true", DJANGO_BEHIND_PROXY="true")
 
         self.assertEqual(loaded["hsts"], 31536000)
         self.assertTrue(loaded["subdomains"])
@@ -125,8 +156,23 @@ class HttpsSettingsTests(SimpleTestCase):
         self.assertEqual(loaded["hsts"], 0)
         self.assertFalse(loaded["redirect"])
 
+    def test_without_the_proxy_flag_the_redirect_stays_off_to_avoid_a_loop(self):
+        """Behind a TLS proxy Django only sees https through the proxy header; without the flag
+        every request looks like http and a redirect would loop forever."""
+        loaded = self.loaded(DJANGO_COOKIE_SECURE="true")
+
+        self.assertFalse(loaded["redirect"])
+
+    def test_asking_for_the_redirect_without_the_proxy_flag_fails_the_start(self):
+        result = self.run_settings(DJANGO_COOKIE_SECURE="true", DJANGO_SSL_REDIRECT="true")
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("DJANGO_BEHIND_PROXY", result.stderr)
+
     def test_the_redirect_can_be_switched_off_on_its_own(self):
-        loaded = self.loaded(DJANGO_COOKIE_SECURE="true", DJANGO_SSL_REDIRECT="false")
+        loaded = self.loaded(
+            DJANGO_COOKIE_SECURE="true", DJANGO_BEHIND_PROXY="true", DJANGO_SSL_REDIRECT="false"
+        )
 
         self.assertFalse(loaded["redirect"])
         self.assertEqual(loaded["hsts"], 31536000)

@@ -190,3 +190,42 @@ class QuoteTests(ProductTestCase):
     def test_only_a_read_is_allowed(self):
         url = reverse("ventas:producto_cotizar", args=[self.store["bistec"].pk])
         self.assertEqual(self.client.post(url).status_code, 405)
+
+    def test_the_answer_is_never_cached(self):
+        response = self.quote(mode="weight", amount="1", unit="kg")
+
+        self.assertIn("no-store", response["Cache-Control"])
+
+    def test_a_client_that_asks_too_often_gets_a_429_before_any_lookup(self):
+        from ventas.views.productos import QUOTES_PER_MINUTE
+
+        for _ in range(QUOTES_PER_MINUTE):
+            self.quote(mode="weight", amount="1", unit="kg")
+        asked = len(self.gateway.quotes)
+
+        response = self.client.get(reverse("ventas:producto_cotizar", args=[999999]))
+
+        self.assertEqual(response.status_code, 429)
+        self.assertEqual(len(self.gateway.quotes), asked)
+
+    def test_a_line_the_store_refuses_is_a_400_with_its_reason(self):
+        from ventas import domain, services
+
+        self.gateway.quote_cart = mock.Mock(side_effect=services.GatewayError("product_inactive"))
+
+        response = self.quote(mode="weight", amount="1", unit="kg")
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(
+            json.loads(response.content)["error"], domain.message_for("product_inactive")
+        )
+
+    def test_without_the_store_it_is_a_503(self):
+        from ventas import domain, services
+
+        self.gateway.quote_cart = mock.Mock(side_effect=services.GatewayUnavailable())
+
+        response = self.quote(mode="weight", amount="1", unit="kg")
+
+        self.assertEqual(response.status_code, 503)
+        self.assertEqual(json.loads(response.content)["error"], domain.UNAVAILABLE_MESSAGE)

@@ -4,8 +4,8 @@ from django.utils.functional import SimpleLazyObject
 
 from inventory.models import Category
 from ventas import catalog
+from ventas.cart import public_lines
 from ventas.negocio import HORARIO, NEGOCIO
-from ventas.views.carrito import public_lines
 
 
 def negocio(request):
@@ -31,7 +31,7 @@ def _bag(request):
     No price: the prices are quoted by the store on the cart page. A product that left the
     catalogue drops out of the panel (the cart page explains it when the order is placed).
     """
-    lines = public_lines(request)
+    lines = public_lines(request.session)
     if not lines:
         return []
     products = catalog.active_products().in_bulk([line["product_id"] for line in lines])

@@ -211,6 +211,12 @@ class SearchJsonTests(HeaderTestCase):
     def test_only_a_read_is_allowed(self):
         self.assertEqual(self.client.post(reverse("ventas:buscar")).status_code, 405)
 
+    def test_the_answer_may_only_be_kept_by_the_browser_for_a_moment(self):
+        cache_control = self.search("bis")["Cache-Control"]
+
+        self.assertIn("private", cache_control)
+        self.assertIn("max-age=30", cache_control)
+
 
 class HeroVideoTests(HeaderTestCase):
     def test_the_video_has_a_pause_button(self):

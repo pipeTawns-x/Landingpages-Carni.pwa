@@ -15,8 +15,9 @@ DROP POLICY IF EXISTS "orders_insert_own" ON public.orders;
 DROP POLICY IF EXISTS "orders_update_own" ON public.orders;
 DROP POLICY IF EXISTS "order_items_insert_order" ON public.order_items;
 
-REVOKE INSERT, UPDATE, DELETE ON TABLE public.orders, public.order_items
-    FROM PUBLIC, anon, authenticated;
+-- Todo menos la lectura: el default de Supabase da ALL (tambien TRUNCATE, REFERENCES y TRIGGER).
+REVOKE ALL ON TABLE public.orders, public.order_items FROM PUBLIC, anon, authenticated;
+GRANT SELECT ON TABLE public.orders, public.order_items TO anon, authenticated;
 
 REVOKE EXECUTE ON FUNCTION public.create_order_with_items(text, jsonb, text, jsonb)
     FROM PUBLIC, anon, authenticated;
@@ -32,7 +33,12 @@ REVOKE EXECUTE ON FUNCTION public.cancel_order(uuid)
 -- GRANT EXECUTE ON FUNCTION public.cancel_order(uuid) TO PUBLIC, anon, authenticated, service_role;
 -- REVOKE EXECUTE ON FUNCTION public.create_order_with_items(text, jsonb, text, jsonb) FROM service_role;
 -- GRANT EXECUTE ON FUNCTION public.create_order_with_items(text, jsonb, text, jsonb) TO PUBLIC, anon, authenticated, service_role;
--- GRANT INSERT, UPDATE, DELETE ON TABLE public.orders, public.order_items TO anon, authenticated;
+-- REVOKE ALL ON TABLE public.orders, public.order_items FROM anon, authenticated, service_role;
+-- REVOKE ALL ON TABLE public.order_items FROM django;
+-- GRANT ALL ON TABLE public.orders, public.order_items TO anon;
+-- GRANT ALL ON TABLE public.orders, public.order_items TO authenticated;
+-- GRANT ALL ON TABLE public.orders, public.order_items TO service_role;
+-- GRANT SELECT ON TABLE public.order_items TO django;
 -- CREATE POLICY "order_items_insert_order" ON public.order_items FOR INSERT WITH CHECK (EXISTS (SELECT 1 FROM public.orders WHERE orders.id = order_items.order_id AND orders.user_id = auth.uid()));
 -- CREATE POLICY "orders_update_own" ON public.orders FOR UPDATE USING (user_id = auth.uid() AND status = 'pending') WITH CHECK (user_id = auth.uid());
 -- CREATE POLICY "orders_insert_own" ON public.orders FOR INSERT WITH CHECK (user_id = auth.uid());

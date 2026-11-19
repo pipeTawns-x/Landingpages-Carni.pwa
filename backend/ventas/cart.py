@@ -11,6 +11,8 @@ One line per product. Adding a product that is already in the cart replaces its 
 from decimal import Decimal
 
 SESSION_KEY = "ventas_cart"
+# The cart of the public store, apart from the counter cart of the panel.
+PUBLIC_SESSION_KEY = "tienda_cart"
 # The functions of the store refuse an order of more than 50 lines (`too_many_lines`).
 MAX_LINES = 50
 LINE_KEYS = frozenset({"product_id", "mode", "amount", "unit", "thickness_in", "note"})
@@ -79,3 +81,24 @@ def remove(session, product_id):
 
 def clear(session):
     session.pop(SESSION_KEY, None)
+
+
+class PublicSlot:
+    """The session seen through the public key, so the store's cart keeps these same rules."""
+
+    def __init__(self, session):
+        self._session = session
+
+    def get(self, key, default=None):
+        return self._session.get(PUBLIC_SESSION_KEY, default)
+
+    def __setitem__(self, key, value):
+        self._session[PUBLIC_SESSION_KEY] = value
+
+    def pop(self, key, default=None):
+        return self._session.pop(PUBLIC_SESSION_KEY, default)
+
+
+def public_lines(session):
+    """The lines of the public store's cart in `session`."""
+    return lines(PublicSlot(session))

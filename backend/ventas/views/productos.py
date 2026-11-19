@@ -9,15 +9,15 @@ live summary asks the store (`quote_cart`) for the number; the browser never com
 
 from decimal import Decimal
 
-from django.core.cache import cache
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
+from django.views.decorators.cache import cache_control, never_cache
 from django.views.decorators.http import require_safe
 
-from ventas import catalog, domain, services
+from ventas import catalog, domain, services, throttle
 from ventas.forms import CartLineForm
-from ventas.views.carrito import client_ip, line_data
+from ventas.views.carrito import line_data
 from ventas.views.comun import listing, modes_of, moved_to
 
 CATALOG_PER_PAGE = 24
@@ -28,8 +28,10 @@ MODE_ORDER = ("weight", "money", "pieces")
 # The thickness slider when the panel gave no range: the one of the CodePen.
 THICKNESS_DEFAULTS = {"min": Decimal("0.50"), "max": Decimal("3.00"), "default": Decimal("1.25")}
 THICKNESS_STEP = "0.25"
-# Live quotes per client address and minute: a person typing never reaches it, a script does.
+# Live quotes and searches per client address and minute: a person typing never reaches them, a
+# script does.
 QUOTES_PER_MINUTE = 90
+SEARCHES_PER_MINUTE = 120
 
 products_html = moved_to("ventas:catalogo")
 
@@ -74,25 +76,18 @@ def producto(request, pk):
     return render(request, "ventas/tienda/producto.html", context)
 
 
-def _too_many_quotes(request):
-    key = f"tienda:cotizar:{client_ip(request)}"
-    cache.add(key, 0, timeout=60)
-    try:
-        return cache.incr(key) > QUOTES_PER_MINUTE
-    except ValueError:  # the entry expired between add and incr
-        return False
-
-
+@never_cache
 @require_safe
 def cotizar(request, pk):
     """The live summary of the configuration: what the store charges for that one line, as JSON.
 
-    It changes nothing (no cart, no order). A line the form refuses, or the store refuses, is a
-    400 with the reason in words.
+    It changes nothing (no cart, no order) and is never cached: prices and the exchange rate move.
+    The limit per client is checked before anything is read. A line the form refuses, or the
+    store refuses, is a 400 with the reason in words; without the store, a 503.
     """
-    product = get_object_or_404(catalog.active_products(), pk=pk)
-    if _too_many_quotes(request):
+    if throttle.too_many(request, "cotizar", QUOTES_PER_MINUTE):
         return JsonResponse({"error": "Demasiadas consultas, espera un momento."}, status=429)
+    product = get_object_or_404(catalog.active_products(), pk=pk)
     form = CartLineForm(line_data(request.GET))
     if not form.is_valid():
         error = next(iter(form.errors.values()))[0]
@@ -114,12 +109,16 @@ def cotizar(request, pk):
     )
 
 
+@cache_control(private=True, max_age=30)
 @require_safe
 def buscar(request):
     """The live search of the header: up to eight active products whose name matches, as JSON.
 
-    The search form itself is a plain GET to the catalogue, so this only speeds it up.
+    The search form itself is a plain GET to the catalogue, so this only speeds it up. Limited
+    per client; the browser may keep an answer for 30 seconds, no shared cache may.
     """
+    if throttle.too_many(request, "buscar", SEARCHES_PER_MINUTE):
+        return JsonResponse({"resultados": [], "error": "Demasiadas búsquedas."}, status=429)
     query = request.GET.get("q", "").strip()
     if len(query) < SEARCH_MIN_LENGTH:
         return JsonResponse({"resultados": []})

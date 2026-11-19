@@ -2,6 +2,7 @@
 
 from django.conf import settings
 from django.http import HttpResponse
+from django.urls import reverse
 
 
 class RequestBodyLimitMiddleware:
@@ -34,7 +35,7 @@ class RequestBodyLimitMiddleware:
 def _content_security_policy(path):
     """The CSP of a response, as one header value. See SecurityHeadersMiddleware."""
     supabase = settings.SUPABASE_URL
-    styles = "'self' 'unsafe-inline'" if path.startswith("/admin/") else "'self'"
+    styles = "'self' 'unsafe-inline'" if path.startswith(reverse("admin:index")) else "'self'"
     policy = [
         "default-src 'self'",
         "script-src 'self'",

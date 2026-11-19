@@ -21,19 +21,19 @@ import logging
 from django import forms
 from django.conf import settings
 from django.contrib import messages
-from django.core.cache import cache
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_POST, require_safe
 
-from ventas import cart, catalog, domain, services
+from ventas import cart, catalog, domain, services, throttle
 from ventas.forms import CartLineForm, phone_validator
 from ventas.models import PanelOrder
+from ventas.throttle import client_ip
 from ventas.views.comun import currency_of, modes_of, quote_rows
 
 logger = logging.getLogger("ventas.checkout")
 
-PUBLIC_CART_KEY = "tienda_cart"
+PUBLIC_CART_KEY = cart.PUBLIC_SESSION_KEY
 LAST_ORDER_KEY = "tienda_ultimo_pedido"
 STORE_CHANNEL = "web"
 # Only for the fallback: `create_order_staff` accepts `mostrador` and `whatsapp` only.
@@ -53,28 +53,12 @@ STORE_NOTE = "[Tienda en línea]"
 NOTES_MAX = 450  # what is left of the 500 of the database after the marker above
 
 
-class _PublicSlot:
-    """The session seen through the public key, so `ventas.cart` keeps one set of rules."""
-
-    def __init__(self, session):
-        self._session = session
-
-    def get(self, key, default=None):
-        return self._session.get(PUBLIC_CART_KEY, default)
-
-    def __setitem__(self, key, value):
-        self._session[PUBLIC_CART_KEY] = value
-
-    def pop(self, key, default=None):
-        return self._session.pop(PUBLIC_CART_KEY, default)
-
-
 def _slot(request):
-    return _PublicSlot(request.session)
+    return cart.PublicSlot(request.session)
 
 
 def public_lines(request):
-    return cart.lines(_slot(request))
+    return cart.public_lines(request.session)
 
 
 class StoreOrderForm(forms.Form):
@@ -255,16 +239,6 @@ def carrito(request):
     return render(request, "ventas/tienda/carrito.html", _cart_context(request, currency))
 
 
-def client_ip(request):
-    """The address the throttle counts: the proxy's own entry behind one, else REMOTE_ADDR."""
-    if settings.CHECKOUT_TRUST_FORWARDED_FOR:
-        forwarded = request.META.get("HTTP_X_FORWARDED_FOR", "")
-        last = forwarded.rsplit(",", 1)[-1].strip()
-        if last:
-            return last
-    return request.META.get("REMOTE_ADDR", "")
-
-
 def _throttled(request):
     """Count this attempt against the IP and the session; True when either is over the limit.
 
@@ -274,16 +248,9 @@ def _throttled(request):
     keys = [f"checkout-throttle:ip:{client_ip(request)}"]
     if request.session.session_key:
         keys.append(f"checkout-throttle:session:{request.session.session_key}")
-    over = False
-    for key in keys:
-        cache.add(key, 0, settings.CHECKOUT_THROTTLE_WINDOW_SECONDS)
-        try:
-            count = cache.incr(key)
-        except ValueError:  # the counter expired between the two calls
-            cache.set(key, 1, settings.CHECKOUT_THROTTLE_WINDOW_SECONDS)
-            count = 1
-        over = over or count > settings.CHECKOUT_THROTTLE_LIMIT
-    return over
+    window = settings.CHECKOUT_THROTTLE_WINDOW_SECONDS
+    counts = [throttle.count(key, window) for key in keys]
+    return any(n > settings.CHECKOUT_THROTTLE_LIMIT for n in counts)
 
 
 def _place_order(request, lines, form):

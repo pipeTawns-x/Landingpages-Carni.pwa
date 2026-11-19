@@ -71,6 +71,9 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    # CSP, Permissions-Policy and Cross-Origin-Resource-Policy (config/middleware.py). First, so
+    # it wraps everything: the static files WhiteNoise answers and the 413 of the size limit too.
+    "config.middleware.SecurityHeadersMiddleware",
     "django.middleware.security.SecurityMiddleware",
     # Serves the files that `collectstatic` collects from the Django process itself, so a deployment
     # needs no web server for them. It goes right after SecurityMiddleware.
@@ -79,9 +82,6 @@ MIDDLEWARE = [
     # Refuses an oversized body from its Content-Length, before the session, CSRF or a form reads
     # it (MAX_REQUEST_BODY_BYTES below).
     "config.middleware.RequestBodyLimitMiddleware",
-    # CSP, Permissions-Policy and Cross-Origin-Resource-Policy (config/middleware.py), on every
-    # page; the static files WhiteNoise answers above do not need them.
-    "config.middleware.SecurityHeadersMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -291,16 +291,6 @@ SESSION_COOKIE_AGE = 8 * 60 * 60
 # refuses `null`, which would break the logout, the product forms and the admin.
 SECURE_REFERRER_POLICY = "same-origin"
 
-# HTTPS only, once the cookies are secure (the deployment): every http request is redirected to
-# https and browsers are told, for a year, to never try http again (HSTS, subdomains included;
-# no preload, which is a commitment to the browsers' lists). A local http run, with the cookies
-# not secure, keeps both off. DJANGO_SSL_REDIRECT switches the redirect off on its own, for a
-# platform that already redirects at its edge.
-SECURE_HSTS_SECONDS = 31536000 if SESSION_COOKIE_SECURE else 0
-SECURE_HSTS_INCLUDE_SUBDOMAINS = SESSION_COOKIE_SECURE
-SECURE_SSL_REDIRECT = parse_bool(
-    os.environ.get("DJANGO_SSL_REDIRECT"), "DJANGO_SSL_REDIRECT", default=SESSION_COOKIE_SECURE
-)
 
 # Behind a proxy that ends TLS
 # https://docs.djangoproject.com/en/5.2/ref/settings/#secure-proxy-ssl-header
@@ -316,6 +306,26 @@ BEHIND_PROXY = parse_bool(
 )
 if BEHIND_PROXY:
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
+# HTTPS only, once the cookies are secure (the deployment): every http request is redirected to
+# https and browsers are told, for a year, to never try http again (HSTS, subdomains included;
+# no preload, which is a commitment to the browsers' lists). A local http run, with the cookies
+# not secure, keeps both off. Behind a TLS proxy Django sees https only through the header above,
+# so without DJANGO_BEHIND_PROXY every request would look like http and the redirect would loop:
+# the redirect is on by default only behind the proxy, and asking for it without the proxy fails
+# the start. DJANGO_SSL_REDIRECT=false leaves it to a platform that redirects at its edge.
+SECURE_HSTS_SECONDS = 31536000 if SESSION_COOKIE_SECURE else 0
+SECURE_HSTS_INCLUDE_SUBDOMAINS = SESSION_COOKIE_SECURE
+SECURE_SSL_REDIRECT = parse_bool(
+    os.environ.get("DJANGO_SSL_REDIRECT"),
+    "DJANGO_SSL_REDIRECT",
+    default=SESSION_COOKIE_SECURE and BEHIND_PROXY,
+)
+if SECURE_SSL_REDIRECT and not BEHIND_PROXY:
+    raise ImproperlyConfigured(
+        "DJANGO_SSL_REDIRECT needs DJANGO_BEHIND_PROXY=true: behind a TLS proxy every request "
+        "looks like http to Django and the redirect would never end."
+    )
 
 # Largest request body accepted, in bytes (default 6 MiB: a 5 MB product photo plus its form).
 MAX_REQUEST_BODY_BYTES = parse_positive_int(

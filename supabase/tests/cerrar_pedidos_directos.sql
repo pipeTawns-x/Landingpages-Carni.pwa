@@ -3,8 +3,8 @@
 -- call the old functions that bypassed the quote; orders are born only in the functions of the
 -- store (create_order_v2, create_order_staff, create_order_web).
 --
--- Covers: the three policies are gone, anon and authenticated hold no INSERT, UPDATE or DELETE
--- on orders and order_items, they keep SELECT (their own orders, through RLS), the two old
+-- Covers: the three policies are gone, anon and authenticated hold no INSERT, UPDATE, DELETE,
+-- TRUNCATE, REFERENCES or TRIGGER on orders and order_items, they keep SELECT (their own orders, through RLS), the two old
 -- functions are not executable by them, and the functions of the store still are for their roles.
 
 BEGIN;
@@ -19,7 +19,7 @@ SELECT is(
 SELECT ok(NOT has_table_privilege(r, 'public.' || t, p), r || ' cannot ' || p || ' on ' || t)
   FROM unnest(ARRAY['anon', 'authenticated']) AS r,
        unnest(ARRAY['orders', 'order_items']) AS t,
-       unnest(ARRAY['INSERT', 'UPDATE', 'DELETE']) AS p;
+       unnest(ARRAY['INSERT', 'UPDATE', 'DELETE', 'TRUNCATE', 'REFERENCES', 'TRIGGER']) AS p;
 
 SELECT ok(has_table_privilege('authenticated', 'public.orders', 'SELECT'),
           'authenticated still reads (its own orders, through RLS)');
