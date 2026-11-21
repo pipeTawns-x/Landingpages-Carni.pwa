@@ -144,6 +144,7 @@ Se requiere aprobacion explicita antes de:
 - La direccion visual objetivo es maximalismo mexicano equilibrado.
 - El dashboard debe sentirse operativo, no generico.
 - El rediseño puede evolucionar a bento grid si mantiene claridad comercial.
+- Stack de producto: Django (obligatorio por el LMS) con islas de React y Tailwind v4. La animacion va con GSAP/ScrollTrigger y Motion, con un solo momento 3D de carga diferida.
 - Tailwind v4 ya esta adoptado en las paginas migradas y en el panel de Django; Astro y Alpine siguen siendo objetivos de evolucion.
 
 ## Seguridad
