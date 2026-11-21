@@ -1,20 +1,5 @@
 // js/modules/api.js
-// API module for service worker and online status
-
-// Register Service Worker
-export function registerServiceWorker() {
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/js/modules/utils/service-worker.js')
-        .then(registration => {
-          console.log('ServiceWorker registration successful');
-        })
-        .catch(err => {
-          console.log('ServiceWorker registration failed: ', err);
-        });
-    });
-  }
-}
+// API module for online status
 
 // Check online status
 export function checkOnlineStatus() {

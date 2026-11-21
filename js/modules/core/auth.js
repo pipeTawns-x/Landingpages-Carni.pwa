@@ -68,10 +68,9 @@ function setupAuthToggle() {
   const btnShowRegister = document.getElementById('btnShowRegister');
   const btnShowLogin = document.getElementById('btnShowLogin');
 
-  // Validación exhaustiva
+  // Only the login page has #authContainer. Any other page simply has no
+  // toggle to wire, so leave quietly instead of logging a false error.
   if (!container) {
-    console.error('❌ authContainer no encontrado en el DOM');
-    console.warn('💡 Verifica que el HTML tenga: <div id="authContainer">');
     return;
   }
 

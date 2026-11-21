@@ -45,7 +45,7 @@ Netlify** — ese es el error que hay que no cometer.
 
 ### P-05 · El registro del service worker apunta a la raíz del dominio
 
-**Estado:** abierto · **Evidencia:** `js/modules/core/api.js:8`
+**Estado:** resuelto 2026-11-20 (se borró la función muerta; 0 referencias fuera de docs) · **Evidencia:** `js/modules/core/api.js`
 
 `registerServiceWorker()` registra `/js/modules/utils/service-worker.js` con ruta
 absoluta. En Netlify resuelve; en Pages el sitio vive bajo
@@ -273,7 +273,7 @@ El arreglo de `p_address` se commiteó con `--no-verify` porque la sesión de GG
 
 ### P-35 · Un error rojo en consola en cada página que no es el login
 
-**Estado:** abierto · **Evidencia:** `js/modules/core/auth.js:73`
+**Estado:** resuelto 2026-11-20 (sale en silencio sin `#authContainer`; prueba `js/modules/core/__tests__/auth.test.js`) · **Evidencia:** `js/modules/core/auth.js:72`
 
 ```
 ❌ authContainer no encontrado en el DOM
@@ -292,7 +292,7 @@ es una página que no tiene login. Un `if` y un `return`.
 
 ### P-26 · El slug de categoría no pasa por `encodeURIComponent`
 
-**Estado:** abierto · **Evidencia:** `src/components/CategoryCard/CategoryCard.tsx`
+**Estado:** resuelto 2026-11-20 (`encodeURIComponent`; prueba `src/components/CategoryCard/__tests__/CategoryCard.test.tsx`) · **Evidencia:** `src/components/CategoryCard/CategoryCard.tsx`
 
 El `href` arma `products.html?categoria=${slug}` interpolando el slug crudo. Hoy no explota porque solo un admin crea categorías y los slugs reales son `[a-z-]`, sin caracteres que necesiten escaparse. Pero la seguridad descansa en una convención, no en el código.
 
