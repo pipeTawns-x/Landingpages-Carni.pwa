@@ -125,9 +125,9 @@ Se requiere aprobacion explicita antes de:
 ## Contexto Visual y Producto
 
 - La direccion visual objetivo es maximalismo mexicano equilibrado.
-- El dashboard debe sentirse operativo, no generico.
+- El dashboard debe sentirse operativo, no generico, con el nivel de las referencias de la skill `design-references` (Horizon X `verdara-dashboard`, Motion Sites).
 - El rediseño puede evolucionar a bento grid si mantiene claridad comercial.
-- Astro, Tailwind y Alpine son objetivos de evolucion, no estado actual del repo.
+- Stack de producto: Django (obligatorio por el LMS) con islas de React y Tailwind v4. La animacion va con GSAP/ScrollTrigger y Motion, con un solo momento 3D de carga diferida. Astro y Alpine siguen siendo objetivos de evolucion.
 
 ## Seguridad
 
