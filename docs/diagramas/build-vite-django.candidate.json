@@ -1,0 +1,266 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "Carni-mvp build flow: Vite to manifest to template",
+    "quality_profile": "showcase",
+    "output": "docs/diagramas/build-vite-django.html",
+    "repository": {
+      "url": "https://github.com/pipeTawns-x/Landingpages-Carni.pwa",
+      "provider": "github",
+      "link_mode": "local-only",
+      "revision": "c7f6bde5aa3e71929abe99d99d1a49c19ee30e9f"
+    }
+  },
+  "lanes": [
+    {
+      "id": "build",
+      "label": "Source and build (Docker)"
+    },
+    {
+      "id": "out",
+      "label": "Committed output"
+    },
+    {
+      "id": "django",
+      "label": "Django"
+    },
+    {
+      "id": "browser",
+      "label": "Browser"
+    }
+  ],
+  "mainPath": [
+    "entries",
+    "config",
+    "build",
+    "manifest",
+    "cache",
+    "tag",
+    "template",
+    "page"
+  ],
+  "nodes": [
+    {
+      "id": "entries",
+      "lane": "build",
+      "col": 0,
+      "type": "frontend",
+      "label": "Page entries",
+      "sublabel": "src/entry/*.tsx",
+      "width": 140
+    },
+    {
+      "id": "shim",
+      "lane": "build",
+      "col": 3,
+      "type": "frontend",
+      "label": "Bootstrap shim",
+      "sublabel": "window.bootstrap",
+      "tag": "global shim",
+      "width": 140,
+      "sources": [
+        {
+          "path": "js/modules/ui/bootstrap-global.js",
+          "line": 4,
+          "end_line": 8
+        }
+      ]
+    },
+    {
+      "id": "config",
+      "lane": "build",
+      "col": 1,
+      "type": "backend",
+      "label": "Vite config",
+      "sublabel": "base + manifest",
+      "width": 140,
+      "sources": [
+        {
+          "path": "vite.django.config.js",
+          "line": 15
+        }
+      ]
+    },
+    {
+      "id": "build",
+      "lane": "build",
+      "col": 2,
+      "type": "messagebus",
+      "label": "build:django",
+      "sublabel": "npm, inside Docker",
+      "width": 140,
+      "sources": [
+        {
+          "path": "package.json",
+          "line": 10
+        }
+      ]
+    },
+    {
+      "id": "manifest",
+      "lane": "out",
+      "col": 2,
+      "type": "database",
+      "label": "manifest.json",
+      "sublabel": "entry to hashed files",
+      "tag": "generated, committed",
+      "width": 140,
+      "sources": [
+        {
+          "path": "vite.django.config.js",
+          "line": 26,
+          "end_line": 28
+        }
+      ]
+    },
+    {
+      "id": "assets",
+      "lane": "out",
+      "col": 3,
+      "type": "database",
+      "label": "Hashed assets",
+      "sublabel": "js, css, fonts",
+      "width": 140
+    },
+    {
+      "id": "cache",
+      "lane": "django",
+      "col": 2,
+      "type": "backend",
+      "label": "Manifest loader",
+      "sublabel": "read once",
+      "tag": "memoization",
+      "width": 140,
+      "sources": [
+        {
+          "path": "backend/ventas/templatetags/vite.py",
+          "line": 30,
+          "end_line": 38
+        }
+      ]
+    },
+    {
+      "id": "tag",
+      "lane": "django",
+      "col": 3,
+      "type": "backend",
+      "label": "vite_asset tag",
+      "sublabel": "walk imports, emit tags",
+      "tag": "adapter",
+      "width": 140,
+      "sources": [
+        {
+          "path": "backend/ventas/templatetags/vite.py",
+          "line": 57,
+          "end_line": 80
+        }
+      ]
+    },
+    {
+      "id": "template",
+      "lane": "django",
+      "col": 4,
+      "type": "backend",
+      "label": "Page template",
+      "sublabel": "renders the tags",
+      "width": 140
+    },
+    {
+      "id": "page",
+      "lane": "browser",
+      "col": 4,
+      "type": "external",
+      "label": "HTML page",
+      "sublabel": "CSP: self only",
+      "width": 140
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "entries",
+      "to": "config",
+      "label": "input",
+      "variant": "emphasis"
+    },
+    {
+      "id": "e2",
+      "from": "config",
+      "to": "build",
+      "variant": "emphasis"
+    },
+    {
+      "id": "e3",
+      "from": "build",
+      "to": "manifest",
+      "label": "writes",
+      "variant": "emphasis"
+    },
+    {
+      "id": "e4",
+      "from": "build",
+      "to": "assets",
+      "label": "emits",
+      "variant": "dashed",
+      "role": "branch"
+    },
+    {
+      "id": "e5",
+      "from": "manifest",
+      "to": "cache",
+      "label": "read",
+      "variant": "emphasis"
+    },
+    {
+      "id": "e6",
+      "from": "cache",
+      "to": "tag",
+      "variant": "emphasis"
+    },
+    {
+      "id": "e7",
+      "from": "tag",
+      "to": "template",
+      "label": "tags",
+      "variant": "emphasis"
+    },
+    {
+      "id": "e8",
+      "from": "template",
+      "to": "page",
+      "label": "HTML",
+      "variant": "emphasis"
+    },
+    {
+      "id": "e9",
+      "from": "shim",
+      "to": "build",
+      "label": "bundled by",
+      "variant": "dashed",
+      "role": "branch"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "amber",
+      "title": "Patterns in the code",
+      "items": [
+        "Adapter: vite.py:71 vite_asset turns a manifest entry into HTML tags",
+        "Memoization: vite.py:30 lru_cache reads the manifest once",
+        "Fail-fast: vite.py:35 and vite.py:75 raise ImproperlyConfigured",
+        "Depth-first walk: vite.py:57 _walk lists CSS and chunks once each",
+        "Committed generated output: vite.django.config.js:26-28",
+        "Global shim: bootstrap-global.js:4-8 keeps window.bootstrap"
+      ]
+    },
+    {
+      "dot": "cyan",
+      "title": "Security",
+      "items": [
+        "No CDN: Django CSP only allows self",
+        "npm install runs with ignore-scripts in Docker"
+      ]
+    }
+  ]
+}
