@@ -1,0 +1,88 @@
+{
+  "_Lupa-BOy_r1FX.js": {
+    "file": "assets/Lupa-BOy_r1FX.js",
+    "name": "Lupa",
+    "imports": [
+      "_shared-DPhTWRNK.js"
+    ],
+    "css": [
+      "assets/Lupa-rpCnOEIg.css"
+    ],
+    "assets": [
+      "assets/bootstrap-icons-Drp84nVS.woff2",
+      "assets/bootstrap-icons-D8ioIzQS.woff"
+    ]
+  },
+  "_Lupa-rpCnOEIg.css": {
+    "file": "assets/Lupa-rpCnOEIg.css",
+    "src": "_Lupa-rpCnOEIg.css"
+  },
+  "_montar-CTPN-Jhm.js": {
+    "file": "assets/montar-CTPN-Jhm.js",
+    "name": "montar",
+    "imports": [
+      "_shared-DPhTWRNK.js",
+      "_Lupa-BOy_r1FX.js"
+    ]
+  },
+  "_shared-DPhTWRNK.js": {
+    "file": "assets/shared-DPhTWRNK.js",
+    "name": "shared",
+    "css": [
+      "assets/shared-lt_nljx8.css"
+    ]
+  },
+  "_shared-lt_nljx8.css": {
+    "file": "assets/shared-lt_nljx8.css",
+    "src": "_shared-lt_nljx8.css"
+  },
+  "node_modules/bootstrap-icons/font/fonts/bootstrap-icons.woff": {
+    "file": "assets/bootstrap-icons-D8ioIzQS.woff",
+    "src": "node_modules/bootstrap-icons/font/fonts/bootstrap-icons.woff"
+  },
+  "node_modules/bootstrap-icons/font/fonts/bootstrap-icons.woff2": {
+    "file": "assets/bootstrap-icons-Drp84nVS.woff2",
+    "src": "node_modules/bootstrap-icons/font/fonts/bootstrap-icons.woff2"
+  },
+  "src/entry/auth.tsx": {
+    "file": "assets/auth-BMeKn8Fd.js",
+    "name": "auth",
+    "src": "src/entry/auth.tsx",
+    "isEntry": true,
+    "imports": [
+      "_shared-DPhTWRNK.js",
+      "_Lupa-BOy_r1FX.js",
+      "_montar-CTPN-Jhm.js"
+    ]
+  },
+  "src/entry/dashboard.tsx": {
+    "file": "assets/dashboard-B7TlxCuw.js",
+    "name": "dashboard",
+    "src": "src/entry/dashboard.tsx",
+    "isEntry": true,
+    "imports": [
+      "_shared-DPhTWRNK.js"
+    ]
+  },
+  "src/entry/home.tsx": {
+    "file": "assets/home-CUWhNkXX.js",
+    "name": "home",
+    "src": "src/entry/home.tsx",
+    "isEntry": true,
+    "imports": [
+      "_shared-DPhTWRNK.js",
+      "_Lupa-BOy_r1FX.js",
+      "_montar-CTPN-Jhm.js"
+    ]
+  },
+  "src/entry/products.tsx": {
+    "file": "assets/products-BOZGTzuS.js",
+    "name": "products",
+    "src": "src/entry/products.tsx",
+    "isEntry": true,
+    "imports": [
+      "_shared-DPhTWRNK.js",
+      "_Lupa-BOy_r1FX.js"
+    ]
+  }
+}
