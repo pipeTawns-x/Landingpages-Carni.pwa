@@ -43,6 +43,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/components/store-motion.css">
   <!-- Un solo juego de tokens (color, tipografía, radios) para todo el sitio: el mismo
        archivo que usan landing.html, catalogo.html y el panel. Solo declara variables. -->
   <link rel="stylesheet" href="./src/styles/tokens-globales.css">
@@ -182,6 +183,7 @@
         <source src="img/Videos/VideoCarniwebP01.mp4" type="video/mp4">
       </video>
       <div class="home-hero-video__overlay" aria-hidden="true"></div>
+      <button type="button" class="home-hero-video__toggle" data-hero-playback hidden>Pausar video</button>
     </section>
 
     <!-- SECCIÓN 2: CATEGORÍAS — React, leídas de public.categories -->
