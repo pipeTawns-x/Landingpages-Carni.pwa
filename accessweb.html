@@ -23,10 +23,11 @@
     rel="stylesheet">
 
   <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/components/auth-mascot.css">
   <!-- Un solo juego de tokens para todo el sitio (el mismo de landing.html, catalogo.html y el panel). -->
   <link rel="stylesheet" href="./src/styles/tokens-globales.css">
-  <link rel="icon" href="img/recursos_web/logo-user.png" type="image/png">
-  <link rel="apple-touch-icon" href="img/recursos_web/logo-user.png">
+  <link rel="icon" href="public/img/recursos_web/logo-user.png" type="image/png">
+  <link rel="apple-touch-icon" href="public/img/recursos_web/logo-user.png">
 </head>
 
 <body class="auth-page dark-premium">
@@ -46,7 +47,7 @@
       </button>
       <div class="main-header__logo-container">
         <a class="navbar-brand" href="index.html">
-          <img src="img/recursos_web/logo-user.png" alt="Carnicería El Señor de La Misericordia" class="main-header__logo" style="object-fit:contain;max-height:56px;">
+          <img src="public/img/recursos_web/logo-user.png" alt="Carnicería El Señor de La Misericordia" class="main-header__logo" style="object-fit:contain;max-height:56px;">
         </a>
       </div>
       <a class="header-search" href="products.html?search=true" aria-label="Buscar productos">
@@ -72,7 +73,7 @@
   <aside class="mobile-drawer" id="mobileDrawer" aria-hidden="true">
     <div class="mobile-drawer__header">
       <div class="d-flex align-items-center gap-2">
-        <img src="img/recursos_web/logo-user.png" alt="Carnicería" class="mobile-drawer__logo">
+        <img src="public/img/recursos_web/logo-user.png" alt="Carnicería" class="mobile-drawer__logo">
         <div>
           <p class="mb-0 fw-bold">Carnicería Premium</p>
           <small class="text-muted">El Señor de La Misericordia</small>
@@ -257,8 +258,10 @@
             <p>Crea tu cuenta en minutos y deja listo tu acceso para pedir sin filas ni vueltas.</p>
             <button class="btn transparent" type="button" id="btnShowRegister">REGISTRARSE</button>
           </div>
-          <img src="img/recursos_web/carniLogin.png" alt="Carnicero dando la bienvenida" class="image"
-            loading="lazy">
+          <div class="image mascot-scene">
+            <img src="public/img/recursos_web/don-carlos-login-cutout-v1.png" alt="Don Carlos te recibe junto al banco de corte" class="mascot-cutout"
+              width="1145" height="1374" decoding="async">
+          </div>
         </div>
 
         <!-- Panel derecho (visible en modo registro) - Imagen de REGISTRO -->
@@ -268,8 +271,10 @@
             <p>Entra, revisa tus favoritos y vuelve a pedir tus cortes de siempre en segundos.</p>
             <button class="btn transparent" type="button" id="btnShowLogin">INICIAR SESIÓN</button>
           </div>
-          <img src="img/recursos_web/carniRegistro.png" alt="Carnicero cortando carne premium" class="image"
-            loading="lazy">
+          <div class="image mascot-scene">
+            <img src="public/img/recursos_web/don-carlos-register-cutout-v1.png" alt="Don Carlos te recibe con los brazos abiertos" class="mascot-cutout"
+              width="1254" height="1254" loading="lazy" decoding="async">
+          </div>
         </div>
       </div>
     </div>
@@ -376,7 +381,7 @@
     <section class="chat-drawer" id="chatPanel" aria-hidden="true" aria-label="Ventana del asistente virtual">
       <header class="chat-header">
         <div class="chat-header__info">
-          <img class="chat-header__avatar" src="img/recursos_web/logo-user.png" alt="" aria-hidden="true">
+          <img class="chat-header__avatar" src="public/img/recursos_web/logo-user.png" alt="" aria-hidden="true">
           <div class="chat-header__text">
             <p class="chat-header__title">Asistente virtual</p>
             <p class="chat-header__status"><span class="chat-header__dot" aria-hidden="true"></span> En línea</p>

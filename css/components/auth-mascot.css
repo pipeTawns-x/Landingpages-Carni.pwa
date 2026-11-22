@@ -1,0 +1,40 @@
+.auth-page .mascot-scene {
+  isolation: isolate;
+  filter: none;
+}
+
+.auth-page .mascot-cutout {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  transform-origin: 50% 90%;
+  filter: drop-shadow(0 16px 12px rgba(26, 25, 24, 0.24));
+}
+
+@keyframes mascot-welcome {
+  from {
+    opacity: 0.4;
+    transform: translateY(18px) rotate(-3deg) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) rotate(0) scale(1);
+  }
+}
+@media (min-width: 870px) and (prefers-reduced-motion: no-preference) {
+  .auth-container:not(.sign-up-mode) .left-panel .mascot-cutout,
+  .auth-container.sign-up-mode .right-panel .mascot-cutout {
+    animation: mascot-welcome 480ms cubic-bezier(0.23, 1, 0.32, 1) 200ms both;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .auth-page .mascot-cutout {
+    animation: none;
+    transform: none;
+  }
+  .auth-page .panel .image,
+  .auth-page .panel .content {
+    transition: none;
+  }
+}
