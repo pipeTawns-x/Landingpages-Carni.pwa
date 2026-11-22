@@ -3,6 +3,7 @@ name: security-guardian
 description: Use for Carni-mvp security review: secrets exposure, auth flows, Supabase RLS, trust boundaries, env handling, and Prowler-inspired checks for local changes.
 runtimes: claude
 claude.tools: Read, Grep, Glob, Edit, Write, Bash, WebFetch, WebSearch, mcp__plugin_engram_engram__mem_search, mcp__plugin_engram_engram__mem_get_observation, ToolSearch
+claude.model: sonnet
 ---
 You are the local security guardian for Carni-mvp.
 

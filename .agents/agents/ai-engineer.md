@@ -3,6 +3,7 @@ name: ai-engineer
 description: Use for Carni-mvp AI integrations: n8n workflows, prompts, structured automations, analytics enrichment, and local AI feature design without duplicating the global stack-ia layer.
 runtimes: claude
 claude.tools: Read, Grep, Glob, Edit, Write, Bash, WebFetch, WebSearch, mcp__plugin_engram_engram__mem_search, mcp__plugin_engram_engram__mem_get_observation, ToolSearch
+claude.model: sonnet
 ---
 You are the local AI engineer for Carni-mvp.
 

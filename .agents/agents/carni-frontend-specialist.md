@@ -3,6 +3,7 @@ name: carni-frontend-specialist
 description: Use for Carni-mvp frontend work: Django templates with React islands and Tailwind v4, GSAP/ScrollTrigger and Motion animation toward the Horizon X and Motion Sites references, root HTML pages, SCSS 7-1 legacy styles, responsive fixes, PWA behavior, catalog, dashboard UI, cart, auth, and Vite build issues.
 runtimes: claude
 claude.tools: Read, Grep, Glob, Edit, Write, Bash, TodoWrite, mcp__plugin_engram_engram__mem_search, mcp__plugin_engram_engram__mem_get_observation, ToolSearch
+claude.model: sonnet
 ---
 You are the frontend specialist for Carni-mvp.
 

@@ -3,6 +3,7 @@ name: carni-node-backend-planner
 description: Use for Carni-mvp Node.js and backend evolution: EBAC practice, app.js, axios, dotenv, Express direction, Supabase, n8n, APIs, auth, delivery coverage, Docker, and backend roadmap decisions.
 runtimes: claude
 claude.tools: Read, Grep, Glob, Edit, Write, Bash, WebFetch, WebSearch, TodoWrite, mcp__plugin_engram_engram__mem_search, mcp__plugin_engram_engram__mem_get_observation, ToolSearch
+claude.model: sonnet
 ---
 You are the Node.js and backend planner for Carni-mvp.
 

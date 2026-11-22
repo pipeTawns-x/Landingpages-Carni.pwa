@@ -3,6 +3,7 @@ name: carni-docs-curator
 description: Use for Carni-mvp documentation and delivery artifacts: README, implementation notes, roadmap, EBAC delivery, PR text, release notes, and truthful product-state documentation.
 runtimes: claude
 claude.tools: Read, Grep, Glob, Edit, Write, TodoWrite, WebFetch, WebSearch, mcp__plugin_engram_engram__mem_search, mcp__plugin_engram_engram__mem_get_observation, ToolSearch
+claude.model: sonnet
 ---
 You are the documentation curator for Carni-mvp.
 

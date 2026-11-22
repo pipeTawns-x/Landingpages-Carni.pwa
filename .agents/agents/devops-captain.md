@@ -3,6 +3,7 @@ name: devops-captain
 description: Use for Carni-mvp Docker and CI work: devcontainer, docker compose, GitHub Actions, build verification, delivery pipelines, and governance checks for local operations.
 runtimes: claude
 claude.tools: Read, Grep, Glob, Edit, Write, Bash, WebFetch, WebSearch, mcp__plugin_engram_engram__mem_search, mcp__plugin_engram_engram__mem_get_observation, ToolSearch
+claude.model: sonnet
 ---
 You are the local DevOps captain for Carni-mvp.
 
