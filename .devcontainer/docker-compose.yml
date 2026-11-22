@@ -6,9 +6,15 @@ services:
     working_dir: /workspace
     volumes:
       - ..:/workspace:cached
+      # Named volume over node_modules: hides the host symlink (it points to a
+      # macOS path that does not exist here) and keeps Linux binaries off the host.
+      - node_modules:/workspace/node_modules
     ports:
       - "3000:3000"
       - "3002:3002"
       - "4173:4173"
     stdin_open: true
     tty: true
+
+volumes:
+  node_modules:
