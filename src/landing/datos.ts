@@ -50,15 +50,26 @@ export interface CategoriaBento {
   foto?: string;
   posicion?: string;
   grande?: boolean;
+  /**
+   * Ilustración de ambiente de la categoría, sin extensión ni ancho (la entrega
+   * el agente de imágenes en dos anchos). Va antes que `foto`; si todavía no
+   * existe el archivo, la celda usa `foto`, y sin ninguna, el ícono.
+   */
+  ilustracion?: string;
 }
+
+/** Carpeta de las imágenes de ambientación del comercio (ilustración, textura, estados vacíos). */
+export const CARPETA_AMBIENTE = '/img/comercio-v1';
 
 /**
  * Las nueve categorías del mostrador, en el orden de la tienda.
  *
- * El nombre visible sale del catálogo; aquí solo viven la descripción y la foto.
- * Pollo, Ofertas, Merch y Otros no llevan foto: sus imágenes de categoría están
- * vetadas (marca de agua, aspecto generado o una categoría que no existe), así
- * que la celda es tipográfica. Ninguna descripción lleva cifras de productos.
+ * El nombre visible sale del catálogo; aquí solo viven la descripción, la foto y
+ * la ilustración. Cada celda tiene su ilustración de ambiente; las fotos que ya
+ * existían quedan de respaldo. Pollo, Ofertas, Merch y Otros no llevan foto de
+ * respaldo: sus imágenes de categoría están vetadas (marca de agua, aspecto
+ * generado o una categoría que no existe), así que, sin ilustración, la celda es
+ * tipográfica. Ninguna descripción lleva cifras de productos.
  */
 export const CATEGORIAS_BENTO: readonly CategoriaBento[] = [
   {
@@ -66,36 +77,57 @@ export const CATEGORIAS_BENTO: readonly CategoriaBento[] = [
     descripcion: 'Bistec, diezmillo, molida y para caldo',
     foto: '/img/products/res.webp',
     posicion: '50% 50%',
-    grande: true
+    grande: true,
+    ilustracion: `${CARPETA_AMBIENTE}/categoria-carnes-rojas`
   },
   {
     slug: 'cortes-especiales',
     descripcion: 'Filete mignon, tomahawk, arrachera',
     foto: '/img/products/filet_mignon.webp',
-    posicion: '50% 50%'
+    posicion: '50% 50%',
+    ilustracion: `${CARPETA_AMBIENTE}/categoria-cortes-especiales`
   },
-  { slug: 'pollo', descripcion: 'Pechuga, pierna y muslo, alas' },
+  {
+    slug: 'pollo',
+    descripcion: 'Pechuga, pierna y muslo, alas',
+    ilustracion: `${CARPETA_AMBIENTE}/categoria-pollo`
+  },
   {
     slug: 'cerdo',
     descripcion: 'Chuleta, costilla, lomo y carnitas',
     foto: '/img/products/cerdo.webp',
-    posicion: '50% 50%'
+    posicion: '50% 50%',
+    ilustracion: `${CARPETA_AMBIENTE}/categoria-cerdo`
   },
   {
     slug: 'preparadas',
     descripcion: 'Chorizos, bistec adobado y pollo marinado',
     foto: '/img/products/preparadas.webp',
-    posicion: '50% 50%'
+    posicion: '50% 50%',
+    ilustracion: `${CARPETA_AMBIENTE}/categoria-preparadas`
   },
   {
     slug: 'embutidos',
     descripcion: 'Salchicha, longaniza, tocino y jamón',
     foto: '/img/products/embutidos.webp',
-    posicion: '50% 50%'
+    posicion: '50% 50%',
+    ilustracion: `${CARPETA_AMBIENTE}/categoria-embutidos`
   },
-  { slug: 'ofertas', descripcion: 'Paquetes para 4 a 10 personas' },
-  { slug: 'merch', descripcion: 'Gorra, delantal, hielera y cuchillo' },
-  { slug: 'otros', descripcion: 'Carbón, leña, hielo y cebolla cambray' }
+  {
+    slug: 'ofertas',
+    descripcion: 'Paquetes para 4 a 10 personas',
+    ilustracion: `${CARPETA_AMBIENTE}/categoria-ofertas`
+  },
+  {
+    slug: 'merch',
+    descripcion: 'Gorra, delantal, hielera y cuchillo',
+    ilustracion: `${CARPETA_AMBIENTE}/categoria-merch`
+  },
+  {
+    slug: 'otros',
+    descripcion: 'Carbón, leña, hielo y cebolla cambray',
+    ilustracion: `${CARPETA_AMBIENTE}/categoria-otros`
+  }
 ];
 
 /* ------------------------------------------------------------ preguntas */

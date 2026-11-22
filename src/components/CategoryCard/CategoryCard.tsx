@@ -94,7 +94,10 @@ export function CategoryCard({
                   product's own slug. These now emit the real database slug, so
                   the alias map that translated the old hand-written values is
                   no longer in play. */}
-              <a href={`products.html?categoria=${category.slug}`} className="btn btn-danger w-100">
+              <a
+                href={`products.html?categoria=${encodeURIComponent(category.slug)}`}
+                className="btn btn-danger w-100"
+              >
                 Ver Productos
               </a>
             </div>

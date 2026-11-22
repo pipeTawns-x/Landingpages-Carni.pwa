@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { NEGOCIO } from '@src/data/negocio';
+import { Cenefa } from './Cenefa';
 import { IconoFacebook, IconoInstagram, IconoTelefono, IconoUbicacion, IconoWhatsapp } from './iconos';
 import { Logotipo } from './Logotipo';
 
@@ -24,7 +25,9 @@ function Columna({ titulo, children }: { titulo: string; children: ReactNode }):
  */
 export function Pie(): JSX.Element {
   return (
-    <footer className="border-t border-border bg-bg">
+    <footer className="bg-bg">
+      {/* La cenefa de azulejos sustituye a la hairline del borde superior: es el cierre de toda página. */}
+      <Cenefa className="h-6" />
       <div className="mx-auto w-full max-w-7xl px-5 py-12 lg:px-6 lg:py-16">
         <div className="grid gap-10 lg:grid-cols-[1.3fr_1fr_1.2fr_1fr] lg:gap-12">
           <div className="flex flex-col items-start gap-4">

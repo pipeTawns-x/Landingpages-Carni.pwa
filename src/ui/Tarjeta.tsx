@@ -2,6 +2,7 @@ import type { ComponentType } from 'react';
 import type { ProductoVista } from '@src/data/catalogo';
 import { formatearPrecio } from '@src/lib/formatearPrecio';
 import { assetUrl } from './assetUrl';
+import { FotoAmbiente } from './FotoAmbiente';
 import { ICONO_POR_CATEGORIA, IconoOtros, IconoSiguiente } from './iconos';
 import { unidadDe, type Presentacion } from './presentacionProducto';
 
@@ -225,11 +226,21 @@ export interface CeldaBentoProps {
   posicion?: string;
   /** La celda grande del mostrador: ocupa todo el ancho en móvil y 2×2 en escritorio. */
   grande?: boolean;
+  /**
+   * Ilustración de ambiente de la categoría: ruta sin extensión ni ancho, por
+   * ejemplo `/img/comercio-v1/categoria-pollo`. Nunca es la foto de un producto
+   * a la venta. Si el archivo no existe cae a `foto`, y sin ninguna queda el ícono.
+   */
+  ilustracion?: string;
+  /** Número de la carta, a la lotería ("N.º 3"). Es adorno: no se lee en voz alta. */
+  numero?: number;
 }
 
 /**
- * Una celda del mostrador de categorías. Vive junto a la Tarjeta porque es la
- * otra pieza del sitio con borde y fondo: todo lo demás va en filas con hairline.
+ * Una celda del mostrador de categorías, dibujada como una carta de lotería:
+ * marco doble de hairline, número en azul talavera y el nombre debajo. Vive junto
+ * a la Tarjeta porque es la otra pieza del sitio con borde y fondo: todo lo demás
+ * va en filas con hairline.
  *
  * Sin degradados encima de la foto: el nombre va debajo, sobre el fondo de la
  * celda, así se lee igual con cualquier foto.
@@ -241,15 +252,18 @@ export function CeldaBento({
   slug,
   foto,
   posicion,
-  grande = false
+  grande = false,
+  ilustracion,
+  numero
 }: CeldaBentoProps): JSX.Element {
   const Icono = iconoDe(slug);
+  const conIlustracion = ilustracion !== undefined;
 
   return (
     <a
       href={href}
       data-celda={slug}
-      className={`group flex h-full flex-col overflow-hidden rounded-card border border-border bg-surface-1 transition-[border-color] duration-150 ease-out-strong hover:border-sand/50 ${
+      className={`group relative flex h-full flex-col overflow-hidden rounded-card border border-border bg-surface-1 transition-[border-color] duration-150 ease-out-strong hover:border-sand/50 ${
         grande ? 'col-span-2 lg:col-span-2 lg:row-span-2' : ''
       }`}
     >
@@ -258,7 +272,25 @@ export function CeldaBento({
           grande ? 'aspect-video lg:aspect-auto lg:min-h-0 lg:flex-1' : 'aspect-[4/3]'
         }`}
       >
-        {foto ? (
+        {conIlustracion || !foto ? (
+          <span aria-hidden="true" className="absolute inset-0 grid place-items-center text-sand">
+            <Icono tamano={48} />
+          </span>
+        ) : null}
+
+        {conIlustracion ? (
+          <FotoAmbiente
+            base={ilustracion}
+            anchoGrande={1344}
+            alt=""
+            sizes={grande ? '(min-width: 1024px) 50vw, 100vw' : '(min-width: 1024px) 25vw, 50vw'}
+            width={1344}
+            height={768}
+            respaldo={foto}
+            style={{ objectPosition: posicion }}
+            className="absolute inset-0 size-full object-cover transition-transform duration-[280ms] ease-out-strong group-hover:scale-[1.03] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+          />
+        ) : foto ? (
           <img
             src={assetUrl(foto)}
             alt=""
@@ -269,11 +301,16 @@ export function CeldaBento({
             style={{ objectPosition: posicion }}
             className="absolute inset-0 size-full object-cover"
           />
-        ) : (
-          <span aria-hidden="true" className="absolute inset-0 grid place-items-center text-sand">
-            <Icono tamano={48} />
+        ) : null}
+
+        {numero !== undefined ? (
+          <span
+            aria-hidden="true"
+            className="absolute top-3 left-3 rounded-control bg-talavera px-2 py-1 text-meta font-medium text-sand tabular-nums"
+          >
+            N.º {numero}
           </span>
-        )}
+        ) : null}
       </div>
 
       <div className="flex items-start justify-between gap-3 p-3 lg:p-4">
@@ -286,6 +323,12 @@ export function CeldaBento({
           className="mt-1 shrink-0 text-text-muted transition-colors duration-150 ease-out-strong group-hover:text-sand"
         />
       </div>
+
+      {/* El segundo filete de la carta: una hairline a 6 px del borde, encima de foto y texto. */}
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-1.5 rounded-[calc(var(--radius-card)-0.375rem)] border border-sand/25 transition-[border-color] duration-150 ease-out-strong group-hover:border-sand/50"
+      />
     </a>
   );
 }

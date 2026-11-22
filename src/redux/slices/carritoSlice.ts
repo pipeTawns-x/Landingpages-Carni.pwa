@@ -14,7 +14,7 @@
  * sigue siendo inmutable.
  */
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
-import type { OrderLine } from '@src/types/database';
+import type { OrderLine, SolicitudLinea } from '@src/types/database';
 
 const estadoInicial: OrderLine[] = [];
 
@@ -48,6 +48,29 @@ const carritoSlice = createSlice({
     },
 
     /**
+     * El editor de la línea: guarda lo que el cliente pidió (`solicitud`, la
+     * forma D7 que el servidor lee) y la cantidad ESTIMADA que sale de ahí, que
+     * es lo que multiplican los totales. Una cantidad que no es positiva y finita
+     * no entra al pedido, y una línea que no existe no se inventa: en los dos casos
+     * devolver `undefined` deja el estado como estaba, con la misma referencia.
+     */
+    editarLinea(
+      estado,
+      accion: PayloadAction<{ lineId: string; solicitud: SolicitudLinea; cantidad: number }>
+    ) {
+      const { lineId, solicitud, cantidad } = accion.payload;
+      if (!Number.isFinite(cantidad) || cantidad <= 0) {
+        return;
+      }
+      const linea = estado.find((l) => l.lineId === lineId);
+      if (!linea) {
+        return;
+      }
+      linea.solicitud = solicitud;
+      linea.quantity = cantidad;
+    },
+
+    /**
      * La puerta por la que entra el pedido que ya vivia en `localStorage`,
      * escrito por otra pestaña o por el `cart.js` plano.
      */
@@ -57,7 +80,7 @@ const carritoSlice = createSlice({
   }
 });
 
-export const { agregarProducto, quitarProducto, vaciarCarrito, hidratarCarrito } =
+export const { agregarProducto, quitarProducto, vaciarCarrito, hidratarCarrito, editarLinea } =
   carritoSlice.actions;
 
 export default carritoSlice.reducer;

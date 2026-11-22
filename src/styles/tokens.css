@@ -7,8 +7,14 @@
  *   2. el panel que sirve Django (su propia compilación de Tailwind v4).
  * Cambiar un token aquí cambia la tienda y el panel a la vez. Los tamaños de
  * texto y los radios por defecto de Tailwind no se usan: solo estos tokens.
+ *
+ * `static`: Tailwind emite TODAS las variables en `:root`, se use o no una
+ * utilidad. Es lo que permite cargar este mismo archivo con un `<link>` en las
+ * páginas que siguen en Bootstrap (index.html, products.html, accessweb.html):
+ * ahí no hay utilidades que "usen" el token, pero sí CSS escrito a mano que lo
+ * lee con `var(--color-...)`. Un solo juego de tokens, sin copias.
  */
-@theme {
+@theme static {
   /* Color. Las superficies suben de luminosidad; el rojo solo rellena. */
   --color-bg: #0b0b0c;
   --color-surface-1: #151517;
@@ -26,6 +32,16 @@
   --color-success: #059669;
   --color-danger: #f43f5e;
   --color-veil: rgb(0 0 0 / 0.92);  /* encabezado con hover o con foco dentro */
+
+  /*
+   * La capa mexicana (dirección S1: "maximalismo mexicano, sí, pero moderno").
+   * Es decoración con reglas: azulejos, franjas y fondos de sección. Poca
+   * superficie y nunca como texto sobre `bg`, para que el sitio siga leyéndose
+   * como una carnicería moderna y no como un cartel de fiesta.
+   */
+  --color-talavera: #1e40af;        /* azul talavera: relleno de azulejos y franjas. Texto `sand` encima: 5,82:1 */
+  --color-talavera-deep: #172554;   /* azul profundo: fondo de sección. `sand` 9,81:1, `text-muted` 5,81:1, `gold` 6,84:1 */
+  --color-rosa: #e4087c;            /* rosa mexicano: solo formas decorativas (4,34:1 sobre bg), nunca texto */
 
   /* Tipografía autoalojada (Fontsource): los nombres de familia llevan "Variable". */
   --font-display: "Fraunces Variable", ui-serif, Georgia, serif;

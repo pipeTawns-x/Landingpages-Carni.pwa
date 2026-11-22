@@ -1,0 +1,19 @@
+/**
+ * Raíz de los tokens para las páginas que siguen en Bootstrap (index.html,
+ * products.html, accessweb.html).
+ *
+ * El plugin de Tailwind solo compila un archivo que sea raíz de verdad (el que
+ * pide utilidades); un `tokens.css` suelto, cargado con un <link>, llegaría al
+ * navegador con el `@theme` sin compilar y no declararía ni una variable. Esta
+ * raíz no define nada: importa el MISMO `tokens.css` que usan la tienda y el
+ * panel, y Tailwind lo emite como `:root { --color-bg: ...; }`. Cambiar un valor
+ * sigue siendo tocar un solo archivo.
+ *
+ * Importa las utilidades con `source(none)`: son lo que convierte este archivo en
+ * raíz, pero sin ninguna fuente que escanear no genera ni una clase. Tampoco hay
+ * reset (preflight). Bootstrap y el SCSS 7-1 de estas páginas no cambian en nada;
+ * solo aparecen las variables, para que el CSS escrito a mano las lea con
+ * `var(--color-...)`.
+ */
+@import "tailwindcss/utilities.css" layer(utilities) source(none);
+@import "./tokens.css";
