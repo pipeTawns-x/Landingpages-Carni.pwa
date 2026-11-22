@@ -125,15 +125,33 @@ Se requiere aprobacion explicita antes de:
 ## Contexto Visual y Producto
 
 - La direccion visual objetivo es maximalismo mexicano equilibrado.
-- El dashboard debe sentirse operativo, no generico.
+- El dashboard debe sentirse operativo, no generico, con el nivel de las referencias de la skill `design-references` (Horizon X `verdara-dashboard`, Motion Sites).
 - El rediseño puede evolucionar a bento grid si mantiene claridad comercial.
-- Astro, Tailwind y Alpine son objetivos de evolucion, no estado actual del repo.
+- Stack de producto: Django (obligatorio por el LMS) con islas de React y Tailwind v4. La animacion va con GSAP/ScrollTrigger y Motion, con un solo momento 3D de carga diferida. Astro y Alpine siguen siendo objetivos de evolucion.
 
 ## Seguridad
 
 - Nunca hardcodear secrets.
 - RLS en todas las tablas que lleguen a produccion.
 - El escaneo y las barreras de seguridad deben quedar en CI.
+
+## Reglas de Ramas (agentes)
+
+### Ramas activas del producto
+- `main` — rama maestra protegida. Los agentes **no hacen push directo**. Solo reciben merges de `frontend` o `backend` tras pasar revisión humana.
+- `frontend` — trabajo de UI, HTML, CSS, React, Vite, PWA, assets del frontend.
+- `backend` — trabajo de Django, Supabase, migrations, RLS, APIs, lógica de servidor.
+- `pruebas` — entorno de integración para validar antes de subir a `main`.
+- `practicas-ebac` — entregas académicas del LMS (EBAC). **Nunca se mezcla con `main`.**
+
+### Regla de protección de `main`
+**Nada de contexto de prácticas, LMS, entregas escolares o referencia académica entra a `main`.** Esto aplica a todas las prácticas de ahora en adelante, no solo a la M16. Si una tarea tiene origen en una práctica del curso, se mantiene en `practicas-ebac` o en la rama de desarrollo correspondiente, y se adapta a las reglas de la rama destino antes de cualquier merge.
+
+### Regla de adaptabilidad por rama
+Cada rama trabaja con sus propias reglas y estilos, y complementa las reglas comunes. Al hacer merge, se modifica el código para adaptarlo a la rama destino con sus reglas y estilos. Nunca se mezclan reglas ni estilos entre ramas. Esto vale para `main`, `backend`, `frontend` y `pruebas`.
+
+### Secretos
+Los agentes **no gestionan secretos ni tokens**. Toda configuración de entorno se maneja manualmente desde la app de GitHub o con comandos `gh`. No hay archivos `.env.example` ni copias de entorno en el repo. `.env` es el contrato local único y no se versiona.
 
 ## Limite de Esta Capa Local
 

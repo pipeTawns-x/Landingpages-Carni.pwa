@@ -906,3 +906,31 @@ MIT License.
 **Branch activo**: `main`
 **Última actualización**: Abril 2026
 **Versión**: v3.2
+
+---
+
+## Reglas de Ramas (desarrolladores)
+
+### Ramas activas del producto
+- `main` — rama maestra protegida. Solo recibe merges de `frontend` o `backend` tras pasar revisión.
+- `frontend` — trabajo de UI, HTML, CSS, React, Vite, PWA, assets del frontend.
+- `backend` — trabajo de Django, Supabase, migrations, RLS, APIs, lógica de servidor.
+- `pruebas` — entorno de integración para validar antes de subir a `main`.
+- `practicas-ebac` — entregas académicas del LMS (EBAC). **Nunca se mezcla con `main`.**
+
+### Regla de protección de `main`
+**Nada de contexto de prácticas, LMS, entregas escolares o referencia académica entra a `main`.** Esto aplica a todas las prácticas de ahora en adelante, no solo a la M16. Si una tarea tiene origen en una práctica del curso, se mantiene en `practicas-ebac` o en la rama de desarrollo correspondiente, y se adapta a las reglas de la rama destino antes de cualquier merge.
+
+### Regla de adaptabilidad por rama
+Cada rama trabaja con sus propias reglas y estilos, y complementa las reglas comunes. Al hacer merge, se modifica el código para adaptarlo a la rama destino con sus reglas y estilos. Nunca se mezclan reglas ni estilos entre ramas. Esto vale para `main`, `backend`, `frontend` y `pruebas`.
+
+### Flujo de trabajo con ramas
+1. Crear rama de feature desde `frontend` o `backend` según corresponda.
+2. Trabajar en la feature respetando las reglas de esa rama.
+3. Abrir PR hacia `frontend` o `backend` (nunca directo a `main`).
+4. Cuando la feature esté lista, abrir PR de `frontend` o `backend` hacia `pruebas` para validar integración.
+5. Solo desde `pruebas` (verde) se abre PR hacia `main`.
+6. Antes de cualquier merge a `main`, confirmar que no hay contexto de prácticas ni referencias escolares en los commits.
+
+### Secretos
+Los agentes **no gestionan secretos**. Toda configuración de entorno se maneja manualmente desde GitHub o con comandos `gh`. No hay archivos `.env.example` ni copias de entorno en el repo. `.env` es el contrato local único y no se versiona.
