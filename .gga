@@ -22,7 +22,30 @@
 #   PROVIDER="github:deepseek-r1"
 #   PROVIDER="minimax"
 #   PROVIDER="minimax:MiniMax-M3"
-PROVIDER="opencode:google/gemini-3.5-flash-lite"
+# Review model per runtime. GGA is started by the git hook, so GGA_RUNTIME says which agent
+# is committing. Reviewing is cheap work: Haiku on Claude, gpt-6.1-sol at low effort on Codex.
+# There is no branch for OpenCode: no free third-party model reviews Carni code, so it uses the
+# claude branch until a local model exists (PROVIDER="ollama:<model>").
+# If a model does not answer with the strict STATUS line: Haiku -> claude-sonnet-5-5,
+# gpt-6.1-sol low -> medium (change the two values below).
+case "${GGA_RUNTIME:-claude}" in
+  codex)
+    PROVIDER="codex"
+    # GGA starts the provider as `bash -c 'exec codex exec ...'`: a shell function is not
+    # visible there, and `exec` skips functions anyway. A wrapper first in PATH adds the flags.
+    _gga_shim_dir="${XDG_CACHE_HOME:-$HOME/.cache}/gga-carni/bin"
+    mkdir -p "$_gga_shim_dir"
+    _gga_real_codex="$(type -ap codex | grep -vxF "$_gga_shim_dir/codex" | head -n 1)"
+    printf '#!/usr/bin/env bash\nif [ "$1" = exec ]; then\n  shift\n  exec "%s" exec -m gpt-6.1-sol -c model_reasoning_effort=low "$@"\nfi\nexec "%s" "$@"\n' \
+      "$_gga_real_codex" "$_gga_real_codex" > "$_gga_shim_dir/codex"
+    chmod 700 "$_gga_shim_dir/codex"
+    export PATH="$_gga_shim_dir:$PATH"
+    ;;
+  *)
+    PROVIDER="claude"
+    export ANTHROPIC_MODEL="claude-haiku-5-5"
+    ;;
+esac
 
 # File patterns to include in review (comma-separated)
 # Default: * (all files)
@@ -37,7 +60,9 @@ FILE_PATTERNS="*.ts,*.tsx,*.js,*.jsx,*.py"
 # Examples:
 #   EXCLUDE_PATTERNS="*.test.ts,*.spec.ts"
 #   EXCLUDE_PATTERNS="*_test.go,*.mock.ts"
-EXCLUDE_PATTERNS="*.test.ts,*.spec.ts,*.test.tsx,*.spec.tsx,*.d.ts,backend/*/migrations/*"
+# Generated code is not reviewed, same reason as the migrations: backend/static/vite is the
+# committed output of `npm run build:django`, and *.min.js is minified by definition.
+EXCLUDE_PATTERNS="*.test.ts,*.spec.ts,*.test.tsx,*.spec.tsx,*.d.ts,backend/*/migrations/*,backend/static/vite/*,*.min.js"
 
 # File containing code review rules
 # Default: AGENTS.md
@@ -51,24 +76,6 @@ STRICT_MODE="true"
 # Default: 300 (5 minutes)
 # Increase for large changesets or slow connections
 TIMEOUT="300"
-
-# OpenCode provider: optional reasoning effort / variant
-# Examples: minimal, low, medium, high, max
-# OPENCODE_VARIANT="high"
-
-# OpenCode provider: optional agent profile
-# Keep this lightweight. Agent prompts can add significant token overhead.
-OPENCODE_AGENT="gga-reviewer"
-
-# OpenCode provider: no snapshots and a tool-less reviewer during reviews
-# Inside the pre-commit hook git exports GIT_INDEX_FILE, and the OpenCode
-# snapshot reuses it: it stages untracked files and unstages ignored ones in
-# the commit under review. Turning snapshots off keeps that commit intact.
-# The reviewer already gets the files in the prompt. It cannot run bash or
-# edit, and it is told to answer with the STATUS line first instead of
-# exploring. Custom agents only work with non-Zen models: the OpenCode Zen
-# free tier rejects them ("only from within OpenCode"), hence Gemini here.
-export OPENCODE_CONFIG_CONTENT='{"snapshot":false,"agent":{"gga-reviewer":{"description":"GGA code reviewer","mode":"primary","prompt":"You review the staged code in the prompt against the project rules in the prompt. Your first line must be exactly STATUS: PASSED or STATUS: FAILED. After it, list each violation as file:line and the rule, or write that there are none. Do not call tools: everything you need is in the prompt.","tools":{"bash":false,"edit":false,"write":false,"patch":false,"webfetch":false,"task":false,"todowrite":false}}}}'
 
 # Base branch for --pr-mode (auto-detects main/master/develop if empty)
 # Default: auto-detect
