@@ -1,43 +1,50 @@
 # Rediseño moderno de Carni-mvp
 
-Objetivo: llevar `index.html` y `accessweb.html`, y después el catálogo, al nivel de Horizon X y Motion Sites, mejorando el proyecto existente en su lugar, sobre Django con islas de React, Tailwind v4, GSAP/ScrollTrigger y Motion.
-Ramas: `frontend` (UI) y `backend` (puente con Django). Estrategia de entrega: ask-on-risk. Pruebas: Jest + `node --test tests/visual/` + Django test.
+Objetivo: migrar las páginas reales (index, products, accessweb) y el panel a plantillas de Django y modernizarlas en su lugar, al nivel de Horizon X y Motion Sites, mobile first, con Django + islas de React + Tailwind v4 + GSAP/ScrollTrigger + Motion.
+Rama de trabajo: `backend`, que tiene Django, el panel y el JS/CSS; se trabaja desde el worktree `.claude/worktrees/stack-carney-mvp-244236` y se entrega con `git push origin HEAD:backend`. Pruebas: Django (`manage.py test --settings=config.settings_test`, 1025 en verde), Jest (239 en verde) y `node --test tests/visual/` (9 en verde).
 
 ## Specs
 
-- **S1** Mejorar el proyecto existente, nunca uno paralelo: "si bien los trabajos anteriores era una iteración, o sea, no era una mejora a nuestro proyecto, no, se convirtió en un proyecto nuevo, que eso estaba mal".
-- **S2** Accessweb: "eso es una mejora que sí se hizo al Access Web… la idea es mejorar toda la Access Web, hacerla más moderna". La base es la mascota de Don Carlos (`frontend` `37535551`).
-- **S3** Landing: "La landing page, en este caso la index HTML, igual mejorarla. ¿Mm? Tenerla bien estructurada, bien animada, scroll driven, motion".
-- **S4** Nivel visual: "una web al nivel como las de Horizon X o Motion Site, pero con tecnologías como Django, React, Tailwind, o si ocupa alguna otra más? Obviamente, esta que se ocupe… tiene que ser compatible con, sí o sí, con Django".
-- **S5** Lo bueno del proyecto paralelo se trae al proyecto real: "en ese nuevo proyecto se puede mejorar nuestro proyecto para que quede a la par… implementarlo esta vez sí o sí en nuestro proyecto".
+Citas literales de Eduardo, 2026-11-21.
 
-## Cómo se logra (decisión técnica)
+- **S1** Mejorar el proyecto base, nunca uno paralelo: "Vamos a mejorar nuestro proyecto base integrando lo que nos dicen las prácticas o seguimos igual, creando nuevos proyectos aislados, generando ejercicios que no sirven".
+- **S2** Las cuatro piezas pasan a Django: "En el paso 1 también te faltó la web products… También tienes que pasarla a una vista de Django. Plantillas. Igual conectando [Vite] con Django para que estas páginas carguen React, Tailwind, [GSAP] y Motion".
+- **S3** Landing: "una landing con scroll de animación"; "La landing page, en este caso la index HTML, igual mejorarla… bien estructurada, bien animada, scroll driven, motion".
+- **S4** Accessweb: "Access Web moderna sobre sus mismos archivos". La base es la mascota de Don Carlos (`37535551`). La referencia mobile first es `docs/design/referencias/accessweb-mobile-first-2026-11-21.png`: login y registro con Don Carlos sobre fondo naranja y la tarjeta blanca del formulario. "Igual esto es mejorable a nivel de… motion sites, animaciones de motion graphics, animaciones como [Refero], como V0… tanto como para móvil como para… una computadora".
+- **S5** Panel: "Ya también empieza con el panel, es la funcionalidad completa… si bien también ya lo tenemos ahí, pero es muy básico… ya sabes los ejemplos, ya sabes referencias, ya sabes lo que tiene que venir en el panel".
+- **S6** Productos: "teníamos nuestras vistas de los productos, configuración de los productos… ya tienes que mejorar… la página de configuración de productos, la web products, el carrito".
+- **S7** Componentes coherentes: "el carrito, el header, el hamburger menu, igual que sea el mismo en todas las páginas, que sea coherente, el header bien hecho, los logos bien hechos, mejorar los logos… mejorar los diseños de la mascota, los diseños de la animación… haciendo la mobile first".
+- **S8** Tienda paralela: "En la parte solo saco lo que sirvo como animación… ya las puedes borrar si ya las comiteaste". Antes de borrar, lo rescatable queda en Engram (#3328, topic `carni-mvp/tienda-paralela-rescate`). La lógica de `ventas/views/` (catálogo, cotizar, carrito, pedido) se conserva; solo se borra su capa visual.
+- **S9** Recursos obligatorios: "Utiliza roadmap… REA… Grillhouse y Carnívoros… Big School… Videos igual". "Caarni1.zip"… "no es lo que buscábamos". Puede servir de base, pero no es el resultado.
 
-| Capa | Herramienta | Por qué es compatible con Django |
+## Cómo se logra
+
+| Capa | Herramienta | Estado |
 |---|---|---|
-| Páginas | Plantillas de Django (`backend/templates/`) | Django sirve el HTML; cada página conserva su diseño al migrar. |
-| Puente | Manifiesto de Vite leído por una etiqueta de plantilla (`django-vite` u otra equivalente) + WhiteNoise | Vite compila y Django inserta los `<script>`/`<link>` con hash. Hoy no existe: es T1. |
-| Interactividad | Islas de React montadas en `<div data-island>` | React solo donde hay estado (carrito, mascota, formularios); el resto es HTML. |
-| Estilos | Tailwind v4 (`@tailwindcss/vite`, ya instalado) + SCSS 7-1 existente | Va dentro del mismo bundle de Vite. |
-| Scroll y timelines | GSAP + ScrollTrigger | JavaScript puro: funciona sobre HTML de Django sin framework. |
-| Microinteracciones | Motion, dentro de las islas de React | Vive en React y no toca el servidor. |
-| 3D | Un solo momento, de carga diferida | Import dinámico detrás de IntersectionObserver. |
-
-Reglas de calidad: `prefers-reduced-motion` en toda animación, LCP < 2.5 s y CLS < 0.1, comparación con capturas de las referencias (skill `design-references`).
+| Páginas | Plantillas de Django; las vistas de `ventas/views/` las pintan en las mismas rutas (`/`, `/productos/`, `/acceso/`) | Pendiente (T3-T5) |
+| Puente | `{% vite_asset %}` (`backend/ventas/templatetags/vite.py`) lee `backend/static/vite/.vite/manifest.json` | Hecho (`78576637`, 5 pruebas) |
+| Build | `vite.django.config.js` con `base: '/static/vite/'`, `manifest: true`, `outDir: backend/static/vite`, y el script `build:django`; la salida se versiona, igual que `static/panel/panel.css` | Pendiente (T2) |
+| Sin CDN | La CSP de Django solo admite `'self'`. Bootstrap, Bootstrap Icons y Font Awesome se empaquetan con Vite o se reemplazan | Pendiente (T2) |
+| Animación | GSAP + ScrollTrigger empaquetados; Motion en las islas; `prefers-reduced-motion` siempre | Pendiente |
+| Calidad | LCP < 2.5 s, CLS < 0.1, imágenes con width y height, WebP/AVIF, CSRF en todo fetch, paginación y RBAC en el panel (roadmap.sh: `django`, `api-design`, `cyber-security`, `frontend`) | Regla |
 
 ## Tasks
 
 | ID | Specs | Tarea | Ruta | Estado |
 |---|---|---|---|---|
-| T1 | S4 | Puente Django↔Vite en `backend`: etiqueta de plantilla que lee el manifiesto, con su prueba | inline | pendiente |
-| T2 | S4 | Instalar GSAP y Motion en `frontend` con versión fija, dentro del devcontainer | inline | pendiente |
-| T3 | S2 | Accessweb: entrada animada de la mascota, microinteracciones de formulario y PNG de 1.3 MB a WebP/AVIF | inline | pendiente |
-| T4 | S3, S4 | Landing: secciones con ScrollTrigger y hero con video, sobre `index.html` | inline | pendiente |
-| T5 | S5 | Traer a `index.html` y `accessweb.html` lo que sí funcionó de la tienda paralela de `backend` (`backend/ventas/templates/ventas/tienda/`, `backend/static/tienda/landing.js`, commit `f18c42e7`: ScrollTrigger, bento de nueve tamaños y video 16:9), pieza por pieza, sin copiar la tienda entera | inline | pendiente |
-| T6 | S4 | Un momento 3D de carga diferida | inline | pendiente |
+| T0 | — | Integrar `frontend` en `backend` y recuperar index, products, accessweb y sus entradas | inline | hecho (`c01cbc97`, `33ec0015`) |
+| T1 | S2 | Etiqueta `{% vite_asset %}` con sus pruebas | inline | hecho (`78576637`) |
+| T2 | S2 | Dependencias y build: instalar `gsap`, `motion`, `bootstrap` y `bootstrap-icons` con versión fija; `vite.django.config.js` y el script `build:django`; un entry por página en `js/entries/` | inline | **bloqueada**: ver L4 |
+| T3 | S2, S3, S8 | `index.html` → plantilla de Django en `/`, con su diseño; después, la animación con scroll rescatada de la tienda (#3328) | inline | pendiente |
+| T4 | S2, S6 | `products.html` → plantilla en `/productos/` con el catálogo real, el cotizador y el carrito | inline | pendiente |
+| T5 | S2, S4 | `accessweb.html` → plantilla en `/acceso/`, mobile first según la referencia | inline | pendiente |
+| T6 | S7 | Header, menú hamburguesa, logo, carrito y pie como parciales únicos de Django, compartidos por las cuatro páginas | inline | pendiente |
+| T7 | S5, S6 | Panel completo: tablero con KPIs, pedidos, inventario y la configuración de productos, con las referencias del panel | inline | pendiente |
+| T8 | S8 | Borrar la capa visual de la tienda paralela cuando T3-T5 la reemplacen | inline | pendiente |
 
 ## Log
 
-- **L1 (2026-11-21, Eduardo):** "Ya tenemos claro qué tecnologías se van a utilizar para lograr un resultado moderno, estético, funcional y mejorando de manera espectacular lo que ya se tiene… deja todo listo, empecemos a desarrollar ya."
-- **L2 (2026-11-21):** Estado verificado al abrir este documento. `frontend` tiene React 18.3 y Tailwind 4.3 instalados, pero no tiene GSAP ni Motion. `backend` tiene Django 5.2 y WhiteNoise, pero no tiene ningún puente con el manifiesto de Vite. Lo que sí tiene es una tienda paralela, escrita aparte en `backend/ventas/templates/ventas/tienda/` entre el 17 y el 18 de noviembre (`204ba717`, `f18c42e7`), que carga GSAP y ScrollTrigger como estáticos sueltos. Ese es el error de S1: se rehízo la landing en vez de mover `index.html`. Pendientes heredados: `css/styles.css` no coincide con lo que compila `css/styles.scss` (134 330 contra 131 951 bytes) y está así desde antes de este documento. Los PNG de la mascota pesan 1.3 MB y 1.0 MB.
-- **L3 (2026-11-21):** Este documento se escribió en el worktree `stack-carney-mvp-244236`, porque un hook bloquea escribir en `rama-frontend` desde esa sesión. La sesión de desarrollo lo copia a `frontend` en su primer commit.
+- **L1 (2026-11-21):** el primer pedido de Eduardo: "deja todo listo, empecemos a desarrollar ya".
+- **L2 (2026-11-21):** `backend` borró las páginas reales en `f4141530` (2026-11-17) y montó en su lugar una tienda paralela (`ventas/templates/ventas/tienda/`, `static/tienda/`). En `backend` ya existe Tailwind compilado y versionado para el panel (#798).
+- **L3 (2026-11-21):** consulta de recursos. Roadmap.sh: performance, accesibilidad, CSRF, RBAC y paginación. Videos: tareas de unas 400 líneas, revisar la seguridad en una sesión nueva y correr las pruebas antes de confiar. Referencias por sección: `docs/design/claude-design-1.1/`, `~/agentic-global/claude/raw/diseno/{horizonx,motionsites}/`, Engram #2466, #2913, #703 y #1350. REA de la competencia: #3277, #3246, #3227 (Grill House es referencia funcional; su diseño no se copia).
+- **L4 (2026-11-21), bloqueo de T2:** la regla del proyecto dice "npm solo en Docker". El devcontainer monta el repo completo, y `node_modules` es un enlace a una ruta de macOS (`.claude/worktrees/loop-carni/node_modules`) que no existe dentro del contenedor. Docker Desktop estaba apagado. Hay que montar un volumen con nombre en `/workspace/node_modules` dentro del contenedor (`.devcontainer/docker-compose.yml`), encender Docker y correr `npm install` ahí. Ese cambio toca dependencias, que es el riesgo 5: commit aparte.
