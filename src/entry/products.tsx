@@ -1,3 +1,4 @@
+import '../../js/modules/ui/bootstrap-global.js';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Provider } from 'react-redux';
 import { ThemeProvider } from 'styled-components';

@@ -7,6 +7,7 @@
   "scripts": {
     "dev": "vite --host 0.0.0.0 --port 3002",
     "build": "vite build",
+    "build:django": "vite build --config vite.django.config.js",
     "preview": "vite preview --host 0.0.0.0 --port 4173",
     "css:components": "sass src/components:src/components --no-source-map",
     "css:components:watch": "sass src/components:src/components --no-source-map --watch",

@@ -1,4 +1,4 @@
-"""`{% vite_asset "js/entries/home.js" %}`: the tags one Vite entry needs, read from its manifest.
+"""`{% vite_asset "src/entry/home.tsx" %}`: the tags one Vite entry needs, read from its manifest.
 
 Vite compiles the store's JavaScript and CSS (React islands, Tailwind, GSAP, Motion) into
 static/vite/ with `npm run build:django`, and writes .vite/manifest.json next to them. That
@@ -74,7 +74,7 @@ def vite_asset(entry):
     if entry not in manifest:
         raise ImproperlyConfigured(
             f"{entry} is not an entry of the Vite manifest. Add it to build.rollupOptions.input "
-            "in vite.config.js and run `npm run build:django`."
+            "in vite.django.config.js and run `npm run build:django`."
         )
     styles, chunks = _walk(manifest, entry, {entry})
     parts = [

@@ -1,3 +1,4 @@
+import '../../js/modules/ui/bootstrap-global.js';
 import { ThemeProvider } from 'styled-components';
 import { mountReactNode } from './shared';
 import { montarCarrito } from '@src/components/CartPanel/montar';

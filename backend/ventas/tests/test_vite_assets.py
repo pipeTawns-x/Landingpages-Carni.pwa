@@ -16,9 +16,9 @@ from django.test import SimpleTestCase, override_settings
 from ventas.templatetags import vite as vite_tags
 
 MANIFEST = {
-    "js/entries/home.js": {
+    "src/entry/home.tsx": {
         "file": "assets/home-a1b2.js",
-        "src": "js/entries/home.js",
+        "src": "src/entry/home.tsx",
         "isEntry": True,
         "imports": ["_motion-c3d4.js"],
         "css": ["assets/home-e5f6.css"],
@@ -27,9 +27,9 @@ MANIFEST = {
         "file": "assets/motion-c3d4.js",
         "css": ["assets/motion-0a0b.css"],
     },
-    "js/entries/access.js": {
+    "src/entry/auth.tsx": {
         "file": "assets/access-1111.js",
-        "src": "js/entries/access.js",
+        "src": "src/entry/auth.tsx",
         "isEntry": True,
     },
 }
@@ -52,7 +52,7 @@ class ViteAssetTagTests(SimpleTestCase):
         self.addCleanup(vite_tags.clear_cache)
 
     def test_entry_renders_its_styles_preloads_and_module_script_in_order(self):
-        html = render('{% vite_asset "js/entries/home.js" %}')
+        html = render('{% vite_asset "src/entry/home.tsx" %}')
 
         expected = [
             '<link rel="stylesheet" href="/static/vite/assets/home-e5f6.css">',
@@ -64,22 +64,22 @@ class ViteAssetTagTests(SimpleTestCase):
         self.assertEqual(positions, sorted(positions))
 
     def test_entry_without_css_or_imports_renders_only_its_script(self):
-        html = render('{% vite_asset "js/entries/access.js" %}').strip()
+        html = render('{% vite_asset "src/entry/auth.tsx" %}').strip()
 
         expected = '<script type="module" src="/static/vite/assets/access-1111.js"></script>'
         self.assertEqual(html, expected)
 
     def test_unknown_entry_fails_loudly_and_names_the_entry(self):
-        with self.assertRaisesMessage(ImproperlyConfigured, "js/entries/nope.js"):
-            render('{% vite_asset "js/entries/nope.js" %}')
+        with self.assertRaisesMessage(ImproperlyConfigured, "src/entry/nope.tsx"):
+            render('{% vite_asset "src/entry/nope.tsx" %}')
 
     def test_missing_manifest_fails_loudly_with_the_build_command(self):
         self.manifest.unlink()
 
         with self.assertRaisesMessage(ImproperlyConfigured, "npm run build:django"):
-            render('{% vite_asset "js/entries/home.js" %}')
+            render('{% vite_asset "src/entry/home.tsx" %}')
 
     def test_output_is_safe_html_not_escaped(self):
-        html = render('{% vite_asset "js/entries/access.js" %}')
+        html = render('{% vite_asset "src/entry/auth.tsx" %}')
 
         self.assertNotIn("&lt;", html)
