@@ -348,6 +348,18 @@ CHECKOUT_THROTTLE_WINDOW_SECONDS = parse_positive_int(
 )
 CHECKOUT_TRUST_FORWARDED_FOR = BEHIND_PROXY
 
+# The counters above and the cart-write limit live in this cache. The built-in default keeps only
+# 300 entries and drops the oldest first, so a flood of requests from other addresses would push a
+# client's counter out and hand them a fresh window; 10,000 entries (a few MB) makes that flood
+# impractical. Still per process: exact for the one gunicorn worker of render.yaml.
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": "carni-throttle",
+        "OPTIONS": {"MAX_ENTRIES": 10000},
+    }
+}
+
 # Other origins that may post a form here, comma-separated (optional). The host the request came to
 # is always trusted, so this is only for a second domain.
 CSRF_TRUSTED_ORIGINS = parse_optional_origins(
