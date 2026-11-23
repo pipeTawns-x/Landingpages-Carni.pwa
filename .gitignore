@@ -22,6 +22,11 @@ build/
 # documenta en prosa, ahí mismo. Esto lo hace cumplir en vez de solo pedirlo.
 .env.example
 
+# Cualquier otra variante (.env.production, .env.staging, ...) y la carpeta de
+# secretos: la regla global 4 las exige y solo `.env` estaba cubierto por nombre.
+.env.*
+secrets/
+
 # Configuración local de agentes. Es donde las herramientas de IA escriben
 # solas, así que un `git add .` se las lleva sin que nadie lo note. El
 # gitignore global de esta máquina ya cubría settings.local.json, pero eso
