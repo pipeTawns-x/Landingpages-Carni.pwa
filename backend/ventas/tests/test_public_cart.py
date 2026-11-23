@@ -280,13 +280,13 @@ class CartPageTests(StoreTestCase):
             self.assertIn("&lt;b&gt;Bistec&lt;/b&gt;", html)
 
     def test_the_header_shows_how_many_products_the_cart_has(self):
-        self.assertRegex(
-            self.page("ventas:catalogo").content.decode(), r"data-cart-count[^>]*>\s*0\s*<"
-        )
+        # An empty cart shows no badge at all; the badge appears with the first line.
+        empty = self.page("ventas:catalogo").content.decode()
+        self.assertNotIn("main-header__cart-count", empty)
         self.add("bistec")
         self.add("camiseta", mode="pieces", amount="1")
         html = self.page("ventas:catalogo").content.decode()
-        self.assertRegex(html, r"data-cart-count[^>]*>\s*2\s*<")
+        self.assertRegex(html, r'main-header__cart-count">\s*2\s*<')
         self.assertIn(f'href="{reverse("ventas:carrito")}"', html)
 
     def test_the_catalogue_runs_no_inline_script(self):
@@ -469,18 +469,33 @@ class MissingFunctionTests(StoreTestCase):
         self.missing()
         self.add()
         with self.assertLogs("ventas.checkout", level="ERROR"):
-            self.client.post(
-                reverse("ventas:tienda_pedido"), {**ORDER, "customer_phone": "-------"}
-            )
+            self.client.post(reverse("ventas:tienda_pedido"), ORDER)
         self.assertEqual(self.gateway.orders, [])
         self.assertEqual(PanelOrder.objects.count(), 0)
 
-    def test_a_different_missing_function_is_the_same_refusal(self):
-        self.missing("public.quote_cart")
+    def test_the_quote_function_missing_when_the_order_is_placed_is_the_same_refusal(self):
+        # The line is kept while `quote_cart` exists; it disappears before the order is placed
+        # (the double's `create_order_web` quotes the cart itself, as the SQL one does).
         self.add()
-        with self.assertLogs("ventas.checkout", level="ERROR"):
+        self.gateway.errors["quote_cart"] = services.GatewayFunctionMissing("public.quote_cart")
+        with self.assertLogs("ventas.checkout", level="ERROR") as logged:
             response = self.client.post(reverse("ventas:tienda_pedido"), ORDER)
         self.assertEqual(response.status_code, 200)
+        self.assertContains(response, domain.UNAVAILABLE_MESSAGE)
+        self.assertIn("public.quote_cart", logged.output[0])
+        self.assertEqual(self.gateway.orders, [])
+        self.assertEqual(PanelOrder.objects.count(), 0)
+        self.assertEqual(len(self.cart()), 1)
+
+    def test_another_function_named_by_create_order_web_is_the_same_refusal(self):
+        # What the database says when a function that `create_order_web` calls is the one missing.
+        self.missing("public.some_inner_function")
+        self.add()
+        with self.assertLogs("ventas.checkout", level="ERROR") as logged:
+            response = self.client.post(reverse("ventas:tienda_pedido"), ORDER)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, domain.UNAVAILABLE_MESSAGE)
+        self.assertIn("public.some_inner_function", logged.output[0])
         self.assertEqual(PanelOrder.objects.count(), 0)
         self.assertEqual(len(self.cart()), 1)
 

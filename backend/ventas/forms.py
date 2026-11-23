@@ -7,6 +7,7 @@ read: the numbers come from the quote of the store.
 from decimal import Decimal
 
 from django import forms
+from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
 
 from ventas import cart, domain
@@ -59,6 +60,19 @@ class CartLineForm(forms.Form):
 phone_validator = RegexValidator(
     r"^\+?[0-9 ()\-]{7,20}$", "Escribe el teléfono solo con números (puede llevar espacios)."
 )
+# `create_order_web` refuses a phone with fewer digits than this; the form of the store says so
+# first, so a phone made of hyphens never reaches the database.
+STORE_PHONE_MIN_DIGITS = 7
+
+
+def store_phone_validator(value):
+    """The phone of a guest order: the characters of `phone_validator` and seven digits at least.
+
+    Only the public store uses it; the sale at the counter keeps the looser rule of the staff.
+    """
+    phone_validator(value)
+    if sum(char in "0123456789" for char in value) < STORE_PHONE_MIN_DIGITS:
+        raise ValidationError(f"Escribe tu teléfono con al menos {STORE_PHONE_MIN_DIGITS} dígitos.")
 
 
 class OrderForm(forms.Form):

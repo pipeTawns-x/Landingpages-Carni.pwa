@@ -31,7 +31,7 @@ from django.views.decorators.http import require_POST, require_safe
 
 from ventas import cart, catalog, domain, services, throttle
 from ventas.context_processors import bag_payload
-from ventas.forms import CartLineForm, phone_validator
+from ventas.forms import CartLineForm, store_phone_validator
 from ventas.models import PanelOrder
 from ventas.throttle import client_ip
 from ventas.views.comun import currency_of, modes_of, quote_rows, wants_json
@@ -56,7 +56,7 @@ THROTTLED_MESSAGE = (
 # store for a quote, so a script must not be able to hammer the database through them.
 CART_WRITES_PER_MINUTE = 60
 STORE_NOTE = "[Tienda en línea]"
-NOTES_MAX = 450  # what is left of the 500 of the database after the marker above
+NOTES_MAX = 450  # a margin under the 500 of the database once the marker above is prepended
 
 
 def _slot(request):
@@ -79,7 +79,7 @@ class StoreOrderForm(forms.Form):
     )
     customer_phone = forms.CharField(
         max_length=20,
-        validators=[phone_validator],
+        validators=[store_phone_validator],
         error_messages={
             "required": "Escribe tu teléfono para avisarte de tu pedido.",
             "max_length": "El teléfono es demasiado largo.",
@@ -250,9 +250,22 @@ def quitar(request, pk):
     return _answer(request, 200, "Se quitó el producto de tu carrito.", target)
 
 
-def _cart_context(request, currency, order_form=None):
+def _cart_context(request, currency, order_form=None, ask_store=True):
+    """What the cart page shows. Its quote is the one call to the database of the page, so it
+    spends the budget of the client like a write does (`CART_WRITES_PER_MINUTE`).
+
+    Over the budget, or when the caller says `ask_store=False` (a checkout that was refused
+    already), the lines are listed with no quote and the order button blocked: the page answers
+    without reaching the database. An empty cart asks nothing and spends nothing.
+    """
     lines = public_lines(request)
-    rows, quote, currency, blocked = quote_rows(request, lines, currency)
+    over_the_limit = bool(lines) and ask_store and _over_the_limit(request)
+    if over_the_limit:
+        messages.error(request, domain.TOO_MANY_REQUESTS_MESSAGE)
+    if lines and ask_store and not over_the_limit:
+        rows, quote, currency, blocked = quote_rows(request, lines, currency)
+    else:
+        rows, quote, blocked = [{"line": line} for line in lines], None, True
     products = {
         product.pk: product
         for product in catalog.active_products().filter(
@@ -281,13 +294,21 @@ def _cart_context(request, currency, order_form=None):
         "units": domain.UNITS,
         "delivery_labels": domain.DELIVERY_LABELS,
         "payment_labels": domain.PAYMENT_LABELS,
+        "over_the_limit": over_the_limit,
     }
+
+
+def _cart_page(request, context, status=None):
+    """Draw the cart page: a 429 when the client is over its budget, `status` if given."""
+    if status is None:
+        status = 429 if context["over_the_limit"] else 200
+    return render(request, "ventas/tienda/carrito.html", context, status=status)
 
 
 @require_safe
 def carrito(request):
     currency = currency_of(request.GET.get("currency"))
-    return render(request, "ventas/tienda/carrito.html", _cart_context(request, currency))
+    return _cart_page(request, _cart_context(request, currency))
 
 
 def _throttled(request):
@@ -337,8 +358,8 @@ def pedido(request):
         if _throttled(request):
             messages.error(request, THROTTLED_MESSAGE)
             currency = currency_of(form.cleaned_data["currency"])
-            context = _cart_context(request, currency, form)
-            return render(request, "ventas/tienda/carrito.html", context, status=429)
+            context = _cart_context(request, currency, form, ask_store=False)
+            return _cart_page(request, context, status=429)
         order_id = _place_order(request, lines, form)
         if order_id is not None:
             cart.clear(_slot(request))
@@ -346,7 +367,7 @@ def pedido(request):
             return redirect("ventas:pedido_confirmado")
 
     currency = currency_of(form.data.get("currency"))
-    return render(request, "ventas/tienda/carrito.html", _cart_context(request, currency, form))
+    return _cart_page(request, _cart_context(request, currency, form))
 
 
 @require_safe

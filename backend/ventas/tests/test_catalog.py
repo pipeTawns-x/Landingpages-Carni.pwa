@@ -66,11 +66,12 @@ class PublicCatalogTests(TestCase):
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "ventas/tienda/productos.html")
+        self.assertTemplateUsed(response, "ventas/productos.html")
         for name in ("Bistec", "Molida", "Camiseta", "Ribeye"):
             self.assertContains(response, name)
-        self.assertContains(response, "200.00")
-        self.assertContains(response, "549.00")
+        # The card drops the cents only when they are zero: $200.00 reads $200.
+        self.assertContains(response, "$200<")
+        self.assertContains(response, "$549<")
         # Bistec is sold by the kilo and the shirt by the piece.
         self.assertContains(response, "/ kg")
         self.assertContains(response, "/ pieza")
@@ -88,11 +89,14 @@ class PublicCatalogTests(TestCase):
             price_per_kg=Decimal("77.00"),
         )
 
-        html = re.sub(r"\s+", " ", self.client.get(self.url).content.decode())
+        # The card puts the price and the unit in two tags: read the text the visitor sees.
+        text = re.sub(
+            r"\s+", " ", re.sub(r"<[^>]+>", " ", self.client.get(self.url).content.decode())
+        )
 
-        self.assertIn("$999.00 / paquete", html)
-        self.assertIn("$77.00 / kg", html)
-        self.assertIn("$250.00 / pieza", html)
+        self.assertIn("$999 / paquete", text)
+        self.assertIn("$77 / kg", text)
+        self.assertIn("$250 / pieza", text)
 
     def test_an_inactive_product_is_not_listed(self):
         self.assertNotContains(self.client.get(self.url), "Descontinuado")
@@ -114,7 +118,7 @@ class PublicCatalogTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Bistec")
-        self.assertTemplateUsed(response, "ventas/tienda/productos.html")
+        self.assertTemplateUsed(response, "ventas/productos.html")
 
     def test_the_page_is_not_the_panel_and_does_not_point_to_it(self):
         response = self.client.get(self.url)
@@ -148,7 +152,7 @@ class PublicCatalogTests(TestCase):
         response = self.client.get(self.url, {"q": "nada que coincida"})
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "No encontramos productos")
+        self.assertContains(response, "No encontramos cortes con")
 
     def test_the_name_of_a_product_is_drawn_as_text_and_not_as_html(self):
         Product.objects.create(
@@ -178,7 +182,7 @@ class PublicCatalogTests(TestCase):
         """The search and the cards are plain HTML; the only scripts are the site's own files."""
         html = self.client.get(self.url).content.decode()
 
-        self.assertRegex(html, r'<form [^>]*method="get" action="/productos/"')
+        self.assertRegex(html, r'<form [^>]*action="/productos/"[^>]*method="get"')
         self.assertNotRegex(html, r"<script(?![^>]*\bsrc=\"/static/)[^>]*>")
         for forbidden in (" style=", " onclick=", "javascript:"):
             with self.subTest(forbidden=forbidden):
@@ -189,35 +193,28 @@ class PublicCatalogTests(TestCase):
 
 
 class StoreFrameTests(TestCase):
-    """The frame every public page shares: the header with the brand and the elegant footer."""
+    """The frame of the page: the header and the footer of the store, never the panel's."""
 
     def setUp(self):
         make_store()
         self.response = self.client.get(reverse("ventas:catalogo"))
 
-    def test_the_page_extends_the_store_frame(self):
-        self.assertTemplateUsed(self.response, "ventas/tienda/base.html")
+    def test_the_page_is_drawn_with_the_header_and_the_footer_of_the_store(self):
+        self.assertTemplateUsed(self.response, "ventas/parciales/_cabecera.html")
+        self.assertTemplateUsed(self.response, "ventas/parciales/_pie.html")
 
-    def test_the_header_carries_the_brand_title(self):
-        self.assertContains(self.response, "CARNICERÍA")
-        self.assertContains(self.response, "EL SEÑOR DE LA MISERICORDIA")
+    def test_the_page_carries_the_name_of_the_business(self):
+        self.assertContains(self.response, "Carnicería El Señor de La Misericordia")
 
     def test_the_footer_carries_the_contact_of_the_business(self):
-        for text in (
-            "+52 444 271 5470",
-            "https://wa.me/524442715470",
-            "Agua Marina 110, Manuel J. Othón",
-            "Siempre contando con la mejor calidad y frescura",
-            "© 2026 Carnicería El Señor de La Misericordia",
-        ):
+        for text in ("+52 444 271 5470", "https://wa.me/524442715470"):
             with self.subTest(text=text):
                 self.assertContains(self.response, text)
 
     def test_the_footer_links_point_to_the_django_pages(self):
         self.assertContains(self.response, f'href="{reverse("ventas:catalogo")}"')
 
-    def test_it_links_the_store_stylesheet_and_not_the_panel_one(self):
-        self.assertContains(self.response, "tienda/tienda.css")
+    def test_it_does_not_link_the_stylesheet_of_the_panel(self):
         self.assertNotContains(self.response, "panel/panel.css")
         self.assertNotContains(self.response, "ventas/ventas.css")
 

@@ -34,6 +34,8 @@ await fetch(url, {
 
 The CSP only allows `'self'`: call same-origin paths, load nothing from a CDN.
 
+The `csrftoken` cookie is only issued by a page that renders a token. The catalogue and the product page do (a hidden `csrfmiddlewaretoken` input, with the cart empty too; tested in `CsrfForScriptsTests`). **Any other page that writes in JSON must render `{% csrf_token %}` (or use `ensure_csrf_cookie`)**, or its first write is a 403. A token from a page of another origin is refused too (`Origin` is checked).
+
 ### Status codes used
 
 | Code | Meaning here |
@@ -69,7 +71,7 @@ Context [`comun.py:21`]:
 | `query` | str | the stripped `q` that was applied (NEW: at most 80 characters). |
 | `selected_category` | str | `"<id>"` or `""`. Compare with `category.pk\|stringformat:"d"`. |
 
-Product attributes available on each item of `page_obj`: `pk`, `name`, `description` (may be `None`), `category.pk`, `category.name`, `price_per_kg` (Decimal, the price of the unit), `price_per_lb` (Decimal), `unit_label` (`"kg"`, `"pieza"` or `"paquete"`), `image_src` (address or `""`). `price_per_kg` is the price **per `unit_label`** (per piece or package when it is not `kg`). **Never** read cost or margin: the catalogue has no cost. `stock` exists on the object and may be tested with `> 0` ("sold out" or not); do not print the figure.
+Product attributes available on each item of `page_obj`: `pk`, `name`, `description` (may be `None`), `category.pk`, `category.name`, `price_per_kg` (Decimal, the price of the unit), `price_per_lb` (Decimal), `unit_label` (`"kg"`, `"pieza"` or `"paquete"`), `image_src` (address or `""`). `price_per_kg` is the price **per `unit_label`** (per piece or package when it is not `kg`). **Never** read cost or margin: the catalogue has no cost. `stock` exists on the object. The page of today only tests it with `> 0` ("available" or not) and prints no figure; showing "quedan N piezas" is allowed (see the decision on `avisos` in section 3).
 
 Links of the pagination: keep `q` and `category` in them (`?page=2&q=...&category=...`).
 
@@ -115,6 +117,8 @@ Answer 200 (all numbers are strings except `piezas`):
   "avisos": []              // Spanish sentences, e.g. "Poco stock: puede que no alcance." (NEW)
 }
 ```
+
+**Decision (lead, 2026-11-23, audit F-19): the exact stock is public by design.** `avisos` carries `low_stock` when the amount asked exceeds the stock, so a script can find the stock of a product by binary search. The shop shows "quedan N piezas" anyway (comercio-v1), so this is accepted; the limit of 90 quotes per client and minute (429) only slows it down.
 
 Errors (all `{"error": "<sentence>"}`):
 
@@ -183,7 +187,7 @@ Body of a failure: `{"ok": false, "error": "<sentence>"}`:
 | 429 | more than 60 cart writes per client IP and minute (both modes) | `Demasiadas consultas, espera un momento.` |
 | 503 | database unavailable | `No se pudo hablar con la base de datos de la tienda. Inténtalo de nuevo en un momento.` |
 
-The three routes share one counter per client IP (60 a minute). It is spent before anything else is read, so a 404 or a refused line counts; a request that is not a POST (405) does not. Only the answers of 200 carry `carrito` (a refusal costs no query).
+The three routes share one counter per client (60 a minute). The client is its IP address; an IPv6 client counts as its whole /64, and an IPv4 written as IPv6 as the IPv4 (`ventas/throttle.py`, audit F-17). The counter lives in the cache of the process (no `CACHES` is configured: a local memory cache of 300 entries), so under heavy traffic from many addresses an old counter can be evicted early; the same holds for every other limit of the store. It is spent before anything else is read, so a 404 or a refused line counts; a request that is not a POST (405) does not. The cart page spends it too, because drawing it quotes the cart (one call to the database): `GET /carrito/` with lines in the cart and every `POST /carrito/pedido/` (valid or not) cost one. Over the budget the page answers **429** with the lines listed and no quote, and `Demasiadas consultas, espera un momento.` as its message; the page of a checkout that was already refused (`CHECKOUT_THROTTLE_*`) never asks for a quote. An empty cart asks nothing and spends nothing. Only the answers of 200 carry `carrito` (a refusal costs no query).
 
 In HTML mode the same refusals are flash `error` messages (the absent-line one is a `warning`) and a 302 to the same place as before; the limit is checked first in both modes, and over it the form gets the 302 with the sentence, never a 429 page.
 
@@ -197,7 +201,7 @@ Template `ventas/tienda/carrito.html`. The quote is asked again on every visit; 
 
 Guest order: no account. Controls that compensate for it (AGENTS.md exception): CSRF, validation on the server, **at most 3 pending orders per phone** [`carrito.py:44`, enforced by `public.create_order_web`], and **at most `CHECKOUT_THROTTLE_LIMIT` (5) attempts per client IP and per session in `CHECKOUT_THROTTLE_WINDOW_SECONDS` (3600)** [`carrito.py:242`].
 
-Fields (`StoreOrderForm`): `customer_name` (≤120), `customer_phone` (7-20 characters, digits, spaces, `+ ( ) -`), `delivery_type` (`pickup` or `delivery`), `delivery_address` (required when `delivery`), `payment_method` (`efectivo`, `transferencia`, `tarjeta`; optional), `notes` (≤450), `currency`. No price, channel or status field exists.
+Fields (`StoreOrderForm`): `customer_name` (≤120), `customer_phone` (7-20 characters, digits, spaces, `+ ( ) -`, and **at least 7 digits**: `Escribe tu teléfono con al menos 7 dígitos.`; `-------` is refused by the form without asking the database, as `create_order_web` would), `delivery_type` (`pickup` or `delivery`), `delivery_address` (required when `delivery`), `payment_method` (`efectivo`, `transferencia`, `tarjeta`; optional), `notes` (≤450), `currency`. No price, channel or status field exists.
 
 Outcomes: success is a **302** to `ventas:pedido_confirmado` (`/pedido/confirmado/`, which reads only the order of this session); invalid data or a store refusal re-renders the cart page with **200** and the sentences as messages; over the attempt limit is a **429** page (`Hiciste demasiados intentos de pedido en poco tiempo. Espera un rato e inténtalo de nuevo, o escríbenos por WhatsApp.`). Empty cart: 302 to the cart with `Tu carrito está vacío: agrega productos antes de pedir.`
 
@@ -251,4 +255,4 @@ sequenceDiagram
 | Validate at the boundary | `CartLineForm` `forms.py:19`, `CATEGORY_ID_MAX_DIGITS` `catalog.py:20` | what the address bar sends is shaped before it reaches a query |
 | Session as the cart, never a price | `cart.py:18` | nothing in the browser can lower the total |
 
-Status (2026-11-23): every NEW item of this document is **GREEN**: `backend/ventas/tests/test_contract_productos.py` (12 tests: catalogue inputs, quote currency, dollars, warnings, JSON 404) and `test_contract_carrito.py` (23 tests: JSON mode of the three writes, CSRF, limit). `catalogo` and `producto` still render `ventas/tienda/productos.html` and `producto.html` until `frontend` says its template is ready.
+Status (2026-11-23): every NEW item of this document is **GREEN**: `backend/ventas/tests/test_contract_productos.py` (12 tests: catalogue inputs, quote currency, dollars, warnings, JSON 404), `test_contract_carrito.py` (39: JSON mode of the three writes, `next`, CSRF for scripts, the phone, the limit, the budget of the cart page) and `test_contract_throttle.py` (7: the key of a client). `catalogo` and `producto` now render one template with two modes, `ventas/productos.html` (the catalogue when the context has no `product`, the page of a product when it has one); the old `ventas/tienda/productos.html` and `producto.html` are no longer rendered by any view (T8 deletes them).

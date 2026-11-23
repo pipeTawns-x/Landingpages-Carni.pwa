@@ -21,9 +21,12 @@ from inventory.models import Product
 from ventas.negocio import NEGOCIO
 from ventas.tests.support import FakeGateway, make_store
 
-# The landing paints the real index.html, with its own header (T3); T6 makes the header one partial
-# for the four pages again. Until then this header is the one of the three pages that still use it.
-PAGES = ("ventas:catalogo", "ventas:acceso", "ventas:carrito")
+# The landing paints the real index.html with its own header (T3) and the products page paints
+# `ventas/productos.html` with `parciales/_cabecera.html` (T4b, tested in test_products_page.py).
+# T6 makes the header one partial for the four pages again. Until then this header is the one of
+# the two pages that still use it, and the cart page stands in for "a page of the store".
+PAGES = ("ventas:acceso", "ventas:carrito")
+DEFAULT_PAGE = "ventas:carrito"
 PANELS = ("menu", "buscador", "contactar", "favoritos", "bolsa")
 
 
@@ -47,7 +50,7 @@ class HeaderTestCase(TestCase):
         cache.clear()
         self.addCleanup(cache.clear)
 
-    def page(self, name="ventas:catalogo"):
+    def page(self, name=DEFAULT_PAGE):
         return self.client.get(reverse(name)).content.decode()
 
 
@@ -86,7 +89,7 @@ class SameHeaderTests(HeaderTestCase):
         self.assertIn('popover="manual"', tag)
 
     def test_the_title_sits_in_the_centre_and_goes_home(self):
-        header = header_of(self.page("ventas:catalogo"))
+        header = header_of(self.page())
 
         self.assertRegex(header, r'<a href="/" aria-label="[^"]*" class="justify-self-center')
 
@@ -116,7 +119,7 @@ class PanelsTests(HeaderTestCase):
         self.assertRegex(search, r'<input [^>]*type="search" name="q"')
 
     def test_the_contact_panel_carries_the_phone_whatsapp_address_and_hours(self):
-        html = self.page("ventas:catalogo")
+        html = self.page()
         panel = html[html.index('id="contactar"') :]
         panel = panel[: panel.index("</aside>")]
 
@@ -138,7 +141,7 @@ class CartPanelTests(HeaderTestCase):
         data.update(fields)
         self.client.post(reverse("ventas:tienda_agregar", args=[self.store[key].pk]), data)
 
-    def bolsa(self, name="ventas:catalogo"):
+    def bolsa(self, name=DEFAULT_PAGE):
         html = self.page(name)
         panel = html[html.index('id="bolsa"') :]
         return panel[: panel.index("</aside>")]

@@ -9,13 +9,13 @@ limit of writes per client. The cart holds what was asked and never a price.
 from unittest import mock
 
 from django.core.cache import cache
-from django.test import Client, TestCase
+from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 
 from inventory.models import Product
 from ventas import domain, services
 from ventas.tests.support import FakeGateway, make_store, messages_of
-from ventas.views.carrito import CART_WRITES_PER_MINUTE, PUBLIC_CART_KEY
+from ventas.views.carrito import CART_WRITES_PER_MINUTE, PUBLIC_CART_KEY, THROTTLED_MESSAGE
 
 AS_JSON = {"Accept": "application/json"}
 # What a form of the browser sends: HTML first, anything else after.
@@ -305,6 +305,167 @@ class NextAfterWriteTests(CartContractCase):
         self.assertEqual(response["Content-Type"], "application/json")
 
 
+class CartPageBudgetTests(CartContractCase):
+    """Every render of the cart page quotes the cart (one call to the database), so it spends
+    the same budget of the client as the writes do: GET /carrito/, an order form with errors, and
+    the page that answers a refused checkout (reviewer of T4a, point 5)."""
+
+    ORDER = {
+        "customer_name": "Ana Pérez",
+        "customer_phone": "444 123 4567",
+        "delivery_type": "pickup",
+        "currency": "MXN",
+    }
+
+    def spend_the_budget(self):
+        """One line in the cart and the rest of the budget used up with `quitar`, which asks
+        the store nothing."""
+        self.add()
+        for _ in range(CART_WRITES_PER_MINUTE - 1):
+            self.write("tienda_quitar", "molida")
+        return len(self.gateway.quotes)
+
+    def test_the_cart_page_over_the_budget_is_a_429_that_asks_no_quote(self):
+        quotes = self.spend_the_budget()
+
+        response = self.client.get(reverse("ventas:carrito"))
+
+        self.assertEqual(response.status_code, 429)
+        self.assertContains(response, domain.TOO_MANY_REQUESTS_MESSAGE, status_code=429)
+        self.assertContains(response, "Bistec", status_code=429)  # the cart is still there
+        self.assertEqual(len(self.gateway.quotes), quotes)
+
+    def test_an_order_form_with_errors_over_the_budget_is_a_429_that_asks_no_quote(self):
+        quotes = self.spend_the_budget()
+
+        response = self.client.post(
+            reverse("ventas:tienda_pedido"), {**self.ORDER, "customer_name": ""}
+        )
+
+        self.assertEqual(response.status_code, 429)
+        self.assertEqual(len(self.gateway.quotes), quotes)
+        self.assertEqual(self.gateway.orders, [])
+
+    def test_an_order_form_with_errors_within_the_budget_still_quotes_and_says_what_is_wrong(self):
+        self.add()
+        quotes = len(self.gateway.quotes)
+
+        response = self.client.post(
+            reverse("ventas:tienda_pedido"), {**self.ORDER, "customer_name": ""}
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(self.gateway.quotes), quotes + 1)
+        self.assertIn("customer_name", response.context["order_form"].errors)
+
+    @override_settings(CHECKOUT_THROTTLE_LIMIT=0)
+    def test_the_page_of_a_refused_checkout_asks_no_quote(self):
+        self.add()
+        quotes = len(self.gateway.quotes)
+
+        response = self.client.post(reverse("ventas:tienda_pedido"), self.ORDER)
+
+        self.assertEqual(response.status_code, 429)
+        self.assertContains(response, THROTTLED_MESSAGE, status_code=429)
+        self.assertEqual(len(self.gateway.quotes), quotes)
+        self.assertEqual(self.gateway.orders, [])
+
+    def test_an_empty_cart_page_asks_nothing_and_spends_nothing(self):
+        for _ in range(CART_WRITES_PER_MINUTE + 5):
+            self.assertEqual(self.client.get(reverse("ventas:carrito")).status_code, 200)
+
+        self.assertEqual(self.add().status_code, 200)
+        self.assertEqual(self.gateway.quotes[:-1], [])  # only the quote of the add itself
+
+
+class CsrfForScriptsTests(CartContractCase):
+    """A script that writes in JSON needs the cookie and the token (audit F-20)."""
+
+    def strict_client_with_a_cookie(self):
+        strict = Client(enforce_csrf_checks=True)
+        strict.get(self.url("producto"))
+        return strict
+
+    def write_json(self, strict, **extra):
+        return strict.post(
+            self.url("tienda_agregar"),
+            {"mode": "weight", "amount": "1", "unit": "kg"},
+            headers=AS_JSON,
+            **extra,
+        )
+
+    def test_every_page_of_the_products_section_sets_the_csrf_cookie(self):
+        for name, args in (("ventas:catalogo", []), ("ventas:producto", [self.store["bistec"].pk])):
+            with self.subTest(page=name):
+                response = Client(enforce_csrf_checks=True).get(reverse(name, args=args))
+                self.assertIn("csrftoken", response.cookies)
+                self.assertContains(response, 'name="csrfmiddlewaretoken"')
+
+    def test_a_json_write_with_the_token_of_the_cookie_in_the_header_goes_through(self):
+        strict = self.strict_client_with_a_cookie()
+
+        response = self.write_json(strict, HTTP_X_CSRFTOKEN=strict.cookies["csrftoken"].value)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.json()["ok"])
+
+    def test_the_same_token_from_a_foreign_origin_is_refused(self):
+        strict = self.strict_client_with_a_cookie()
+
+        response = self.write_json(
+            strict,
+            HTTP_X_CSRFTOKEN=strict.cookies["csrftoken"].value,
+            HTTP_ORIGIN="https://evil.example",
+        )
+
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(strict.session.get(PUBLIC_CART_KEY), None)
+
+
+class CheckoutPhoneTests(CartContractCase):
+    """The phone of a guest order must have seven digits before the store is asked (F-18)."""
+
+    ORDER = {
+        "customer_name": "Ana Pérez",
+        "customer_phone": "444 123 4567",
+        "delivery_type": "pickup",
+        "currency": "MXN",
+    }
+    ORDER_ID = "00000000-0000-0000-0000-000000000001"
+
+    def order(self, phone):
+        self.gateway.create_order_web = mock.Mock(return_value=self.ORDER_ID)
+        return self.client.post(
+            reverse("ventas:tienda_pedido"), {**self.ORDER, "customer_phone": phone}
+        )
+
+    def test_a_phone_with_fewer_than_seven_digits_is_refused_by_the_form(self):
+        self.add()
+        for phone in ("-------", "(((((((", "1 2 3 4 5 6"):
+            with self.subTest(phone=phone):
+                response = self.order(phone)
+
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(
+                    response.context["order_form"].errors["customer_phone"],
+                    ["Escribe tu teléfono con al menos 7 dígitos."],
+                )
+                self.gateway.create_order_web.assert_not_called()
+        self.assertEqual(len(self.cart()), 1)
+
+    def test_a_phone_with_seven_digits_in_any_of_the_usual_shapes_places_the_order(self):
+        for phone in ("444 123 4567", "4441234", "+52 (444) 123-4567"):
+            with self.subTest(phone=phone):
+                self.add()
+                self.gateway.create_order_web = mock.Mock(return_value=self.ORDER_ID)
+
+                self.client.post(
+                    reverse("ventas:tienda_pedido"), {**self.ORDER, "customer_phone": phone}
+                )
+
+                self.gateway.create_order_web.assert_called_once()
+
+
 class WriteLimitTests(CartContractCase):
     def spend_the_limit(self):
         """Use up the writes of this client with `quitar`, which never asks the store."""
@@ -350,6 +511,17 @@ class WriteLimitTests(CartContractCase):
         )
 
         self.assertEqual(response.status_code, 200)
+
+    def test_the_addresses_of_one_ipv6_network_share_the_limit(self):
+        mine = {"REMOTE_ADDR": "2001:db8:aa:bb::1"}
+        for _ in range(CART_WRITES_PER_MINUTE):
+            self.write("tienda_quitar", **mine)
+
+        same_64 = self.write("tienda_quitar", REMOTE_ADDR="2001:db8:aa:bb:ffff:ffff:ffff:ffff")
+        other_64 = self.write("tienda_quitar", REMOTE_ADDR="2001:db8:aa:cc::1")
+
+        self.assertEqual(same_64.status_code, 429)
+        self.assertEqual(other_64.status_code, 404)  # not limited: the line is just not there
 
     def test_a_405_does_not_spend_the_limit(self):
         for _ in range(CART_WRITES_PER_MINUTE + 5):

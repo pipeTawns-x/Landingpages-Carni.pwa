@@ -22,6 +22,7 @@ from ventas.views.comun import currency_of, listing, modes_of, moved_to
 
 # One template with two modes: the catalogue when the context has no `product`, the page of a
 # product when it has one.
+PRODUCTS_TEMPLATE = "ventas/productos.html"
 CATALOG_PER_PAGE = 24
 SEARCH_RESULTS = 8
 SEARCH_MIN_LENGTH = 2
@@ -42,7 +43,7 @@ products_html = moved_to("ventas:catalogo")
 def catalogo(request):
     """The public catalogue: each card opens the configuration of its product. Reads only."""
     context = listing(request, CATALOG_PER_PAGE)
-    return render(request, "ventas/tienda/productos.html", context)
+    return render(request, PRODUCTS_TEMPLATE, context)
 
 
 def _thickness(product):
@@ -81,7 +82,7 @@ def producto(request, pk):
         .filter(category=product.category)
         .exclude(pk=product.pk)[:4],
     }
-    return render(request, "ventas/tienda/producto.html", context)
+    return render(request, PRODUCTS_TEMPLATE, context)
 
 
 @never_cache

@@ -6,18 +6,38 @@ enough for the one gunicorn worker of the deployment (render.yaml); more workers
 cache.
 """
 
+import ipaddress
+
 from django.conf import settings
 from django.core.cache import cache
 
 
+def _key_of(address):
+    """What a limit counts for an address.
+
+    An IPv6 customer owns a whole /64 (a phone or a home rotates inside it), so counting the full
+    address would hand a script millions of keys: every address of the /64 shares one. An IPv4
+    address written as IPv6 counts as the IPv4, and text that is not an address stays as it is.
+    """
+    try:
+        ip = ipaddress.ip_address(address)
+        if ip.version == 6 and ip.ipv4_mapped is not None:
+            return str(ip.ipv4_mapped)
+        if ip.version == 6:
+            return str(ipaddress.ip_network((ip, 64), strict=False))
+        return str(ip)
+    except ValueError:
+        return address
+
+
 def client_ip(request):
-    """The address a limit counts: the proxy's own entry behind one, else REMOTE_ADDR."""
+    """The key a limit counts: the proxy's own entry behind one, else REMOTE_ADDR."""
     if settings.CHECKOUT_TRUST_FORWARDED_FOR:
         forwarded = request.META.get("HTTP_X_FORWARDED_FOR", "")
         last = forwarded.rsplit(",", 1)[-1].strip()
         if last:
-            return last
-    return request.META.get("REMOTE_ADDR", "")
+            return _key_of(last)
+    return _key_of(request.META.get("REMOTE_ADDR", ""))
 
 
 def count(key, window_seconds):

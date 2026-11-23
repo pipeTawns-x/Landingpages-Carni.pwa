@@ -45,7 +45,7 @@ class ProductTestCase(TestCase):
 class PageTests(ProductTestCase):
     def test_it_lives_under_productos(self):
         self.assertEqual(self.url(), f"/productos/{self.store['bistec'].pk}/")
-        self.assertTemplateUsed(self.client.get(self.url()), "ventas/tienda/producto.html")
+        self.assertTemplateUsed(self.client.get(self.url()), "ventas/productos.html")
 
     def test_an_inactive_or_unknown_product_is_a_404(self):
         self.store["molida"].is_active = False
@@ -121,12 +121,12 @@ class PageTests(ProductTestCase):
         self.assertNotIn("Agregar 1 kg", html)
         self.assertRegex(html, r'<input [^>]*name="amount"[^>]*required')
 
-    def test_the_form_adds_to_the_cart_and_comes_back_to_the_cart(self):
+    def test_the_form_adds_to_the_cart_and_comes_back_to_the_page_of_the_product(self):
         html = self.html()
 
         action = reverse("ventas:tienda_agregar", args=[self.store["bistec"].pk])
         self.assertRegex(html, rf'<form [^>]*method="post" action="{action}"')
-        self.assertIn('name="next" value="/carrito/"', html)
+        self.assertIn(f'name="next" value="{self.url()}"', html)
 
     def test_adding_by_pieces_with_a_thickness_and_a_note_keeps_them(self):
         self.client.post(
@@ -151,7 +151,6 @@ class PageTests(ProductTestCase):
         html = self.client.get(reverse("ventas:catalogo")).content.decode()
 
         self.assertIn(f'href="{self.url()}"', html)
-        self.assertIn("Haz clic para personalizar tu pedido", html)
         self.assertNotIn("Agregar 1 kg", html)
         self.assertNotIn("Agregar 1 pieza", html)
 
