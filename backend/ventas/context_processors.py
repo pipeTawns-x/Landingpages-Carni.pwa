@@ -1,5 +1,6 @@
 """Context every template receives from `ventas`."""
 
+from django.urls import reverse
 from django.utils.functional import SimpleLazyObject
 
 from inventory.models import Category
@@ -44,6 +45,29 @@ def _bag(request):
         for line in lines
         if line["product_id"] in products
     ]
+
+
+def bag_payload(request):
+    """The cart panel as the JSON of a cart write: the same lines as `bolsa`, no price.
+
+    A script that adds a line without reloading draws the drawer from this, so what it shows is
+    what the next page would print.
+    """
+    lines = _bag(request)
+    return {
+        "total_lineas": len(lines),
+        "lineas": [
+            {
+                "producto_id": line["product"].pk,
+                "nombre": line["product"].name,
+                "url": reverse("ventas:producto", args=[line["product"].pk]),
+                "imagen": line["product"].image_src,
+                "cantidad": line["amount"],
+                "nota": line["note"],
+            }
+            for line in lines
+        ],
+    }
 
 
 def tienda(request):

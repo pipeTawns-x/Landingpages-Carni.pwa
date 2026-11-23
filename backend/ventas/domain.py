@@ -81,6 +81,7 @@ GENERIC_REFUSAL = "La tienda no pudo registrar esto. Revisa los datos e inténta
 UNAVAILABLE_MESSAGE = (
     "No se pudo hablar con la base de datos de la tienda. Inténtalo de nuevo en un momento."
 )
+TOO_MANY_REQUESTS_MESSAGE = "Demasiadas consultas, espera un momento."
 
 
 def message_for(code):

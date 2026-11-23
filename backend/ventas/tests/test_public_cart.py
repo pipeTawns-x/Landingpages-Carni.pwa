@@ -14,11 +14,10 @@ from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 
 from inventory.models import Product
-from ventas import services
+from ventas import domain, services
 from ventas.models import PanelOrder
 from ventas.tests.support import FakeGateway, make_store, messages_of
 from ventas.views.carrito import (
-    FALLBACK_CHANNEL,
     LAST_ORDER_KEY,
     PUBLIC_CART_KEY,
     STORE_CHANNEL,
@@ -445,41 +444,44 @@ class CheckoutTests(StoreTestCase):
         self.assertGreaterEqual(len(re.findall(r'name="csrfmiddlewaretoken"', html)), 3)
 
 
-class MissingFunctionFallbackTests(StoreTestCase):
-    """Until the migration of `create_order_web` is applied the store keeps selling."""
+class MissingFunctionTests(StoreTestCase):
+    """Without `create_order_web` in the database the store refuses the order: it fails closed.
+
+    `create_order_staff` is not a substitute for it: it has neither the cap of three pending
+    orders per phone nor the seven digits of the phone, and it would file a guest order as one
+    of the staff (channel `whatsapp`, no `staff_ref`). Audit F-01 (docs/auditoria/).
+    """
 
     def missing(self, function="public.create_order_web"):
         self.gateway.errors["create_order_web"] = services.GatewayFunctionMissing(function)
 
-    def test_without_the_function_the_order_is_saved_as_whatsapp_and_a_warning_is_logged(self):
+    def test_without_the_function_the_order_is_refused_and_the_error_names_the_migration(self):
         self.missing()
         self.add()
-        with self.assertLogs("ventas.checkout", level="WARNING") as logged:
+        with self.assertLogs("ventas.checkout", level="ERROR") as logged:
             response = self.client.post(reverse("ventas:tienda_pedido"), ORDER)
-        self.assertRedirects(response, reverse("ventas:pedido_confirmado"))
-        self.assertIn("20261117000002_create_order_web.sql", logged.output[0])
-        self.assertEqual(self.gateway.orders[0]["channel"], FALLBACK_CHANNEL)
-        self.assertEqual(PanelOrder.objects.get().channel, "whatsapp")
-        self.assertEqual(self.cart(), [])
-
-    def test_a_different_missing_function_is_not_the_fallback(self):
-        self.missing("public.quote_cart")
-        self.add()
-        response = self.client.post(reverse("ventas:tienda_pedido"), ORDER)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(PanelOrder.objects.count(), 0)
+        self.assertContains(response, domain.UNAVAILABLE_MESSAGE)
+        self.assertIn("20261117000002_create_order_web.sql", logged.output[0])
         self.assertEqual(len(self.cart()), 1)
 
-    def test_the_fallback_still_reports_what_the_store_refuses(self):
+    def test_it_never_files_the_guest_order_through_the_staff_function(self):
         self.missing()
-        self.gateway.errors["create_order_staff"] = services.GatewayError("below_minimum_order")
         self.add()
-        with self.assertLogs("ventas.checkout", level="WARNING"):
-            response = self.client.post(
-                reverse("ventas:tienda_pedido"),
-                {**ORDER, "delivery_type": "delivery", "delivery_address": "Calle 1"},
+        with self.assertLogs("ventas.checkout", level="ERROR"):
+            self.client.post(
+                reverse("ventas:tienda_pedido"), {**ORDER, "customer_phone": "-------"}
             )
-        self.assertContains(response, "no llega al mínimo")
+        self.assertEqual(self.gateway.orders, [])
+        self.assertEqual(PanelOrder.objects.count(), 0)
+
+    def test_a_different_missing_function_is_the_same_refusal(self):
+        self.missing("public.quote_cart")
+        self.add()
+        with self.assertLogs("ventas.checkout", level="ERROR"):
+            response = self.client.post(reverse("ventas:tienda_pedido"), ORDER)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(PanelOrder.objects.count(), 0)
         self.assertEqual(len(self.cart()), 1)
 
 

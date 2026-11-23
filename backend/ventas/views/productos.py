@@ -18,8 +18,10 @@ from django.views.decorators.http import require_safe
 from ventas import catalog, domain, services, throttle
 from ventas.forms import CartLineForm
 from ventas.views.carrito import line_data
-from ventas.views.comun import listing, modes_of, moved_to
+from ventas.views.comun import currency_of, listing, modes_of, moved_to
 
+# One template with two modes: the catalogue when the context has no `product`, the page of a
+# product when it has one.
 CATALOG_PER_PAGE = 24
 SEARCH_RESULTS = 8
 SEARCH_MIN_LENGTH = 2
@@ -89,18 +91,25 @@ def cotizar(request, pk):
 
     It changes nothing (no cart, no order) and is never cached: prices and the exchange rate move.
     The limit per client is checked before anything is read. A line the form refuses, or the
-    store refuses, is a 400 with the reason in words; without the store, a 503.
+    store refuses, is a 400 with the reason in words; a product that is not sold is a 404 in
+    JSON too, so the script reads one shape; without the store, a 503.
+
+    `currency` (MXN, or USD to read a money amount as dollars) goes to the store as is; the answer
+    carries the dollars when the store has a valid rate, and the warnings as sentences.
     """
     if throttle.too_many(request, "cotizar", QUOTES_PER_MINUTE):
-        return JsonResponse({"error": "Demasiadas consultas, espera un momento."}, status=429)
-    product = get_object_or_404(catalog.active_products(), pk=pk)
+        return JsonResponse({"error": domain.TOO_MANY_REQUESTS_MESSAGE}, status=429)
+    product = catalog.active_products().filter(pk=pk).first()
+    if product is None:
+        return JsonResponse({"error": domain.ERROR_MESSAGES["product_not_found"]}, status=404)
     form = CartLineForm(line_data(request.GET))
     if not form.is_valid():
         error = next(iter(form.errors.values()))[0]
         return JsonResponse({"error": error}, status=400)
     line = form.line_for(product.pk)
+    currency = currency_of(request.GET.get("currency"))
     try:
-        quoted = services.get_gateway().quote_cart([line], domain.DEFAULT_CURRENCY).lines[0]
+        quoted = services.get_gateway().quote_cart([line], currency).lines[0]
     except services.GatewayError as error:
         return JsonResponse({"error": domain.message_for(error.code)}, status=400)
     except services.GatewayUnavailable:
@@ -111,6 +120,9 @@ def cotizar(request, pk):
             "descuento": f"{quoted.discount_mxn:.2f}",
             "kg": f"{quoted.quantity_kg:.3f}",
             "piezas": quoted.pieces,
+            "moneda": currency,
+            "total_usd": None if quoted.line_total_usd is None else f"{quoted.line_total_usd:.2f}",
+            "avisos": [domain.WARNING_MESSAGES.get(code, code) for code in quoted.warnings],
         }
     )
 
@@ -128,7 +140,9 @@ def buscar(request):
     query = request.GET.get("q", "").strip()
     if len(query) < SEARCH_MIN_LENGTH:
         return JsonResponse({"resultados": []})
-    products, _ = catalog.filtered(catalog.active_products(), query[:80], "")
+    products, _ = catalog.filtered(
+        catalog.active_products(), query[: catalog.SEARCH_MAX_LENGTH], ""
+    )
     return JsonResponse(
         {
             "resultados": [

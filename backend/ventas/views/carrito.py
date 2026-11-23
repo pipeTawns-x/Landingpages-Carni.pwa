@@ -6,14 +6,17 @@ the same pieces as the counter sale of the panel: the session cart holds only wh
 
 The cart lives under its own session key, apart from the counter cart of the panel, so a staff
 member selling at the counter and a customer browsing the store never share lines. Every page
-works with plain forms; `static/tienda/carrito.js` only enhances the cart page. The catalogue
-that feeds it is `ventas.views.productos`.
+works with plain forms (POST, redirect, GET); `static/tienda/carrito.js` only enhances the cart
+page. A script that sends `Accept: application/json` gets the same writes as JSON instead of the
+redirect (docs/datos/contrato-productos.md, section 5), under the same CSRF rule and the same
+limit of writes per client. The catalogue that feeds it is `ventas.views.productos`.
 
 The order is placed with `create_order_web` (channel `web`, no user, the rule of three pending
-orders per phone), the one function of the store for a customer without a session. Until the
-migration that creates it is applied, `create_order_staff` with the channel `whatsapp` takes its
-place and a warning is logged, so the store keeps selling. Anonymous checkout is throttled per
-client IP and per session (`CHECKOUT_THROTTLE_*` in settings).
+orders per phone and the seven digits of the phone), the one function of the store for a
+customer without a session. Until the migration that creates it is applied the store refuses the
+order and logs an error that names the migration: `create_order_staff` has none of those checks
+and would file the guest order as one of the staff, so it never takes its place. Anonymous
+checkout is throttled per client IP and per session (`CHECKOUT_THROTTLE_*` in settings).
 """
 
 import logging
@@ -21,23 +24,23 @@ import logging
 from django import forms
 from django.conf import settings
 from django.contrib import messages
-from django.shortcuts import get_object_or_404, redirect, render
+from django.http import Http404, JsonResponse
+from django.shortcuts import redirect, render
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_POST, require_safe
 
 from ventas import cart, catalog, domain, services, throttle
+from ventas.context_processors import bag_payload
 from ventas.forms import CartLineForm, phone_validator
 from ventas.models import PanelOrder
 from ventas.throttle import client_ip
-from ventas.views.comun import currency_of, modes_of, quote_rows
+from ventas.views.comun import currency_of, modes_of, quote_rows, wants_json
 
 logger = logging.getLogger("ventas.checkout")
 
 PUBLIC_CART_KEY = cart.PUBLIC_SESSION_KEY
 LAST_ORDER_KEY = "tienda_ultimo_pedido"
 STORE_CHANNEL = "web"
-# Only for the fallback: `create_order_staff` accepts `mostrador` and `whatsapp` only.
-FALLBACK_CHANNEL = "whatsapp"
 # What a customer reads where `domain.ERROR_MESSAGES` is worded for the staff.
 STORE_MESSAGES = {
     "too_many_pending": (
@@ -49,6 +52,9 @@ THROTTLED_MESSAGE = (
     "Hiciste demasiados intentos de pedido en poco tiempo. "
     "Espera un rato e inténtalo de nuevo, o escríbenos por WhatsApp."
 )
+# Writes to the cart (add, update, remove) per client address and minute. Each one asks the
+# store for a quote, so a script must not be able to hammer the database through them.
+CART_WRITES_PER_MINUTE = 60
 STORE_NOTE = "[Tienda en línea]"
 NOTES_MAX = 450  # what is left of the 500 of the database after the marker above
 
@@ -143,60 +149,105 @@ def _safe_next(request, default):
     return target if allowed else default
 
 
-def _quote_ok(request, line):
-    """Ask the store whether the line can be sold. Say why not and return False if it cannot."""
+def _refusal(line):
+    """Ask the store whether the line can be sold: (status, sentence) if not, else None."""
     try:
         services.get_gateway().quote_cart([line], domain.DEFAULT_CURRENCY)
     except services.GatewayError as error:
-        messages.error(request, domain.message_for(error.code))
-        return False
+        return 400, domain.message_for(error.code)
     except services.GatewayUnavailable:
-        messages.error(request, domain.UNAVAILABLE_MESSAGE)
-        return False
-    return True
+        return 503, domain.UNAVAILABLE_MESSAGE
+    return None
 
 
 def _save_line(request, product, success_text):
+    """Check the line, ask the store, keep it. Return the (status, sentence) of the outcome."""
     form = CartLineForm(line_data(request.POST))
     if not form.is_valid():
-        messages.error(request, form.first_error())
-        return False
+        return 400, form.first_error()
     line = form.line_for(product.pk)
     slot = _slot(request)
     if cart.get(slot, product.pk) is None and len(cart.lines(slot)) >= cart.MAX_LINES:
-        messages.error(request, domain.ERROR_MESSAGES["too_many_lines"])
-        return False
-    if not _quote_ok(request, line):
-        return False
+        return 409, domain.ERROR_MESSAGES["too_many_lines"]
+    refusal = _refusal(line)
+    if refusal is not None:
+        return refusal
     cart.put(slot, line)
-    messages.success(request, success_text.format(name=product.name))
-    return True
+    return 200, success_text.format(name=product.name)
+
+
+def _answer(request, status, text, target, level=None):
+    """Say how a write of the cart ended, the way the client asked for it.
+
+    A script that sent `Accept: application/json` gets JSON and the same status; the cart is read
+    only when the write worked, so a refusal costs no query (the database may be what failed). A
+    form gets the message in the session and a redirect to `target`, as it always had.
+    """
+    if wants_json(request):
+        if status == 200:
+            body = {"ok": True, "mensaje": text, "carrito": bag_payload(request)}
+        else:
+            body = {"ok": False, "error": text}
+        return JsonResponse(body, status=status)
+    if level == "warning":
+        show = messages.warning
+    elif status == 200:
+        show = messages.success
+    else:
+        show = messages.error
+    show(request, text)
+    return redirect(target)
+
+
+def _over_the_limit(request):
+    return throttle.too_many(request, "carrito", CART_WRITES_PER_MINUTE)
+
+
+def _not_in_the_cart(request, target):
+    return _answer(request, 404, "Ese producto ya no estaba en tu carrito.", target, "warning")
+
+
+def _product_gone(request, target):
+    """A product that is not sold (anymore): a 404 page for a form, a 404 in JSON for a script."""
+    if not wants_json(request):
+        raise Http404
+    return _answer(request, 404, domain.ERROR_MESSAGES["product_not_found"], target)
 
 
 @require_POST
 def agregar(request, pk):
-    product = get_object_or_404(catalog.active_products(), pk=pk)
-    _save_line(request, product, "{name} se agregó a tu carrito.")
-    return redirect(_safe_next(request, "ventas:catalogo"))
+    target = _safe_next(request, "ventas:catalogo")
+    if _over_the_limit(request):
+        return _answer(request, 429, domain.TOO_MANY_REQUESTS_MESSAGE, target)
+    product = catalog.active_products().filter(pk=pk).first()
+    if product is None:
+        return _product_gone(request, target)
+    status, text = _save_line(request, product, "{name} se agregó a tu carrito.")
+    return _answer(request, status, text, target)
 
 
 @require_POST
 def actualizar(request, pk):
+    target = _safe_next(request, "ventas:carrito")
+    if _over_the_limit(request):
+        return _answer(request, 429, domain.TOO_MANY_REQUESTS_MESSAGE, target)
     if cart.get(_slot(request), pk) is None:
-        messages.warning(request, "Ese producto ya no estaba en tu carrito.")
-        return redirect("ventas:carrito")
-    product = get_object_or_404(catalog.active_products(), pk=pk)
-    _save_line(request, product, "Se actualizó {name}.")
-    return redirect("ventas:carrito")
+        return _not_in_the_cart(request, target)
+    product = catalog.active_products().filter(pk=pk).first()
+    if product is None:
+        return _product_gone(request, target)
+    status, text = _save_line(request, product, "Se actualizó {name}.")
+    return _answer(request, status, text, target)
 
 
 @require_POST
 def quitar(request, pk):
-    if cart.remove(_slot(request), pk):
-        messages.success(request, "Se quitó el producto de tu carrito.")
-    else:
-        messages.warning(request, "Ese producto ya no estaba en tu carrito.")
-    return redirect("ventas:carrito")
+    target = _safe_next(request, "ventas:carrito")
+    if _over_the_limit(request):
+        return _answer(request, 429, domain.TOO_MANY_REQUESTS_MESSAGE, target)
+    if not cart.remove(_slot(request), pk):
+        return _not_in_the_cart(request, target)
+    return _answer(request, 200, "Se quitó el producto de tu carrito.", target)
 
 
 def _cart_context(request, currency, order_form=None):
@@ -258,22 +309,17 @@ def _place_order(request, lines, form):
     gateway = services.get_gateway()
     values = form.order_values()
     try:
-        try:
-            return gateway.create_order_web(items=lines, **values)
-        except services.GatewayFunctionMissing as missing:
-            if not missing.function.endswith("create_order_web"):
-                raise
-            logger.warning(
-                "create_order_web is missing in the database (apply the migration "
-                "20261117000002_create_order_web.sql): saving the order as %s through "
-                "create_order_staff",
-                FALLBACK_CHANNEL,
-            )
-            return gateway.create_order_staff(
-                items=lines, staff_ref=None, channel=FALLBACK_CHANNEL, **values
-            )
+        return gateway.create_order_web(items=lines, **values)
     except services.GatewayError as error:
         messages.error(request, STORE_MESSAGES.get(error.code) or domain.message_for(error.code))
+    except services.GatewayFunctionMissing as missing:
+        # Fail closed: no other function may take its place (see the module docstring).
+        logger.error(
+            "The database lacks %s, so the order is refused (create_order_web comes from the "
+            "migration 20261117000002_create_order_web.sql)",
+            missing.function,
+        )
+        messages.error(request, domain.UNAVAILABLE_MESSAGE)
     except services.GatewayUnavailable:
         messages.error(request, domain.UNAVAILABLE_MESSAGE)
     return None

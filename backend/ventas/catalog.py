@@ -13,6 +13,11 @@ from django.db.models import Q
 from inventory.models import CutSpec, Product
 
 MODES = ("money", "weight", "pieces")
+# What the public pages accept from the address bar. A search longer than this is cut, and a
+# category id longer than the digits of a 32-bit integer cannot name a category: both are input
+# nobody types, so they are shaped here instead of reaching the database as a 500.
+SEARCH_MAX_LENGTH = 80
+CATEGORY_ID_MAX_DIGITS = 9
 
 
 def spec_of(product):
@@ -51,10 +56,12 @@ def active_products():
 def filtered(products, query, category_id):
     """Narrow `products` by free text (name or description) and by category.
 
-    Return the queryset and the category id that was applied ("" when none or not a number).
+    Return the queryset and the category id that was applied, as plain digits ("" when there is
+    none, or it is not a number, or it has more digits than an id can).
     """
     if query:
         products = products.filter(Q(name__icontains=query) | Q(description__icontains=query))
-    if category_id.isdecimal():
-        return products.filter(category_id=int(category_id)), category_id
+    if category_id.isdecimal() and len(category_id) <= CATEGORY_ID_MAX_DIGITS:
+        category = int(category_id)
+        return products.filter(category_id=category), str(category)
     return products, ""

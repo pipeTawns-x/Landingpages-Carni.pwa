@@ -19,7 +19,7 @@ def page_of(request, products, per_page):
 
 
 def listing(request, per_page):
-    query = request.GET.get("q", "").strip()
+    query = request.GET.get("q", "").strip()[: catalog.SEARCH_MAX_LENGTH]
     products, category_id = catalog.filtered(
         catalog.active_products(), query, request.GET.get("category", "").strip()
     )
@@ -90,6 +90,15 @@ def modes_of(product):
 
 def currency_of(value):
     return value if value in domain.CURRENCY_LABELS else domain.DEFAULT_CURRENCY
+
+
+def wants_json(request):
+    """True when the client asks for JSON (`Accept: application/json`), as a script does.
+
+    A form of the page sends the `Accept` of a browser, so it keeps the redirect and the message
+    it always had; only a script that names JSON gets JSON.
+    """
+    return "application/json" in request.headers.get("Accept", "")
 
 
 def with_labels(order):
