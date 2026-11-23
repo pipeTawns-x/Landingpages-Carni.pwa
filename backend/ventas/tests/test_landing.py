@@ -72,6 +72,21 @@ class LandingTests(TestCase):
     def test_it_lives_at_the_root(self):
         self.assertEqual(self.url, "/")
 
+    def test_the_logo_is_the_light_webp_declared_with_its_real_proportions(self):
+        # logo-user.png is an opaque 1254x363 wordmark of 699 KB, not a square: the three tags
+        # said 512x512 (a wrong box that jumps when the image loads) and the favicon link made
+        # the browser download the PNG as well. The WebP is the same picture at 428x124.
+        html = self.html()
+        webp = Path(settings.BASE_DIR).parent / "public/img/recursos_web/logo-user.webp"
+
+        self.assertLess(webp.stat().st_size, 40 * 1024)
+        self.assertEqual(html.count('src="/img/recursos_web/logo-user.webp"'), 3)
+        self.assertEqual(html.count('width="428" height="124"'), 3)
+        self.assertNotIn('src="/img/recursos_web/logo-user.png"', html)
+        self.assertNotIn('rel="icon" href="/img/recursos_web/logo-user.png"', html)
+        # Social crawlers do not always read WebP, and og:image is not a page load.
+        self.assertIn('content="/img/recursos_web/logo-user.png"', html)
+
     def test_an_anonymous_visitor_gets_the_real_index_and_not_the_parallel_store_frame(self):
         response = self.client.get(self.url)
 
