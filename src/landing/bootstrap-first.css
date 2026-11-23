@@ -1,0 +1,10 @@
+/*
+ * Bootstrap and its icons, written at the top of the page's own stylesheet.
+ *
+ * `{% vite_asset %}` lists the CSS of the entry before the CSS of the chunks it imports. If
+ * Bootstrap came from a shared chunk (js/modules/ui/bootstrap-global.js), it would land after the
+ * site's rules and override them. Importing it here, from a file only the home entry uses, keeps
+ * it first inside that one stylesheet: Bootstrap first, the site wins, as before.
+ */
+@import 'bootstrap/dist/css/bootstrap.min.css';
+@import 'bootstrap-icons/font/bootstrap-icons.css';

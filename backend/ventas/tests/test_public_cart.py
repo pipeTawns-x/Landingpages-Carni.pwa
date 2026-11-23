@@ -75,7 +75,8 @@ class AddToCartTests(StoreTestCase):
                 with self.subTest(page=name, product=key):
                     page = reverse("ventas:producto", args=[self.store[key].pk])
                     action = reverse("ventas:tienda_agregar", args=[self.store[key].pk])
-                    self.assertIn(f'href="{page}"', html)
+                    if name == "ventas:catalogo":  # the landing shows only the dearest cuts
+                        self.assertIn(f'href="{page}"', html)
                     self.assertNotIn(f'action="{action}"', html)
 
     def test_the_page_of_a_product_offers_its_modes_and_its_thickness(self):
@@ -274,7 +275,7 @@ class CartPageTests(StoreTestCase):
     def test_product_names_are_escaped(self):
         Product.objects.filter(pk=self.store["bistec"].pk).update(name="<b>Bistec</b>")
         self.add()
-        for name in ("ventas:carrito", "ventas:catalogo", "ventas:landing"):
+        for name in ("ventas:carrito", "ventas:catalogo"):
             html = self.page(name).content.decode()
             self.assertNotIn("<b>Bistec</b>", html)
             self.assertIn("&lt;b&gt;Bistec&lt;/b&gt;", html)

@@ -11,10 +11,8 @@ page behind it (`popover="manual"`, Engram #541).
 import json
 import re
 from decimal import Decimal
-from pathlib import Path
 from unittest import mock
 
-from django.contrib.staticfiles import finders
 from django.core.cache import cache
 from django.test import TestCase
 from django.urls import reverse
@@ -23,7 +21,9 @@ from inventory.models import Product
 from ventas.negocio import NEGOCIO
 from ventas.tests.support import FakeGateway, make_store
 
-PAGES = ("ventas:landing", "ventas:catalogo", "ventas:acceso", "ventas:carrito")
+# The landing paints the real index.html, with its own header (T3); T6 makes the header one partial
+# for the four pages again. Until then this header is the one of the three pages that still use it.
+PAGES = ("ventas:catalogo", "ventas:acceso", "ventas:carrito")
 PANELS = ("menu", "buscador", "contactar", "favoritos", "bolsa")
 
 
@@ -47,7 +47,7 @@ class HeaderTestCase(TestCase):
         cache.clear()
         self.addCleanup(cache.clear)
 
-    def page(self, name="ventas:landing"):
+    def page(self, name="ventas:catalogo"):
         return self.client.get(reverse(name)).content.decode()
 
 
@@ -90,9 +90,8 @@ class SameHeaderTests(HeaderTestCase):
 
         self.assertRegex(header, r'<a href="/" aria-label="[^"]*" class="justify-self-center')
 
-    def test_the_landing_puts_the_header_over_the_video_and_the_others_do_not(self):
-        self.assertIn('data-cabecera="sobre"', header_of(self.page("ventas:landing")))
-        for name in ("ventas:catalogo", "ventas:acceso", "ventas:carrito"):
+    def test_the_header_is_solid_on_the_pages_that_have_no_video(self):
+        for name in PAGES:
             with self.subTest(page=name):
                 self.assertIn('data-cabecera="solida"', header_of(self.page(name)))
 
@@ -218,24 +217,7 @@ class SearchJsonTests(HeaderTestCase):
         self.assertIn("max-age=30", cache_control)
 
 
-class HeroVideoTests(HeaderTestCase):
-    def test_the_video_has_a_pause_button(self):
-        html = self.page()
-
-        self.assertRegex(html, r'<button [^>]*data-hero-toggle[^>]*aria-pressed="false"[^>]*>')
-        self.assertIn('aria-label="Pausar el video"', html)
-
-    def test_the_video_is_never_scaled_by_the_motion_script(self):
-        script = Path(finders.find("tienda/landing.js")).read_text(encoding="utf-8")
-
-        self.assertNotRegex(script, r'"\[data-hero-video\]"[^;]*scale')
-
-    def test_the_frame_is_never_cut_to_the_height_of_the_screen(self):
-        tag = re.search(r"<div data-hero-media[^>]*>", self.page()).group(0)
-
-        self.assertIn("aspect-video", tag)
-        self.assertNotIn("max-h-", tag)
-
+class HeaderScriptTests(HeaderTestCase):
     def test_every_page_loads_the_header_script_from_the_site(self):
         for name in PAGES:
             with self.subTest(page=name):

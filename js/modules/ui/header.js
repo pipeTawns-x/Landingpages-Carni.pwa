@@ -115,3 +115,5 @@
         initHeader();
     }
 })();
+// Loaded as a module by the HTML pages and imported dynamically by the Django entry.
+export {};

@@ -1,0 +1,463 @@
+{% load vite %}<!DOCTYPE html>
+{% comment %}
+  The store's real index.html, painted by Django at "/" (ventas.views.landing). Same design, same
+  texts, same sections. Two things differ from the static file, both on purpose:
+  - The categories and the showcase were React islands that read Supabase from the browser; here
+    Django paints them from the real catalogue, so the page is complete before any script runs.
+  - The CSP of the site only admits 'self': no inline style, no CDN. The styles and the scripts
+    come from the Vite build ({% vite_asset %}), which writes Bootstrap before the site's own CSS.
+{% endcomment %}
+<html lang="es">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#363432" />
+  <title>Cortes Premium a Tu Puerta | Carnicería El Señor de La Misericordia - SLP</title>
+  <meta name="description" content="🥩 Carnicería premium en San Luis Potosí. Arrachera $289/kg, Ribeye $399/kg, T-Bone $349/kg. Entrega a domicilio. Calidad garantizada.">
+  <meta name="keywords" content="carnicería, carne fresca, cortes premium, arrachera, ribeye, San Luis Potosí, delivery, carnicería SLP">
+  <meta name="author" content="Carnicería El Señor de La Misericordia">
+  <meta property="og:title" content="Cortes Premium a Tu Puerta | Carnicería El Señor de La Misericordia">
+  <meta property="og:description" content="Los mejores cortes de carne fresca delivering a San Luis Potosí. Arrachera, Ribeye, T-Bone y más.">
+  <meta property="og:image" content="/img/recursos_web/logo-user.png">
+  <meta property="og:url" content="https://carniceriamisericordia.com">
+  <meta property="og:type" content="business.business">
+  <link rel="canonical" href="https://carniceriamisericordia.com">
+
+  <!-- SEO: Schema.org LocalBusiness. A data block, not a script: the CSP does not run it. -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "name": "Carnicería El Señor de La Misericordia",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Agua Marina 110, Manuel J. Othon",
+      "addressLocality": "San Luis Potosí",
+      "addressRegion": "S.L.P.",
+      "postalCode": "78150",
+      "addressCountry": "MX"
+    },
+    "telephone": "+524442715470",
+    "priceRange": "$$$",
+    "openingHours": "Mo-Sa 08:00-17:00"
+  }
+  </script>
+
+  <link rel="icon" href="/img/recursos_web/logo-user.png" type="image/png">
+  {% vite_asset "src/entry/home.tsx" %}
+</head>
+
+<body class="dark-premium django-landing" data-server-store>
+  <a class="landing-skip-link" href="#contenido">Ir al contenido</a>
+  <h1 class="visually-hidden">Cortes Premium a Tu Puerta - Carnicería El Señor de La Misericordia</h1>
+  <!-- Alerta Offline -->
+  <div class="offline-alert alert alert-warning d-none" role="alert">
+    <i class="bi bi-wifi-off me-2"></i> Estás en modo offline. Algunas funciones pueden estar limitadas.
+  </div>
+
+  <!-- Main Header Maximalista Unificado -->
+  <!-- `--over-media` solo en la landing: es la única página con video detrás. -->
+  <header class="main-header main-header--over-media" id="mainHeader">
+    <!-- Tres zonas: izquierda y derecha ocupan lo que necesitan; el centro se lleva el resto y
+         ahí el logo queda centrado de verdad. -->
+    <nav class="navbar main-header__nav-container container-fluid px-2 px-md-3 px-lg-5">
+
+      <!-- ── Izquierda: menú y búsqueda ── -->
+      <div class="header-zone header-zone--left">
+        <button class="hamburger-btn" type="button" id="menuToggle" aria-expanded="false" aria-controls="mobileDrawer" aria-label="Abrir menú de navegación">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+        <button class="header-search" type="button" id="searchBtn" aria-label="Buscar productos">
+          <i class="bi bi-search" aria-hidden="true"></i>
+          <span class="header-search__label">Buscar cortes y productos</span>
+        </button>
+      </div>
+
+      <!-- ── Centro: el logo ── -->
+      <div class="header-zone header-zone--center">
+        <a class="navbar-brand main-header__logo-container" href="/">
+          <img width="512" height="512" src="/img/recursos_web/logo-user.png" alt="Carnicería El Señor de La Misericordia" class="main-header__logo">
+        </a>
+      </div>
+
+      <!-- ── Derecha: carrito y cuenta ── -->
+      <div class="header-zone header-zone--right">
+        <a class="header-icon-btn header-icon-btn--round position-relative" href="/carrito/" id="cartBtn" aria-label="Carrito">
+          <i class="bi bi-cart3" aria-hidden="true"></i>
+          {% with cantidad=bolsa|length %}{% if cantidad %}<span class="badge bg-danger rounded-pill position-absolute top-0 start-100 translate-middle main-header__cart-count">{{ cantidad }}</span>{% endif %}{% endwith %}
+        </a>
+        <a href="/acceso/" class="header-icon-btn header-icon-btn--round" aria-label="Entrar o registrarse">
+          <i class="bi bi-person" aria-hidden="true"></i>
+        </a>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Drawer móvil -->
+  <div class="drawer-overlay" id="drawerOverlay"></div>
+  <aside class="mobile-drawer" id="mobileDrawer" aria-hidden="true" inert>
+    <div class="mobile-drawer__header">
+      <div class="d-flex align-items-center gap-2">
+        <img width="512" height="512" src="/img/recursos_web/logo-user.png" alt="Carnicería" class="mobile-drawer__logo">
+        <div>
+          <p class="mb-0 fw-bold">Carnicería Premium</p>
+          <small class="text-muted">El Señor de La Misericordia</small>
+        </div>
+      </div>
+      <button class="mobile-drawer__close" type="button" id="drawerClose" aria-label="Cerrar menú">
+        <i class="bi bi-x-lg" aria-hidden="true"></i>
+      </button>
+    </div>
+
+    <nav class="mobile-drawer__nav">
+      <a href="/" class="mobile-drawer__link mobile-drawer__link--active">Inicio</a>
+      <a href="/productos/" class="mobile-drawer__link">Productos</a>
+      <a href="/acceso/" class="mobile-drawer__link">Club Misericordia</a>
+      <a href="#sobre-nosotros" class="mobile-drawer__link">Sobre Nosotros</a>
+      <a href="#contacto" class="mobile-drawer__link">Contacto</a>
+    </nav>
+
+    <div class="mobile-drawer__section">
+      <p class="mobile-drawer__section-title">Categorías destacadas</p>
+      <div class="mobile-drawer__chips">
+        {% for tile in bento %}<a href="/productos/?category={{ tile.categoria.pk }}" class="chip">{{ tile.categoria.name }}</a>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="mobile-drawer__footer">
+      <a class="btn btn-outline-light w-100 mb-2" href="/productos/">
+        <i class="bi bi-eye me-2" aria-hidden="true"></i>Ver productos
+      </a>
+      <a class="btn btn-danger w-100" href="/carrito/">
+        <i class="bi bi-cart3 me-2" aria-hidden="true"></i>Mi carrito
+      </a>
+    </div>
+  </aside>
+
+  <main id="contenido">
+    <!-- SECCIÓN 1: HERO — video de fondo + logo. Sin título textual (el logo ya lo dice) y sin
+         botones: Ver Productos y el club ya viven en el header y en las categorías.
+         El video va mudo, sin pista de audio (2.0 MB el MP4 y 1.2 MB el WebM). El WebM va primero
+         porque el navegador elige la primera fuente que sabe reproducir. El poster es su primer
+         fotograma real, así que lo que se ve antes de que cargue es lo mismo que se verá después.
+         No lleva `autoplay`: lo arranca js/modules/ui/hero-video.js solo si la persona no pidió
+         menos movimiento, y le deja un botón de pausa. Sin script se queda el poster. -->
+    <section class="hero-section home-hero-section home-hero-video dark-premium">
+      <video class="home-hero-video__media" width="1920" height="1080" muted loop playsinline preload="metadata"
+        poster="/img/Videos/VideoCarniwebP01-poster.jpg" aria-hidden="true" tabindex="-1">
+        <source src="/img/Videos/VideoCarniwebP01.webm" type="video/webm">
+        <source src="/img/Videos/VideoCarniwebP01.mp4" type="video/mp4">
+        <img data-hero-fallback src="/img/Videos/VideoCarniwebP01-poster.jpg" alt="" width="1920" height="1080">
+      </video>
+      <div class="home-hero-video__overlay" aria-hidden="true"></div>
+      <button type="button" class="home-hero-video__toggle" data-hero-playback hidden>Pausar video</button>
+    </section>
+
+    <!-- SECCIÓN 2: CATEGORÍAS — las activas de la base, en su orden. -->
+    <section id="bento" class="landing-detail-1 categories-section py-5">
+      <div class="container-fluid px-2 px-md-3 px-lg-5 home-shell">
+        <h2 class="landing-detail-2 text-center fw-bold mb-5">Nuestras Categorías</h2>
+
+        <!-- `is-visible` lo ponía el observer de la isla al hacer scroll: la hoja de estilos oculta la
+             tarjeta hasta que lo lleva. Aquí la página nace completa, sin esperar a ningún script. -->
+        <div id="categoriesReactRoot" data-server-rendered>
+          <div class="bento-categories-grid">
+            {% for tile in bento %}
+            <article class="category-card category-card-{{ tile.posicion }} is-visible">
+              <div class="category-card__lift">
+                <img src="{{ tile.foto }}" alt="{{ tile.categoria.name }}" width="800" height="600" loading="lazy" decoding="async" class="category-img">
+                <div class="category-body">
+                  <h3 class="category-title"><i class="bi {{ tile.icono }} me-2" aria-hidden="true"></i>{{ tile.categoria.name }}</h3>
+                  <div class="category-reveal">
+                    <div class="category-reveal__inner">
+                      <p class="category-desc">{{ tile.descripcion }}</p>
+                      <a href="/productos/?category={{ tile.categoria.pk }}" class="btn btn-danger w-100">Ver Productos</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </article>
+            {% empty %}<p>Consulta los productos disponibles en nuestro <a href="/productos/">catálogo</a>.</p>{% endfor %}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECCIÓN 3: VITRINA — carrusel + cuatro fichas, con producto real de la base: los cortes
+         más caros con foto, solo de las categorías que se venden por kilo. -->
+    <div id="showcaseReactRoot" data-server-rendered>
+      {% if diapositivas %}
+      <section class="showcase" aria-labelledby="showcase-title">
+        <div id="showcaseCarousel" class="carousel slide showcase__carousel" data-bs-ride="carousel"
+          data-bs-interval="5000" data-bs-pause="hover" data-bs-touch="true">
+          <div class="carousel-indicators">
+            {% for producto in diapositivas %}<button type="button" data-bs-target="#showcaseCarousel" data-bs-slide-to="{{ forloop.counter0 }}"{% if forloop.first %} class="active" aria-current="true"{% endif %} aria-label="Ir a {{ producto.name }}"></button>
+            {% endfor %}
+          </div>
+          <div class="carousel-inner">
+            {% for producto in diapositivas %}
+            <div class="carousel-item{% if forloop.first %} active{% endif %}">
+              <img src="{{ producto.image_src }}" class="showcase__slide-img" alt="{{ producto.name }}" width="1600" height="900" loading="{% if forloop.first %}eager{% else %}lazy{% endif %}" decoding="async">
+              <div class="carousel-caption showcase__caption">
+                <h3 class="showcase__slide-title">{{ producto.name }}</h3>
+                <p class="showcase__slide-desc">{{ producto.description|default:"" }}</p>
+                <a class="btn showcase__slide-cta" href="/productos/">Ver el catálogo</a>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+          <button class="carousel-control-prev showcase__control" type="button" data-bs-target="#showcaseCarousel" data-bs-slide="prev" aria-label="Corte anterior">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          </button>
+          <button class="carousel-control-next showcase__control" type="button" data-bs-target="#showcaseCarousel" data-bs-slide="next" aria-label="Corte siguiente">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          </button>
+        </div>
+
+        <div class="showcase__head">
+          <p class="showcase__eyebrow">De la vitrina</p>
+          <h2 class="showcase__title" id="showcase-title">Lo que se lleva la gente</h2>
+        </div>
+
+        <ul class="showcase__cards">
+          {% for producto in fichas %}
+          <li class="showcase-card">
+            <a class="showcase-card__link" href="{% url 'ventas:producto' producto.pk %}">
+              <div class="showcase-card__frame">
+                <img src="{{ producto.image_src }}" class="showcase-card__img" alt="{{ producto.name }}" width="640" height="480" loading="lazy" decoding="async">
+              </div>
+              <div class="showcase-card__body">
+                <h3 class="showcase-card__name">{{ producto.name }}</h3>
+                <p class="showcase-card__price">${{ producto.price_per_kg }}<span class="showcase-card__unit"> / kg</span></p>
+              </div>
+            </a>
+          </li>
+          {% endfor %}
+        </ul>
+      </section>
+      {% endif %}
+    </div>
+
+    <!-- Reseñas reales del perfil de Google del negocio. Van justo antes de "Sobre Nosotros":
+         primero habla el cliente, después la carnicería. Sus textos viven en src/data/resenas.ts
+         y las monta src/landing/server-store.tsx. -->
+    <div id="resenasReactRoot"></div>
+
+    <!-- SECCIÓN 4: SOBRE NOSOTROS + UBICACIÓN -->
+    <section id="sobre-nosotros" class="landing-detail-1 about-section py-5">
+      <div class="container-fluid px-2 px-md-3 px-lg-5">
+        <h2 class="landing-detail-2 text-center fw-bold mb-5">Sobre Nosotros</h2>
+
+        <div class="row g-4 g-lg-5">
+          <!-- Card: Quiénes Somos -->
+          <div class="col-12 col-lg-6">
+            <div class="landing-detail-3 card border-0 rounded-3 h-100">
+              <h3 class="landing-detail-4 fw-bold mb-3"><i class="landing-detail-5 bi bi-info-circle me-2" aria-hidden="true"></i>Quiénes Somos</h3>
+              <p class="landing-detail-6">Carnicería El Señor de La Misericordia es una carnicería premium
+                que ofrece los mejores cortes y productos cárnicos frescos. Nos destacamos por nuestro compromiso con la
+                excelencia y la satisfacción del cliente.</p>
+              <p class="landing-detail-6">Los clientes valoran nuestra atención personalizada, la
+                confianza en la procedencia de nuestros productos y los precios justos. Somos parte de la comunidad
+                local.</p>
+            </div>
+          </div>
+
+          <!-- Card: Ubicación -->
+          <div class="col-12 col-lg-6">
+            <div class="landing-detail-7 card border-0 rounded-3 h-100">
+              <h3 class="landing-detail-8 fw-bold mb-3"><i class="landing-detail-9 bi bi-geo-alt me-2" aria-hidden="true"></i>Ubicación</h3>
+              <p class="landing-detail-10">
+                <strong>Carnicería El Señor de La Misericordia</strong><br>
+                Agua Marina 110, Manuel J. Othon<br>
+                78150 San Luis Potosí, S.L.P.<br>
+                México
+              </p>
+              <a href="{{ negocio.mapa_href }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline-danger btn-sm">
+                <i class="bi bi-map me-2" aria-hidden="true"></i>Cómo llegar
+              </a>
+            </div>
+          </div>
+
+          <!-- Full Width: Horario -->
+          <div class="col-12">
+            <div class="landing-detail-11 card border-0 rounded-3">
+              <h3 class="fw-bold mb-3"><i class="bi bi-clock me-2" aria-hidden="true"></i>Horario de Atención</h3>
+              <div class="row g-3">
+                <div class="col-12 col-md-6">
+                  <p class="mb-1 fw-bold">Lunes a Sábado</p>
+                  <p class="landing-detail-12 mb-0">8:00 - 17:00</p>
+                </div>
+                <div class="col-12 col-md-6">
+                  <p class="mb-1 fw-bold">Domingos y Festivos</p>
+                  <p class="landing-detail-12 mb-0">Cerrado</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECCIÓN 5: PREGUNTAS FRECUENTES. No estaba en index.html: los menús y los pies de las demás
+         páginas enlazan a ella (/#preguntas), así que vive aquí. -->
+    <section id="preguntas" class="landing-detail-1 faq-section py-5" aria-labelledby="preguntas-titulo">
+      <div class="container-fluid px-2 px-md-3 px-lg-5">
+        <h2 id="preguntas-titulo" class="landing-detail-2 text-center fw-bold mb-5">Preguntas frecuentes</h2>
+        <div class="landing-faq">
+          {% for pregunta, respuesta in preguntas %}<details><summary>{{ pregunta }}</summary><p>{{ respuesta }}</p></details>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+
+    <!-- SECCIÓN 6: CONTACTO DIRECTO -->
+    <section id="contacto" class="landing-detail-13 contact-section py-5">
+      <div class="container-fluid px-2 px-md-3 px-lg-5">
+        <h2 class="landing-detail-2 text-center fw-bold mb-5">Contacto Directo</h2>
+
+        <div class="row g-4">
+          <!-- Teléfono -->
+          <div class="col-12 col-md-6 col-lg-4">
+            <div class="landing-detail-3 card border-0 rounded-3 h-100 text-center contact-direct-card">
+              <i class="landing-detail-14 bi bi-telephone-fill" aria-hidden="true"></i>
+              <h3 class="landing-detail-4 fw-bold mb-3">Teléfono</h3>
+              <p class="landing-detail-15 mb-3">Llama directamente</p>
+              <a href="{{ negocio.telefono_href }}" class="landing-detail-16 btn fw-bold contact-direct-card__button contact-direct-card__button--phone">
+                {{ negocio.telefono }}
+              </a>
+            </div>
+          </div>
+
+          <!-- WhatsApp -->
+          <div class="col-12 col-md-6 col-lg-4">
+            <div class="landing-detail-3 card border-0 rounded-3 h-100 text-center contact-direct-card">
+              <i class="landing-detail-17 bi bi-whatsapp" aria-hidden="true"></i>
+              <h3 class="landing-detail-4 fw-bold mb-3">WhatsApp</h3>
+              <p class="landing-detail-15 mb-3">Mensajes directos</p>
+              <a href="{{ negocio.whatsapp_href }}" target="_blank" rel="noopener noreferrer" class="landing-detail-18 btn fw-bold contact-direct-card__button contact-direct-card__button--whatsapp">
+                Chatear
+              </a>
+            </div>
+          </div>
+
+          <!-- Email -->
+          <div class="col-12 col-md-6 col-lg-4">
+            <div class="landing-detail-3 card border-0 rounded-3 h-100 text-center contact-direct-card">
+              <i class="landing-detail-19 bi bi-envelope-fill" aria-hidden="true"></i>
+              <h3 class="landing-detail-4 fw-bold mb-3">Email</h3>
+              <p class="landing-detail-15 mb-3">Escríbenos</p>
+              <a href="mailto:contacto@carniceriamisericordia.com" class="landing-detail-20 btn fw-bold contact-direct-card__button contact-direct-card__button--email">
+                Enviar Email
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="landing-detail-21 main-footer">
+    <div class="container-fluid px-2 px-md-3 px-lg-5">
+      <div class="row g-4 mb-4">
+        <!-- Column 1: Empresa -->
+        <div class="col-12 col-md-6 col-lg-4">
+          <h5 class="landing-detail-22 fw-bold mb-3">Carnicería El Señor de La Misericordia</h5>
+          <p class="landing-detail-23">Productos cárnicos frescos de la más alta
+            calidad. Compromiso con la excelencia.</p>
+          <p lang="en" class="landing-detail-23">Premium cuts, delivered to your door —
+            San Luis Potosí, México.</p>
+          <div class="mt-3 d-flex gap-2">
+            <a href="{{ negocio.facebook }}" target="_blank" rel="noopener noreferrer" class="landing-detail-24 btn btn-sm btn-outline-light rounded-circle" aria-label="Facebook"><i
+                class="bi bi-facebook" aria-hidden="true"></i></a>
+            <a href="{{ negocio.instagram }}" target="_blank" rel="noopener noreferrer" class="landing-detail-24 btn btn-sm btn-outline-light rounded-circle" aria-label="Instagram"><i
+                class="bi bi-instagram" aria-hidden="true"></i></a>
+            <a href="{{ negocio.whatsapp_href }}" target="_blank" rel="noopener noreferrer" class="landing-detail-24 btn btn-sm btn-outline-light rounded-circle" aria-label="WhatsApp"><i
+                class="bi bi-whatsapp" aria-hidden="true"></i></a>
+          </div>
+        </div>
+
+        <!-- Column 2: Información -->
+        <div class="col-12 col-md-6 col-lg-4">
+          <h5 class="landing-detail-22 fw-bold mb-3">Información</h5>
+          <ul class="landing-detail-25 list-unstyled">
+            <li class="mb-2"><a href="#sobre-nosotros" class="landing-detail-26">Sobre Nosotros</a></li>
+            <li class="mb-2"><a href="/productos/" class="landing-detail-26">Productos</a></li>
+            <li class="mb-2"><a href="#preguntas" class="landing-detail-26">Preguntas frecuentes</a></li>
+            <li class="mb-2"><a href="#contacto" class="landing-detail-26">Contacto</a></li>
+            <li class="mb-2"><a href="/privacidad/" class="landing-detail-26">Aviso de privacidad</a></li>
+          </ul>
+        </div>
+
+        <!-- Column 3: Contacto Rápido -->
+        <div class="col-12 col-md-6 col-lg-4">
+          <h5 class="landing-detail-22 fw-bold mb-3">Contacto Rápido</h5>
+          <p class="landing-detail-27">
+            <i class="bi bi-telephone me-2" aria-hidden="true"></i><a href="{{ negocio.telefono_href }}" class="landing-detail-28">{{ negocio.telefono }}</a>
+          </p>
+          <p class="landing-detail-29">
+            <i class="bi bi-envelope me-2" aria-hidden="true"></i><a href="mailto:contacto@carniceriasenmisericordia.com" class="landing-detail-28">contacto@carniceriasenmisericordia.com</a>
+          </p>
+        </div>
+      </div>
+
+      <!-- Bottom -->
+      <div class="landing-detail-30">
+        <p class="landing-detail-31">© 2025 Carnicería El Señor de La Misericordia. Todos los
+          derechos reservados.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- La lupa: un formulario que abre el catálogo ya filtrado (`?q=`). -->
+  <dialog class="landing-search" data-store-search aria-labelledby="store-search-title">
+    <h2 id="store-search-title">Buscar cortes y productos</h2>
+    <form action="/productos/" method="get">
+      <label for="store-search-input">Buscar productos</label>
+      <input id="store-search-input" name="q" type="search" autocomplete="off" autofocus>
+      <button type="submit">Buscar</button>
+    </form>
+    <button type="button" data-search-close>Cerrar búsqueda</button>
+  </dialog>
+
+  <!-- Asistente virtual (chatbot flotante, práctica M44) -->
+  <div class="chat-widget" data-carni-chat>
+    <button class="chat-floating-btn" id="chatToggle" type="button"
+      aria-label="Abrir asistente virtual" aria-expanded="false" aria-controls="chatPanel">
+      <i class="bi bi-chat-dots-fill chat-floating-btn__icon" aria-hidden="true"></i>
+      <i class="bi bi-x-lg chat-floating-btn__close" aria-hidden="true"></i>
+    </button>
+
+    <section class="chat-drawer" id="chatPanel" aria-hidden="true" aria-label="Ventana del asistente virtual">
+      <header class="chat-header">
+        <div class="chat-header__info">
+          <img width="512" height="512" class="chat-header__avatar" src="/img/recursos_web/logo-user.png" alt="" aria-hidden="true">
+          <div class="chat-header__text">
+            <p class="chat-header__title">Asistente virtual</p>
+            <p class="chat-header__status"><span class="chat-header__dot" aria-hidden="true"></span> En línea</p>
+          </div>
+        </div>
+        <button class="chat-header__close" id="chatClose" type="button" aria-label="Cerrar asistente virtual">
+          <i class="bi bi-x-lg" aria-hidden="true"></i>
+        </button>
+      </header>
+
+      <div class="chat-messages" id="chatMessages" role="log" aria-live="polite" aria-label="Mensajes del chat"></div>
+
+      <form class="chat-input" id="chatForm" novalidate>
+        <label class="visually-hidden" for="chatInput">Escribe tu mensaje</label>
+        <input class="chat-input__field" id="chatInput" type="text" placeholder="Escribe tu mensaje..."
+          autocomplete="off" maxlength="500" required>
+        <button class="chat-input__send" id="chatSend" type="submit" aria-label="Enviar mensaje">
+          <i class="bi bi-send-fill" aria-hidden="true"></i>
+        </button>
+      </form>
+    </section>
+  </div>
+</body>
+
+</html>

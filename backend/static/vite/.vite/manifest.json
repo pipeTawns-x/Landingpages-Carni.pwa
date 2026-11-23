@@ -1,40 +1,111 @@
 {
-  "_Lupa-BOy_r1FX.js": {
-    "file": "assets/Lupa-BOy_r1FX.js",
-    "name": "Lupa",
+  "_bootstrap-icons-rpCnOEIg.css": {
+    "file": "assets/bootstrap-icons-rpCnOEIg.css",
+    "src": "_bootstrap-icons-rpCnOEIg.css"
+  },
+  "_bootstrap-js-2ki2q52q.js": {
+    "file": "assets/bootstrap-js-2ki2q52q.js",
+    "name": "bootstrap-js"
+  },
+  "_client-CtTkSSao.js": {
+    "file": "assets/client-CtTkSSao.js",
+    "name": "client"
+  },
+  "_globalStyles-Cc1az5Oc.js": {
+    "file": "assets/globalStyles-Cc1az5Oc.js",
+    "name": "globalStyles",
     "imports": [
-      "_shared-DPhTWRNK.js"
-    ],
-    "css": [
-      "assets/Lupa-rpCnOEIg.css"
-    ],
-    "assets": [
-      "assets/bootstrap-icons-Drp84nVS.woff2",
-      "assets/bootstrap-icons-D8ioIzQS.woff"
+      "_client-CtTkSSao.js",
+      "_shared-BZQbP3ME.js"
     ]
   },
-  "_Lupa-rpCnOEIg.css": {
-    "file": "assets/Lupa-rpCnOEIg.css",
-    "src": "_Lupa-rpCnOEIg.css"
+  "_header-state-BcGBT7OX.js": {
+    "file": "assets/header-state-BcGBT7OX.js",
+    "name": "header-state",
+    "imports": [
+      "_client-CtTkSSao.js"
+    ]
   },
-  "_montar-CTPN-Jhm.js": {
-    "file": "assets/montar-CTPN-Jhm.js",
+  "_montar-Bnlxmr0W.js": {
+    "file": "assets/montar-Bnlxmr0W.js",
     "name": "montar",
     "imports": [
-      "_shared-DPhTWRNK.js",
-      "_Lupa-BOy_r1FX.js"
+      "_client-CtTkSSao.js",
+      "_globalStyles-Cc1az5Oc.js"
     ]
   },
-  "_shared-DPhTWRNK.js": {
-    "file": "assets/shared-DPhTWRNK.js",
+  "_redesign-lt_nljx8.css": {
+    "file": "assets/redesign-lt_nljx8.css",
+    "src": "_redesign-lt_nljx8.css"
+  },
+  "_shared-BZQbP3ME.js": {
+    "file": "assets/shared-BZQbP3ME.js",
     "name": "shared",
-    "css": [
-      "assets/shared-lt_nljx8.css"
+    "imports": [
+      "_client-CtTkSSao.js"
     ]
   },
-  "_shared-lt_nljx8.css": {
-    "file": "assets/shared-lt_nljx8.css",
-    "src": "_shared-lt_nljx8.css"
+  "js/modules/chatbot.js": {
+    "file": "assets/chatbot-BD-E1OUE.js",
+    "name": "chatbot",
+    "src": "js/modules/chatbot.js",
+    "isDynamicEntry": true
+  },
+  "js/modules/ui/header.js": {
+    "file": "assets/header-vo9bOGAt.js",
+    "name": "header",
+    "src": "js/modules/ui/header.js",
+    "isDynamicEntry": true
+  },
+  "js/modules/ui/hero-video.js": {
+    "file": "assets/hero-video-DvviMu6d.js",
+    "name": "hero-video",
+    "src": "js/modules/ui/hero-video.js",
+    "isDynamicEntry": true
+  },
+  "node_modules/@fontsource-variable/fraunces/files/fraunces-latin-ext-opsz-italic.woff2": {
+    "file": "assets/fraunces-latin-ext-opsz-italic-CGbN9UgK.woff2",
+    "src": "node_modules/@fontsource-variable/fraunces/files/fraunces-latin-ext-opsz-italic.woff2"
+  },
+  "node_modules/@fontsource-variable/fraunces/files/fraunces-latin-ext-opsz-normal.woff2": {
+    "file": "assets/fraunces-latin-ext-opsz-normal-CJcjJNj7.woff2",
+    "src": "node_modules/@fontsource-variable/fraunces/files/fraunces-latin-ext-opsz-normal.woff2"
+  },
+  "node_modules/@fontsource-variable/fraunces/files/fraunces-latin-opsz-italic.woff2": {
+    "file": "assets/fraunces-latin-opsz-italic-lSdLDfvT.woff2",
+    "src": "node_modules/@fontsource-variable/fraunces/files/fraunces-latin-opsz-italic.woff2"
+  },
+  "node_modules/@fontsource-variable/fraunces/files/fraunces-latin-opsz-normal.woff2": {
+    "file": "assets/fraunces-latin-opsz-normal-DihXLNYH.woff2",
+    "src": "node_modules/@fontsource-variable/fraunces/files/fraunces-latin-opsz-normal.woff2"
+  },
+  "node_modules/@fontsource-variable/fraunces/files/fraunces-vietnamese-opsz-italic.woff2": {
+    "file": "assets/fraunces-vietnamese-opsz-italic-DxWqP7Ku.woff2",
+    "src": "node_modules/@fontsource-variable/fraunces/files/fraunces-vietnamese-opsz-italic.woff2"
+  },
+  "node_modules/@fontsource-variable/fraunces/files/fraunces-vietnamese-opsz-normal.woff2": {
+    "file": "assets/fraunces-vietnamese-opsz-normal-Czevyj-6.woff2",
+    "src": "node_modules/@fontsource-variable/fraunces/files/fraunces-vietnamese-opsz-normal.woff2"
+  },
+  "node_modules/@fontsource-variable/geist/files/geist-cyrillic-ext-wght-normal.woff2": {
+    "file": "assets/geist-cyrillic-ext-wght-normal-DjL33-gN.woff2",
+    "src": "node_modules/@fontsource-variable/geist/files/geist-cyrillic-ext-wght-normal.woff2"
+  },
+  "node_modules/@fontsource-variable/geist/files/geist-cyrillic-wght-normal.woff2": {
+    "file": "assets/geist-cyrillic-wght-normal-BEAKL7Jp.woff2",
+    "src": "node_modules/@fontsource-variable/geist/files/geist-cyrillic-wght-normal.woff2"
+  },
+  "node_modules/@fontsource-variable/geist/files/geist-latin-ext-wght-normal.woff2": {
+    "file": "assets/geist-latin-ext-wght-normal-DC-KSUi6.woff2",
+    "src": "node_modules/@fontsource-variable/geist/files/geist-latin-ext-wght-normal.woff2"
+  },
+  "node_modules/@fontsource-variable/geist/files/geist-latin-wght-normal.woff2": {
+    "file": "assets/geist-latin-wght-normal-BgDaEnEv.woff2",
+    "src": "node_modules/@fontsource-variable/geist/files/geist-latin-wght-normal.woff2"
+  },
+  "node_modules/@fontsource-variable/geist/files/geist-vietnamese-wght-normal.woff2": {
+    "file": "assets/geist-vietnamese-wght-normal-6IgcOCM7.woff2",
+    "src": "node_modules/@fontsource-variable/geist/files/geist-vietnamese-wght-normal.woff2"
   },
   "node_modules/bootstrap-icons/font/fonts/bootstrap-icons.woff": {
     "file": "assets/bootstrap-icons-D8ioIzQS.woff",
@@ -45,44 +116,122 @@
     "src": "node_modules/bootstrap-icons/font/fonts/bootstrap-icons.woff2"
   },
   "src/entry/auth.tsx": {
-    "file": "assets/auth-BMeKn8Fd.js",
+    "file": "assets/auth-BQZN047F.js",
     "name": "auth",
     "src": "src/entry/auth.tsx",
     "isEntry": true,
     "imports": [
-      "_shared-DPhTWRNK.js",
-      "_Lupa-BOy_r1FX.js",
-      "_montar-CTPN-Jhm.js"
+      "_client-CtTkSSao.js",
+      "_bootstrap-js-2ki2q52q.js",
+      "_globalStyles-Cc1az5Oc.js",
+      "_shared-BZQbP3ME.js",
+      "_montar-Bnlxmr0W.js"
+    ],
+    "css": [
+      "assets/bootstrap-icons-rpCnOEIg.css",
+      "assets/redesign-lt_nljx8.css"
+    ],
+    "assets": [
+      "assets/bootstrap-icons-Drp84nVS.woff2",
+      "assets/bootstrap-icons-D8ioIzQS.woff"
     ]
   },
   "src/entry/dashboard.tsx": {
-    "file": "assets/dashboard-B7TlxCuw.js",
+    "file": "assets/dashboard-BwwaGQH5.js",
     "name": "dashboard",
     "src": "src/entry/dashboard.tsx",
     "isEntry": true,
     "imports": [
-      "_shared-DPhTWRNK.js"
+      "_client-CtTkSSao.js",
+      "_shared-BZQbP3ME.js"
+    ],
+    "css": [
+      "assets/redesign-lt_nljx8.css"
     ]
   },
   "src/entry/home.tsx": {
-    "file": "assets/home-CUWhNkXX.js",
+    "file": "assets/home-CYMWN74G.js",
     "name": "home",
     "src": "src/entry/home.tsx",
     "isEntry": true,
     "imports": [
-      "_shared-DPhTWRNK.js",
-      "_Lupa-BOy_r1FX.js",
-      "_montar-CTPN-Jhm.js"
+      "_bootstrap-js-2ki2q52q.js"
+    ],
+    "dynamicImports": [
+      "src/landing/server-store.tsx",
+      "src/landing/legacy-home.tsx"
+    ],
+    "css": [
+      "assets/home-Dos-b_89.css",
+      "assets/redesign-lt_nljx8.css"
+    ],
+    "assets": [
+      "assets/bootstrap-icons-Drp84nVS.woff2",
+      "assets/bootstrap-icons-D8ioIzQS.woff",
+      "assets/geist-cyrillic-ext-wght-normal-DjL33-gN.woff2",
+      "assets/geist-cyrillic-wght-normal-BEAKL7Jp.woff2",
+      "assets/geist-vietnamese-wght-normal-6IgcOCM7.woff2",
+      "assets/geist-latin-ext-wght-normal-DC-KSUi6.woff2",
+      "assets/geist-latin-wght-normal-BgDaEnEv.woff2",
+      "assets/fraunces-vietnamese-opsz-normal-Czevyj-6.woff2",
+      "assets/fraunces-latin-ext-opsz-normal-CJcjJNj7.woff2",
+      "assets/fraunces-latin-opsz-normal-DihXLNYH.woff2",
+      "assets/fraunces-vietnamese-opsz-italic-DxWqP7Ku.woff2",
+      "assets/fraunces-latin-ext-opsz-italic-CGbN9UgK.woff2",
+      "assets/fraunces-latin-opsz-italic-lSdLDfvT.woff2"
     ]
   },
   "src/entry/products.tsx": {
-    "file": "assets/products-BOZGTzuS.js",
+    "file": "assets/products-aMdAmy8T.js",
     "name": "products",
     "src": "src/entry/products.tsx",
     "isEntry": true,
     "imports": [
-      "_shared-DPhTWRNK.js",
-      "_Lupa-BOy_r1FX.js"
+      "_client-CtTkSSao.js",
+      "_bootstrap-js-2ki2q52q.js",
+      "_globalStyles-Cc1az5Oc.js",
+      "_shared-BZQbP3ME.js"
+    ],
+    "css": [
+      "assets/bootstrap-icons-rpCnOEIg.css",
+      "assets/redesign-lt_nljx8.css"
+    ],
+    "assets": [
+      "assets/bootstrap-icons-Drp84nVS.woff2",
+      "assets/bootstrap-icons-D8ioIzQS.woff"
+    ]
+  },
+  "src/landing/legacy-home.tsx": {
+    "file": "assets/legacy-home-CIrLkNwR.js",
+    "name": "legacy-home",
+    "src": "src/landing/legacy-home.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "_client-CtTkSSao.js",
+      "_header-state-BcGBT7OX.js",
+      "_montar-Bnlxmr0W.js",
+      "_shared-BZQbP3ME.js",
+      "_globalStyles-Cc1az5Oc.js"
+    ]
+  },
+  "src/landing/server-store.tsx": {
+    "file": "assets/server-store-C2yASUbS.js",
+    "name": "server-store",
+    "src": "src/landing/server-store.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "src/entry/home.tsx",
+      "_client-CtTkSSao.js",
+      "_header-state-BcGBT7OX.js",
+      "_bootstrap-js-2ki2q52q.js"
+    ],
+    "dynamicImports": [
+      "js/modules/ui/header.js",
+      "js/modules/ui/hero-video.js",
+      "js/modules/chatbot.js"
+    ],
+    "css": [
+      "assets/redesign-lt_nljx8.css"
     ]
   }
 }

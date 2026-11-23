@@ -48,3 +48,69 @@
     transform: none;
   }
 }
+
+/*
+ * index.html wrote these declarations in style="" attributes. The CSP of the Django site
+ * (style-src 'self') refuses inline style attributes, so the same values live here as classes.
+ * The location card is the one change of value: its title (#363432) and its text (#666) were
+ * written for a white card, but the dark theme paints it dark, where they could not be read.
+ */
+.django-landing .landing-detail-1 { background: linear-gradient(135deg, var(--carni-charcoal) 0%, var(--carni-dark) 100%); }
+.django-landing .landing-detail-2 { color: var(--carni-gold); font-size: 2rem; }
+.django-landing .landing-detail-3 { background: var(--carni-charcoal); box-shadow: 0 4px 16px rgba(0,0,0,0.3); padding: 2rem; }
+.django-landing .landing-detail-4 { color: var(--carni-gold); }
+.django-landing .landing-detail-5 { color: var(--carni-red); }
+.django-landing .landing-detail-6 { color: var(--carni-text-muted); line-height: 1.7; }
+.django-landing .landing-detail-7 { background: var(--carni-charcoal); box-shadow: 0 4px 16px rgba(0,0,0,0.3); padding: 2rem; }
+.django-landing .landing-detail-8 { color: var(--carni-gold); }
+.django-landing .landing-detail-9 { color: #d22222; }
+.django-landing .landing-detail-10 { color: var(--carni-text-muted); margin-bottom: 1.5rem; }
+.django-landing .landing-detail-11 { background: linear-gradient(135deg, #d22222 0%, #b71c1c 100%); color: white; box-shadow: 0 4px 16px rgba(0,0,0,0.15); padding: 2rem; text-align: center; }
+.django-landing .landing-detail-12 { font-size: 1.1rem; }
+.django-landing .landing-detail-13 { background: var(--carni-dark); }
+.django-landing .landing-detail-14 { font-size: 2.5rem; color: var(--carni-red); margin-bottom: 1rem; }
+.django-landing .landing-detail-15 { color: var(--carni-text-muted); }
+.django-landing .landing-detail-16 { background: var(--carni-red); color: white; }
+.django-landing .landing-detail-17 { font-size: 2.5rem; color: #25d366; margin-bottom: 1rem; }
+.django-landing .landing-detail-18 { background: #25d366; color: #0B3D2E; }
+.django-landing .landing-detail-19 { font-size: 2.5rem; color: var(--carni-amber); margin-bottom: 1rem; }
+.django-landing .landing-detail-20 { background: var(--carni-amber); color: var(--carni-dark); }
+.django-landing .landing-detail-21 { background: var(--carni-charcoal); color: white; padding: 3rem 0 1rem; }
+.django-landing .landing-detail-22 { color: #e4d1b0; }
+.django-landing .landing-detail-23 { font-size: 0.9rem; color: #ccc; line-height: 1.6; }
+.django-landing .landing-detail-24 { width: 40px; height: 40px; padding: 0; display: flex; align-items: center; justify-content: center; }
+.django-landing .landing-detail-25 { font-size: 0.9rem; }
+.django-landing .landing-detail-26 { color: #ccc; text-decoration: none; }
+.django-landing .landing-detail-27 { font-size: 0.9rem; margin-bottom: 0.5rem; color: #ccc; }
+.django-landing .landing-detail-28 { color: #ccc; }
+.django-landing .landing-detail-29 { font-size: 0.9rem; margin-bottom: 0; color: #ccc; }
+.django-landing .landing-detail-30 { border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1.5rem; text-align: center; }
+.django-landing .landing-detail-31 { font-size: 0.85rem; color: #999; margin: 0; }
+
+/*
+ * The fonts index.html asked Google Fonts for cannot load under that CSP, so the page uses the
+ * ones the site already ships (src/styles/fuentes.ts, self-hosted).
+ */
+.django-landing {
+  --font-primary: 'Geist Variable', sans-serif;
+  font-family: var(--font-primary);
+  font-variant-numeric: tabular-nums;
+}
+.django-landing :is(h1, h2, h3, h4, h5) { font-family: 'Fraunces Variable', serif; }
+.django-landing .category-title .bi { color: #d22222; }
+
+/* Keyboard focus is always visible, and the search dialog and the skip link are native. */
+.django-landing :is(a, button, input, summary):focus-visible { outline: 2px solid var(--carni-sand, #e4d1b0); outline-offset: 4px; }
+.landing-search { width: min(90vw, 600px); border: 1px solid var(--carni-sand, #e4d1b0); border-radius: 20px; padding: 1.5rem; color: var(--carni-text, #f5f3ef); background: var(--carni-charcoal, #363432); }
+.landing-search::backdrop { background: rgb(0 0 0 / 0.8); }
+.landing-search form { display: grid; gap: 1rem; margin-block: 1rem; }
+.landing-search :is(button, input) { min-height: 44px; }
+.landing-search input { min-width: 0; padding: 0.5rem; }
+.landing-skip-link { position: fixed; z-index: 10000; top: 0; left: 1rem; padding: 0.75rem; background: var(--carni-bg, #0b0b0c); color: var(--carni-text, #f5f3ef); transform: translateY(-120%); }
+.landing-skip-link:focus { transform: none; }
+
+/* The FAQ: native <details>, one line per question, the answer opens under it. */
+.landing-faq { max-width: 52rem; margin-inline: auto; }
+.landing-faq details { border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+.landing-faq summary { min-height: 44px; padding: 0.9rem 0; cursor: pointer; color: var(--carni-gold); font-weight: 600; }
+.landing-faq details p { max-width: 65ch; margin: 0 0 1rem; color: var(--carni-text-muted); line-height: 1.7; }

@@ -1,97 +1,50 @@
-"""The store's landing page: the static index.html, migrated into Django (ventas:landing, /).
+"""The store's landing page: the real index.html, painted by Django (ventas:landing, /).
 
-The catalogue part reads the real active products and categories (`ventas.catalog`); nothing
-private reaches the template (no cost, no inactive product). The texts that are not data of the
-business (the FAQ and the reviews) live here, as they did in src/landing/datos.ts and
-src/data/resenas.ts.
+The template (ventas/index.html) keeps the design, the texts and the sections of index.html. The
+two parts that were React islands reading Supabase from the browser are painted here instead, from
+the real catalogue (`ventas.catalog`): the nine category tiles and the showcase. Nothing private
+reaches the template (no cost, no inactive product). The reviews stay an island of the page, as
+index.html mounts them, because their texts live in src/data/resenas.ts. The FAQ is the only
+section index.html did not have: the menus and the footers of the other pages link to it.
 """
-
-from urllib.parse import urlsplit
 
 from django.shortcuts import render
 from django.views.decorators.http import require_safe
 
-from inventory.models import Category
+from inventory.models import Category, store_image_url
 from ventas import catalog
-from ventas.negocio import NEGOCIO
 from ventas.views.comun import moved_to
 
 index_html = moved_to("ventas:landing")
 
-SHOWCASE_SIZE = 8
-HEADLINE = "Carne fresca, cortada como la pides"
-
-# The bento of the categories: a 6 x 6 grid on wide screens, nine tiles of nine different sizes
-# (columns x rows), all in one section. The geometry lives in assets/tienda.css (.bento-a ...
-# .bento-i); this table only says which category takes which slot and with which photo.
-BENTO_SLOTS = {
-    "a": {"cols": 3, "rows": 3},
-    "b": {"cols": 2, "rows": 2},
-    "c": {"cols": 1, "rows": 3},
-    "d": {"cols": 2, "rows": 1},
-    "e": {"cols": 2, "rows": 3},
-    "f": {"cols": 1, "rows": 1},
-    "g": {"cols": 1, "rows": 2},
-    "h": {"cols": 3, "rows": 1},
-    "i": {"cols": 3, "rows": 2},
+# What the database does not carry, per category: the icon and the line of its tile. They are the
+# texts of src/components/CategoryCard/CategoryCard.tsx, kept word for word (keyed by slug, which
+# survives a rename of the category in the panel).
+CATEGORY_PRESENTATION = {
+    "carnes-rojas": ("bi-fire", "Selección premium para parrilla y asados"),
+    "cortes-especiales": ("bi-star-fill", "Cortes exclusivos y gourmet"),
+    "cerdo": ("bi-egg-fried", "Chuletas, costillas y carnitas"),
+    "pollo": ("bi-egg", "Fresco del día, en todas sus piezas"),
+    "embutidos": ("bi-link", "Salchichas, longaniza y tocino"),
+    "preparadas": ("bi-basket", "Chorizos y carnes ya sazonadas"),
+    "ofertas": ("bi-tag-fill", "Paquetes y precios de temporada"),
+    "merch": ("bi-bag-fill", "Gorras, cuchillos y accesorios"),
+    "otros": ("bi-box-seam", "Carbón, hielo y lo que falte para el asador"),
 }
-BENTO_TILES = {
-    "carnes-rojas": (
-        "a",
-        "res",
-        "Bistec, diezmillo, molida y para caldo",
-        "Bistec de res marmoleado sobre la tabla",
-    ),
-    "cortes-especiales": (
-        "b",
-        "tomahawk",
-        "Tomahawk, rib eye, arrachera",
-        "Corte grueso de res con pimienta",
-    ),
-    "pollo": (
-        "c",
-        "pollo",
-        "Pechuga, pierna y muslo, alas",
-        "Piernas de pollo crudas con especias",
-    ),
-    "embutidos": (
-        "d",
-        "embutidos",
-        "Chorizo, longaniza y salchicha",
-        "Chorizo y salchichas sobre tabla",
-    ),
-    "cerdo": ("e", "cerdo", "Chuleta, costilla, lomo y carnitas", "Chuletas de cerdo frescas"),
-    "otros": ("f", "otrosproductos", "Carbón, hielo y más", "Productos para la carne asada"),
-    "merch": ("g", "merch", "Gorra, delantal y hielera", "Artículos de la carnicería"),
-    "ofertas": ("h", "premium", "Paquetes para 4 a 10 personas", "Paquete de cortes para asar"),
-    "preparadas": ("i", "preparadas", "Adobados y marinados listos", "Carne adobada con especias"),
-}
+FALLBACK_PRESENTATION = ("bi-shop", "Productos de la carnicería")
+FALLBACK_PHOTO = "/img/products/otrosproductos.webp"
 
-
-def _bento(categorias):
-    """The tiles of the bento: every active category, the known ones in their slot first."""
-    tiles = []
-    for categoria in categorias:
-        known = BENTO_TILES.get(categoria.slug)
-        if known is None:
-            # A category the table does not know yet still shows, after the nine, in a plain tile.
-            known = ("x", "premium", "", categoria.name)
-        slot, photo, description, alt = known
-        tiles.append(
-            {
-                "categoria": categoria,
-                "slot": slot,
-                "foto": f"/img/products/{photo}-alto.webp",
-                "descripcion": description,
-                "alt": alt,
-            }
-        )
-    return sorted(tiles, key=lambda tile: tile["slot"])
-
+# The showcase of src/components/Showcase/Showcase.tsx: a carousel of six cuts and four cards under
+# it. Only the categories sold by weight qualify, because the cards print "/ kg": merch carries a
+# price per piece in the same column and `ofertas` are whole packages.
+SELLABLE_BY_WEIGHT = frozenset({"cortes-especiales", "carnes-rojas", "cerdo", "pollo"})
+SLIDE_COUNT = 6
+CARD_COUNT = 4
 
 # The three questions the business can answer today. Two more of the design (weight policy and
 # payment) are not published until the butcher shop validates them: an answer it cannot keep is
-# worse than no question.
+# worse than no question. The minimum of the first answer is enforced by the store's RPC
+# (`below_minimum_order` in ventas/domain.py): this text must follow it.
 FAQ = (
     (
         "¿Cuál es el pedido mínimo?",
@@ -99,8 +52,8 @@ FAQ = (
     ),
     (
         "¿A qué zonas entregan?",
-        "A zonas participantes de San Luis Potosí. Cuando escribes tu dirección en el pedido te "
-        "decimos si tu colonia está cubierta.",
+        "A zonas participantes de San Luis Potosí. Escríbenos o llámanos con tu colonia y te "
+        "confirmamos si llegamos.",
     ),
     (
         "¿Puedo pedir por precio en vez de por peso?",
@@ -108,60 +61,54 @@ FAQ = (
     ),
 )
 
-# Real reviews of the shop's Google profile, read on 2026-09-03 (same texts as src/data/resenas.ts).
-# The real average and the real count stay on screen, linked to the profile.
-GOOGLE_PROFILE = (
-    "https://www.google.com/maps/place/Carnicer%C3%ADa+El+Se%C3%B1or+de+La+Misericordia/"
-    "@22.1649636,-101.002778,20.28z"
-)
-RATING = "4.7"
-REVIEW_COUNT = 61
-REVIEWS = (
-    ("marco molina", "Excelente atención y precio. Se recomienda ampliamente."),
-    (
-        "Oscar Alcocer",
-        "Excelente proveedor. Excelente trato de sus dueños. Excelentes recomendaciones!",
-    ),
-    (
-        "Sandra Rodriguez",
-        "Tienen muy buena calidad de carne y muy serviciales, la verdad siempre tienen fila pero "
-        "atienden súper rápido",
-    ),
-    (
-        "Ramon Lopez Medel",
-        "Pequeña carnicería atendida por la familia, encuentras carne fresca de puerco, "
-        "pollo y res",
-    ),
-    ("Rosy Reyna", "Excelente servicio y atención por parte del personal y sus propietarios"),
-    ("Armando Viramontes", "Buena carne, buen precio y buena atención"),
-)
+
+def _bento(categorias):
+    """The tiles of the bento: every active category, in its order, with its icon and its photo.
+
+    `posicion` is the tile's number in the grid (`category-card-N` in css/pages/_bento-main.scss).
+    It comes from the order column, so reordering the categories in the panel moves the tile. A
+    zero (the column's default) means "not placed yet": the tile takes its position in the list.
+    """
+    tiles = []
+    for index, categoria in enumerate(categorias, start=1):
+        icono, descripcion = CATEGORY_PRESENTATION.get(categoria.slug, FALLBACK_PRESENTATION)
+        tiles.append(
+            {
+                "categoria": categoria,
+                "posicion": categoria.order or index,
+                "icono": icono,
+                "descripcion": descripcion,
+                "foto": store_image_url(categoria.image_url) or FALLBACK_PHOTO,
+            }
+        )
+    return tiles
 
 
 def _showcase():
-    """Up to eight active products, the ones with a photo first."""
-    products = list(catalog.active_products())
-    with_photo = [product for product in products if product.image_src]
-    without_photo = [product for product in products if not product.image_src]
-    return (with_photo + without_photo)[:SHOWCASE_SIZE]
+    """The slides and the cards: the dearest photographed cuts sold by weight, slides first."""
+    candidates = sorted(
+        (
+            product
+            for product in catalog.active_products()
+            if product.image_src and product.category.slug in SELLABLE_BY_WEIGHT
+        ),
+        key=lambda product: product.price_per_kg,
+        reverse=True,
+    )
+    return candidates[:SLIDE_COUNT], candidates[SLIDE_COUNT : SLIDE_COUNT + CARD_COUNT]
 
 
 @require_safe
 def landing(request):
     """The landing page of the store."""
-    instagram = urlsplit(NEGOCIO["instagram"]).path.strip("/")
+    diapositivas, fichas = _showcase()
     context = {
-        "cabecera": "sobre",
-        "titular": HEADLINE.split(),
         "bento": _bento(Category.objects.filter(is_active=True).order_by("order", "name")),
-        "productos": _showcase(),
+        "diapositivas": diapositivas,
+        "fichas": fichas,
         "preguntas": FAQ,
-        "resenas": REVIEWS,
-        "calificacion": RATING,
-        "total_opiniones": REVIEW_COUNT,
-        "perfil_google": GOOGLE_PROFILE,
-        "instagram_usuario": f"@{instagram}",
     }
-    return render(request, "ventas/tienda/landing.html", context)
+    return render(request, "ventas/index.html", context)
 
 
 @require_safe

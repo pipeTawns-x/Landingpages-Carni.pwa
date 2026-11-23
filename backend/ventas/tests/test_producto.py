@@ -146,14 +146,14 @@ class PageTests(ProductTestCase):
         self.assertEqual(line["thickness_in"], "1.25")
         self.assertEqual(line["note"], "Con más grasa")
 
-    def test_the_catalogue_and_the_landing_cards_open_the_page(self):
-        for name in ("ventas:catalogo", "ventas:landing"):
-            html = self.client.get(reverse(name)).content.decode()
-            with self.subTest(page=name):
-                self.assertIn(f'href="{self.url()}"', html)
-                self.assertIn("Haz clic para personalizar tu pedido", html)
-                self.assertNotIn("Agregar 1 kg", html)
-                self.assertNotIn("Agregar 1 pieza", html)
+    def test_the_catalogue_cards_open_the_page(self):
+        # The landing's showcase cards open it too: see test_landing.py.
+        html = self.client.get(reverse("ventas:catalogo")).content.decode()
+
+        self.assertIn(f'href="{self.url()}"', html)
+        self.assertIn("Haz clic para personalizar tu pedido", html)
+        self.assertNotIn("Agregar 1 kg", html)
+        self.assertNotIn("Agregar 1 pieza", html)
 
 
 class QuoteTests(ProductTestCase):
