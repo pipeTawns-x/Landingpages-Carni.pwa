@@ -3,7 +3,8 @@
  */
 import { afterEach, describe, expect, jest, test } from '@jest/globals';
 
-jest.mock('../../supabase.js', () => ({
+// Supabase is loaded as ESM, so register its mock before the dynamic auth import.
+jest.unstable_mockModule('../../supabase.js', () => ({
   supabase: {
     auth: {
       getSession: async () => ({ data: { session: null }, error: null }),
