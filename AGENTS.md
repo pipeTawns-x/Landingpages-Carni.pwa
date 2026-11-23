@@ -65,7 +65,8 @@ Viven en `.claude/skills/<nombre>/SKILL.md`. Estuvieron en `agents/skills/` hast
 
 ## Reglas para Desarrolladores y Colaboradores
 
-- Mantener entrypoints HTML de la tienda en raiz: `index.html`, `products.html`, `accessweb.html`.
+- Los entrypoints HTML de la tienda siguen en raiz (`index.html`, `products.html`, `accessweb.html`) hasta que cada pagina migre a Django.
+- Django sirve la tienda en `/`, `/productos/` y `/acceso/`; `/index.html`, `/products.html` y `/accessweb.html` redirigen con 301.
 - El panel de administracion no vive en la raiz: lo sirve Django desde `backend/templates/`. `dashboar.html` se movio a `backend/templates/panel/base.html` (marco) y `panel/inicio.html` (Inicio).
 - No renombrar rutas ni mover HTML sin revisar referencias en JS, CSS, manifest y service worker.
 - Mantener JS modular dentro de `js/modules/`.
@@ -75,7 +76,8 @@ Viven en `.claude/skills/<nombre>/SKILL.md`. Estuvieron en `agents/skills/` hast
 - `css/` mantiene la arquitectura 7-1 para los estilos globales del sitio: variables, base, layout, paginas y componentes compartidos entre paginas HTML.
 - Los componentes de React llevan su propia hoja de estilos co-locada en su carpeta, bajo `src/components/<Componente>/styles.scss`, compilada al `.css` hermano que importa el componente. Es el patron de co-locacion habitual en React y lo exige la actividad 6.28.9 de EBAC.
 - Ningun otro directorio contiene SCSS.
-- Las paginas migradas y sus componentes (`src/ui`, `src/landing`, `src/catalogo`, `src/asistente`) y las plantillas del panel en `backend/templates/` usan Tailwind v4 con un unico `@theme` compartido; el `styles.scss` co-locado aplica solo a `src/components/`.
+- La landing real conserva Bootstrap 5 (npm, sin CDN) mientras se migra en el lugar; Tailwind v4 es el destino del panel y de los componentes nuevos (`src/ui`, `src/catalogo`, `src/asistente` y las plantillas del panel en `backend/templates/`), con un unico `@theme` compartido; el `styles.scss` co-locado aplica solo a `src/components/`.
+- `backend/assets/tienda.css` y su salida `backend/static/tienda/tienda.css` se borran en T8 de `odd/tasks/rediseno-moderno.md`; no se les agregan estilos nuevos.
 
 - Variables publicas del frontend solo con prefijo `VITE_*`.
 - El contrato local de entorno es `.env`; no agregar archivos espejo de entorno ni duplicados documentales.
@@ -94,6 +96,7 @@ Viven en `.claude/skills/<nombre>/SKILL.md`. Estuvieron en `agents/skills/` hast
 - Django se conecta con un rol de Postgres propio, nunca con `postgres` ni `service_role` fuera del entorno local.
 - Precios y cantidades con `DecimalField`, nunca `FloatField`.
 - Las vistas que modifican datos exigen usuario autenticado y validan en el servidor; nunca confiar solo en el frontend.
+- Excepción documentada: la tienda pública (carrito y pedido de invitado) escribe sin cuenta; lo compensan CSRF, validación en el servidor, tope de pedidos pendientes por teléfono y límite de intentos.
 - Django nunca guarda contrasenas de clientes: los usuarios viven en Supabase Auth.
 - Dependencias con `uv` (`backend/pyproject.toml` y `uv.lock`); `ruff check` y `ruff format --check` deben pasar.
 - Las migraciones autogeneradas de Django no pasan por la revision de GGA.
