@@ -56,8 +56,45 @@ test('the Django branch mounts the reviews and never talks to Supabase', () => {
   assert.doesNotMatch(store, /supabase|fetchCategories|entry\/shared/);
 });
 
+test('the Django branch lets the visitor pause the rotating showcase and respects reduced motion', () => {
+  const store = read('src/landing/server-store.tsx');
+
+  assert.match(store, /data-showcase-pause/);
+  assert.match(store, /prefers-reduced-motion: reduce[\s\S]*addEventListener\('change'/);
+  assert.match(store, /ride: paused\(\) \? false : 'carousel'/, 'a paused carousel must not restart on mouse leave');
+});
+
 test('both landings drive the header with the same module', () => {
   for (const file of ['src/landing/server-store.tsx', 'src/landing/legacy-home.tsx']) {
     assert.match(read(file), /import \{ governHeader \} from '\.\/header-state'/, file);
   }
+});
+
+// The scroll choreography of the landing (src/landing/landing-motion.ts, GSAP and ScrollTrigger).
+test('landing motion runs only when motion is allowed, reverts when it is not, and never moves the film', () => {
+  const source = read('src/landing/landing-motion.ts');
+
+  assert.match(source, /prefers-reduced-motion: no-preference/);
+  assert.match(source, /gsap\.matchMedia\(\)/);
+  assert.match(source, /revert\(\)/);
+  assert.doesNotMatch(source, /home-hero-video__media|querySelector\([^)]*video/, 'the film is never a target');
+  assert.doesNotMatch(source, /autoAlpha/, 'visibility:hidden would take a hidden card out of the tab order');
+  assert.match(source, /clearProps/, 'clip-path and transforms are cleared at the end: the final state is the CSS one');
+  assert.match(source, /ScrollTrigger\.batch/);
+  assert.match(source, /resenasReactRoot/, 'React owns the reviews: the titles split must skip them');
+});
+
+test('the CSS hides nothing for the motion and the hero opens only when motion is allowed', () => {
+  const css = read('css/components/store-motion.css');
+
+  assert.doesNotMatch(css, /storefront-frame|scale\(1\.04\)/, 'the old zoom of the film is gone');
+  assert.doesNotMatch(css, /\[data-(rise|bento-tile|kinetic-line)\][^{]*\{[^}]*opacity:\s*0/);
+  assert.match(css, /@media \(prefers-reduced-motion: no-preference\)[\s\S]*home-hero-video__frame[\s\S]*hero-open/);
+  assert.match(css, /\.home-hero-video \{[^}]*aspect-ratio: 16 \/ 9/);
+});
+
+test('the home entry loads the motion after the page and survives its failure', () => {
+  const entry = read('src/entry/home.tsx');
+
+  assert.match(entry, /import\('@src\/landing\/landing-motion'\)[\s\S]*initLandingMotion[\s\S]*catch/);
 });

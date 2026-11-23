@@ -150,7 +150,7 @@
     ]
   },
   "src/entry/home.tsx": {
-    "file": "assets/home-CYMWN74G.js",
+    "file": "assets/home-CslgA_TM.js",
     "name": "home",
     "src": "src/entry/home.tsx",
     "isEntry": true,
@@ -159,10 +159,11 @@
     ],
     "dynamicImports": [
       "src/landing/server-store.tsx",
+      "src/landing/landing-motion.ts",
       "src/landing/legacy-home.tsx"
     ],
     "css": [
-      "assets/home-Dos-b_89.css",
+      "assets/home-sRGQpvPU.css",
       "assets/redesign-lt_nljx8.css"
     ],
     "assets": [
@@ -201,6 +202,12 @@
       "assets/bootstrap-icons-D8ioIzQS.woff"
     ]
   },
+  "src/landing/landing-motion.ts": {
+    "file": "assets/landing-motion-DHtJvbip.js",
+    "name": "landing-motion",
+    "src": "src/landing/landing-motion.ts",
+    "isDynamicEntry": true
+  },
   "src/landing/legacy-home.tsx": {
     "file": "assets/legacy-home-CIrLkNwR.js",
     "name": "legacy-home",
@@ -215,7 +222,7 @@
     ]
   },
   "src/landing/server-store.tsx": {
-    "file": "assets/server-store-C2yASUbS.js",
+    "file": "assets/server-store-Bq1MNpGx.js",
     "name": "server-store",
     "src": "src/landing/server-store.tsx",
     "isDynamicEntry": true,

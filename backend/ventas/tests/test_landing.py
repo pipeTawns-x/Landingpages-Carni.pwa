@@ -132,9 +132,12 @@ class LandingTests(TestCase):
 
         self.assertIn('id="preguntas"', html)
         self.assertIn("Preguntas frecuentes", html)
-        self.assertEqual(html.count("<details>"), 3)
+        self.assertEqual(len(re.findall(r"<details[ >]", html)), 3)
         self.assertIn("¿Cuál es el pedido mínimo?", html)
         self.assertIn("Para entrega a domicilio, $150.", html)
+        # Only what the store really does: there is no coverage check in the order form.
+        self.assertIn("Escríbenos o llámanos con tu colonia", html)
+        self.assertNotIn("te decimos si tu colonia está cubierta", html)
         self.assertIn('href="#preguntas"', html)
 
     def test_the_footer_links_the_privacy_notice(self):
@@ -220,6 +223,14 @@ class LandingTests(TestCase):
             '<p class="showcase-card__price">$53.00<span class="showcase-card__unit"> / kg</span>',
             html,
         )
+
+    def test_the_rotating_showcase_has_a_pause_button_that_only_the_script_shows(self):
+        html = self.html()
+
+        self.assertRegex(
+            html, r'<button type="button" class="showcase__pause" data-showcase-pause hidden>'
+        )
+        self.assertIn("Pausar carrusel", html)
 
     def test_the_showcase_leads_with_the_most_expensive_cut_and_skips_what_is_not_by_weight(self):
         html = self.html()

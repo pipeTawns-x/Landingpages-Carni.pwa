@@ -12,9 +12,12 @@ import { governHeader } from './header-state';
  * localStorage to drift from the real one.
  */
 
-type CarouselInstance = { pause: () => void; cycle: () => void };
+type CarouselInstance = { dispose: () => void };
 type BootstrapGlobal = {
-  Carousel: { getOrCreateInstance: (element: Element) => CarouselInstance };
+  Carousel: {
+    new (element: Element, config: Record<string, unknown>): CarouselInstance;
+    getInstance: (element: Element) => CarouselInstance | null;
+  };
 };
 
 const reducedMotion = (): MediaQueryList => window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -75,23 +78,48 @@ function containDrawerFocus(): void {
   });
 }
 
-/** Bootstrap rotates the showcase on its own; someone who asked for less motion keeps it still. */
-function calmCarousel(): void {
+/**
+ * Bootstrap rotates the showcase every five seconds, so the visitor needs a control to stop it
+ * (WCAG 2.2.2), and someone who asked for less motion gets it still from the start. The carousel
+ * is built again with `ride: false` when it is paused: pausing an instance is not enough, because
+ * Bootstrap resumes a hover-paused carousel when the pointer leaves.
+ */
+function controlCarousel(): void {
   const carousel = document.getElementById('showcaseCarousel');
+  const button = document.querySelector<HTMLButtonElement>('[data-showcase-pause]');
   const bootstrap = (window as unknown as { bootstrap?: BootstrapGlobal }).bootstrap;
   if (!carousel || !bootstrap) {
     return;
   }
+
   const preference = reducedMotion();
+  let chosen: boolean | null = null; // true: the visitor paused it; null: follow the preference
+  const paused = (): boolean => chosen ?? preference.matches;
+
   const apply = (): void => {
-    const instance = bootstrap.Carousel.getOrCreateInstance(carousel);
-    if (preference.matches) {
-      instance.pause();
-    } else {
-      instance.cycle();
+    bootstrap.Carousel.getInstance(carousel)?.dispose();
+    new bootstrap.Carousel(carousel, {
+      ride: paused() ? false : 'carousel',
+      interval: 5000,
+      pause: 'hover',
+      touch: true
+    });
+    if (button) {
+      button.textContent = paused() ? 'Reanudar carrusel' : 'Pausar carrusel';
     }
   };
-  preference.addEventListener('change', apply);
+
+  if (button) {
+    button.hidden = false;
+    button.addEventListener('click', () => {
+      chosen = !paused();
+      apply();
+    });
+  }
+  preference.addEventListener('change', () => {
+    chosen = null;
+    apply();
+  });
   apply();
 }
 
@@ -103,5 +131,5 @@ export function initServerStore(): void {
   wireSearch();
   containDrawerFocus();
   governHeader();
-  calmCarousel();
+  controlCarousel();
 }

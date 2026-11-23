@@ -23,32 +23,6 @@
   outline-offset: 4px;
 }
 
-@keyframes storefront-frame {
-  from {
-    clip-path: inset(0 0 0 0 round 0);
-    transform: scale(1.04);
-  }
-  to {
-    clip-path: inset(0 3% 5% 3% round 24px);
-    transform: scale(1);
-  }
-}
-@supports (animation-timeline: view()) {
-  @media (prefers-reduced-motion: no-preference) and (min-width: 768px) {
-    .home-hero-video__media {
-      animation: storefront-frame linear both;
-      animation-timeline: view();
-      animation-range: exit 0% exit 75%;
-    }
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .home-hero-video__media {
-    animation: none;
-    transform: none;
-  }
-}
-
 /*
  * index.html wrote these declarations in style="" attributes. The CSP of the Django site
  * (style-src 'self') refuses inline style attributes, so the same values live here as classes.
@@ -114,3 +88,41 @@
 .landing-faq details { border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
 .landing-faq summary { min-height: 44px; padding: 0.9rem 0; cursor: pointer; color: var(--carni-gold); font-weight: 600; }
 .landing-faq details p { max-width: 65ch; margin: 0 0 1rem; color: var(--carni-text-muted); line-height: 1.7; }
+
+/*
+ * The hero: the whole 16:9 film, never cropped and never scaled (Eduardo: "sin zoom"). The frame
+ * around it opens once when the page loads, only when motion is allowed: a CSS animation, so it
+ * starts on the first paint and the film never jumps. Without motion the frame is just the film.
+ */
+.django-landing .home-hero-video { aspect-ratio: 16 / 9; min-height: 0; }
+.home-hero-video__frame { position: absolute; inset: 0; overflow: clip; }
+.django-landing .home-hero-video__media { object-fit: contain; }
+@keyframes hero-open {
+  from { clip-path: inset(10% 8% 10% 8% round 24px); }
+  to { clip-path: inset(0 0 0 0 round 0); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .home-hero-video__frame { animation: hero-open 1.4s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both; }
+}
+
+/* The kinetic strip: two lines wider than the screen that landing-motion.ts slides sideways. */
+.landing-kinetic { overflow: clip; padding: 1.25rem 0; border-block: 1px solid rgba(255, 255, 255, 0.1); background: var(--carni-dark); color: var(--carni-sand, #e4d1b0); }
+.landing-kinetic p { width: max-content; margin: 0; white-space: nowrap; font-family: 'Fraunces Variable', serif; font-size: clamp(1.5rem, 4vw, 3rem); line-height: 1.25; }
+.landing-kinetic p + p { color: var(--carni-text-muted); }
+
+/*
+ * While landing-motion.ts runs (it marks <html class="gsap">, and only when motion is allowed)
+ * each bento photo drifts inside its tile through --drift. The photo is scaled up a little to have
+ * room to move, and the hover zoom keeps working because both go through the same transform.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  html.gsap .category-img { transform: translate3d(0, var(--drift, 0%), 0) scale(1.1); }
+  html.gsap .category-card:hover .category-img { transform: translate3d(0, var(--drift, 0%), 0) scale(1.17); }
+}
+
+/* The pause control of the rotating showcase: same pill as the one of the hero. */
+.showcase__pause { min-height: 44px; margin-top: 1rem; padding: 0.5rem 1.1rem; border: 1px solid var(--carni-sand, #e4d1b0); border-radius: 999px; background: transparent; color: var(--carni-text, #f5f3ef); font: inherit; cursor: pointer; }
+.showcase__pause[hidden] { display: none; }
+
+/* The footer line was #999 on the charcoal footer: 3.9:1, under the 4.5:1 of WCAG AA. */
+.django-landing .landing-detail-31 { color: #bdbdbd; }

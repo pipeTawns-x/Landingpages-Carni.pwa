@@ -18,6 +18,18 @@ import '../../css/components/store-motion.css';
 // does not use it never loads it.
 if (document.body.hasAttribute('data-server-store')) {
   void import('@src/landing/server-store').then(({ initServerStore }) => initServerStore());
+
+  // The scroll choreography is an enhancement of the Django page (the static one has no hooks for
+  // it): loaded after the page, and a failed load leaves the page complete and still. It is a
+  // chunk of its own, so GSAP never delays the first paint.
+  void import('@src/landing/landing-motion')
+    .then(({ initLandingMotion }) => {
+      const stop = initLandingMotion();
+      window.addEventListener('pagehide', stop, { once: true });
+    })
+    .catch(() => {
+      /* Motion is optional. */
+    });
 } else {
   void import('@src/landing/legacy-home').then(({ mountLegacyStore }) => mountLegacyStore());
 }

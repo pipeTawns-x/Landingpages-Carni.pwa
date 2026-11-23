@@ -144,18 +144,29 @@
          El video va mudo, sin pista de audio (2.0 MB el MP4 y 1.2 MB el WebM). El WebM va primero
          porque el navegador elige la primera fuente que sabe reproducir. El poster es su primer
          fotograma real, así que lo que se ve antes de que cargue es lo mismo que se verá después.
+         El marco (`data-hero-frame`) se abre al cargar (CSS, solo con movimiento permitido) y el
+         video nunca se mueve ni se escala: se ve entero, en 16:9.
          No lleva `autoplay`: lo arranca js/modules/ui/hero-video.js solo si la persona no pidió
          menos movimiento, y le deja un botón de pausa. Sin script se queda el poster. -->
     <section class="hero-section home-hero-section home-hero-video dark-premium">
-      <video class="home-hero-video__media" width="1920" height="1080" muted loop playsinline preload="metadata"
-        poster="/img/Videos/VideoCarniwebP01-poster.jpg" aria-hidden="true" tabindex="-1">
-        <source src="/img/Videos/VideoCarniwebP01.webm" type="video/webm">
-        <source src="/img/Videos/VideoCarniwebP01.mp4" type="video/mp4">
-        <img data-hero-fallback src="/img/Videos/VideoCarniwebP01-poster.jpg" alt="" width="1920" height="1080">
-      </video>
+      <div class="home-hero-video__frame" data-hero-frame>
+        <video class="home-hero-video__media" width="1920" height="1080" muted loop playsinline preload="metadata"
+          poster="/img/Videos/VideoCarniwebP01-poster.jpg" aria-hidden="true" tabindex="-1">
+          <source src="/img/Videos/VideoCarniwebP01.webm" type="video/webm">
+          <source src="/img/Videos/VideoCarniwebP01.mp4" type="video/mp4">
+          <img data-hero-fallback src="/img/Videos/VideoCarniwebP01-poster.jpg" alt="" width="1920" height="1080">
+        </video>
+      </div>
       <div class="home-hero-video__overlay" aria-hidden="true"></div>
       <button type="button" class="home-hero-video__toggle" data-hero-playback hidden>Pausar video</button>
     </section>
+
+    <!-- Cinta cinética: dos líneas que corren en sentidos opuestos con el scroll (landing-motion.ts).
+         Es decoración repetida, no texto de la página: va oculta a los lectores de pantalla. -->
+    <div class="landing-kinetic" aria-hidden="true">
+      <p data-kinetic-line="1">{% for _ in "1234" %}{{ negocio.lema }} · {% endfor %}</p>
+      <p data-kinetic-line="-1">{% for _ in "1234" %}San Luis Potosí · {{ negocio.nombre }} · {% endfor %}</p>
+    </div>
 
     <!-- SECCIÓN 2: CATEGORÍAS — las activas de la base, en su orden. -->
     <section id="bento" class="landing-detail-1 categories-section py-5">
@@ -167,7 +178,7 @@
         <div id="categoriesReactRoot" data-server-rendered>
           <div class="bento-categories-grid">
             {% for tile in bento %}
-            <article class="category-card category-card-{{ tile.posicion }} is-visible">
+            <article class="category-card category-card-{{ tile.posicion }} is-visible" data-bento-tile>
               <div class="category-card__lift">
                 <img src="{{ tile.foto }}" alt="{{ tile.categoria.name }}" width="800" height="600" loading="lazy" decoding="async" class="category-img">
                 <div class="category-body">
@@ -221,11 +232,14 @@
         <div class="showcase__head">
           <p class="showcase__eyebrow">De la vitrina</p>
           <h2 class="showcase__title" id="showcase-title">Lo que se lleva la gente</h2>
+          <!-- El carrusel gira solo cada 5 s: la persona debe poder detenerlo (WCAG 2.2.2). Solo el
+               script lo muestra, porque sin script el carrusel no gira. -->
+          <button type="button" class="showcase__pause" data-showcase-pause hidden>Pausar carrusel</button>
         </div>
 
         <ul class="showcase__cards">
           {% for producto in fichas %}
-          <li class="showcase-card">
+          <li class="showcase-card" data-rise>
             <a class="showcase-card__link" href="{% url 'ventas:producto' producto.pk %}">
               <div class="showcase-card__frame">
                 <img src="{{ producto.image_src }}" class="showcase-card__img" alt="{{ producto.name }}" width="640" height="480" loading="lazy" decoding="async">
@@ -255,7 +269,7 @@
         <div class="row g-4 g-lg-5">
           <!-- Card: Quiénes Somos -->
           <div class="col-12 col-lg-6">
-            <div class="landing-detail-3 card border-0 rounded-3 h-100">
+            <div class="landing-detail-3 card border-0 rounded-3 h-100" data-rise>
               <h3 class="landing-detail-4 fw-bold mb-3"><i class="landing-detail-5 bi bi-info-circle me-2" aria-hidden="true"></i>Quiénes Somos</h3>
               <p class="landing-detail-6">Carnicería El Señor de La Misericordia es una carnicería premium
                 que ofrece los mejores cortes y productos cárnicos frescos. Nos destacamos por nuestro compromiso con la
@@ -268,7 +282,7 @@
 
           <!-- Card: Ubicación -->
           <div class="col-12 col-lg-6">
-            <div class="landing-detail-7 card border-0 rounded-3 h-100">
+            <div class="landing-detail-7 card border-0 rounded-3 h-100" data-rise>
               <h3 class="landing-detail-8 fw-bold mb-3"><i class="landing-detail-9 bi bi-geo-alt me-2" aria-hidden="true"></i>Ubicación</h3>
               <p class="landing-detail-10">
                 <strong>Carnicería El Señor de La Misericordia</strong><br>
@@ -284,7 +298,7 @@
 
           <!-- Full Width: Horario -->
           <div class="col-12">
-            <div class="landing-detail-11 card border-0 rounded-3">
+            <div class="landing-detail-11 card border-0 rounded-3" data-rise>
               <h3 class="fw-bold mb-3"><i class="bi bi-clock me-2" aria-hidden="true"></i>Horario de Atención</h3>
               <div class="row g-3">
                 <div class="col-12 col-md-6">
@@ -308,7 +322,7 @@
       <div class="container-fluid px-2 px-md-3 px-lg-5">
         <h2 id="preguntas-titulo" class="landing-detail-2 text-center fw-bold mb-5">Preguntas frecuentes</h2>
         <div class="landing-faq">
-          {% for pregunta, respuesta in preguntas %}<details><summary>{{ pregunta }}</summary><p>{{ respuesta }}</p></details>
+          {% for pregunta, respuesta in preguntas %}<details data-rise><summary>{{ pregunta }}</summary><p>{{ respuesta }}</p></details>
           {% endfor %}
         </div>
       </div>
@@ -322,7 +336,7 @@
         <div class="row g-4">
           <!-- Teléfono -->
           <div class="col-12 col-md-6 col-lg-4">
-            <div class="landing-detail-3 card border-0 rounded-3 h-100 text-center contact-direct-card">
+            <div class="landing-detail-3 card border-0 rounded-3 h-100 text-center contact-direct-card" data-rise>
               <i class="landing-detail-14 bi bi-telephone-fill" aria-hidden="true"></i>
               <h3 class="landing-detail-4 fw-bold mb-3">Teléfono</h3>
               <p class="landing-detail-15 mb-3">Llama directamente</p>
@@ -334,7 +348,7 @@
 
           <!-- WhatsApp -->
           <div class="col-12 col-md-6 col-lg-4">
-            <div class="landing-detail-3 card border-0 rounded-3 h-100 text-center contact-direct-card">
+            <div class="landing-detail-3 card border-0 rounded-3 h-100 text-center contact-direct-card" data-rise>
               <i class="landing-detail-17 bi bi-whatsapp" aria-hidden="true"></i>
               <h3 class="landing-detail-4 fw-bold mb-3">WhatsApp</h3>
               <p class="landing-detail-15 mb-3">Mensajes directos</p>
@@ -346,7 +360,7 @@
 
           <!-- Email -->
           <div class="col-12 col-md-6 col-lg-4">
-            <div class="landing-detail-3 card border-0 rounded-3 h-100 text-center contact-direct-card">
+            <div class="landing-detail-3 card border-0 rounded-3 h-100 text-center contact-direct-card" data-rise>
               <i class="landing-detail-19 bi bi-envelope-fill" aria-hidden="true"></i>
               <h3 class="landing-detail-4 fw-bold mb-3">Email</h3>
               <p class="landing-detail-15 mb-3">Escríbenos</p>
