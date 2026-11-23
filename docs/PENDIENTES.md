@@ -6,9 +6,9 @@ Los blueprints guardan **decisiones** (por qué se hizo algo). Este archivo guar
 
 Estados: `abierto` · `en curso` · `congelado`
 
-Última revisión: 2026-09-21 (auditoría del rediseño contra el código y el esquema)
+Última revisión: 2026-11-23 (auditoría de seguridad del rediseño, `docs/auditoria/rediseno-seguridad.md`)
 
-> **Aviso de techo.** El archivo queda en 21 pendientes abiertos (contados, no estimados). La regla del proyecto sigue en pie: pasar de ~20 no es un problema del archivo, es señal de que se acumulan decisiones sin tomar.
+> **Aviso de techo.** El archivo queda en 32 pendientes abiertos (contadas las líneas de estado «abierto» y «en curso», 2026-11-23), por encima del techo de ~20. No es un problema del archivo: se acumulan decisiones sin tomar. Las que esperan a Eduardo son P-34, P-45, P-46, P-47 y P-49; las demás son trabajo que ya tiene dueño en `odd/tasks/rediseno-moderno.md`.
 
 > **Estado operativo del 2026-09-02.** El trabajo ya está publicado en los dos destinos y ambos verificados en el navegador: nueve categorías con los nombres de la base, carrusel de seis, video reproduciéndose e imágenes en `image/webp`, a 375, 768 y 1440.
 
@@ -35,6 +35,8 @@ Los cinco enlaces de salida del panel son `<a href="index.html">` sin ningún ma
 `voice_id` sin validar se concatena a una ruta, con la API key adjunta. Y los errores del servicio externo se reenvían crudos al navegador.
 
 Congelado porque BuildAds lo está. **Se descongela junto con el módulo, no después.**
+
+**Actualización 2026-11-23 (auditoría F-11):** la API completa de `/api/buildads` no tiene autenticación (`server/app.ts:14`) y `express.static` sirve la raíz del repo. No se despliega; se resuelve con el módulo.
 
 ---
 
@@ -310,18 +312,6 @@ El `href` arma `products.html?categoria=${slug}` interpolando el slug crudo. Hoy
 
 **Arreglo:** envolver el slug en `encodeURIComponent()`. Un cambio de una línea; se anotó en vez de hacerlo para no mezclarlo con la migración del bento.
 
-### P-27 · GGA no arranca: no tiene proveedor configurado
-
-**Estado:** abierto · **Evidencia:** commits `58134436` y el del bento
-
-`Failed to authenticate: OAuth session expired and could not be refreshed`. Falla determinista, tres intentos, en dos sesiones distintas. **Nunca llega a ver el diff**: no es que rechace código, es que no arranca. Hay `gga` 2.8.1 instalado y existe la 2.10.1.
-
-**Arreglo:** probar `brew update && brew upgrade gga`. Si sigue igual, revisar dónde guarda su credencial, que parece ser aparte de la de Claude Code.
-
-**Actualización 2026-08-27:** se actualizó a 2.10.1. El error cambió, no se resolvió: ahora dice `❌ No provider configured · Run 'gga init'`. La versión nueva no lee el `~/.config/gga/config` que declara `PROVIDER="claude"`. `gga init` es config global y lo corre Eduardo.
-
-**Confirmado el 2026-09-02:** sigue igual, palabra por palabra. Los tres commits de ese día salieron con `--no-verify`. **Ojo:** el error de OAuth ya no aparece desde el 27 de agosto — quien lo siga citando está leyendo un histórico viejo.
-
 ### P-28 · `gentle-ai` no sigue enlaces simbólicos; Claude Code sí
 
 **Estado:** abierto · **Evidencia:** experimento del 2026-08-27, `gentle-ai` 1.39.4
@@ -429,6 +419,78 @@ Refuerza la regla que ya está en `AGENTS.md`: nunca `git add .`, siempre archiv
 
 ---
 
+### P-43 · Las sesiones de la tienda se acumulan sin límite
+**Estado:** abierto · **Evidencia:** `render.yaml:31`
+
+Cada visita que toca el carrito crea una fila de sesión en la base y nadie corre `clearsessions` (no aparece en `render.yaml` ni en `scripts/`). La tabla solo crece.
+
+**Arreglo:** correr `manage.py clearsessions` en el despliegue o en un trabajo programado; Eduardo decide dónde.
+
+---
+
+### P-44 · Cualquiera con la llave publicable guarda filas de tamaño arbitrario en `chat_messages`
+**Estado:** abierto · **Evidencia:** `supabase/migrations/20260911_chat_messages.sql:50-52`
+
+La política `chat_messages_insert_anon` es `WITH CHECK (true)` y `session_id`, `message` y `page_url` no tienen tope de longitud. La lectura sí es solo de administradores.
+
+**Arreglo:** migración nueva con `CHECK` de longitud agregado `NOT VALID` (session_id 1 a 64, page_url hasta 512, message 1 a 8000) y `VALIDATE` en un paso aparte, después de medir los máximos reales; con pruebas de RLS para dueño, otro usuario y anónimo. **Ojo:** `js/modules/chatbot.js` no recorta `message` antes del INSERT; con el `CHECK`, un mensaje largo se rechazaría en silencio.
+
+---
+
+### P-45 · El lock de npm trae 9 vulnerabilidades, una crítica
+**Estado:** abierto · **Evidencia:** `npm audit --omit=dev` del 2026-11-23, `src/redux/slices/busquedaSlice.ts:17`
+
+1 crítica (proxy-addr), 5 altas (axios, body-parser, form-data, ip-address, ws) y 3 moderadas. Solo axios llega al navegador de Django; el resto es la cadena de `express` de `server/app.ts`, que no se despliega.
+
+**Arreglo:** subir axios y regenerar el lock dentro de Docker; decidir si `server/` se congela con BuildAds (P-03). El plazo de parcheo del contrato (ASVS 15.1.1) ya venció.
+
+---
+
+### P-46 · `/admin/login/` es público y no limita intentos
+**Estado:** abierto (por validar) · **Evidencia:** `backend/config/urls.py:22`
+
+Los usuarios del panel tienen contraseña inutilizable (`backend/panel/access.py:51`), así que solo importa si existe un superusuario con contraseña. No se ha comprobado.
+
+**Arreglo:** confirmar con Eduardo si existe; si existe, límite de intentos o cerrar la ruta.
+
+---
+
+### P-47 · Detrás de dos proxies, todos los visitantes compartirían un contador de pedidos
+**Estado:** abierto (por validar) · **Evidencia:** `backend/ventas/throttle.py:13-20`
+
+`client_ip` toma la última entrada de `X-Forwarded-For`. Con un salto más (por ejemplo Cloudflare delante de Render) todas las visitas comparten IP y el pedido número 6 de la hora recibe 429. Falta registrar un `X-Forwarded-For` real del despliegue.
+
+**Arreglo:** ajuste `CHECKOUT_TRUSTED_PROXY_HOPS` (por defecto 1, el comportamiento de hoy) en `config/settings.py` con su prueba, cuando Eduardo confirme la topología.
+
+---
+
+### P-48 · La política `profiles_insert_own` no fija el rol del perfil
+**Estado:** abierto (por validar) · **Evidencia:** `supabase/migrations/202604100002_rls_policies.sql:23-26`
+
+Un usuario autenticado puede insertar su propio perfil sin que la política obligue `role = 'customer'`; hoy lo cubre el alta automática. Falta confirmarlo en la base viva con los advisors de seguridad.
+
+**Arreglo:** `WITH CHECK (auth.uid() = id AND role = 'customer')` en una migración nueva, revisada por `guardian-de-datos`.
+
+---
+
+### P-49 · `docker compose run` no encuentra `vite` ni `jest`
+**Estado:** abierto · **Evidencia:** `.devcontainer/docker-compose.yml:11`
+
+El volumen con nombre `node_modules` nace vacío y tapa el `node_modules` del host: dentro del contenedor no hay dependencias hasta correr `npm ci --ignore-scripts`. Las pruebas del 2026-11-23 corrieron con `docker run -v "$PWD":/workspace`.
+
+**Arreglo:** sembrar el volumen con `npm ci --ignore-scripts` en el devcontainer o quitarlo del compose (`4dc7f79e`). Decide Eduardo.
+
+---
+
+### P-50 · El logo de 699 KB se sigue descargando en PNG
+**Estado:** abierto · **Evidencia:** `js/modules/utils/service-worker.js:13`, `products.html:44`
+
+La landing ya usa `logo-user.webp` (13 KB, `137304cd`), pero el service worker precachea el PNG al instalarse y `products.html` lo pide con `?probe=` en cada visita. El logo es un wordmark de 1254 por 363, no cuadrado, y el arte dice "SEÑJOR".
+
+**Arreglo:** T6 lo unifica como parcial; corregir la errata y recortar el emblema para el cajón y el chat necesita material nuevo. **Ojo:** `og:image` y los íconos del manifest se quedan en PNG.
+
+---
+
 ## 🔵 Diseño — mejoras planeadas
 
 ### P-14 · Video de fondo con IA e imágenes propias de producto
@@ -477,6 +539,8 @@ TANDA 3   P-42                    sesión de admin que no se cierra — va prime
                                      del service worker y el rojo de consola
 TANDA 4   P-34                    decidir los tres sitios de Netlify — es de Eduardo
 TANDA 5   P-15, P-16              animación scroll, escalas de 10 tonos
+TANDA 6   P-43 a P-50              hallazgos de la auditoría del 2026-11-23: sesiones, chat,
+                                     npm, /admin/, proxies, perfiles, Docker y logo
 ```
 
 `P-11`, `P-12`, `P-13` se resuelven de paso cuando se toque cada archivo. No merecen tanda propia.
