@@ -1,0 +1,30 @@
+{% comment %}
+  The card of a cut, the one of products.html (src/components/ProductCard): photo with the stock
+  badge, category, name, description and the price, with ONE action, "Agregar", whose stretched
+  link covers the whole card (two links to the same place would be read twice by a screen reader).
+  The action does not add anything: nothing reaches the cart without passing through the sheet,
+  where weight, budget and pieces are chosen. Prices drop the cents only when they are zero, so
+  $200 reads as $200 and $189.50 never turns into $190. Pass `producto` and, for the card that
+  paints first, `destacada`: its photo is the LCP candidate (high priority, never lazy); every
+  other photo is lazy. The box is declared (800x600) so nothing moves when a photo arrives.
+{% endcomment %}<li class="tw-card-shell tw-card-shell--medium producto-card" data-categoria="{{ producto.category.slug }}">
+  <div class="tw-card-shell__image-wrap">
+    {% if producto.image_src %}<img class="tw-card-shell__image" src="{{ producto.image_src }}" alt="{{ producto.name }}" width="800" height="600" decoding="async"{% if destacada %} fetchpriority="high"{% else %} loading="lazy"{% endif %}>{% endif %}
+    <span class="tw-card-shell__stock-badge{% if producto.stock <= 0 %} tw-card-shell__stock-badge--out{% endif %}">{% if producto.stock > 0 %}Disponible{% else %}Sin existencias{% endif %}</span>
+  </div>
+  <div class="tw-card-shell__body">
+    <div class="tw-card-shell__meta">
+      <p class="tw-card-shell__category">{{ producto.category.name }}</p>
+    </div>
+    <h3 class="tw-card-shell__title producto-card__title">{{ producto.name }}</h3>
+    {% if producto.description %}<p class="tw-card-shell__description producto-card__description">{{ producto.description }}</p>{% endif %}
+    <div class="tw-card-shell__footer">
+      <div>
+        <strong class="tw-card-shell__price">${{ producto.price_per_kg|floatformat:"-2" }}</strong>
+        <span class="tw-card-shell__unit">/ {{ producto.unit_label }}</span>
+        {% if producto.unit_label == "kg" %}<span class="tw-card-shell__price-alt">${{ producto.price_per_lb|floatformat:"-2" }} / lb</span>{% endif %}
+      </div>
+      <a class="tw-button tw-button--primary tw-card-shell__enlace" href="{% url 'ventas:producto' producto.pk %}" aria-label="Configurar y agregar {{ producto.name }}">Agregar</a>
+    </div>
+  </div>
+</li>

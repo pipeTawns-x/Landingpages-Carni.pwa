@@ -1,0 +1,54 @@
+{% comment %}
+  The catalogue half of products.html: the category rail and the grid of cards, as the React
+  island drew them (CarrilCategorias + ProductList), painted by Django from the real catalogue.
+  The chips are links, so the filter works without script and the address says what is shown;
+  the search and the page keep each other. The arrows of the rail are the one thing only the
+  script can drive, so they stay hidden until it shows them.
+{% endcomment %}<h1 class="visually-hidden">Productos - {{ negocio.nombre }}</h1>
+<div class="container-fluid px-3 px-lg-5 mb-4 products-top-zone">
+  <section class="tw-redesign-root tw-catalog-shell" aria-labelledby="catalogo-titulo">
+    <div class="tw-catalog-shell__header">
+      <p class="tw-kicker">Catálogo Maestro</p>
+      <h2 id="catalogo-titulo">Elige tu corte, compara opciones y arma tu pedido sin perder tiempo</h2>
+      <p>
+        Aquí reunimos los productos más buscados de la carnicería para que cualquier cliente pueda
+        encontrar res, pollo, cerdo y especiales con una navegación clara y directa.
+      </p>
+
+      <div class="tw-filter-carril">
+        <button class="tw-filter-flecha tw-filter-flecha--izq" type="button" aria-label="Ver categorías anteriores" data-carril-flecha="-1" hidden>‹</button>
+        <nav class="tw-filter-row" aria-label="Categorías" data-carril>
+          <a class="tw-filter-chip{% if not selected_category %} tw-filter-chip--active" aria-current="page{% endif %}" href="{% url 'ventas:catalogo' %}{% if query %}?q={{ query|urlencode }}{% endif %}">Todo el catálogo</a>
+          {% for category in categories %}<a class="tw-filter-chip{% if selected_category == category.pk|stringformat:'d' %} tw-filter-chip--active" aria-current="page{% endif %}" href="{% url 'ventas:catalogo' %}?category={{ category.pk }}{% if query %}&amp;q={{ query|urlencode }}{% endif %}">{{ category.name }}</a>
+          {% endfor %}
+        </nav>
+        <button class="tw-filter-flecha tw-filter-flecha--der" type="button" aria-label="Ver más categorías" data-carril-flecha="1" hidden>›</button>
+      </div>
+
+      {% if query %}
+      <p class="tw-filter-row__hint">
+        Buscando: <strong>{{ query }}</strong>
+        <a href="{% url 'ventas:catalogo' %}{% if selected_category %}?category={{ selected_category }}{% endif %}" class="tw-filter-row__limpiar">Limpiar búsqueda</a>
+      </p>
+      {% endif %}
+    </div>
+
+    {% if page_obj %}
+    <ul class="product-list" role="list" aria-label="Productos">
+      {% for producto in page_obj %}{% include "ventas/parciales/_tarjeta_producto.html" with destacada=forloop.first %}{% endfor %}
+    </ul>
+
+    {% if page_obj.paginator.num_pages > 1 %}
+    <nav class="productos-paginas" aria-label="Páginas del catálogo">
+      {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}&amp;q={{ query|urlencode }}&amp;category={{ selected_category }}" rel="prev">Anterior</a>{% else %}<span></span>{% endif %}
+      <span>Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+      {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}&amp;q={{ query|urlencode }}&amp;category={{ selected_category }}" rel="next">Siguiente</a>{% else %}<span></span>{% endif %}
+    </nav>
+    {% endif %}
+    {% else %}
+    <div class="tw-empty-state">
+      <p>{% if query %}No encontramos cortes con «{{ query }}». Prueba con otra palabra o quita el filtro.{% else %}Por ahora no tenemos cortes publicados en esta categoría. Prueba con otra selección.{% endif %}</p>
+    </div>
+    {% endif %}
+  </section>
+</div>

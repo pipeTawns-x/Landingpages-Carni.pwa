@@ -1,0 +1,240 @@
+/*
+ * The Django products page (backend/ventas/templates/ventas/productos.html) and its partials.
+ *
+ * The real design is the one of the React page: its `tw-*` and `ficha__*` classes live in
+ * src/styles/redesign.css and are reused untouched. What follows is what that page drew at
+ * runtime with styled-components (the card grid, the cart drawer) or that the Django page adds
+ * (the cart as a native <dialog>, the footer, the flash messages, the pagination).
+ *
+ * Mobile first: the base rules are the phone, the media queries add room. Motion only animates
+ * `transform` and `opacity`, and only when the person has not asked for less of it.
+ */
+
+/* ── Skip link and search dialog ───────────────────────────────────────────
+   The same two rules store-motion.css writes for the landing, which scopes the rest to it. */
+.django-store .landing-skip-link {
+  position: fixed;
+  z-index: 10000;
+  top: 0;
+  left: 1rem;
+  padding: 0.75rem;
+  background: var(--carni-bg, #0b0b0c);
+  color: var(--carni-text, #f5f3ef);
+  transform: translateY(-120%);
+}
+.django-store .landing-skip-link:focus { transform: none; }
+
+.django-store .landing-search {
+  width: min(90vw, 600px);
+  border: 1px solid var(--carni-sand, #e4d1b0);
+  border-radius: 20px;
+  padding: 1.5rem;
+  color: var(--carni-text, #f5f3ef);
+  background: var(--carni-charcoal, #363432);
+}
+.django-store .landing-search::backdrop { background: rgb(0 0 0 / 0.8); }
+.django-store .landing-search form { display: grid; gap: 1rem; margin-block: 1rem; }
+.django-store .landing-search :is(button, input) { min-height: 44px; }
+.django-store .landing-search input { min-width: 0; padding: 0.5rem; }
+
+/* ── Modal dialogs: the page behind never scrolls ──────────────────────────
+   `showModal()` already makes the page inert; these two rules stop the scroll gesture too, without
+   touching `overflow` on html or body (that removes the scrollbar and shifts the layout). */
+.django-store dialog:modal { overscroll-behavior: contain; }
+.django-store dialog::backdrop { overflow: hidden; overscroll-behavior: contain; }
+
+/* ── Flash messages ───────────────────────────────────────────────────────── */
+.productos-avisos { display: grid; gap: 0.5rem; padding-block: 0.5rem; }
+.productos-aviso {
+  margin: 0;
+  padding: 0.75rem 1rem;
+  border: 1px solid rgb(228 209 176 / 0.4);
+  border-radius: 12px;
+  background: rgb(228 209 176 / 0.08);
+  color: #f5f3ef;
+}
+.productos-aviso--error { border-color: rgb(255 138 128 / 0.6); background: rgb(200 48 47 / 0.14); }
+
+/* ── Catalogue ────────────────────────────────────────────────────────────── */
+.tw-filter-row__hint { margin-top: 1rem; }
+.tw-filter-row__limpiar { margin-left: 0.5rem; color: #e4d1b0; text-underline-offset: 3px; }
+.tw-filter-chip { text-decoration: none; display: inline-flex; align-items: center; min-height: 44px; }
+
+/* One column on a phone, as many as fit from there: a card never gets narrower than 17rem. */
+ul.product-list {
+  list-style: none;
+  margin: 1.5rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr));
+  align-items: start;
+}
+
+.productos-paginas {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 2.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid rgb(255 255 255 / 0.12);
+  color: rgb(255 255 255 / 0.78);
+}
+.productos-paginas a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding-inline: 0.5rem;
+  color: #e4d1b0;
+}
+
+/* ── The sheet ────────────────────────────────────────────────────────────── */
+.ficha__formulario { margin: 0; }
+/* The row of the quantity: the number takes what is left and the unit chips wrap under it on a
+   narrow screen. Without this the input (width 100%) and three chips made the row 397px wide at
+   375px, the page scrolled sideways and a fixed dialog stretched with it. */
+.ficha__campo { min-width: 0; }
+.ficha__fila { flex-wrap: wrap; align-items: stretch; }
+.ficha__fila input[type="number"] { flex: 1 1 8rem; width: auto; min-width: 0; }
+.ficha__modo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.ficha__modo:has(input:checked) {
+  background: var(--tinta);
+  border-color: var(--tinta);
+  color: #111;
+  font-weight: 600;
+}
+.ficha__modo:has(input:focus-visible) { outline: 2px solid var(--crema); outline-offset: 2px; }
+.ficha__unidades { display: flex; gap: 0.5rem; border: 0; margin: 0; padding: 0; min-width: 0; }
+.ficha__unidades[hidden] { display: none; }
+.ficha__modo--chico { flex: 0 0 auto; min-width: 52px; padding-inline: 0.75rem; }
+.ficha__relacionados { margin-top: 3.5rem; }
+.ficha__relacionados h2 { font-size: 1.25rem; margin: 0 0 0.5rem; }
+.ficha__resumen-linea strong { min-height: 1.2em; }
+
+/* ── Footer ───────────────────────────────────────────────────────────────── */
+.store-footer { background: var(--carni-charcoal, #363432); color: #fff; padding: 3rem 0 1rem; margin-top: 4rem; }
+.store-footer__title { font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem; color: #e4d1b0; }
+.store-footer__text { font-size: 0.9rem; line-height: 1.6; color: #ccc; margin-bottom: 0.75rem; }
+.store-footer address { font-style: normal; }
+.store-footer__text a, .store-footer__list a { color: #ccc; text-decoration: none; }
+.store-footer__list { font-size: 0.9rem; }
+.store-footer__list a { display: inline-flex; align-items: center; min-height: 32px; }
+.store-footer a:hover { color: #fff; text-decoration: underline; }
+.store-footer__social { width: 40px; height: 40px; padding: 0; display: flex; align-items: center; justify-content: center; }
+.store-footer__bottom { border-top: 1px solid rgb(255 255 255 / 0.1); padding-top: 1.5rem; text-align: center; }
+.store-footer__bottom p { font-size: 0.85rem; color: #bdbdbd; margin: 0; }
+
+/* ── Cart drawer: a native modal <dialog> on the right edge ─────────────────
+   Full height, a phone-wide sheet on a phone and 26rem from there. The UA gives a dialog a box
+   with margin, border and a max size; all of it is reset here. `display` is never set on the
+   dialog itself, or the closed state would show (it is scoped to `[open]`). */
+.bolsa {
+  position: fixed;
+  inset: 0 0 0 auto;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  width: min(26rem, 100%);
+  max-width: none;
+  height: 100dvh;
+  max-height: none;
+  background: #14110f;
+  color: #f5f3ef;
+  box-shadow: -12px 0 40px rgb(0 0 0 / 0.5);
+}
+.bolsa::backdrop { background: rgb(0 0 0 / 0.65); }
+.bolsa[open] { display: flex; flex-direction: column; }
+
+.bolsa__panel { display: flex; flex-direction: column; min-height: 0; height: 100%; }
+.bolsa__cabeza {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.25rem 1.25rem 1rem;
+  border-bottom: 1px solid rgb(255 255 255 / 0.12);
+}
+.bolsa__titulo { margin: 0; font-size: 1.35rem; font-weight: 800; }
+.bolsa__cuenta { margin: 0.25rem 0 0; font-size: 0.85rem; color: rgb(245 243 239 / 0.72); }
+.bolsa__cerrar {
+  display: inline-grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid rgb(255 255 255 / 0.25);
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+.bolsa__cerrar:hover { border-color: #e4d1b0; color: #e4d1b0; }
+
+.bolsa__cuerpo { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 0.5rem 1.25rem 1.25rem; }
+.bolsa__lineas { list-style: none; margin: 0; padding: 0; }
+.bolsa__linea {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr) auto;
+  gap: 0.9rem;
+  align-items: start;
+  padding: 1rem 0;
+  border-bottom: 1px solid rgb(255 255 255 / 0.1);
+}
+.bolsa__foto { width: 72px; height: 72px; overflow: hidden; border-radius: 10px; background: #26211e; }
+.bolsa__foto img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.bolsa__nombre { color: #f5f3ef; font-weight: 700; text-decoration: none; }
+.bolsa__nombre:hover { color: #e4d1b0; }
+.bolsa__cantidad, .bolsa__nota, .bolsa__aviso, .bolsa__vacio { margin: 0.25rem 0 0; font-size: 0.9rem; color: rgb(245 243 239 / 0.78); }
+.bolsa__aviso { margin-top: 1rem; font-size: 0.8rem; color: rgb(245 243 239 / 0.62); }
+.bolsa__quitar {
+  min-height: 44px;
+  padding: 0 0.25rem;
+  border: 0;
+  background: transparent;
+  color: rgb(245 243 239 / 0.7);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.bolsa__quitar:hover { color: #ff8a80; }
+
+.bolsa__pie { display: grid; gap: 0.5rem; padding: 1rem 1.25rem calc(1rem + env(safe-area-inset-bottom)); border-top: 1px solid rgb(255 255 255 / 0.12); }
+.bolsa__pagar, .bolsa__seguir {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0 1.5rem;
+  border-radius: 999px;
+  text-decoration: none;
+  font-weight: 700;
+}
+.bolsa__pagar { background: #c8302f; color: #fff; }
+.bolsa__pagar:hover { filter: brightness(1.1); }
+.bolsa__seguir { border: 1px solid rgb(255 255 255 / 0.3); color: #f5f3ef; }
+.bolsa__seguir:hover { border-color: #e4d1b0; color: #e4d1b0; }
+
+/* The drawer slides in from the right and its backdrop fades: transform and opacity only, and only
+   for someone who has not asked for less motion. `allow-discrete` lets the closing animation play
+   before the dialog leaves the top layer; a browser without it simply closes at once. */
+@media (prefers-reduced-motion: no-preference) {
+  .bolsa {
+    transform: translateX(100%);
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), overlay 0.3s allow-discrete, display 0.3s allow-discrete;
+  }
+  .bolsa[open] { transform: none; }
+  .bolsa::backdrop {
+    opacity: 0;
+    transition: opacity 0.3s ease, overlay 0.3s allow-discrete, display 0.3s allow-discrete;
+  }
+  .bolsa[open]::backdrop { opacity: 1; }
+  @starting-style {
+    .bolsa[open] { transform: translateX(100%); }
+    .bolsa[open]::backdrop { opacity: 0; }
+  }
+}

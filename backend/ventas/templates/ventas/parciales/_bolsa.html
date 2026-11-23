@@ -1,0 +1,53 @@
+{% comment %}
+  The cart drawer ("Tu pedido"): a native modal <dialog>, so the browser makes the page inert,
+  keeps the focus inside, closes it with Escape and gives the focus back to the button that
+  opened it. The header's cart button is a link to the cart page; the island opens this dialog
+  instead, so without script the customer simply lands on the cart page. It lists the lines of
+  the session (`bolsa`, from ventas.context_processors.tienda) without prices: the store quotes
+  them on the cart page. Each line is removed with a plain POST that carries the CSRF token and
+  comes back to the page the customer was on (`next`, with #bolsa so the drawer is still open).
+{% endcomment %}<dialog class="bolsa" id="bolsa" aria-labelledby="bolsa-titulo" closedby="any">
+  <div class="bolsa__panel">
+    {# The token the scripts send in X-CSRFToken. Rendered on every page, empty cart included: the cookie of the token is only issued on a page that renders one. #}
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}" data-csrf>
+    <header class="bolsa__cabeza">
+      <div>
+        <h2 class="bolsa__titulo" id="bolsa-titulo">Tu pedido</h2>
+        <p class="bolsa__cuenta">{% with cantidad=bolsa|length %}{% if cantidad == 1 %}1 producto{% elif cantidad %}{{ cantidad }} productos{% else %}Sin productos{% endif %}{% endwith %}</p>
+      </div>
+      <form method="dialog">
+        <button class="bolsa__cerrar" type="submit" autofocus aria-label="Cerrar el pedido"><i class="bi bi-x-lg" aria-hidden="true"></i></button>
+      </form>
+    </header>
+
+    <div class="bolsa__cuerpo">
+      {% if bolsa %}
+      <ul class="bolsa__lineas" role="list">
+        {% for linea in bolsa %}
+        <li class="bolsa__linea">
+          <div class="bolsa__foto">{% if linea.product.image_src %}<img src="{{ linea.product.image_src }}" alt="" width="72" height="72" loading="lazy" decoding="async">{% endif %}</div>
+          <div class="bolsa__detalle">
+            <a class="bolsa__nombre" href="{% url 'ventas:producto' linea.product.pk %}">{{ linea.product.name }}</a>
+            <p class="bolsa__cantidad">{{ linea.amount }}</p>
+            {% if linea.note %}<p class="bolsa__nota">“{{ linea.note }}”</p>{% endif %}
+          </div>
+          <form method="post" action="{% url 'ventas:tienda_quitar' linea.product.pk %}">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.get_full_path }}#bolsa">
+            <button class="bolsa__quitar" type="submit" aria-label="Quitar {{ linea.product.name }} del pedido">Quitar</button>
+          </form>
+        </li>
+        {% endfor %}
+      </ul>
+      <p class="bolsa__aviso">El precio final lo calcula la carnicería con el peso real; lo ves antes de pedir.</p>
+      {% else %}
+      <p class="bolsa__vacio">Tu carrito está vacío.</p>
+      {% endif %}
+    </div>
+
+    <footer class="bolsa__pie">
+      <a class="bolsa__pagar" href="{% url 'ventas:carrito' %}">Ver carrito y pagar</a>
+      <a class="bolsa__seguir" href="{% url 'ventas:catalogo' %}">Seguir comprando</a>
+    </footer>
+  </div>
+</dialog>

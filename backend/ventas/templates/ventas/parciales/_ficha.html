@@ -1,0 +1,103 @@
+{% comment %}
+  The sheet of one cut, the "ficha" of products.html (src/pages/ProductoDetalle): where the order
+  is configured the way the CodePen dPGYMxJ asked for (Engram #541): the way to order it (weight,
+  money or pieces, only the ones the store accepts for this product), how much, the thickness of
+  the cut when it is sold by pieces, free notes for the butcher and a live subtotal. The number of
+  the subtotal is the store's (ventas:producto_cotizar, JSON); the browser never computes a price.
+  It is a plain POST form: without script every field is there and the cart page shows the price.
+  src/products/configurador.ts shows the fields of the chosen way and asks for the subtotal.
+{% endcomment %}<section class="ficha" aria-labelledby="ficha-titulo">
+  <nav class="ficha__migas" aria-label="Dónde estás">
+    <a class="ficha__volver" href="{% url 'ventas:catalogo' %}">Todo el catálogo</a>
+    <span class="ficha__migas-sep" aria-hidden="true">/</span>
+    <a class="ficha__volver ficha__volver--cerca" href="{% url 'ventas:catalogo' %}?category={{ product.category.pk }}">{{ product.category.name }}</a>
+  </nav>
+
+  <div class="ficha__lienzo">
+    {% if product.image_src %}<img class="ficha__foto" src="{{ product.image_src }}" alt="{{ product.name }}" width="1000" height="1000" decoding="async" fetchpriority="high">{% endif %}
+  </div>
+
+  <div class="ficha__columna">
+    <div class="ficha__cuerpo">
+      <p class="ficha__marca">{{ negocio.nombre }}</p>
+      <h1 class="ficha__titulo" id="ficha-titulo">{{ product.name }}</h1>
+
+      <p class="ficha__precio">${{ product.price_per_kg }}<span class="ficha__unidad"> / {{ product.unit_label }}</span>{% if product.unit_label == "kg" %}<span class="ficha__libra">${{ product.price_per_lb }} / lb</span>{% endif %}</p>
+
+      <form method="post" action="{% url 'ventas:tienda_agregar' product.pk %}" data-configurador data-cotizar="{% url 'ventas:producto_cotizar' product.pk %}" class="ficha__formulario">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{% url 'ventas:producto' product.pk %}">
+
+        <h2 class="ficha__pregunta">¿Cómo lo quieres?</h2>
+        <div class="ficha__modos" role="radiogroup" aria-label="Forma de compra">
+          {% for value, label in modes %}<label class="ficha__modo"><input type="radio" name="mode" value="{{ value }}" data-modo{% if forloop.first %} checked{% endif %} class="visually-hidden"><span>{{ label }}</span></label>
+          {% endfor %}
+        </div>
+
+        <div class="ficha__campos">
+          <div class="ficha__campo">
+            <label for="cantidad" class="ficha__etiqueta" data-etiqueta-cantidad>Cantidad</label>
+            <span class="ficha__fila">
+              <input id="cantidad" type="number" name="amount" min="0.001" step="any" inputmode="decimal" required placeholder="0" data-cantidad>
+              <fieldset data-grupo="weight" class="ficha__unidades">
+                <legend class="visually-hidden">Unidad del peso</legend>
+                {% for unit in units %}<label class="ficha__modo ficha__modo--chico"><input type="radio" name="unit" value="{{ unit }}"{% if forloop.first %} checked{% endif %} class="visually-hidden"><span>{{ unit }}</span></label>
+                {% endfor %}
+              </fieldset>
+            </span>
+            <p class="ficha__nota ficha__nota--tenue" data-ayuda>Por peso: elige kilos, gramos o libras. Por dinero: cuánto quieres gastar. Por piezas: cuántas.</p>
+          </div>
+
+          {% if asks_thickness %}
+          <div class="ficha__campo" data-grupo="pieces">
+            <label for="grosor" class="ficha__etiqueta">Grosor del corte · <output for="grosor" data-grosor-valor>{{ thickness.default }}"</output></label>
+            <input id="grosor" type="range" name="thickness_in" min="{{ thickness.min }}" max="{{ thickness.max }}" step="{{ thickness.step }}" value="{{ thickness.default }}" data-grosor list="grosores" aria-valuetext="{{ thickness.default }} pulgadas">
+            <datalist id="grosores">{% for valor in thickness.marcas %}<option value="{{ valor }}"></option>{% endfor %}</datalist>
+            <span class="ficha__escala"><span>{{ thickness.min }}"</span><span>{{ thickness.max }}"</span></span>
+          </div>
+          {% endif %}
+
+          <details class="ficha__acordeon">
+            <summary class="ficha__acordeon-fila">
+              <span class="ficha__etiqueta">Observaciones para el carnicero</span>
+            </summary>
+            <label class="ficha__campo ficha__campo--plegado">
+              <span class="visually-hidden">Observaciones para el carnicero</span>
+              <textarea name="note" rows="2" maxlength="200" placeholder="Sin tanta grasa, en bisteces delgados, para asar…"></textarea>
+            </label>
+          </details>
+        </div>
+
+        <div class="ficha__resumen" data-resumen aria-live="polite">
+          <div class="ficha__resumen-linea">
+            <span>Subtotal</span>
+            <strong data-resumen-precio></strong>
+          </div>
+          <p class="ficha__resumen-detalle" data-resumen-texto>Escribe la cantidad para ver tu subtotal.</p>
+          <noscript><p class="ficha__nota ficha__nota--tenue">El subtotal exacto lo ves en tu carrito.</p></noscript>
+        </div>
+
+        <button class="ficha__boton" type="submit">Agregar al pedido</button>
+        <p class="ficha__nota ficha__nota--tenue">El total definitivo lo calcula la tienda con el precio del día.</p>
+      </form>
+
+      {% if product.description %}
+      <details class="ficha__acordeon">
+        <summary class="ficha__acordeon-fila">
+          <span class="ficha__etiqueta">Sobre este corte</span>
+        </summary>
+        <p class="ficha__nota ficha__campo--plegado">{{ product.description }}</p>
+      </details>
+      {% endif %}
+    </div>
+  </div>
+
+  {% if relacionados %}
+  <section class="ficha__relacionados" aria-labelledby="relacionados-titulo">
+    <h2 id="relacionados-titulo">También de {{ product.category.name|lower }}</h2>
+    <ul class="product-list" role="list">
+      {% for producto in relacionados %}{% include "ventas/parciales/_tarjeta_producto.html" %}{% endfor %}
+    </ul>
+  </section>
+  {% endif %}
+</section>

@@ -1,0 +1,78 @@
+{% comment %}
+  The header and the menu drawer of the store, the same three zones as the landing's: menu and
+  search on the left, the logo in the centre, cart and account on the right. Pass `activo`
+  ("productos", "inicio") to mark the page in the menu. The cart button is a link to the cart
+  page, so it works without script; the island turns it into the opener of the cart drawer
+  (#bolsa). The header is solid here: there is no film behind it.
+{% endcomment %}<header class="main-header" id="mainHeader">
+  <nav class="navbar main-header__nav-container container-fluid px-2 px-md-3 px-lg-5" aria-label="Principal">
+    <div class="header-zone header-zone--left">
+      <button class="hamburger-btn" type="button" id="menuToggle" aria-expanded="false" aria-controls="mobileDrawer" aria-label="Abrir menú de navegación">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <button class="header-search" type="button" id="searchBtn" aria-label="Buscar productos">
+        <i class="bi bi-search" aria-hidden="true"></i>
+        <span class="header-search__label">Buscar cortes y productos</span>
+      </button>
+    </div>
+
+    <div class="header-zone header-zone--center">
+      <a class="navbar-brand main-header__logo-container" href="{% url 'ventas:landing' %}">
+        <img width="428" height="124" src="/img/recursos_web/logo-user.webp" alt="{{ negocio.nombre }}" class="main-header__logo" decoding="async">
+      </a>
+    </div>
+
+    <div class="header-zone header-zone--right">
+      <a class="header-icon-btn header-icon-btn--round position-relative" href="{% url 'ventas:carrito' %}" id="cartBtn" aria-label="Carrito" aria-controls="bolsa">
+        <i class="bi bi-cart3" aria-hidden="true"></i>
+        {% with cantidad=bolsa|length %}{% if cantidad %}<span class="badge bg-danger rounded-pill position-absolute top-0 start-100 translate-middle main-header__cart-count">{{ cantidad }}</span>{% endif %}{% endwith %}
+      </a>
+      <a href="{% url 'ventas:acceso' %}" class="header-icon-btn header-icon-btn--round" aria-label="Entrar o registrarse">
+        <i class="bi bi-person" aria-hidden="true"></i>
+      </a>
+    </div>
+  </nav>
+</header>
+
+<div class="drawer-overlay" id="drawerOverlay"></div>
+<aside class="mobile-drawer" id="mobileDrawer" aria-hidden="true" inert>
+  <div class="mobile-drawer__header">
+    <div class="d-flex align-items-center gap-2">
+      <img width="428" height="124" src="/img/recursos_web/logo-user.webp" alt="Carnicería" class="mobile-drawer__logo" loading="lazy" decoding="async">
+      <div>
+        <p class="mb-0 fw-bold">Carnicería Premium</p>
+        <small class="text-muted">El Señor de La Misericordia</small>
+      </div>
+    </div>
+    <button class="mobile-drawer__close" type="button" id="drawerClose" aria-label="Cerrar menú">
+      <i class="bi bi-x-lg" aria-hidden="true"></i>
+    </button>
+  </div>
+
+  <nav class="mobile-drawer__nav" aria-label="Secciones">
+    <a href="{% url 'ventas:landing' %}" class="mobile-drawer__link{% if activo == 'inicio' %} mobile-drawer__link--active" aria-current="page{% endif %}">Inicio</a>
+    <a href="{% url 'ventas:catalogo' %}" class="mobile-drawer__link{% if activo == 'productos' %} mobile-drawer__link--active" aria-current="page{% endif %}">Productos</a>
+    <a href="{% url 'ventas:acceso' %}" class="mobile-drawer__link">Club Misericordia</a>
+    <a href="{% url 'ventas:landing' %}#sobre-nosotros" class="mobile-drawer__link">Sobre Nosotros</a>
+    <a href="{% url 'ventas:landing' %}#contacto" class="mobile-drawer__link">Contacto</a>
+  </nav>
+
+  <div class="mobile-drawer__section">
+    <p class="mobile-drawer__section-title">Categorías destacadas</p>
+    <div class="mobile-drawer__chips">
+      {% for categoria in menu_categorias %}<a href="{% url 'ventas:catalogo' %}?category={{ categoria.pk }}" class="chip">{{ categoria.name }}</a>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="mobile-drawer__footer">
+    <a class="btn btn-outline-light w-100 mb-2" href="{% url 'ventas:catalogo' %}">
+      <i class="bi bi-eye me-2" aria-hidden="true"></i>Ver productos
+    </a>
+    <a class="btn btn-danger w-100" href="{% url 'ventas:carrito' %}">
+      <i class="bi bi-cart3 me-2" aria-hidden="true"></i>Mi carrito
+    </a>
+  </div>
+</aside>

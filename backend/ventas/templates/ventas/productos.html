@@ -1,0 +1,67 @@
+{% load vite %}<!DOCTYPE html>
+{% comment %}
+  The store's real products.html, painted by Django (ventas:catalogo at /productos/, and the sheet
+  of one product at /productos/<id>/). Same design, same sections: the header, the breadcrumb, the
+  category rail with the grid of cards, the sheet where an order is configured, the cart drawer,
+  the footer and the virtual assistant. One template, two modes, as the page had two routes:
+  without `product` in the context it is the catalogue; with it, the sheet of that product.
+  What differs from the static file is on purpose:
+  - The catalogue was a React island that read Supabase from the browser; here Django paints the
+    cards from the real catalogue, so the page is complete before any script runs, and the cart is
+    the one of the session (the server's), not a second copy in localStorage.
+  - The CSP of the site only admits 'self': no inline style, no inline script, no CDN. The styles
+    and the scripts come from the Vite build ({% vite_asset %}), which writes Bootstrap before the
+    site's own CSS. The weather widget (Open-Meteo) and Google Fonts do not fit the CSP.
+  The header, the menu, the search, the footer and the assistant are partials in `parciales/`
+  that the other pages can share.
+{% endcomment %}
+<html lang="es">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#363432" />
+  {% if product %}<title>{{ product.name }} · {{ negocio.nombre }}</title>
+  <meta name="description" content="{{ product.name }}: ${{ product.price_per_kg }} / {{ product.unit_label }}. {{ negocio.nombre }}, San Luis Potosí.">
+  {% else %}<title>Productos · {{ negocio.nombre }}</title>
+  <meta name="description" content="Productos cárnicos frescos de la más alta calidad. Cortes de res, cerdo, pollo y más.">
+  {% endif %}
+  <link rel="icon" href="/img/recursos_web/logo-user.webp" type="image/webp">
+  {% vite_asset "src/entry/products.tsx" %}
+</head>
+
+<body class="dark-premium django-store" data-server-store>
+  <a class="landing-skip-link" href="#contenido">Ir al contenido</a>
+  <div class="offline-alert alert alert-warning d-none" role="alert">
+    <i class="bi bi-wifi-off me-2" aria-hidden="true"></i> Estás en modo offline. Algunas funciones pueden estar limitadas.
+  </div>
+
+  {% include "ventas/parciales/_cabecera.html" with activo="productos" %}
+
+  <main id="contenido" class="products-main-layout">
+    {% if not product %}
+    <nav aria-label="breadcrumb" class="container-fluid px-3 px-lg-5 py-3">
+      <ol class="breadcrumb mb-0">
+        <li class="breadcrumb-item"><a href="{% url 'ventas:landing' %}">Inicio</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Productos</li>
+      </ol>
+    </nav>
+    {% endif %}
+
+    {% if messages %}
+    <div class="productos-avisos container-fluid px-3 px-lg-5">
+      {% for message in messages %}{% if message.level_tag == "error" %}<p class="productos-aviso productos-aviso--error" role="alert">{{ message }}</p>{% else %}<p class="productos-aviso" role="status">{{ message }}</p>{% endif %}
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if product %}{% include "ventas/parciales/_ficha.html" %}{% else %}{% include "ventas/parciales/_catalogo.html" %}{% endif %}
+  </main>
+
+  {% include "ventas/parciales/_bolsa.html" %}
+  {% include "ventas/parciales/_pie.html" %}
+  {% include "ventas/parciales/_buscar.html" %}
+  {% include "ventas/parciales/_chat.html" %}
+</body>
+
+</html>

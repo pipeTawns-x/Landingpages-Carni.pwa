@@ -1,0 +1,13 @@
+{% comment %}
+  The magnifier of the header: a dialog whose form sends the visitor to the catalogue already
+  filtered (`?q=`). It is a plain GET form, so the search works without script; the island only
+  opens the dialog.
+{% endcomment %}<dialog class="landing-search" data-store-search aria-labelledby="store-search-title">
+  <h2 id="store-search-title">Buscar cortes y productos</h2>
+  <form action="{% url 'ventas:catalogo' %}" method="get" role="search">
+    <label for="store-search-input">Buscar productos</label>
+    <input id="store-search-input" type="search" name="q" value="{{ query }}" autocomplete="off" maxlength="80" autofocus>
+    <button type="submit">Buscar</button>
+  </form>
+  <button type="button" data-search-close>Cerrar búsqueda</button>
+</dialog>

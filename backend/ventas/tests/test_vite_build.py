@@ -55,4 +55,6 @@ class ViteBuildOutputTests(SimpleTestCase):
         for entry in PAGE_ENTRIES:
             with self.subTest(entry=entry):
                 html = render(entry)
-                self.assertIn(f'<script type="module" src="/static/vite/{manifest[entry]["file"]}">', html)
+                self.assertIn(
+                    f'<script type="module" src="/static/vite/{manifest[entry]["file"]}">', html
+                )

@@ -17,9 +17,13 @@ from panel.test_stylesheet import classes_missing_from
 TEMPLATES = Path(settings.BASE_DIR) / "ventas" / "templates" / "ventas"
 PANEL_CSS = "panel/panel.css"
 # The public store templates live in ventas/tienda/ and have their own tests.
-# index.html is the store's real landing: it is styled by the Vite build (Bootstrap and the site's
-# own CSS, see test_landing.py), not by the panel's Tailwind stylesheet.
-PANEL_TEMPLATES = sorted(path for path in TEMPLATES.glob("*.html") if path.name != "index.html")
+# index.html and productos.html are the store's real pages: they are styled by the Vite build
+# (Bootstrap and the site's own CSS, see test_landing.py and test_products_page.py), not by the
+# panel's Tailwind stylesheet. acceso.html joins them when T5 lands.
+VITE_STYLED_TEMPLATES = {"index.html", "productos.html"}
+PANEL_TEMPLATES = sorted(
+    path for path in TEMPLATES.glob("*.html") if path.name not in VITE_STYLED_TEMPLATES
+)
 V_CLASS = re.compile(r"""class="[^"]*(?<![\w-])v-[a-z]""")
 
 
