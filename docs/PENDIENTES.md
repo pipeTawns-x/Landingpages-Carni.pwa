@@ -6,7 +6,7 @@ Los blueprints guardan **decisiones** (por qué se hizo algo). Este archivo guar
 
 Estados: `abierto` · `en curso` · `congelado`
 
-Última revisión: 2026-11-23 (auditoría de seguridad del rediseño, `docs/auditoria/rediseno-seguridad.md`)
+Última revisión: 2026-11-24 (T5, página de acceso; antes, auditoría de seguridad del rediseño, `docs/auditoria/rediseno-seguridad.md`)
 
 > **Aviso de techo.** El archivo queda en 32 pendientes abiertos (contadas las líneas de estado «abierto» y «en curso», 2026-11-23), por encima del techo de ~20. No es un problema del archivo: se acumulan decisiones sin tomar. Las que esperan a Eduardo son P-34, P-45, P-46, P-47 y P-49; las demás son trabajo que ya tiene dueño en `odd/tasks/rediseno-moderno.md`.
 
@@ -489,6 +489,13 @@ La landing ya usa `logo-user.webp` (13 KB, `137304cd`), pero el service worker p
 
 **Arreglo:** T6 lo unifica como parcial; corregir la errata y recortar el emblema para el cajón y el chat necesita material nuevo. **Ojo:** `og:image` y los íconos del manifest se quedan en PNG.
 
+### P-51 · La página de acceso deja decisiones y cabos sueltos tras T5
+**Estado:** abierto · **Evidencia:** `src/acceso/legacy-acceso.tsx:25`, `backend/static/tienda/acceso.js:25-26` y `:104`
+
+El módulo legado del `accessweb.html` estático prometía un programa de puntos y un seguimiento de pedidos que no existen; se reescribió en futuro ("Próximamente…") y nadie lo ve, porque Django redirige `/accessweb.html` a `/acceso/`. `acceso.js` revela si un correo ya tiene cuenta (se puede enumerar cuentas, OWASP A07) y deja la sesión de Supabase en `localStorage` (`persistSession: true`): son decisiones de Eduardo, no regresiones de T5. Faltan "¿Olvidaste tu contraseña?" (no hay flujo de recuperación), un enlace a los términos que se aceptan, `aria-invalid` y mandar el foco al primer campo inválido, volver a `type="password"` al cambiar de formulario, y los tokens de la página (naranja, arena y rojo medido) en el tema compartido, vía `design-handoff`.
+
+**Arreglo:** T8 borra el módulo legado junto con el HTML estático y muda `acceso.js`; el resto se hace al mudarlo y con `design-handoff`. **Depende de** T8 (`odd/tasks/rediseno-moderno.md`).
+
 ---
 
 ## 🔵 Diseño — mejoras planeadas
@@ -541,6 +548,7 @@ TANDA 4   P-34                    decidir los tres sitios de Netlify — es de E
 TANDA 5   P-15, P-16              animación scroll, escalas de 10 tonos
 TANDA 6   P-43 a P-50              hallazgos de la auditoría del 2026-11-23: sesiones, chat,
                                      npm, /admin/, proxies, perfiles, Docker y logo
+TANDA 7   P-51                    cabos de la página de acceso tras T5: se atacan con T8
 ```
 
 `P-11`, `P-12`, `P-13` se resuelven de paso cuando se toque cada archivo. No merecen tanda propia.

@@ -1,4 +1,4 @@
-import{j as e,r as d}from"./client-qoJOnyWg.js";import{T as f}from"./Testimonios-CZaOUNVa.js";import{m as _,a as x}from"./montar-DRJI4-IO.js";import{a as u,f as j,c as w,m as p,b as N}from"./shared-CqOXKDrN.js";import{g as v,f as y}from"./Lupa-BjPeg98k.js";import{g as C}from"./header-state-DMaMtNjo.js";const E=v.article`
+import{j as e,r as d}from"./client-qoJOnyWg.js";import{T as f}from"./Testimonios-CZaOUNVa.js";import{m as _,a as x}from"./montar-BX95kkwW.js";import{a as u,f as j,c as w,m as p,b as N}from"./shared-CqOXKDrN.js";import{g as v,f as y}from"./Lupa-SFId8shL.js";import{g as C}from"./header-state-DMaMtNjo.js";const E=v.article`
   /* El tile entero es un enlace al catalogo, asi que toda su superficie deberia
      decirlo. El markup anterior solo mostraba el cursor sobre el boton. */
   .category-img,

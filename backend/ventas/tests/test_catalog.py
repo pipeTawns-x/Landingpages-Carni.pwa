@@ -252,7 +252,7 @@ class MigratedStorePagesTests(TestCase):
         self.assertEqual(response["Location"], "/acceso/?salir=1")
 
     def test_the_access_page_uses_the_store_frame_and_the_landing_the_real_index(self):
-        for url, template in (("/acceso/", "ventas/tienda/base.html"), ("/", "ventas/index.html")):
+        for url, template in (("/acceso/", "ventas/acceso.html"), ("/", "ventas/index.html")):
             with self.subTest(url=url):
                 response = self.client.get(url)
                 self.assertEqual(response.status_code, 200)

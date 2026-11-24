@@ -1,4 +1,4 @@
-"""Sign in and sign up: the static accessweb.html, migrated into Django (ventas:acceso)."""
+"""Sign in and sign up: the real accessweb.html, painted by Django (ventas:acceso)."""
 
 from django.conf import settings
 from django.shortcuts import render
@@ -34,4 +34,4 @@ def acceso(request):
         "salir": request.GET.get("salir") == "1",
         "admin": request.GET.get("admin") == "true",
     }
-    return render(request, "ventas/tienda/acceso.html", context, status=200 if key else 503)
+    return render(request, "ventas/acceso.html", context, status=200 if key else 503)

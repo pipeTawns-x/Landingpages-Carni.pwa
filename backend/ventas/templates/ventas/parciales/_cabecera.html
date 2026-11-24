@@ -1,7 +1,8 @@
 {% comment %}
   The header and the menu drawer of the store, the same three zones as the landing's: menu and
   search on the left, the logo in the centre, cart and account on the right. Pass `activo`
-  ("productos", "inicio") to mark the page in the menu. The cart button is a link to the cart
+  ("productos", "inicio") to mark the page in the menu, and `sin_bolsa` on a page that does not
+  include the cart drawer (#bolsa), so the cart button does not point at a panel that is not there. The cart button is a link to the cart
   page, so it works without script; the island turns it into the opener of the cart drawer
   (#bolsa). The header is solid here: there is no film behind it.
 {% endcomment %}<header class="main-header" id="mainHeader">
@@ -25,7 +26,7 @@
     </div>
 
     <div class="header-zone header-zone--right">
-      <a class="header-icon-btn header-icon-btn--round position-relative" href="{% url 'ventas:carrito' %}" id="cartBtn" aria-label="Carrito" aria-controls="bolsa">
+      <a class="header-icon-btn header-icon-btn--round position-relative" href="{% url 'ventas:carrito' %}" id="cartBtn" aria-label="Carrito"{% if not sin_bolsa %} aria-controls="bolsa"{% endif %}>
         <i class="bi bi-cart3" aria-hidden="true"></i>
         {% with cantidad=bolsa|length %}{% if cantidad %}<span class="badge bg-danger rounded-pill position-absolute top-0 start-100 translate-middle main-header__cart-count">{{ cantidad }}</span>{% endif %}{% endwith %}
       </a>

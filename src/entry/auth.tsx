@@ -1,39 +1,24 @@
-import '../../js/modules/ui/bootstrap-global.js';
-import { ThemeProvider } from 'styled-components';
-import { mountReactNode } from './shared';
-import { montarCarrito } from '@src/components/CartPanel/montar';
-import { montarLupa } from '@src/components/Lupa/montar';
-import { carniTheme } from '@src/theme/carniTheme';
-import '@src/styles/redesign.css';
+// Bootstrap's global and the styles come first, statically: `{% vite_asset %}` turns the CSS of
+// this entry into <link> tags, and a style imported from a dynamic chunk would load late.
+//
+// `?acceso` is not read by anything: it gives each stylesheet a module identity of its own, so the
+// pages that import the same files do not hoist them into a shared chunk that `{% vite_asset %}`
+// would list AFTER this entry's CSS (and Bootstrap would then override the site). See products.tsx.
+// Only the shared files carry it: acceso-page.css is imported by this entry alone, so it needs none.
+import '../../js/modules/ui/bootstrap-js.js';
+import '@src/landing/bootstrap-first.css?acceso';
+import '@src/styles/fuentes';
+import '@src/styles/redesign.css?acceso';
+import '@src/styles/tokens-globales.css?acceso';
+import '../../css/styles.css?acceso';
+import '../../css/pages/acceso-page.css';
 
-function AuthExperience(): JSX.Element {
-  return (
-    <section className="tw-redesign-root tw-auth-strip">
-      <div className="tw-auth-strip__content">
-        <p className="tw-kicker">Acceso Premium</p>
-        <h2>Login y registro con identidad editorial, confianza y claridad móvil</h2>
-        <p>
-          Se preservan los efectos visuales del acceso actual, pero se suma una capa editorial que explica beneficios,
-          delivery, seguimiento y la experiencia premium del club digital.
-        </p>
-        <div className="tw-auth-strip__grid">
-          <article className="tw-mini-card"><h3>Entrega y pickup</h3><p>Compra, agenda y confirma pedidos con seguimiento para tienda o envío.</p></article>
-          <article className="tw-mini-card"><h3>Mercy Club</h3><p>Acumula puntos, recibe ofertas especiales y conserva tu historial de compras.</p></article>
-        </div>
-      </div>
-    </section>
-  );
+// Two pages share this entry. The Django page (backend/ventas/templates/ventas/acceso.html) paints
+// its own forms and only needs behaviour (the sign-in logic is static/tienda/acceso.js, loaded by
+// the template); the static accessweb.html at the root, served by the Vite dev server, mounts its
+// React strip. Each branch is its own chunk, so the page that does not use it never loads it.
+if (document.body.hasAttribute('data-server-store')) {
+  void import('@src/acceso/server-acceso').then(({ initServerAcceso }) => initServerAcceso());
+} else {
+  void import('@src/acceso/legacy-acceso').then(({ mountLegacyAcceso }) => mountLegacyAcceso());
 }
-
-mountReactNode(
-  '#authExperienceRoot',
-  <ThemeProvider theme={carniTheme}>
-    <AuthExperience />
-  </ThemeProvider>
-);
-
-// El popin y el cajón son los mismos en las tres páginas. Se montan aparte
-// porque sus disparadores (#searchBtn, .header-search, #cartBtn) viven en el
-// header estático, fuera de este árbol.
-montarLupa();
-montarCarrito();

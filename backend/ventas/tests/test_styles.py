@@ -19,8 +19,8 @@ PANEL_CSS = "panel/panel.css"
 # The public store templates live in ventas/tienda/ and have their own tests.
 # index.html and productos.html are the store's real pages: they are styled by the Vite build
 # (Bootstrap and the site's own CSS, see test_landing.py and test_products_page.py), not by the
-# panel's Tailwind stylesheet. acceso.html joins them when T5 lands.
-VITE_STYLED_TEMPLATES = {"index.html", "productos.html"}
+# panel's Tailwind stylesheet. acceso.html is the third one (T5, tested in test_acceso_page.py).
+VITE_STYLED_TEMPLATES = {"index.html", "productos.html", "acceso.html"}
 PANEL_TEMPLATES = sorted(
     path for path in TEMPLATES.glob("*.html") if path.name not in VITE_STYLED_TEMPLATES
 )

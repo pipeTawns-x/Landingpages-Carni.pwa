@@ -47,7 +47,8 @@ class AccessPageTests(TestCase):
         response = self.get()
 
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "ventas/tienda/acceso.html")
+        self.assertTemplateUsed(response, "ventas/acceso.html")
+        self.assertTemplateNotUsed(response, "ventas/tienda/acceso.html")
 
     def test_it_lives_at_acceso_and_the_old_address_still_lands_on_it(self):
         self.assertEqual(reverse("ventas:acceso"), "/acceso/")
@@ -57,14 +58,20 @@ class AccessPageTests(TestCase):
             response, "/acceso/?salir=1", status_code=301, fetch_redirect_response=False
         )
 
-    def test_it_sits_inside_the_store_frame(self):
+    def test_it_has_its_own_frame_built_by_vite(self):
+        # The page no longer sits inside the parallel store's frame (ventas/tienda/base.html): it is
+        # one template with the shared header, footer and search partials, and its styles and
+        # script come from the Vite build, like the landing and the products page.
         response = self.get()
 
-        self.assertTemplateUsed(response, "ventas/tienda/base.html")
+        self.assertTemplateUsed(response, "ventas/acceso.html")
+        self.assertTemplateNotUsed(response, "ventas/tienda/base.html")
         html = response.content.decode()
         self.assertIn('<main id="contenido">', html)
         self.assertIn("<title>Acceso", html)
         self.assertEqual(len(re.findall(r"<h1[ >]", html)), 1)
+        self.assertRegex(html, r'<link rel="stylesheet" [^>]*href="/static/vite/assets/[^"]+\.css"')
+        self.assertIn("data-server-store", html)
 
     def test_both_forms_are_there_with_their_fields(self):
         html = self.get().content.decode()
@@ -75,11 +82,12 @@ class AccessPageTests(TestCase):
         self.assertIn("form-registro", ids)
         by_id = {attrs.get("id"): attrs for _, attrs in tags.tags if attrs.get("id")}
         self.assertEqual(by_id["ingresar-correo"]["type"], "email")
-        self.assertEqual(by_id["ingresar-correo"]["autocomplete"], "email")
+        self.assertEqual(by_id["ingresar-correo"]["autocomplete"], "username")
         self.assertEqual(by_id["ingresar-clave"]["type"], "password")
         self.assertEqual(by_id["ingresar-clave"]["autocomplete"], "current-password")
         self.assertEqual(by_id["registro-nombre"]["autocomplete"], "name")
         self.assertEqual(by_id["registro-correo"]["type"], "email")
+        self.assertEqual(by_id["registro-correo"]["autocomplete"], "username")
         self.assertEqual(by_id["registro-telefono"]["type"], "tel")
         self.assertEqual(by_id["registro-clave"]["autocomplete"], "new-password")
         self.assertEqual(by_id["registro-clave2"]["autocomplete"], "new-password")
@@ -134,12 +142,14 @@ class AccessPageTests(TestCase):
         scripts = tags.named("script")
         modules = [s for s in scripts if s.get("type") == "module"]
 
-        # The header script of every page, and the one module of this page.
+        # The entry of the Vite build (the site's header, menu and search) and the one module of
+        # this page, the sign-in script. Both are external modules; nothing else runs.
         self.assertEqual(len(scripts), 2)
-        self.assertEqual(len(modules), 1)
-        self.assertRegex(modules[0].get("src", ""), r"^/static/tienda/acceso(\.[0-9a-f]+)?\.js$")
-        for script in scripts:
-            self.assertTrue(script.get("src", "").startswith("/static/tienda/"))
+        self.assertEqual(len(modules), 2)
+        sources = sorted(script.get("src", "") for script in scripts)
+        self.assertRegex(sources[0], r"^/static/tienda/acceso(\.[0-9a-f]+)?\.js$")
+        self.assertRegex(sources[1], r"^/static/vite/assets/auth-[\w-]+\.js$")
+        self.assertEqual(len([s for s in sources if s.startswith("/static/tienda/")]), 1)
         self.assertNotIn("<style", html)
         for _, attrs in tags.tags:
             self.assertNotIn("style", attrs)
@@ -188,9 +198,10 @@ class AccessPageTests(TestCase):
         html = response.content.decode()
         self.assertIn("no está configurado", html)
         self.assertNotIn("data-supabase-key", html)
-        # Only the header script of every page: the sign-in module is not loaded.
+        # Only the entry of the build: the sign-in module is not loaded.
         sources = [attrs.get("src") for attrs in parse(html).named("script")]
-        self.assertEqual(sources, ["/static/tienda/tienda.js"])
+        self.assertEqual(len(sources), 1)
+        self.assertRegex(sources[0], r"^/static/vite/assets/auth-[\w-]+\.js$")
 
     def test_salir_is_accepted_and_the_page_is_never_cached(self):
         response = self.get(salir="1")

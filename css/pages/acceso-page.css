@@ -1,0 +1,627 @@
+/*
+ * The sign-in / sign-up page (backend/ventas/templates/ventas/acceso.html), mobile first.
+ *
+ * Where it lives: AGENTS.md keeps the styles of the site's pages under css/ (7-1) and Tailwind v4
+ * for the panel and the new components (src/ui, src/catalogo, src/asistente). This is the style
+ * of one page, so it lives in the pages layer (css/pages/), loaded by the Django branch of
+ * src/entry/auth.tsx.
+ *
+ * Narrow: Don Carlos peeks over the top of one white card, on the orange of the first view; only
+ * the active form shows. From 64rem: one wide card, the form on one half and Don Carlos' panel on
+ * the other, which slides over to the other half when the form changes (480 ms, the curve the
+ * mascot README defines). The mode lives in `data-modo` on #acceso, which static/tienda/acceso.js
+ * flips; every visual change below is a selector on that attribute, so the script never needs to
+ * know about the design.
+ *
+ * The page is complete and still without motion. Every animation is opted into with
+ * `prefers-reduced-motion: no-preference`; with `reduce`, the change of form is a plain 180 ms fade
+ * (it is marked !important on purpose: css/styles.css shortens every animation to .01 ms there).
+ * Colours are the ones of the approved mobile reference (docs/design/referencias/
+ * accessweb-mobile-first-2026-11-21.png), scoped to this page until DESIGN.md names them.
+ */
+
+.acceso-page {
+  --acceso-naranja: #d4561b;
+  --acceso-naranja-profundo: #b3401a;
+  --acceso-arena: #e0c18d;
+  --acceso-rojo: #b3261e;
+  --acceso-rojo-oscuro: #8f1d17;
+  --acceso-tinta: #2a1f1a;
+  --acceso-tinta-suave: #5a4f48;
+  --acceso-campo: #f1efec;
+  --acceso-borde: #6f6862;
+  --acceso-crema: #f2dcc4;
+  --acceso-curva: cubic-bezier(0.77, 0, 0.175, 1);
+  /* The site's stylesheet puts a decorative heading face on `--font-display` (it redefines the
+     token after src/styles/tokens.css), so the heading face stays local; `--font-sans` has one
+     definition and resolves to Geist. Both faces are the self-hosted ones of src/styles/fuentes.ts. */
+  --acceso-sans: var(--font-sans);
+  --acceso-display: "Fraunces Variable", ui-serif, Georgia, serif;
+}
+
+/* The skip link is the one of the landing; its rule lives in a stylesheet this page does not load. */
+.acceso-page .landing-skip-link {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  z-index: 100;
+  padding: 0.75rem 1rem;
+  background: #fff;
+  color: #111;
+  translate: 0 -120%;
+}
+
+.acceso-page .landing-skip-link:focus-visible {
+  translate: 0 0;
+}
+
+/* The scene: orange first view that turns to sand under the card. */
+.acceso {
+  position: relative;
+  font-family: var(--acceso-sans);
+  padding: 11.75rem 1rem 3rem;
+  background: linear-gradient(to bottom, var(--acceso-naranja) 0 14rem, var(--acceso-arena) 14rem);
+}
+
+/* The card is reserved before the forms show (they wait for Supabase to load), so nothing jumps. */
+.acceso__ranura {
+  position: relative;
+  display: block;
+  inline-size: 100%;
+  max-inline-size: 26rem;
+  min-block-size: 22rem;
+  margin-inline: auto;
+  border-radius: 1.5rem;
+  background: #fff;
+  color: var(--acceso-tinta);
+  box-shadow: 0 1.25rem 2.5rem rgb(60 24 10 / 0.28);
+}
+
+.acceso__ranura noscript {
+  display: block;
+  padding: 2rem 1.5rem;
+  text-align: center;
+}
+
+.acceso__ranura noscript a {
+  color: var(--acceso-rojo-oscuro);
+}
+
+/* Don Carlos, from the waist up, standing on the top edge of the card. */
+.acceso__mascota {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 100%;
+  block-size: 10.75rem;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.acceso__mascota::before {
+  content: "";
+  position: absolute;
+  inset-block-start: 1rem;
+  inset-inline: 0;
+  margin-inline: auto;
+  inline-size: 11rem;
+  block-size: 11rem;
+  border-radius: 50%;
+  background: var(--acceso-naranja-profundo);
+}
+
+.acceso__pose {
+  position: absolute;
+  inset-block-start: 0.25rem;
+  inset-inline: 0;
+  margin-inline: auto;
+  block-size: 15.5rem;
+  inline-size: auto;
+  max-inline-size: none;
+  opacity: 0;
+  visibility: hidden;
+  translate: 0 1rem;
+}
+
+.acceso__pose--registro {
+  block-size: 13.5rem;
+}
+
+.acceso__ranura:not(:has(#acceso[data-modo="registro"])) .acceso__pose--ingresar,
+.acceso__ranura:has(#acceso[data-modo="registro"]) .acceso__pose--registro {
+  opacity: 1;
+  visibility: visible;
+  translate: 0 0;
+}
+
+/* The root of the sign-in script. Its children join the card's own layout. */
+#acceso {
+  display: block;
+}
+
+#acceso[hidden] {
+  display: none;
+}
+
+.acceso__aviso {
+  margin: 1rem 1rem 0;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  background: #fbefd9;
+  color: var(--acceso-tinta);
+  font-size: 0.9375rem;
+  line-height: 1.4;
+}
+
+.acceso__aviso:empty {
+  display: none;
+}
+
+.acceso__forma {
+  display: grid;
+  gap: 0.875rem;
+  padding: 1.5rem 1.25rem 1.25rem;
+}
+
+#acceso[data-modo="registro"] > #form-ingresar,
+#acceso:not([data-modo="registro"]) > #form-registro {
+  display: none;
+}
+
+.acceso__titulo {
+  margin: 0;
+  color: var(--acceso-rojo-oscuro);
+  font-family: var(--acceso-display);
+  font-size: clamp(1.3rem, 5.4vw, 1.625rem);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1.15;
+  text-align: center;
+  text-transform: uppercase;
+  text-wrap: balance;
+}
+
+.acceso__sub {
+  margin: -0.375rem 0 0;
+  color: var(--acceso-tinta-suave);
+  font-size: 0.9375rem;
+  text-align: center;
+  text-wrap: balance;
+}
+
+.acceso-campo {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.acceso-campo__etiqueta {
+  padding-inline: 1rem;
+  color: var(--acceso-rojo-oscuro);
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.acceso-campo__caja {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding-inline: 1rem 0.375rem;
+  border: 2px solid var(--acceso-borde);
+  border-radius: 999px;
+  background: var(--acceso-campo);
+  color: var(--acceso-tinta);
+  transition: border-color 150ms ease, background-color 150ms ease, box-shadow 150ms ease;
+}
+
+.acceso-campo__caja > i {
+  color: var(--acceso-tinta-suave);
+  font-size: 1.125rem;
+  line-height: 1;
+}
+
+.acceso-campo__caja:focus-within {
+  border-color: var(--acceso-rojo);
+  background: #fff;
+  box-shadow: 0 0 0 3px rgb(179 38 30 / 0.22);
+}
+
+.acceso-campo__caja input {
+  flex: 1;
+  inline-size: 100%;
+  min-inline-size: 0;
+  min-block-size: 2.75rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 1rem;
+  outline: none;
+}
+
+.acceso-campo__caja input::placeholder {
+  color: #6b625c;
+  opacity: 1;
+}
+
+.acceso-campo__ojo {
+  display: grid;
+  place-items: center;
+  flex: none;
+  inline-size: 2.75rem;
+  block-size: 2.75rem;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--acceso-tinta-suave);
+  font-size: 1.125rem;
+  cursor: pointer;
+}
+
+.acceso__dos {
+  display: grid;
+  gap: 0.875rem;
+}
+
+.acceso__marca {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-block-size: 2.75rem;
+  font-size: 0.9375rem;
+  line-height: 1.3;
+}
+
+.acceso__marca input {
+  flex: none;
+  inline-size: 1.375rem;
+  block-size: 1.375rem;
+  accent-color: var(--acceso-rojo);
+}
+
+.acceso__error {
+  margin: 0;
+  color: var(--acceso-rojo-oscuro);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.acceso__error:empty {
+  display: none;
+}
+
+.acceso__enviar {
+  min-block-size: 3rem;
+  padding: 0.5rem 1.5rem;
+  border: 0;
+  border-radius: 999px;
+  background: var(--acceso-rojo);
+  color: #fff;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background-color 150ms ease, scale 120ms ease;
+}
+
+.acceso__enviar:disabled {
+  opacity: 0.7;
+  cursor: progress;
+}
+
+.acceso__cambio {
+  margin: 0;
+  color: var(--acceso-tinta-suave);
+  font-size: 0.9375rem;
+  text-align: center;
+}
+
+.acceso__cambio button {
+  min-block-size: 2.75rem;
+  padding: 0 0.25rem;
+  border: 0;
+  background: none;
+  color: var(--acceso-rojo-oscuro);
+  font: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  cursor: pointer;
+}
+
+/* Keyboard focus: a ring on every control the field box does not already ring. */
+.acceso__enviar:focus-visible,
+.acceso__cambio button:focus-visible,
+.acceso-campo__ojo:focus-visible,
+.acceso__marca input:focus-visible {
+  outline: 3px solid var(--acceso-rojo);
+  outline-offset: 3px;
+}
+
+/* The panel is dark red: a red ring would vanish on it (1.7:1). Cream is 8.4:1. */
+.acceso__panel button:focus-visible {
+  outline: 3px solid var(--acceso-crema);
+  outline-offset: 3px;
+}
+
+/* The panel with the switch buttons is the wide screens' job; the forms carry their own links. */
+.acceso__panel {
+  display: none;
+}
+
+@media (hover: hover) {
+  .acceso__enviar:hover:not(:disabled) {
+    background: var(--acceso-rojo-oscuro);
+  }
+
+  .acceso-campo__ojo:hover,
+  .acceso__cambio button:hover {
+    color: var(--acceso-rojo);
+  }
+
+  /* Only the wide screens show the panel; on a narrow one it is display: none. */
+  .acceso__panel button:hover {
+    background: #fff;
+    color: var(--acceso-rojo-oscuro);
+  }
+}
+
+.acceso__enviar:active:not(:disabled) {
+  scale: 0.97;
+}
+
+@media (min-width: 40rem) {
+  .acceso {
+    padding-block-end: 4rem;
+  }
+
+  .acceso__forma {
+    padding: 1.75rem 2rem 1.5rem;
+  }
+}
+
+/* Wide screens: one card, two halves, a panel that slides over the half that is not in use. */
+@media (min-width: 64rem) {
+  .acceso {
+    display: grid;
+    place-items: center;
+    padding: 4rem 2rem;
+    background:
+      radial-gradient(circle at 12% 88%, rgb(212 86 27 / 0.55) 0 14rem, transparent 14.1rem),
+      linear-gradient(to bottom, var(--acceso-naranja) 0 40%, var(--acceso-arena) 40%);
+  }
+
+  .acceso__ranura {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto 1fr;
+    max-inline-size: 66rem;
+    min-block-size: 38rem;
+    overflow: hidden;
+    border-radius: 1.75rem;
+  }
+
+  #acceso {
+    display: contents;
+  }
+
+  #acceso[hidden] {
+    display: none;
+  }
+
+  .acceso__aviso {
+    position: relative;
+    z-index: 3;
+    grid-column: 1 / -1;
+    grid-row: 1;
+  }
+
+  .acceso__forma {
+    align-self: center;
+    grid-row: 2;
+    padding: 2rem 3.5rem;
+  }
+
+  #form-ingresar {
+    grid-column: 1;
+  }
+
+  #form-registro {
+    grid-column: 2;
+  }
+
+  /* Don Carlos' half: red with a cream arch, the figure whole and standing on the floor. */
+  .acceso__mascota {
+    inset-block: 0;
+    inset-inline: 50% 0;
+    block-size: auto;
+    background:
+      radial-gradient(circle at 50% 66%, var(--acceso-crema) 0 36%, transparent 36.4%),
+      var(--acceso-rojo);
+  }
+
+  .acceso__mascota::before {
+    display: none;
+  }
+
+  /* 76% of the card's height, but never wider than the half: the stacked sign-up form makes the
+     card taller than the pose is wide, and `contain` keeps Don Carlos whole instead of cropped. */
+  .acceso__pose,
+  .acceso__pose--registro {
+    inset-block: auto 0;
+    inline-size: 100%;
+    block-size: 76%;
+    object-fit: contain;
+    object-position: 50% 100%;
+    translate: 0 0;
+  }
+
+  .acceso__ranura:has(#acceso[data-modo="registro"]) .acceso__mascota {
+    translate: -100% 0;
+  }
+
+  .acceso__panel {
+    position: absolute;
+    inset-block: 0;
+    inset-inline: 50% 0;
+    z-index: 2;
+    display: grid;
+    align-items: end;
+    padding: 2.5rem;
+    background: linear-gradient(to top, rgb(110 20 15 / 0.94) 0 22%, transparent 52%);
+    color: #fff;
+  }
+
+  #acceso[data-modo="registro"] > .acceso__panel {
+    translate: -100% 0;
+  }
+
+  .acceso__panel > div {
+    grid-area: 1 / 1;
+    visibility: hidden;
+    opacity: 0;
+  }
+
+  #acceso:not([data-modo="registro"]) > .acceso__panel > [data-panel="ingresar"],
+  #acceso[data-modo="registro"] > .acceso__panel > [data-panel="registro"] {
+    visibility: visible;
+    opacity: 1;
+  }
+
+  .acceso__panel h2 {
+    margin: 0;
+    font-family: var(--acceso-display);
+    font-size: 1.75rem;
+    font-weight: 700;
+    line-height: 1.15;
+    text-wrap: balance;
+  }
+
+  .acceso__panel p {
+    margin: 0.5rem 0 1.25rem;
+    font-size: 1rem;
+    line-height: 1.45;
+  }
+
+  .acceso__panel button {
+    min-block-size: 3rem;
+    padding: 0.5rem 1.75rem;
+    border: 2px solid #fff;
+    border-radius: 999px;
+    background: transparent;
+    color: #fff;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background-color 150ms ease, color 150ms ease;
+  }
+
+  .acceso__cambio {
+    display: none;
+  }
+}
+
+/* Two columns of fields only where each input keeps room for the 8-character password minimum.
+   Measured in Brave with two columns: 61 px at 768, 69 px at 1024, 88 px at 1100; 93 px from 1200. */
+@media (min-width: 75rem) {
+  .acceso__dos {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* Motion is opt-in. Only transform-like properties and opacity move. */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes acceso-mascota {
+    from {
+      opacity: 0;
+      translate: 0 3rem;
+      rotate: -4deg;
+    }
+
+    60% {
+      translate: 0 -0.35rem;
+      rotate: 1.5deg;
+    }
+  }
+
+  @keyframes acceso-forma {
+    from {
+      opacity: 0;
+      translate: 0 0.75rem;
+    }
+  }
+
+  @keyframes acceso-error {
+    from {
+      opacity: 0;
+      translate: 0 -0.375rem;
+    }
+  }
+
+  /* The card does not animate: it wraps the first image to paint (the LCP). Don Carlos is the one
+     big effect of the view: he rises into the card; the other pose waits hidden. */
+  .acceso__ranura:not(:has(#acceso[data-modo="registro"])) .acceso__pose--ingresar {
+    transform-origin: 70% 100%;
+    animation: acceso-mascota 480ms var(--ease-out-strong) 80ms both;
+  }
+
+  /* Changing form on a narrow screen: the old pose leaves in 130 ms and the new one enters after
+     it (130 ms of delay), so two Don Carlos are never on screen together. */
+  .acceso__pose {
+    transition: opacity 130ms var(--ease-out-strong), translate 130ms var(--ease-out-strong), visibility 0s linear 130ms;
+  }
+
+  .acceso__ranura:not(:has(#acceso[data-modo="registro"])) .acceso__pose--ingresar,
+  .acceso__ranura:has(#acceso[data-modo="registro"]) .acceso__pose--registro {
+    transition-delay: 130ms;
+  }
+
+  #acceso > form {
+    animation: acceso-forma 320ms var(--ease-out-strong) both;
+  }
+
+  .acceso__error:not(:empty) {
+    animation: acceso-error 200ms var(--ease-out-strong) both;
+  }
+
+  @media (min-width: 64rem) {
+    /* The panel slides the full half in 480 ms. The pose and the text change at the instant of top
+       speed (229 ms): exactly one is on screen at any moment, never two blended. */
+    .acceso__mascota,
+    .acceso__panel {
+      transition: translate 480ms var(--acceso-curva);
+    }
+
+    .acceso__pose,
+    .acceso__ranura:not(:has(#acceso[data-modo="registro"])) .acceso__pose--ingresar,
+    .acceso__ranura:has(#acceso[data-modo="registro"]) .acceso__pose--registro,
+    .acceso__panel > div {
+      transition: opacity 0s linear 229ms, visibility 0s linear 229ms;
+    }
+
+    /* The form that is arriving shows when the panel has cleared the half it takes. */
+    #acceso > form {
+      animation-delay: 240ms;
+    }
+  }
+}
+
+/* Reduced motion: no slide, no rise. The change of form is a short fade of opacity alone. */
+@media (prefers-reduced-motion: reduce) {
+  @keyframes acceso-fundido {
+    from {
+      opacity: 0;
+    }
+  }
+
+  #acceso > form {
+    animation: acceso-fundido 180ms linear both;
+    /* Wins over the rule of css/styles.css:6250 that sets .01 ms on every animation: an !important
+       of a more specific selector beats it. A fade of opacity is not movement. */
+    animation-duration: 180ms !important;
+  }
+}

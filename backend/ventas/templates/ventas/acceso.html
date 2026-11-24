@@ -1,0 +1,141 @@
+{% load static vite %}<!DOCTYPE html>
+{% comment %}
+  Sign in and sign up: the real accessweb.html, painted by Django (ventas:acceso, /acceso/). Same
+  idea as the original page, built mobile first: Don Carlos over one card, one form at a time on a
+  narrow screen; on a wide one, two halves and Don Carlos' panel sliding between them.
+
+  The sign-in logic is NOT in this file. Supabase Auth runs in the browser through
+  static/tienda/acceso.js, which reads the ids, the data-* attributes and the field names below
+  (#acceso, #acceso-aviso, #form-ingresar, #form-registro, [data-error], [data-accion], the
+  `name` of every input). Change one of those and the script stops working; the look is free.
+  The script flips `data-modo` on #acceso ("ingresar" or "registro") and the styles do the rest
+  (css/pages/acceso-page.css). #acceso stays `hidden` until the script has its handlers: a
+  submit before that would post a password. Don Carlos and the card are outside it, so the first
+  paint does not wait for Supabase.
+
+  CSP 'self': no inline style, no inline script, no CDN. Styles and scripts come from the Vite
+  build ({% vite_asset %}), which writes Bootstrap before the site's own CSS. The social buttons of
+  the old page went nowhere (the script has no OAuth), so they are not painted.
+{% endcomment %}
+<html lang="es">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#363432" />
+  <title>Acceso · {{ negocio.nombre }}</title>
+  <meta name="description" content="Inicia sesión o crea tu cuenta en {{ negocio.nombre }} para pedir tus cortes.">
+  <link rel="icon" href="/img/recursos_web/logo-user.webp" type="image/webp">
+  {% if configurado %}<link rel="preload" as="image" type="image/webp" href="/img/mascota/don-carlos-login.webp" imagesrcset="/img/mascota/don-carlos-login.webp 1x, /img/mascota/don-carlos-login@2x.webp 2x" fetchpriority="high">{% endif %}
+  {% vite_asset "src/entry/auth.tsx" %}
+  {% if configurado %}<script type="module" src="{% static 'tienda/acceso.js' %}"></script>{% endif %}
+</head>
+
+<body class="dark-premium django-store acceso-page" data-server-store>
+  <a class="landing-skip-link" href="#contenido">Ir al contenido</a>
+  <div class="offline-alert alert alert-warning d-none" role="alert">
+    <i class="bi bi-wifi-off me-2" aria-hidden="true"></i> Estás en modo offline. Algunas funciones pueden estar limitadas.
+  </div>
+
+  {% include "ventas/parciales/_cabecera.html" with activo="acceso" sin_bolsa=True %}
+
+  <main id="contenido">
+    <h1 class="visually-hidden">Iniciar sesión o crear cuenta</h1>
+
+    {% if not configurado %}
+    <section class="container py-5 text-center">
+      <h2>El acceso no está disponible</h2>
+      <p class="mt-3">El acceso no está configurado en este sitio todavía. Puedes seguir viendo los <a href="{% url 'ventas:catalogo' %}">productos</a>.</p>
+    </section>
+    {% else %}
+    <div class="acceso">
+      <div class="acceso__ranura">
+        <div class="acceso__mascota">
+          <img class="acceso__pose acceso__pose--ingresar" src="/img/mascota/don-carlos-login.webp" srcset="/img/mascota/don-carlos-login@2x.webp 2x" alt="Don Carlos saluda con su cuchilla junto a un corte sobre el tronco" width="640" height="768" fetchpriority="high" decoding="async">
+          <img class="acceso__pose acceso__pose--registro" src="/img/mascota/don-carlos-register.webp" srcset="/img/mascota/don-carlos-register@2x.webp 2x" alt="Don Carlos te da la bienvenida con los brazos abiertos" width="640" height="640" loading="lazy" decoding="async">
+        </div>
+
+        <noscript>
+          <p role="alert">Para iniciar sesión o crear tu cuenta necesitas activar JavaScript en tu navegador. Mientras tanto puedes ver los <a href="{% url 'ventas:catalogo' %}">productos</a>.</p>
+        </noscript>
+
+        <div id="acceso" hidden data-modo="ingresar"
+             data-supabase-url="{{ supabase_url }}"
+             data-supabase-key="{{ supabase_key }}"
+             data-supabase-js="{{ supabase_js }}"
+             data-sesion-url="{{ sesion_url }}"
+             data-panel-url="{{ panel_url }}"
+             data-tienda-url="{{ tienda_url }}">
+
+          <p id="acceso-aviso" class="acceso__aviso" role="status" aria-live="polite"{% if admin %} data-admin="true"{% endif %}>{% if salir %}Cerraste tu sesión.{% elif admin %}Acceso solo para personal autorizado.{% endif %}</p>
+
+          <form id="form-ingresar" class="acceso__forma" method="post" action="{% url 'ventas:acceso' %}" novalidate aria-labelledby="titulo-ingresar">
+            <h2 id="titulo-ingresar" class="acceso__titulo">¡Bienvenido de vuelta!</h2>
+            <div class="acceso-campo">
+              <label class="acceso-campo__etiqueta" for="ingresar-correo">Correo electrónico</label>
+              <span class="acceso-campo__caja"><i class="bi bi-envelope" aria-hidden="true"></i><input id="ingresar-correo" aria-describedby="ingresar-error" name="email" type="email" autocomplete="username" spellcheck="false" enterkeyhint="next" placeholder="tucorreo@ejemplo.com" required></span>
+            </div>
+            <div class="acceso-campo">
+              <label class="acceso-campo__etiqueta" for="ingresar-clave">Contraseña</label>
+              <span class="acceso-campo__caja"><i class="bi bi-lock" aria-hidden="true"></i><input id="ingresar-clave" aria-describedby="ingresar-error" name="password" type="password" autocomplete="current-password" spellcheck="false" autocapitalize="none" autocorrect="off" enterkeyhint="go" required><button type="button" class="acceso-campo__ojo" data-ver-clave aria-controls="ingresar-clave" aria-label="Mostrar contraseña"><i class="bi bi-eye" aria-hidden="true"></i></button></span>
+            </div>
+            <p class="acceso__error" id="ingresar-error" data-error role="alert"></p>
+            <button type="submit" class="acceso__enviar">Entrar a la carnicería</button>
+            <p class="acceso__cambio">¿No tienes cuenta? <button type="button" data-accion="ver-registro">Regístrate aquí</button></p>
+          </form>
+
+          <form id="form-registro" class="acceso__forma" method="post" action="{% url 'ventas:acceso' %}" novalidate aria-labelledby="titulo-registro">
+            <h2 id="titulo-registro" class="acceso__titulo">Crea tu cuenta nueva</h2>
+            <p class="acceso__sub">Solo lo esencial. Los datos de entrega los das cuando hagas tu primer pedido.</p>
+            <div class="acceso-campo">
+              <label class="acceso-campo__etiqueta" for="registro-nombre">Nombre completo</label>
+              <span class="acceso-campo__caja"><i class="bi bi-person" aria-hidden="true"></i><input id="registro-nombre" aria-describedby="registro-error" name="full_name" type="text" autocomplete="name" enterkeyhint="next" required></span>
+            </div>
+            <div class="acceso__dos">
+              <div class="acceso-campo">
+                <label class="acceso-campo__etiqueta" for="registro-correo">Correo electrónico</label>
+                <span class="acceso-campo__caja"><i class="bi bi-envelope" aria-hidden="true"></i><input id="registro-correo" aria-describedby="registro-error" name="email" type="email" autocomplete="username" spellcheck="false" enterkeyhint="next" required></span>
+              </div>
+              <div class="acceso-campo">
+                <label class="acceso-campo__etiqueta" for="registro-telefono">Teléfono (10 dígitos)</label>
+                <span class="acceso-campo__caja"><i class="bi bi-telephone" aria-hidden="true"></i><input id="registro-telefono" aria-describedby="registro-error" name="phone" type="tel" inputmode="numeric" autocomplete="tel-national" enterkeyhint="next" required></span>
+              </div>
+              <div class="acceso-campo">
+                <label class="acceso-campo__etiqueta" for="registro-clave">Contraseña (mínimo 8)</label>
+                <span class="acceso-campo__caja"><i class="bi bi-lock" aria-hidden="true"></i><input id="registro-clave" aria-describedby="registro-error" name="password" type="password" autocomplete="new-password" spellcheck="false" autocapitalize="none" autocorrect="off" enterkeyhint="next" required><button type="button" class="acceso-campo__ojo" data-ver-clave aria-controls="registro-clave" aria-label="Mostrar contraseña"><i class="bi bi-eye" aria-hidden="true"></i></button></span>
+              </div>
+              <div class="acceso-campo">
+                <label class="acceso-campo__etiqueta" for="registro-clave2">Confirmar contraseña</label>
+                <span class="acceso-campo__caja"><i class="bi bi-shield-lock" aria-hidden="true"></i><input id="registro-clave2" aria-describedby="registro-error" name="password_confirm" type="password" autocomplete="new-password" spellcheck="false" autocapitalize="none" autocorrect="off" enterkeyhint="done" required><button type="button" class="acceso-campo__ojo" data-ver-clave aria-controls="registro-clave2" aria-label="Mostrar contraseña"><i class="bi bi-eye" aria-hidden="true"></i></button></span>
+              </div>
+            </div>
+            <label class="acceso__marca"><input id="registro-terminos" aria-describedby="registro-error" name="terms" type="checkbox" required><span>Acepto los términos y condiciones</span></label>
+            <label class="acceso__marca"><input id="registro-ofertas" aria-describedby="registro-error" name="newsletter" type="checkbox"><span>Quiero recibir ofertas por correo</span></label>
+            <p class="acceso__error" id="registro-error" data-error role="alert"></p>
+            <button type="submit" class="acceso__enviar">Crear mi cuenta</button>
+            <p class="acceso__cambio">¿Ya tienes cuenta? <button type="button" data-accion="ver-ingresar">Inicia sesión</button></p>
+          </form>
+
+          <div class="acceso__panel">
+            <div data-panel="ingresar">
+              <h2>¿Primera vez por aquí?</h2>
+              <p>Crea tu cuenta en minutos y pide sin filas ni vueltas.</p>
+              <button type="button" data-accion="ver-registro">Registrarme</button>
+            </div>
+            <div data-panel="registro">
+              <h2>¿Ya compras con nosotros?</h2>
+              <p>Entra, revisa tus favoritos y vuelve a pedir tus cortes de siempre.</p>
+              <button type="button" data-accion="ver-ingresar">Iniciar sesión</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  </main>
+
+  {% include "ventas/parciales/_pie.html" %}
+  {% include "ventas/parciales/_buscar.html" %}
+</body>
+
+</html>
