@@ -231,3 +231,131 @@ El corte de T4a **se puede commitear**: no hay bloqueante. El modo JSON no cambi
 - **F-19 sigue abierto como decisión.** `backend-datos` recomienda aceptarlo porque comercio-v1 pide mostrar "quedan N piezas". Si se acepta, la cifra es pública por diseño y `contrato-productos.md:72` ("no imprimas la cifra") queda en contradicción: hay que alinear uno de los dos.
 - Verificación: `manage.py test ventas.tests.test_contract_throttle ventas.tests.test_contract_carrito ventas.tests.test_contract_productos ventas.tests.test_public_cart ventas.tests.test_sale ventas.tests.test_catalog ventas.tests.test_producto config.test_security_headers --settings=config.settings_test` → **228 pruebas, OK**.
 - Pendiente para la siguiente rebanada, a pedido de `backend-datos`: las páginas `catalogo` y `producto` ya pintan `ventas/productos.html` de `frontend`; se auditan con CSP, `data-csrf`, el `next` de los formularios del cajón (`#bolsa`) y el escapado de nombres y notas (F-07 incluido).
+
+## 7. Rebanada 3: T4b rebanada 1, commits `567aac5c` y `49a602dd` (2026-11-23, HEAD `a9267f0a`)
+
+Auditor: teammate `auditor`. Specs cubiertas: S2, S6, S7, S11 y S12 (estas dos solo como criterio de entrada para T9 y T10, sin código que revisar todavía). Se audita **HEAD** (árbol de trabajo igual a HEAD para el código; solo `.atl/skill-registry.md` y archivos sin seguimiento ajenos). Las líneas son de HEAD. Las sondas viven en el directorio temporal de la sesión, no en el repo; datos sintéticos, SQLite en memoria, ninguna base real.
+
+### Veredicto por commit
+| commit | veredicto | motivo |
+|---|---|---|
+| `567aac5c` (plantilla `productos.html`, parciales, isla) | **se puede commitear** (ya está commiteado; sin hallazgo bloqueante) | Sin `<script>` en línea, sin `style=`, sin manejadores `on*=`, sin CDN y sin `\|safe` (`grep` sobre `productos.html` y `parciales/*.html`: solo `<a href="https://…">` de redes del negocio, que la CSP no restringe). El único `<script>` es `type="module" src="/static/vite/assets/products-V8_vDlyd.js"`. Los bundles nuevos no contienen `sb_publishable_`, `service_role`, `sb_secret_`, `sk_live_`, `sk_test_`, `AKIA…` ni `-----BEGIN` (`grep -rlE` sobre `backend/static/vite`: sin archivos). |
+| `49a602dd` (rutas, F-17, F-18, F-20) | **se puede commitear** (ya está commiteado; sin hallazgo bloqueante) | F-17 (/64 de IPv6), F-18 (7 dígitos) y F-20 (cookie CSRF en todas las páginas de productos) verificados cerrados con prueba. Los hallazgos nuevos F-21 y F-22 son anteriores a estos commits (`eea1d2a0`, `97419f5c`) y ninguno es explotable sin un token válido o sin salir en un 500 sin datos. |
+
+### Hallazgos nuevos
+| id | severidad | estado | archivo:línea (HEAD) | dueño | resumen |
+|---|---|---|---|---|---|
+| F-21 | baja | confirmado con sonda | `backend/ventas/views/carrito.py:144-149`, `:199` | backend-datos | `next=productos` (ruta relativa sin `/` ni `.`) pasa `url_has_allowed_host_and_scheme` y `redirect()` lo trata como nombre de URL: `NoReverseMatch`, 500 |
+| F-22 | baja | confirmado en el controlador; no reproducido contra una base | `backend/ventas/views/comun.py:22`, `backend/ventas/catalog.py:63`, `backend/ventas/views/productos.py:141-146` | backend-datos | `q` con el byte NUL (`?q=%00`) llega a `icontains`; psycopg lo rechaza y la página responde 500 |
+| F-23 | info | confirmado | `backend/ventas/templates/ventas/parciales/_bolsa.html:11-12`, `src/products/configurador.ts:111-115` | frontend | El comentario dice que los scripts envían el token en `X-CSRFToken`; ningún script lee `[data-csrf]`. Hoy solo sirve para que Django emita la cookie |
+| F-24 | baja | confirmado | `backend/ventas/tests/test_catalog.py:49`, `:107-111`; `test_products_page.py:51`, `:169`, `:468-469` | backend-datos | `test_the_cost_never_shows_up` es débil: no ejerce el costo real y su regex puede dar falsos positivos |
+| F-25 | info | confirmado | `docs/PENDIENTES.md` (P-47), Engram #3360, `odd/tasks/rediseno-moderno.md` L17 | lead | Evidencia vieja en P-47 y huecos del recibo de recursos de estos commits |
+
+### F-21 (baja, confirmado): `next` relativo sin barra rompe el redirect
+- `_safe_next` (`carrito.py:144-149`) acepta lo que `url_has_allowed_host_and_scheme` acepta, y una ruta como `productos` no tiene esquema ni host. `_answer` hace `redirect(target)` (`:199`); `redirect` intenta `reverse("productos")` primero, y como el texto no tiene `/` ni `.` lanza `NoReverseMatch`.
+- Sonda (cliente de pruebas, `agregar` y `quitar`): `next='productos'` → `NoReverseMatch` (500 con `DEBUG` falso). Los demás valores salen bien: `'ventas:catalogo'` → `/productos/` (el esquema `ventas` lo rechaza), `'https://evil.example/x'`, `'//evil.example'`, `'/\\evil.example'` y `''` → `/productos/`; `'x.y'` → `Location: x.y` (relativo al mismo origen, sin salto a otro sitio).
+- Alcance: exige un token CSRF válido, así que lo provoca el propio visitante; no hay redirección abierta ni fuga. Es robustez (OWASP A10:2025, manejo de condiciones excepcionales) y ruido de errores 500 en el registro.
+- Arreglo: aceptar solo destinos que empiecen con `/` y no con `//` (`target.startswith("/") and not target.startswith("//")` además de la comprobación actual), y una prueba en `NextAfterWriteTests` (`test_contract_carrito.py:257`) con `next="productos"`.
+
+### F-22 (baja, confirmado en el controlador): byte NUL en la búsqueda
+- `listing` recorta `q` a 80 caracteres pero no quita `\x00` (`comun.py:22`); `filtered` lo usa en `icontains` (`catalog.py:63`) y `buscar` hace lo mismo (`productos.py:141-146`). Django 5.2.19 con psycopg 3.3.5 enlaza los parámetros del lado del cliente: `Transformer().as_literal("a\x00b")` → `DataError: PostgreSQL text fields cannot contain NUL (0x00) bytes`, que Django traduce a `django.db.utils.DataError` sin captura: `GET /productos/?q=%00` y `GET /productos/buscar/?q=%00%00` darían 500 en Postgres.
+- La base de pruebas es SQLite y acepta el NUL (sonda: 200 y 200), así que ninguna prueba actual lo detecta; por eso es "confirmado en el controlador" y no "confirmado". `mostrador.nueva` del panel comparte `listing()`. Los formularios (`CartLineForm`, `StoreOrderForm`) no tienen el problema: `CharField` de Django rechaza NUL.
+- Arreglo: `query.replace("\x00", "")` dentro de `listing` y de `buscar`, y una prueba que simule `filtered` (con `mock`) y compruebe que nunca recibe NUL, porque SQLite no fallará.
+
+### F-23 (info): el token `data-csrf` no lo usa ningún script
+`_bolsa.html:11-12` dice "The token the scripts send in X-CSRFToken". `grep -rn "data-csrf" src js backend/ventas` solo encuentra la plantilla y `test_products_page.py:372`. La isla no hace ninguna escritura por `fetch`: el único `fetch` es un GET (`configurador.ts:111`, `Accept: application/json`, cotización sin efectos, `@never_cache`, `@require_safe`, límite de 90 por minuto en `productos.py:90-101`). El input sirve hoy para que Django emita la cookie (F-20, probado en `test_contract_carrito.py:397`). Cuando el cajón escriba por JSON (T6), tendrá que leerlo y enviar `X-CSRFToken`, y tratar el 403 de CSRF, que es HTML (`response.json()` se llama antes de mirar `ok`, `configurador.ts:115`; hoy cae en el `catch` y muestra "no pudimos calcularlo"). Dueño: `frontend`, al escribir el cajón; mientras tanto, corregir el comentario para que no afirme algo que no existe.
+
+### F-24 (baja, confirmado): `test_the_cost_never_shows_up` no protege el costo real
+1. El costo privado vive en `product_costs` (`inventory/models.py:517-545`, `related_name="cost"`), pero el ejemplo lo pone en `Product.metadata` (`test_catalog.py:49`, `test_products_page.py:51`). Ninguna prueba de `backend/ventas` crea un `ProductCost` (`grep -rn ProductCost backend` → solo `panel/` e `inventory/`). Si alguien escribe `{{ producto.cost.cost_per_kg }}` en una plantilla, el ejemplo no tiene fila y el campo sale vacío: la prueba pasa.
+2. `re.search(r"cost", html, re.I)` (`test_catalog.py:111`) es una trampa de falsos positivos: "Costilla" y "costal" contienen "cost", y una carnicería vende costilla. La primera vez que el catálogo tenga una "Costilla de res" la prueba fallará sin que haya fuga alguna, y quien la repare la debilitará.
+3. Solo cubre el HTML del catálogo; la ficha (`test_products_page.py:468-469`, con el mismo ejemplo) y no el cajón, `cotizar` ni `buscar`.
+- Comportamiento real (sonda con una fila `ProductCost` de 777.7777 por kilo y 888.8888 por pieza sobre un producto visible): ni catálogo, ni ficha, ni `cotizar`, ni `buscar` contienen "777.7", "888.8" ni la palabra "cost". El código está bien; la prueba es la débil.
+- Prueba propuesta (para `backend-datos`): crear la fila `ProductCost` con valores distintivos y el mismo valor en `metadata`; pedir catálogo, ficha, cajón (con el producto en el carrito), `cotizar` y `buscar`; comprobar que no aparecen los números (con `777.78` y `777,78`) ni las claves `cost_per_kg`, `cost_per_piece`, `yield_pct`, `costo`; y agregar un producto "Costilla de res" para fijar que el nombre no dispara la prueba.
+
+### F-25 (info): documentación y recibo de recursos
+- `docs/PENDIENTES.md` P-47 cita `throttle.py:13-20`; en HEAD `client_ip` está en `throttle.py:33-40` (el recorte de IPv6 movió las líneas).
+- El recibo de los 7 ítems de estos commits está en Engram #3359 y #3360 (topic `carni-mvp/resource-receipts/2026-11-23-t4-cierre`), no en el Log de `odd/tasks/rediseno-moderno.md` (L17 solo lo resume). Los commits son anteriores al candado de L18, así que no se rechaza; desde L18 la tabla va en el Log.
+- Ítem 2 (REA): el recibo dice "BLOQUEADO" sin el texto exacto del error (el aviso de sesión solo dice "configured but failed to connect"). Por L14 es un bloqueo y no un "parcial", pero L18 dice que `mcp__rea__*` figura disponible: hay que intentar la conexión y pegar el error literal.
+- Ítem 4 (patrones y diagramas): el recibo dice que el Archify HTML de T4 "queda pendiente"; la skill existe en `.claude/skills/archify` y `docs/diagramas/` no tiene el diagrama de T4. Con el candado de L18 ese ítem está **parcial** (hay Mermaid en `contrato-productos.md` §10 y en la sección 3 de este informe) y necesita el HTML o el OK explícito de Eduardo.
+
+### Lo que sigue abierto (estado en HEAD)
+| id | estado | evidencia | qué falta |
+|---|---|---|---|
+| F-04 / P-47 | abierto, por validar; el código no cambió | `throttle.py:33-40` toma la última entrada de `X-Forwarded-For`; `render.yaml:38` activa `DJANGO_BEHIND_PROXY`; `settings.py:341-342` | El dato de cuántos saltos agrega Render, que Eduardo confirma. **Debe cerrarse antes de T9**: el límite de pedidos (5 por hora) y el de escrituras se comparten entre todos si hay un salto más, y el pago y su webhook no pueden depender de un contador por IP |
+| F-08 / P-44 | abierto | `supabase/migrations/20260911_chat_messages.sql:50-52` (`WITH CHECK (true)`); el chat ahora también carga en `/productos/` (`server-products.ts:19`) y en la landing (`server-store.tsx:129`) | Migración con topes de largo (solo escrita para revisión) o escritura por Django. Hoy el bundle no lleva `VITE_SUPABASE_*` (0 coincidencias de `sb_publishable_`), así que el widget no persiste en esa build; el riesgo es la API REST directa. El render del chat usa `textContent` (`chatbot.js:179`, `:221`): sin XSS |
+| F-07 | **cerrado para `/productos/`** | `src/entry/products.tsx:25-29` y `server-products.ts:15-26` no importan `js/modules/core/cart.js`; `innerHTML` en los tres chunks de productos: 0 coincidencias; el carrito es el de la sesión de Django | El código heredado (`cart.js:228-262`) sigue en el repo y en `legacy-products` solo para el servidor de Vite; no se ejecuta desde Django |
+| F-17 | cerrado en dos partes | `throttle.py:15-30` (/64), `settings.py:355-361` (`MAX_ENTRIES` 10 000), `config/test_cache.py`, `test_contract_throttle.py` | Sigue siendo una caché por proceso con un trabajador (`render.yaml:31`); con más trabajadores hace falta una caché compartida. Para vaciar 10 000 llaves hacen falta unas 10 000 IP: impráctico |
+| F-18 | cerrado | `forms.py` `store_phone_validator`; `test_contract_carrito.py:425-468` | — |
+| F-20 | cerrado | `_bolsa.html:12` pinta el token en toda página de productos, carrito vacío incluido; `test_contract_carrito.py:397` | La landing (`/`) no emite la cookie: bien mientras no escriba por JSON (F-23) |
+| P-43 | abierto | sonda A: `GET /productos/` y la ficha emiten solo `csrftoken`, no `sessionid` | `clearsessions`; las páginas de lectura no crean sesiones, las escrituras sí |
+| P-45, P-46, P-48 | sin cambio | `git diff --stat 4f1e0c86~3..HEAD -- backend/config supabase package.json package-lock.json backend/pyproject.toml backend/uv.lock .npmrc` → vacío | Los commits no tocan configuración, migraciones ni dependencias; los plazos de ASVS 15.1.1 de P-45 siguen vencidos |
+
+### Controles revisados y limpios (rebanada 3)
+| control | resultado | evidencia |
+|---|---|---|
+| CSP `'self'` en las dos páginas | limpio | sonda A: cabecera de `GET /productos/` y de la ficha idéntica a la de la sección 2 (`config/middleware.py:35-54`); sin `unsafe-inline` fuera de `/admin/` |
+| Escapado de nombres, descripción, categoría, nota y `q` | limpio | sonda B: nombre y descripción con `<img src=x onerror=alert(1)>"'><script>alert(2)</script>`, categoría y nota igual, `q` igual: 0 fragmentos crudos en el catálogo y en la ficha; `meta description` y `value=""` escapados por el autoescape |
+| Cajón (`_bolsa.html`) | limpio | `next` es `request.get_full_path` más `#bolsa` y la vista lo revalida (`carrito.py:144-149`); el borrado es un POST con `{% csrf_token %}` (`_bolsa.html:35`); sin precios |
+| Paginación (`_catalogo.html:43,45`) | limpio | `q` con `urlencode`, `category` solo dígitos (`catalog.py:56-66`, tope de 9) |
+| Validación en el servidor del cotizador y del carrito | limpio | `CartLineForm` (`forms.py:19-26`): `amount` 10 dígitos y 3 decimales, `thickness_in` 4 y 2, `note` 200, `mode` y `unit` por lista; sin campo de precio; `StoreOrderForm` (`carrito.py:70-112`) con largos; el precio sale de `quote_cart`; `cotizar` es `require_safe`, `never_cache`, 404 en JSON idéntico para inactivo e inexistente |
+| CSRF en todo `fetch` | limpio | un solo `fetch` hacia Django (`configurador.ts:111`, GET); el POST de `chatbot.js:151` va a Supabase con la llave publicable y sin cookie de sesión, así que CSRF no aplica (su riesgo es F-08). Escrituras de Django: `agregar`, `actualizar`, `quitar` y `pedido` bajo `CsrfViewMiddleware` sin `csrf_exempt`; 403 sin token en modo JSON (`test_contract_carrito.py:164`) |
+| Caso positivo de CSRF en JSON con `Origin` ajeno | **ya existe** (el pendiente de L16 y L17 está cumplido) | `test_contract_carrito.py:404` (token de la cookie en `X-CSRFToken` → 200) y `:412` (mismo token con `Origin: https://evil.example` → 403, carrito vacío), dentro de `CsrfForScriptsTests` (`:381`) |
+| Límites por IP | limpio | sonda E: 95 `cotizar` de un cliente → 90 con 200 y 5 con 429, el primero en la 91; `test_contract_carrito.py:469-526` (`WriteLimitTests`) |
+| Costo privado | limpio en comportamiento; prueba débil (F-24) | sonda C |
+| Métodos y producto inexistente | limpio | sonda G: `POST /productos/` → 405; ficha de un producto que no existe → 404 |
+
+### Diagrama anotado con patrones (rebanada 3)
+Patrones que el código usa de verdad en HEAD; lo demás es analogía. Referencia: `~/agentic-global/claude/fichas/refactoring-guru.md`, sección "Patrones aplicados a Carni-mvp".
+```mermaid
+flowchart LR
+  B[Navegador: /productos/ y ficha] -->|GET| V[productos.catalogo y producto: require_safe]
+  V --> L[listing / filtered: query sin NUL pendiente F-22]
+  V --> T[productos.html: Template Method con parciales]
+  T --> I[Isla: products.tsx -> server-products.ts: Facade y Strangler]
+  I -->|GET JSON Accept| Q[cotizar: never_cache, limite 90/min]
+  B -->|POST + CSRF| W[carrito.agregar/actualizar/quitar: limite 60/min]
+  W --> N[_safe_next: F-21]
+  Q --> G[PostgresGateway: Facade, Singleton  services.py:167]
+  W --> G
+  G --> DB[(Postgres: rol django, RLS)]
+  I -->|POST llave publicable| SB[(Supabase chat_messages: F-08)]
+```
+- Template Method (de Django): `productos.html` con `{% include %}` de `parciales/` (`productos.html:39-64`).
+- Facade: `src/products/server-products.ts:15-26` (una función que monta cuatro comportamientos) y `ventas/services.py:167` (`PostgresGateway`).
+- Strangler (en sentido amplio): `src/entry/products.tsx:25-29` ramifica por `data-server-store` y deja la isla heredada en su propio chunk.
+- Decorator: `@require_safe`, `@never_cache`, `@cache_control` apilados en `productos.py:42,88-89,131-132`.
+- Analogía, no patrón: `_safe_next` recuerda a una lista blanca (Guard), pero no es una clase ni un objeto.
+- **Archify**: la skill existe en `.claude/skills/archify`; no se generó el HTML por la superficie de escritura de este teammate (solo este archivo). Lo debe generar quien tenga la superficie, con este Mermaid como entrada (ver F-25, ítem 4).
+
+### Lo que no se verificó en esta rebanada
+- Navegador real: la CSP en ejecución, el LCP y el CLS se toman del recibo #3360 (Brave a 375, 768 y 1440 px, 0 violaciones); no se repitieron.
+- Base de datos viva: F-22 contra Postgres, el estado de RLS y la migración `20261117000002` (el MCP de Supabase dio timeout en el recibo #3360). Ninguna escritura a una base real.
+- Despliegue real: `X-Forwarded-For` de Render (F-04); no se sondea.
+- `supply-chain-risk-auditor`: se cargó, pero los commits no tocan `package.json`, `package-lock.json`, `pyproject.toml`, `uv.lock` ni `.npmrc` (diff vacío), así que no hay dependencia nueva que medir.
+- `security-review` (comando integrado de Claude Code): un subagente no puede invocarlo; queda para el lead (ver "Needs skill" en el mensaje).
+
+### Pruebas y escaneos de esta rebanada
+- `dj.sh ventas.tests.test_products_page ventas.tests.test_contract_carrito ventas.tests.test_contract_productos ventas.tests.test_contract_throttle ventas.tests.test_public_cart ventas.tests.test_catalog ventas.tests.test_producto ventas.tests.test_header ventas.tests.test_styles config.test_security_headers config.test_cache config.test_request_size` → **261 pruebas, OK** (2.9 s).
+- Sondas propias (`probe_t4b.py`, fuera del repo): 8 sondas A a G; dos hallazgos (D, F).
+- `gitleaks git --redact --no-banner --log-opts="4f1e0c86~3..HEAD"` (gitleaks 8.30.1) → "4 commits scanned … no leaks found".
+
+## 8. Seguimiento de la rebanada 3: `unsafe-inline` en la CSP (2026-11-23)
+
+Origen: aviso del lead, que cita la guía de Todo de IA `protege-tu-app` ("el CSP de Carni permite `unsafe-inline`"). Se verificó contra el código y contra la cabecera real. La guía no se tomó como prueba.
+
+| id | severidad | estado | archivo:línea (HEAD) | dueño | resumen |
+|---|---|---|---|---|---|
+| F-26 | baja | confirmado; **la afirmación de la guía es parcialmente falsa** | `backend/config/middleware.py:38`, `backend/config/test_security_headers.py:90-95` | main (config del lead) | `'unsafe-inline'` existe solo en `style-src` y solo para rutas bajo `/admin/`. `script-src` es `'self'` en todas partes: ni `unsafe-inline` ni `unsafe-eval` |
+
+### F-26 (baja, confirmado): la excepción de estilos en línea de `/admin/`
+- Código: `middleware.py:38` pone `'self' 'unsafe-inline'` en `style-src` solo si `path.startswith(reverse("admin:index"))`; `:41` fija `script-src 'self'` sin condición. `grep -rn "unsafe-inline\|unsafe-eval"` sobre `backend` (sin `static/vite`) → solo `middleware.py:38` y las pruebas. La prueba `test_the_admin_keeps_its_inline_styles_and_nothing_more` (`test_security_headers.py:90-95`) fija ambos valores.
+- Cabecera real (cliente de pruebas, ajustes sintéticos), `style-src` y `script-src` por ruta: `/`, `/productos/`, `/acceso/`, `/carrito/`, `/panel/` y `/panel/acceso/` → `'self'` y `'self'`; `/admin/` y `/admin/login/` → `'self' 'unsafe-inline'` y `'self'`; `/Admin/login/` (404) y cualquier otra ruta → `'self'`. Ninguna respuesta lleva `unsafe-eval`. Ninguna vista fija su propia CSP (`grep` de `Content-Security-Policy`: solo el middleware y pruebas).
+- Plantillas: las únicas marcas en línea que quedan son el `<style>` de `backend/templates/base.html:7`, que nadie extiende (F-14); `ventas/templates` y `panel/templates` no tienen `<script>` en línea, `style=` ni manejadores.
+- Impacto: los estilos en línea permiten inyección de CSS (lectura de atributos con selectores, redibujado de la interfaz) solo si hubiera una inyección de HTML dentro del admin, que Django autoescapa; no habilitan ejecución de scripts. Se alcanza únicamente en `/admin/`, que hoy es público y sin bloqueo por intentos (F-09). Por eso baja.
+- Arreglo propuesto (decisión del lead): el de F-09 (apagar `/admin/` en producción con una variable de entorno) elimina la excepción entera; después se borra la rama de `middleware.py:38` y se cambia la prueba `:90-95` para exigir `style-src 'self'` en todas las rutas. Mientras tanto, la excepción está documentada en el docstring (`middleware.py:76-79`).
+- Nota de riesgo futuro: el middleware usa `setdefault` (`middleware.py:91`), así que una vista que fije su propia CSP la reemplaza sin aviso. Hoy ninguna lo hace.
+- Nota para T9, **por validar en navegador**: `form-action 'self'` (`middleware.py:50`) puede bloquear, en Chromium, el redirect de un formulario POST hacia `checkout.stripe.com`. Dos caminos que no aflojan `script-src`: arrancar Stripe Checkout por una petición JSON y navegar con `window.location` (la navegación no la restringe `form-action`), o agregar el host de Checkout a `form-action`. No se debe agregar `js.stripe.com` a `script-src` si se usa Checkout alojado.
+
+### Handoff de recursos recibido (ítems 5 y 7 del recibo)
+- roadmap.sh: `cyber-security` (OWASP Top 10, CSRF, hashing) y `api-design` (API Security, Idempotency); checklist de `best-practices.md:91-160`. Contraste con el código: límites por IP `throttle.py:33-55`; `X-Content-Type-Options: nosniff` y `X-Frame-Options: DENY` en la respuesta real (sección 2 y `test_security_headers.py:105`); `DEBUG` apagado por defecto (`settings.py:51`); registro sin datos del cliente (`carrito.py:338-342`, `settings.py:362-388`); bloqueo de reintentos del inicio de sesión: sin él en `/admin/login/` (F-09), el acceso de clientes es de Supabase Auth. Idempotencia: sin superficie todavía; es requisito del webhook de T9. Referencia: https://docs.djangoproject.com/en/6.0/ref/csrf/ (el repo usa Django 5.2.19; la regla de `Origin` y del token es la misma) y https://owasp.org/www-project-top-ten/.
+- Videos: https://youtu.be/3spCFnMSGIY?t=7880 (auditar el login que genera la IA) y https://youtu.be/0DhghJpWwVQ?t=646 (probar primero auth, tokens y conexiones). Se citan por el handoff del scout; el auditor no abrió los videos.
