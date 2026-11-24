@@ -1,15 +1,13 @@
 """Compras y stock (/panel/compras/, panel:compras): what came in and what is on the shelf.
 
-Three POST forms with Django's CSRF token share the page, told apart by `action`:
+Four POST forms with Django's CSRF token share the page, told apart by `action`:
 `purchase` calls `register_purchase` (the function applies the yield, the cost per kilo and the
 stock), `lot` calls `register_lot` (a bag counted by the piece with the weight of one piece: each
 piece costs that weight times the price per kilo) and `count` calls `adjust_stock` (a physical
 count with its reason). `cut` calls `cut_lot` (despiece: pieces of a lot become lots of other
-products, listed in the formset `salida`). Both go through the
-gateway, then redirect (POST/redirect/GET). The lots come from `panel_purchase_performance`.
+products, listed in the formset `salida`). Every action goes through the
+gateway, then redirects (POST/redirect/GET). The lots come from `panel_purchase_performance`.
 """
-
-from decimal import ROUND_HALF_UP, Decimal
 
 from django import forms
 from django.contrib import messages
@@ -20,6 +18,7 @@ from django.views.decorators.http import require_http_methods
 
 from inventory.forms import NUMBER, SELECT, TEXT
 from inventory.models import Product, ProductCost
+from inventory.pricing import piece_price
 from panel.access import PANEL_SESSION_KEY, panel_admin_required
 from ventas import domain, services
 
@@ -177,13 +176,6 @@ class LotForm(forms.Form):
         if error:
             self.add_error("product", error)
         return data
-
-
-def piece_price(product, piece_weight_kg):
-    """What one piece of the lot costs: its weight times the price per kilo, to the cent."""
-    return (Decimal(piece_weight_kg) * product.price_per_kg).quantize(
-        Decimal("0.01"), rounding=ROUND_HALF_UP
-    )
 
 
 def _piece_lot_product_errors(product):
