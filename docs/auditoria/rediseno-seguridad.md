@@ -359,3 +359,165 @@ Origen: aviso del lead, que cita la guía de Todo de IA `protege-tu-app` ("el CS
 ### Handoff de recursos recibido (ítems 5 y 7 del recibo)
 - roadmap.sh: `cyber-security` (OWASP Top 10, CSRF, hashing) y `api-design` (API Security, Idempotency); checklist de `best-practices.md:91-160`. Contraste con el código: límites por IP `throttle.py:33-55`; `X-Content-Type-Options: nosniff` y `X-Frame-Options: DENY` en la respuesta real (sección 2 y `test_security_headers.py:105`); `DEBUG` apagado por defecto (`settings.py:51`); registro sin datos del cliente (`carrito.py:338-342`, `settings.py:362-388`); bloqueo de reintentos del inicio de sesión: sin él en `/admin/login/` (F-09), el acceso de clientes es de Supabase Auth. Idempotencia: sin superficie todavía; es requisito del webhook de T9. Referencia: https://docs.djangoproject.com/en/6.0/ref/csrf/ (el repo usa Django 5.2.19; la regla de `Origin` y del token es la misma) y https://owasp.org/www-project-top-ten/.
 - Videos: https://youtu.be/3spCFnMSGIY?t=7880 (un login generado por IA que sale con `admin` y una contraseña por defecto; el minuto de la auditoría como agente aparte es 2:03:36, https://youtu.be/3spCFnMSGIY?t=7416, verificado con `transcript`) y https://youtu.be/0DhghJpWwVQ?t=646 (probar primero auth, tokens y conexiones). Se citan por el handoff del scout; el auditor no abrió los videos.
+
+## 9. Rebanada 4: T7a primera mitad, precios estándar y envío por zonas (2026-11-23, sin commitear, sobre HEAD `b096521d`)
+
+Auditor: teammate `auditor`. Specs: S13 (y, como criterio de entrada, S11 y S12). Riesgo declarado: ítem 1 (migración, solo tablas nuevas, no aplicada) e ítem 2 (RLS y GRANT).
+Alcance (todo sin commitear): `supabase/migrations/20261124000001_precios_estandar_y_envio.sql`, `backend/inventory/pricing.py`, `backend/ventas/shipping.py`, `backend/ventas/models.py` (espejos `ProductSize` y `DeliveryZone`, `managed = False`), `backend/panel/views_compras.py` (`piece_price` se importa ahora de `inventory.pricing`), `docs/contratos/precios-y-envio.md` y las pruebas nuevas. Las líneas son del árbol de trabajo.
+**No se corrió ninguna prueba de RLS contra una base**: el `postgres` local no arranca (`postgres --version` → `dyld: Library not loaded: libicui18n.73.dylib`, falta ICU para `postgresql@14`) y no hay imagen de Postgres en Docker. Lo que sigue de las políticas es lectura de la migración contra el precedente, no ejecución.
+
+### Veredicto
+- **Migración: se puede commitear, en commit aparte y primero** (Riesgo 1 y 2: según el flujo ODD, una unidad con un ítem de alto riesgo lleva su propio commit para que la revisión nativa la tome sola), **con una condición**: corregir la afirmación "probado" de F-27 antes del commit. Mientras no esté aplicada en ninguna base, editar el SQL no cuesta nada; después costaría una migración nueva, así que conviene meter también F-28 y F-31 en el mismo commit.
+- **Código Python, espejos, documento y pruebas: se pueden commitear** en un segundo commit, sin bloqueo. F-29 y F-30 son de baja gravedad y se arreglan con una prueba en rojo antes; pueden entrar antes de T9 y no hace falta frenar el commit.
+- Ninguna ruta lee todavía estas tablas ni llama a `close_price`: lo único que ejecuta el sitio hoy es `piece_price` (misma fórmula que antes: peso por precio por kilo, al centavo, mitad hacia arriba; `views_compras.py:21`, y `panel.test_compras` pasa).
+
+### Hallazgos nuevos
+| id | severidad | estado | archivo:línea | dueño | resumen |
+|---|---|---|---|---|---|
+| F-27 | baja (condición del commit) | confirmado | `supabase/migrations/20261124000001_precios_estandar_y_envio.sql:30-31`, `docs/contratos/precios-y-envio.md:162` | backend-datos | La migración dice "probado como dueño, como otro usuario y como anon"; el contrato dice "escritas, no corridas". Es una afirmación de verificación que no es cierta |
+| F-28 | baja | confirmado por comparación con el precedente; sin base para ejecutarlo | `migración:61-64`, `:99-102`; precedente `20261113000001_comercio_v1_esquema.sql:366-369` y `20261119000003_lote_al_confirmar.sql:31` | backend-datos | Se revoca la tabla pero no la secuencia: `product_sizes_id_seq` y `delivery_zones_id_seq` conservan los privilegios por defecto de `anon` |
+| F-29 | baja | confirmado con sonda | `backend/inventory/pricing.py:51-53`, `:177`, `:190` | backend-datos | `\d` acepta dígitos Unicode: `"٥٠٠"` y `"５００"` se aceptan como 500 g, contra el "parseo estricto" del contrato |
+| F-30 | baja | confirmado con sonda | `backend/inventory/pricing.py:325`, `:388` | backend-datos | `_close_standard_size` y `size_listing` no comprueban que el tamaño sea del producto: confían en que el llamador pase solo `product.sizes` |
+| F-31 | baja | confirmado con sonda en Python; sin reproducir en Postgres | `migración:87-89`, `backend/ventas/shipping.py:40`, `:49`, `:59` | backend-datos | Un `NaN` en `fee`, `from_km` o `to_km` pasa los CHECK de Postgres (en `numeric`, `NaN` es mayor que todo número); `delivery_quote` devuelve `"fee": "NaN"` y un `to_km` `NaN` lanza `InvalidOperation` (500). Además `fee` no tiene tope |
+| F-32 | info (requisito de T9) | confirmado con sonda | `backend/inventory/pricing.py:44-49`, `:366`, `:392-401` | backend-datos | Sin tope de total ni de peso por línea de piezas ni mínimo; las advertencias de existencias no bloquean |
+| F-33 | info | confirmado por lectura | `migración:65-66`, `:103-104`; `202604100002_rls_policies.sql:83-85` | backend-datos | `anon` lee los tamaños activos de productos desactivados (respuesta a la pregunta del lead: no es sensible) |
+
+### (a) Políticas y GRANT: ninguna política permisiva abre de más
+Las dos tablas tienen el mismo molde del precedente `product_promotions` (`20261113000001:397-408`). Combinadas con OR (todas son permisivas):
+
+| rol | SELECT | INSERT, UPDATE, DELETE | por qué |
+|---|---|---|---|
+| `anon` | solo `is_active` (`migración:65-66`) | sin GRANT (`:62`, `:100` dan solo SELECT) | aplica una sola política; la de administrador es `TO authenticated` y la de `django` es `TO django` |
+| `authenticated` sin admin | `is_active OR is_admin()` = solo lo activo | rechazado | las escrituras solo las cubre `*_admin_all` (`:67-69`, `:105-107`), y la política `FOR SELECT` no tiene `WITH CHECK` ni cubre escritura |
+| `authenticated` admin | todo | todo (`USING` y `WITH CHECK` con `is_admin()`) | `(SELECT public.is_admin())` se evalúa una vez por consulta; la función es `SECURITY DEFINER` con `search_path = ''` (`202608250001_arreglar_recursion_rls.sql:44-49`) |
+| `django` | todo | todo, sin `TRUNCATE` (`:63`, `:101`) | rol aparte, `NOINHERIT` |
+| `PUBLIC` | nada | nada | `REVOKE ALL ... FROM PUBLIC, anon, authenticated` en `:61` y `:99`, que además quita `TRUNCATE`, `REFERENCES` y `TRIGGER` (`TRUNCATE` se salta RLS) |
+
+Ninguna suma de políticas da más de lo anotado. Dos precisiones: un `UPDATE` o `DELETE` de un usuario no admin no da error, afecta 0 filas (solo el `INSERT` falla con "viola la política"); y la prueba del contrato solo ejerce el `INSERT` de un no admin (ver abajo).
+
+### (b) El residual de `anon` y los tamaños de productos desactivados
+No es sensible. `anon` ve `product_id`, `grams` y `rounding_step` de un tamaño activo cuyo producto está desactivado; el producto en sí no (`products_select_public USING (is_active = true)`, `202604100002:83-85`), y el precio no se guarda (sale de un $/kg que `anon` no puede leer del producto oculto). Lo único que se aprende es que existe un id y unos gramos. Queda como F-33, info: con ids secuenciales sirve de sonda de existencia para un producto que aún no se lanza. Arreglo opcional, una línea: `USING (is_active AND EXISTS (SELECT 1 FROM public.products p WHERE p.id = product_id))`; la subconsulta respeta el RLS del que consulta, así que `anon` solo cuenta los productos que ya ve.
+
+### (c) Ningún precio ni total del cliente se acepta; flotantes y booleanos se rechazan
+Lista permitida: `_ALLOWED_FIELDS` (`pricing.py:57-61`), más `mode` y `product_id`; lo demás sale con `invalid_items` (`:205-207`). Sonda (Python puro, sin base), todas rechazadas: `total`, `unit_price`, `price_per_kg`, `currency`, `rounding_step`, `discount` en una línea de piezas; `total` en una de dinero; `product_id` como texto `"7"`; `grams` o `amount` como flotante, booleano, `None`, lista, `Decimal`, `"1e3"`, `" 5"`, `"5\n"`, `"-5"`, `"NaN"`, `"Infinity"`; `amount` de 0 o mayor de 1 000 000; tres decimales de más; `size_id` junto con `piece_weight_kg`. `_whole_number` (`:172-182`) y `_decimal_text` (`:185-192`) usan `fullmatch`, así que el salto de línea final no pasa. Únicas fugas: F-29 y F-30. En modo dinero el `amount` del cliente **es** el total por diseño (`pricing.py:280`); está acotado a (0, 1 000 000] y a dos decimales, y el peso se calcula en el servidor.
+
+### (d) `EXCLUDE USING gist` y los CHECK
+- La exclusión `numrange(from_km, to_km, '(]') WITH &&` con `WHERE (is_active)` (`migración:90-92`) es correcta: `&&` sobre `numrange` es nativo, no pide `btree_gist`; `(0, 5.5]` y `(5.5, 11]` no se traslapan; reactivar una zona que choca falla. Cubre la condición de carrera que el `clean()` de `ventas/models.py` no puede cubrir solo.
+- `product_sizes`: `grams BETWEEN 1 AND 50000`, paso en `{0.01, 0.10, 0.50, 1.00}` (rechaza `NaN`: no es igual a ninguno) y `UNIQUE (product_id, grams)` (`:48-50`). Correctos.
+- `delivery_zones`: `from_km >= 0`, `to_km > from_km`, `fee >= 0` (`:87-89`). **Hueco: `NaN` cumple las tres** (F-31).
+
+### (e) El cliente no puede mandar `rounding_step`
+Confirmado. `rounding_step` no está en `_ALLOWED_FIELDS`; sonda: línea de piezas con `rounding_step` → `invalid_items`. El paso sale de la fila `ProductSize` (`pricing.py:328`) y `size_price` lo exige en `ROUNDING_STEPS` (`:153`). En la base lo fija el CHECK `:49`.
+
+### F-27 (baja, condición del commit): una frase que dice "probado" y no lo está
+`migración:30-31`: "Acceso (RLS activo en las dos; probado como dueño, como otro usuario y como anon: ver docs/contratos/precios-y-envio.md, seccion 'Pruebas de RLS')". El contrato (`:162`) titula esa sección "escritas, no corridas", y esta auditoría tampoco pudo correrlas (arriba). Eduardo lee este archivo para aprobar la migración, y "probado" invita a saltarse la prueba. Arreglo: "escritas para correrse, no corridas" y enlazar la sección; cambiar la frase cuando se corran de verdad.
+
+### F-28 (baja): las secuencias conservan privilegios de `anon`
+`migración:61` y `:99` hacen `REVOKE ALL ON TABLE`, pero las secuencias de identidad (`GENERATED BY DEFAULT AS IDENTITY`) se crean con los privilegios por defecto del esquema. El precedente sí las revoca antes de conceder (`20261113000001:366-369`, incluida `product_promotions_id_seq`; `20261119000003:31`). No es alcanzable por la API de PostgREST (no expone secuencias ni `nextval`), así que es defensa en profundidad y coherencia con el precedente. Arreglo: antes de `:64` y `:102`, `REVOKE ALL ON SEQUENCE public.product_sizes_id_seq, public.delivery_zones_id_seq FROM PUBLIC, anon, authenticated;`. No pude comprobar los privilegios por defecto de la base real (sin acceso).
+
+### F-29 (baja): dígitos Unicode en el parseo "estricto"
+`_MONEY_TEXT`, `_WEIGHT_TEXT` y `_DIGITS_TEXT` (`pricing.py:51-53`) usan `\d`, que en Python acepta cualquier dígito Unicode. Sonda: `grams="٥٠٠"` (árabe-índico) y `"５００"` (ancho completo) → total 389.50 y 0.500 kg; `amount="٢٠٠.٥٠"` → 200.50; `quantity="５"` → 5 piezas. No cambia el precio (se normalizan bien), pero el contrato promete "dígitos planos" y la función SQL `quote_line` rechazaría el mismo texto: dos capas que parsean distinto. Arreglo: `re.ASCII` o `[0-9]` en los tres patrones, y una prueba con `"٥٠٠"` y `"５００"`.
+
+### F-30 (baja): el tamaño no se ata al producto
+`_close_standard_size` (`pricing.py:325`) busca `s.id == size_id and s.is_active` en la lista `sizes` que le da el llamador, y `size_listing` (`:388`) pinta todos los activos de esa lista; ninguno exige `s.product_id == product.id`. Sonda: con `sizes=[propio, de_otro_producto]` y `size_id` del otro, la línea se acepta y cobra 50 g × $779 = $38.95. No hay pérdida (el precio por kilo es el del producto) pero se rompe "ese tamaño no se ofrece". Hoy no hay llamador; T9 debe pasar `product.sizes.filter(is_active=True)`. Arreglo en la función, para no depender del llamador: agregar `and s.product_id == product.id` y una prueba con un tamaño de otro producto.
+
+### F-31 (baja): `NaN` en las zonas de envío
+En Postgres `numeric` acepta `NaN` y lo ordena por encima de todo número, así que `CHECK (fee >= 0)`, `CHECK (to_km > from_km)` y `CHECK (from_km >= 0)` lo dejan pasar (por la documentación; no pude reproducirlo sin base). Quién lo escribe es el administrador (política `admin_all`) o `django`, pero un valor así llega a `shipping.py`. Sonda con zonas `NaN`: `delivery_fee` devuelve `NaN` (y `delivery_quote` imprimiría `"fee": "NaN"`); un `to_km` `NaN` lanza `InvalidOperation` en `zone_for_distance` (`shipping.py:40`), es decir un 500 para toda consulta de envío. `order_total` rechaza una cuota `NaN` (`pricing.py:399`), así que no se cobra mal. `fee` no tiene tope (un error de tecleo de $1 000 000). Arreglo en la migración: `CHECK (fee BETWEEN 0 AND 99999.99)` y `CHECK (from_km BETWEEN 0 AND 1000)` y `CHECK (to_km BETWEEN 0 AND 1000)` (un `BETWEEN` rechaza `NaN`); en `shipping.py`, descartar las zonas con valores no finitos. Los espejos de Django que usan SQLite no modelan `NaN`: la prueba de la migración debe ser SQL.
+
+### F-32 (info, requisito de entrada de T9): sin tope de total ni de peso, y las advertencias no bloquean
+Sonda con `close_price`: una línea de piezas enteras con 10 000 piezas y 1 en el estante se **acepta** con la advertencia `low_stock` (`pricing.py:366`) por 73 000 kg y $56 867 000.00; 10 000 piezas de 340 g → $2 650 000.00; modo dinero acepta $0.39. El SQL de la tienda tiene los mismos límites por línea (`20261113000002:124`, `:143-144`), así que el espejo es fiel; pero T9 cobra de verdad, y Stripe rechaza importes menores al mínimo de la moneda y mayores a su tope. T9 debe: poner un mínimo y un máximo de total, un tope de peso por línea de piezas (hoy solo existe en modo dinero, `:269-270`), y decidir si `low_stock` bloquea el pago o se reserva existencia.
+
+### F-33 (info): `anon` lee tamaños de productos desactivados
+Ver (b). No sensible; cierre opcional con una línea.
+
+### (f) Qué debe poner T9 en la vista que reciba las líneas
+1. `@require_POST` y **sin** `csrf_exempt`: la única vista exenta de T9 será el webhook, protegido por la firma. La página que ofrece pagar debe pintar un token (patrón de `_bolsa.html:12`, F-20) y el script debe mandarlo en `X-CSRFToken`; un 403 de CSRF llega en HTML (F-23).
+2. Límite de intentos antes de leer la base: `throttle.too_many(request, "pago", N)` más el contador por sesión y por IP de `carrito.py:314-325` y el tope de 3 pedidos pendientes por teléfono. Crear sesiones de Stripe gasta cuota de su API. Cerrar F-04 primero: con un salto más de proxy todos comparten contador.
+3. Acotar el arreglo de líneas a `MAX_ORDER_LINES` (50) **antes** de consultar productos, y cargar productos y tamaños en bloque (`in_bulk`), no una consulta por línea. `config.middleware` ya corta cuerpos grandes con 413.
+4. Pasar a `close_price` solo `mode`, `product_id` y los campos permitidos del modo; nunca `price_per_kg`, `currency`, `delivery_fee`, `km` ni `total` de la petición. La distancia la mide el servidor (T10) y la cuota sale de `delivery_fee(zonas, km)`.
+5. Calcular el total en el servidor, **guardarlo en el pedido antes** de crear la sesión de Checkout, mandar a Stripe el importe en centavos enteros desde ese valor guardado, y en el webhook comparar `amount_total` y moneda con lo guardado, sin confiar en parámetros de retorno; idempotencia por id de evento y por estado del pedido; clave de idempotencia al crear la sesión (id del pedido).
+6. Mínimo y máximo de total, tope de peso por línea y política de `low_stock` (F-32).
+7. Arrancar Checkout con una petición JSON y navegar con `window.location` (nota de F-26 sobre `form-action 'self'`).
+8. Errores genéricos al cliente y registro sin datos personales (`carrito.py:338-342` es el modelo).
+
+### Pruebas de RLS: qué agregar al guion del contrato (para quien las corra)
+Las del contrato (`precios-y-envio.md:162-212`) cubren bien `SELECT` de `anon`, `INSERT` de un no admin, el administrador, `django` y los cinco CHECK. Faltan: `UPDATE` y `DELETE` de un `authenticated` no admin (esperado: 0 filas, sin error) y de `anon` (esperado: `permission denied`); `SELECT nextval('public.product_sizes_id_seq')` como `anon` (esperado: `permission denied`, solo tras el arreglo de F-28); `INSERT` con `fee = 'NaN'`, `to_km = 'NaN'` (esperado: violación de CHECK, solo tras F-31); y la lectura de `anon` sobre el tamaño de un producto desactivado (esperado hoy: 1 fila; 0 tras el arreglo opcional de F-33). Para correrlas: `brew reinstall postgresql@14` (arregla el ICU que falta; requiere red, lo ejecuta Eduardo) o una base de pruebas de Supabase local; nunca con datos de clientes.
+
+### Diagrama anotado con patrones (rebanada 4)
+```mermaid
+flowchart LR
+  C[Cliente: linea con mode + campos permitidos] --> S{{T9: POST, CSRF, limite, tope de lineas}}
+  S --> A[close_price: Facade sobre tres cierres  pricing.py:232-255]
+  A --> G[_check_line_shape: lista permitida, fail-fast  pricing.py:199-210]
+  A --> V[ClosedPrice: Value Object inmutable  pricing.py:81-94]
+  Z[delivery_fee: busca la zona  shipping.py:46-49] --> T[order_total: suma en el servidor  pricing.py:392-401]
+  V --> T
+  DB[(product_sizes, delivery_zones: RLS, tres politicas permisivas OR)] -. F-28, F-31, F-33 .-> A
+```
+- Value Object: `ClosedPrice` (`@dataclass(frozen=True)`, `pricing.py:81-94`) y `PieceVariant` (`:73-78`).
+- Fail-fast / guard clauses: `_check_line_shape` y los `raise PricingError` (`pricing.py:199-210`, `:395-400`).
+- Facade, en sentido amplio: `close_price` es la única puerta a los tres cierres (`:248-255`).
+- Analogía, no patrón: el `if mode == ...` de `close_price` recuerda a Strategy, pero es una cadena de ramas, no objetos intercambiables.
+- Archify: `docs/diagramas/t7a-precios-er.html` existe (lo generó el dueño); no lo abrí ni lo validé.
+
+### Pruebas y escaneos de esta rebanada
+- `dj.sh inventory.test_pricing ventas.tests.test_shipping ventas.tests.test_contract_precios panel.test_compras` → **128 pruebas, OK** (0.46 s): las 78 nuevas más las 50 de `panel.test_compras`.
+- Sonda propia `probe_t7a.py` (fuera del repo; funciones puras, sin base): 45 casos, 3 aceptaciones que no debían (F-29, F-30, F-32), 2 fallos de `NaN` (F-31).
+- `gitleaks dir --redact --no-banner` sobre la migración, `backend/inventory`, `backend/ventas` y `docs/contratos` → "no leaks found" en las cuatro. (El árbol no está commiteado, así que `gitleaks git` no aplica; escanear de nuevo con `--staged` antes de cada commit.)
+- **No corrido**: RLS contra una base (sin Postgres funcional), el build, Jest y `node --test`.
+
+### Recibo de recursos de esta revisión (7 ítems MANDATORY del kit)
+| # | ítem | estado | evidencia |
+|---|---|---|---|
+| 1 | Seguridad | usado; la parte de RLS es lectura, no ejecución | `dj.sh` 128 OK; `probe_t7a.py` 45 casos; `gitleaks dir --redact` en 4 rutas, "no leaks found"; skill `security-and-hardening` (frontera cliente → `close_price`, STRIDE sobre las dos tablas); OWASP A01 (control de acceso por rol), A04 (diseño: el precio sale del servidor) y A05 (CHECK y GRANT); Engram #1159 y #1570 leídos en la rebanada 3. Las pruebas de RLS y de pgTAP no se corrieron (sin Postgres funcional) |
+| 2 | REA | no usado | Este agente no tiene herramientas `mcp__rea__*`; no hay objetivo de ingeniería inversa en la rebanada |
+| 3 | Diseño y animación | no usado | Revisión de datos y SQL, sin UI |
+| 4 | Patrones y diagramas | parcial | Mermaid de esta sección con archivo:línea; el Archify `docs/diagramas/t7a-precios-er.html` existe (del dueño) y no lo abrí ni lo validé |
+| 5 | roadmap.sh | usado por referencia | Checklist de API Security `best-practices.md:111` (límites), `:123-139` (entradas y procesamiento) y `:148` (códigos de respuesta), leída en la rebanada 3; no corrí un comando nuevo en esta |
+| 6 | Big School | usado | `temario.md:201` (seguridad por diseño, pp. 15-16): validación y precio en el servidor, RLS; TDD (p. 9): pruebas propuestas en rojo para F-29, F-30 y F-31 |
+| 7 | Videos | no usado en esta rebanada | Sin scout; los enlaces vigentes son los de la sección 8 (citados, no abiertos) |
+Por la regla de L18, "no usado" o "parcial" sin el OK de Eduardo rechaza la rebanada: afecta a los ítems 2, 3, 4 y 7. Needs skill: security-review - diff de T7a. Needs scout: youtube-scout - validación estricta de entradas y precios calculados en el servidor.
+
+### Recheck de F-27 a F-31 (2026-11-24, sobre HEAD `1c7e4205`, T7a sin commitear)
+Alcance: solo los seis hallazgos arreglados por `backend-datos`; sin barrido nuevo. Un hallazgo nuevo cuenta solo si lo introduce el arreglo: **no encontré ninguno**. Las líneas son del árbol de trabajo.
+**Sigue sin correrse ninguna prueba de RLS contra una base** (sin Postgres funcional en esta máquina). Lo que digo de la migración y de las 83 aserciones de `supabase/tests/precios_estandar_y_envio.sql` es lectura contra el precedente y rastreo a mano de los conteos, no ejecución.
+
+| id | veredicto | evidencia (archivo:línea) | sonda |
+|---|---|---|---|
+| F-27 | **cerrado** | `migración:30-33` dice "ESCRITAS PARA CORRERSE, NO CORRIDAS", apunta a `supabase/tests/precios_estandar_y_envio.sql` (cabecera `:4`: "WRITTEN, NOT RUN") y a `docs/contratos/precios-y-envio.md` sección 5, cuyo título existe en `:171` ("Pruebas de RLS (escritas, no corridas)") | `grep -i 'probad\|verificad\|tested\|verified'` sobre migración, prueba SQL y contrato: 0 resultados. Ya no afirma nada que no se haya hecho |
+| F-28 | **cerrado** (por lectura) | `migración:68` `REVOKE ALL ON SEQUENCE public.product_sizes_id_seq FROM PUBLIC, anon, authenticated;` y **después** `:69` `GRANT USAGE, SELECT ... TO authenticated, django`; igual para la otra tabla en `:110` y `:111`. Misma forma y mismo orden que el precedente: `20261113000001:366-369` (REVOKE) y `:399` (`GRANT USAGE, SELECT ON SEQUENCE public.product_promotions_id_seq TO authenticated, django`), y `20261119000003:31` | Resultado esperado: `anon` sin ningún privilegio en las dos secuencias; `authenticated` y `django` conservan `USAGE, SELECT`; las dos tablas siguen igual. Lo fijan `tests:68-71`, `:84-85` (`nextval` de `anon` = `42501`), `:101-102`, `:135-136`; el helper `t.seq_privs` ya existe en `ayudas.sql:167` y `t.code` en `:47`. No corrido |
+| F-29 | **cerrado** | `pricing.py:51-55`: los tres patrones usan `[0-9]` y se aplican con `fullmatch` (`:179`, `:192`); pruebas de regresión en `test_pricing.py:406-407` (árabe-índico y ancho completo) | `probe_t7a_recheck.py`: 9 variantes (árabe-índico, ancho completo, árabe-índico extendido, devanagari, dígitos matemáticos en negrita, superíndice, salto de línea final, espacio inicial, NBSP) x 4 campos (`grams`, `amount`, `quantity`, `piece_weight_kg`) = 36, más 4 decimales mixtos (`"٢٠٠.٥٠"`, `"200.５０"`, `"٧.٣"`, `"7.３"`): **40 rechazados** con `invalid_amount`. 6 controles ASCII siguen aceptados (500 g = $389.50, $200.50, tamaño 340 g x2 = $530.00, pieza de 7.3 kg = $5686.70) |
+| F-30 | **cerrado** | `pricing.py:327-330` (`s.id == size_id and s.product_id == product.id and s.is_active`) y `:394` (`size_listing` filtra `s.product_id == product.id`); pruebas `test_pricing.py:181-187` y `:511-512` | Rechazados con `sale_mode_not_allowed`: tamaño de otro producto con las dos listas, solo ese, mismo id de otro producto, `product_id` `"7"` como texto. Control: el tamaño propio da $265.00. `size_listing([propio, ajeno])` = `[1]`; `size_listing([ajeno])` = `[]` |
+| F-31 | **cerrado**, con una decisión de producto abierta (abajo) | `migración:92-96`: los tres CHECK llevan `AND <col> <> 'NaN'::numeric`; `shipping.py:33-42` (`_is_usable`, usado en `:51`) descarta zonas inactivas o con valores no finitos; `models.py:178-180` (`DeliveryZone.clean()`) no consulta con una cota no finita; pruebas `test_shipping.py:82-96` y `:181-185`; SQL `tests:155-157` (`'NaN'` en `fee`, `from_km` y `to_km` -> `23514`) | Seis valores malos (`fee` NaN, `to_km` NaN, `from_km` NaN, `to_km` Infinity, `fee` sNaN, `fee` -Infinity) en cinco situaciones cada uno (zona mala antes y después de la buena, cotización con tres zonas, solo la mala a 12 km y a 0 km): ninguna imprime `NaN` ni `Infinity`, ninguna lanza, la zona buena sigue sirviendo ($50 a 3 km, $90 a 8 km) y la mala sola da `deliverable: False`, `out_of_range`. `clean_fields()` rechaza NaN e Infinity en `fee`, `from_km` y `to_km`; `clean()` con cota NaN o Infinity devuelve sin consultar |
+
+Notas del recheck:
+- **F-31, `clean()` con `fee` NaN y cotas finitas**: sí consulta el traslape (la guarda mira solo las cotas porque la consulta solo usa cotas). En mi sonda dio `no such table: delivery_zones` porque la tabla es `managed = False` y no existe en esa sonda; le pasaría igual a una zona finita. Es un artefacto de la sonda, no un hallazgo; el NaN del `fee` ya lo reporta `clean_fields()`.
+- **Infinity en Postgres**: por la documentación (PostgreSQL 14 en adelante), `numeric(5,2)` y `numeric(10,2)` no admiten infinito (error de desbordamiento); el único vector era `NaN`. No lo ejecuté. El código Python descarta ambos igualmente.
+- **Tope de `fee` (decisión de producto, no bloquea)**: la sugerencia de F-31 de acotar `fee` con `BETWEEN` no se adoptó; quedó como `precios-y-envio.md:265` (sección 8, punto 7). Es coherente: lo que era vulnerable era el `NaN`. Mientras la migración no esté aplicada, agregar el tope no cuesta nada; una vez aplicada costaría una migración nueva. Eduardo decide antes de aplicarla.
+- **F-32**: bien escrito para T9 en `precios-y-envio.md:151-155` (sección 4, punto 6): pide mínimo y máximo del total, tope de peso por línea de piezas y política de `low_stock`, acota a `MAX_ORDER_LINES` antes de consultar productos, y remite al detalle por vista de la sección 9 (f) de este documento y al punto 8 de la sección 8 (`:266`). Verifiqué con sonda las cifras que cita: modo dinero acepta `0.39` (total 0.39, 0.001 kg); 10 000 x 340 g = $2 650 000.00 y 3 400 kg con `low_stock`; 10 000 x 7.3 kg con 1 en el estante = $56 867 000.00 y 73 000 kg con `low_stock`; el tope de 1000 kg del modo dinero está en `pricing.py:271-272`. Sugerencia (no bloquea): la fila de T9 en `odd/tasks/rediseno-moderno.md:49` no nombra F-32; agregar "requisitos de entrada: `precios-y-envio.md` sección 4, punto 6" para que quien tome T9 lo lea.
+- **F-33** se deja como estaba (`precios-y-envio.md:169`, "Residual conocido"; no sensible).
+- **Las 83 aserciones SQL**: las leí todas y rastreé a mano los conteos por rol (anon 1 y 1; cliente ajeno 1 y 1, y 0 filas sin error en UPDATE y DELETE, `:95-99` y `:104-111`; administrador 2 y 2; `django` 3 tamaños y 2 zonas tras las escrituras del administrador, `:129-130`), los códigos (`42501` para `anon`, `23514` para los CHECK, `23505`, `23503`, `23P01`) y la sintaxis de `\gset`: son coherentes con la migración. Eso no sustituye correrlas.
+- Observación sin costo, no es hallazgo (existía antes del arreglo y sigue el precedente `product_promotions`): `authenticated` sin rol de administrador conserva `USAGE` de las dos secuencias (`:69`, `:111`); PostgREST no expone `nextval`, así que no es alcanzable por la API. Si se quiere mínimo privilegio, se podría dejar solo a `django`; no lo pido.
+
+Pruebas y escaneos del recheck:
+- `dj.sh inventory.test_pricing ventas.tests.test_shipping ventas.tests.test_contract_precios panel.test_compras` -> **135 pruebas, OK** (0.479 s).
+- Sondas propias (fuera del repo, en el scratchpad de la sesión): `probe_t7a_recheck.py` (40 rechazos de dígitos, 5 casos de F-30, 30 casos de zonas, 4 casos de Django) y `probe_f32.py` (3 cifras). Único "crash" de la sonda: el artefacto de `no such table` descrito arriba.
+- `gitleaks dir <ruta> --redact --no-banner`, una ruta a la vez: la migración, `supabase/tests/precios_estandar_y_envio.sql`, `backend/inventory`, `backend/ventas` y `docs/contratos` -> "no leaks found" en las cinco.
+- **No corrido**: RLS contra una base, `pgTAP`/`correr.sh` (el `down_sql` lo leí: solo `DROP TABLE public.delivery_zones;` y `DROP TABLE public.product_sizes;`, en ese orden; el orden no importa porque ninguna de las dos tablas referencia a la otra; no lo ejecuté), Jest, `node --test` y el build.
+
+**Veredicto final del recheck.** F-27, F-28, F-29, F-30 y F-31 están cerrados; F-32 está bien escrito como requisito de entrada de T9; F-33 se deja. **Sí se pueden commitear**, sin bloqueos, en el orden ya decidido:
+1. **Commit 1 (primero y aparte, Riesgo 1 y 2):** `supabase/migrations/20261124000001_precios_estandar_y_envio.sql` y su prueba `supabase/tests/precios_estandar_y_envio.sql` (la prueba se encuentra por el nombre de la migración, `correr.sh`). El mensaje no debe decir que la RLS está verificada: está escrita, no corrida.
+2. **Commit 2:** `backend/inventory/pricing.py` y `test_pricing.py`, `backend/ventas/shipping.py`, `backend/ventas/models.py` (espejos), `backend/panel/views_compras.py`, `backend/ventas/tests/test_shipping.py`, `backend/ventas/tests/test_contract_precios.py`, `docs/contratos/precios-y-envio.md`. En el árbol hay además cambios que no son de T7a (`backend/ventas/views/acceso.py`, `_cabecera.html`, `test_acceso*.py`, `test_header.py`, `test_styles.py`, `test_catalog.py`, `src/entry/auth.tsx`, los assets de `backend/static/vite/`): no deben entrar en estos dos commits.
+3. Antes de cada commit: `gitleaks git --redact --no-banner` (o `dir` sobre lo preparado) y la skill `security-review` sobre el diff, que corre el lead (este agente no puede invocarla). Pendiente de Eduardo, sin bloquear el commit: el tope de `fee` antes de aplicar la migración, y correr la prueba SQL cuando haya Postgres (`brew reinstall postgresql@14` lo ejecuta él).
+Riesgo de este recheck: `Risk: none` (solo texto en este documento).
+
+#### Recibo de recursos del recheck (7 ítems MANDATORY del kit)
+| # | ítem | estado | evidencia |
+|---|---|---|---|
+| 1 | Seguridad | usado | `dj.sh` 135 OK; `probe_t7a_recheck.py`; `gitleaks dir` en 5 rutas, sin hallazgos; skill `security-and-hardening` (`SKILL.md:21-40` modelo de amenazas, `:44-46` y `:102-104` validar en el borde con lista permitida); reglas globales sección 4; Engram #1097 (reglas), #1627 (OWASP por proyecto), #3370 (recibo del lead). `supply-chain-risk-auditor`: no aplica, la rebanada no cambia dependencias. `security-review`: lo corre el lead sobre el diff |
+| 2 | REA | no aplica | Eduardo lo limita a S10 y al panel (encargo del lead); este agente no tiene herramientas `mcp__rea__*` |
+| 3 | Diseño y animación | no aplica | Recheck de datos, SQL y funciones puras; sin interfaz |
+| 4 | Patrones y diagramas | parcial | `refactoring-guru.md:58` leído. Los arreglos usan guard clauses y fail-fast (`pricing.py:179`, `:192`, `:327-331`; `shipping.py:33-42` como filtro), sin patrón nuevo; el Mermaid de esta sección 9 sigue vigente (los arreglos no agregan componentes). No abrí el Archify `docs/diagramas/t7a-precios-er.html` |
+| 5 | roadmap.sh | usado por referencia | `best-practices.md:111` (limitar peticiones), `:123-126` (entradas) y `:148` (códigos de respuesta); no corrí `roadmap_search.py` de nuevo |
+| 6 | Big School | usado | `temario.md:201` (seguridad por diseño, pp. 15-16: validar y autorizar en el servidor) y `:198` (TDD, p. 9): las sondas son la verificación independiente de los arreglos que `backend-datos` hizo con rojo antes de verde |
+| 7 | Videos | parcial | Citados del handoff, no abiertos por mí: https://youtu.be/0DhghJpWwVQ?t=646 (probar primero auth, tokens y conexiones) y https://youtu.be/3spCFnMSGIY?t=4926 (minutos verificados por el lead con `transcript`) |
