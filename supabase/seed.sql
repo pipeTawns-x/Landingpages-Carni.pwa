@@ -14,8 +14,8 @@
 --   Categoría:  res · cerdo · pollo · embutidos · preparadas · premium
 --               merch · otrosproductos · frutasverduras
 --
--- price_per_lb NO se escribe a mano: se calcula como price_per_kg × 0.4536
--- (1 lb = 0.45359237 kg). Escribirlo a mano en 53 filas es pedir un error.
+-- price_per_lb NO se escribe a mano: se calcula como price_per_kg × 0.45359237
+-- (1 lb = 0.45359237 kg, el mismo factor con el que se cobra). Escribirlo a mano en 53 filas es pedir un error.
 --
 -- Cada producto dice de qué es su precio (unidad: kg, piece o package), la
 -- regla de la migración 20261113000001: "Paquete ..." es paquete salvo que
@@ -63,7 +63,7 @@ SELECT
     v.nombre,
     v.descripcion,
     v.precio_kg,
-    ROUND(v.precio_kg * 0.4536, 2),
+    ROUND(v.precio_kg * 0.45359237, 2),
     v.imagen,
     v.stock,
     v.minimo,

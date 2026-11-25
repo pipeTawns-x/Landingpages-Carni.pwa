@@ -204,7 +204,7 @@ SELECT
     v.nombre,
     v.descripcion,
     v.precio_kg,
-    ROUND(v.precio_kg * 0.4536, 2),
+    ROUND(v.precio_kg * 0.45359237, 2),
     v.imagen,
     v.stock,
     v.minimo,

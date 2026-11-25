@@ -2,10 +2,12 @@
 
 `Category` and `Product` are unmanaged mirrors of the Supabase-owned tables
 `public.categories` and `public.products` (Django must never emit DDL for
-them). `OrderItem` and `Favorite` mirror `public.order_items` and
-`public.favorites` the same way, but read-only: the panel only counts the rows
-that point at a product. `CutSpec` is the only Django-managed table in this app
-and lives in the `django` schema, linked to `Product` without a DB-level
+them). `Promotion`, `ProductCost` and `StoreCutSpec` mirror
+`public.product_promotions`, `public.product_costs` and
+`public.product_cut_specs` the same way. `OrderItem` and `Favorite` mirror
+`public.order_items` and `public.favorites` read-only: the panel only counts the
+rows that point at a product. `CutSpec` is the only Django-managed table in this
+app and lives in the `django` schema, linked to `Product` without a DB-level
 foreign key (`db_constraint=False`) so Django cannot alter a Supabase-owned
 table.
 """
@@ -20,19 +22,17 @@ from django.core.validators import MinValueValidator
 from django.db import models
 from django.db.models import CheckConstraint, F, Q
 
-# 1 lb weighs 0.4536 kg, so price-per-lb is price-per-kg scaled by this factor.
-KG_TO_LB_PRICE_FACTOR = Decimal("0.4536")
+# 1 lb is exactly 0.45359237 kg: the one pound factor of the store. The SQL quote converts pounds
+# to kilos with it, so the price per pound shown is the price per pound charged. The price the
+# admin types per pound or per 100 g is converted to a price per kilo (the only one the store
+# keeps) with these, rounded half up to cents.
+POUND_IN_KG = Decimal("0.45359237")
+CENTS = Decimal("0.01")
 
 
 def price_per_lb_for(price_per_kg: Decimal) -> Decimal:
-    """Convert a price per kg to a price per lb, rounded half up to cents."""
-    return (price_per_kg * KG_TO_LB_PRICE_FACTOR).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
-
-
-# 1 lb is exactly 0.45359237 kg. The price the admin types per pound or per 100 g is converted
-# to a price per kilo (the only one the store keeps) with these, rounded half up to cents.
-POUND_IN_KG = Decimal("0.45359237")
-CENTS = Decimal("0.01")
+    """Convert a price per kg to a price per lb (`POUND_IN_KG`), rounded half up to cents."""
+    return (price_per_kg * POUND_IN_KG).quantize(CENTS, rounding=ROUND_HALF_UP)
 
 
 def price_per_kg_from(price: Decimal, unit: str) -> Decimal:
@@ -60,9 +60,9 @@ def price_equivalents(price_per_kg: Decimal) -> dict[str, Decimal]:
 class TextArrayField(models.Field):
     """A `text[]` column (`products.sale_modes`) that also works on the SQLite of the tests.
 
-    PostgreSQL gets and gives a real list. Any other backend keeps the list as JSON text, which
-    is only there so the test database can hold the mirror: the table is Supabase's. An
-    `ArrayField` would not do, because it is PostgreSQL only and the tests run on SQLite.
+    PostgreSQL gets and gives a real list. Any other backend keeps the list as JSON text: the
+    tests run on SQLite, where `config.test_runner.UnmanagedModelsTestRunner` creates the
+    unmanaged tables. An `ArrayField` would not do, because it is PostgreSQL only.
     """
 
     def db_type(self, connection):
@@ -96,7 +96,10 @@ def store_image_url(image_url: str | None) -> str:
     path such as `/img/products/tomahawk.webp` is a path of this same site and is returned as a
     root-relative path. An absolute http(s) address is kept as it is. Anything else
     (`javascript:`, `data:`, a protocol-relative `//host`, a path that climbs with `..`) is not a
-    picture a page will point an <img> at.
+    picture a page will point an <img> at. Browsers read a backslash as a slash and drop tabs and
+    newlines inside an address, so a path with any of them (`/\\evil.com`, `img\\..\\x`) is
+    refused too. So is a path with `%`: the browser decodes `%2e%2e`, `%2f` or `%5c` before it
+    resolves the path, and no picture of the store needs one (uploads are http(s) addresses).
     """
     if not image_url or not image_url.strip():
         return ""
@@ -104,6 +107,8 @@ def store_image_url(image_url: str | None) -> str:
     scheme = urlsplit(address).scheme
     if scheme in {"http", "https"}:
         return address
+    if any(char in "\\%" or ord(char) < 32 or ord(char) == 127 for char in address):
+        return ""
     if scheme or address.startswith("//") or ".." in address.split("/"):
         return ""
     return "/" + address.lstrip("/")
@@ -200,6 +205,17 @@ class Product(models.Model):
     # step. They are mirrored so that the one UPDATE that changes the unit also changes them.
     stock_unit = models.TextField(default="kg", editable=False)
     sale_modes = TextArrayField(default=default_sale_modes, editable=False)
+    # The source this product's sales take their kilos from (S14.2, `inventario-por-fuente.md`).
+    # One level deep: the table refuses a product that is its own source.
+    source_product = models.ForeignKey(
+        "self",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="sellables",
+        db_column="source_product_id",
+        verbose_name="fuente",
+    )
 
     class Meta:
         managed = False
@@ -243,7 +259,7 @@ class Product(models.Model):
         """The saved price per kilo, per pound and per 100 g (see `price_equivalents`).
 
         The pound is the stored `price_per_lb`, the one the store shows, so that the panel and the
-        shop never differ by a cent; it is derived with `KG_TO_LB_PRICE_FACTOR`.
+        shop never differ by a cent; it is derived with `POUND_IN_KG`.
         """
         return {**price_equivalents(self.price_per_kg), "lb": self.price_per_lb}
 
@@ -506,7 +522,7 @@ class Promotion(models.Model):
         price, and nothing goes below one cent.
         """
         if self.kind == self.Kind.PERCENT:
-            price = (base * (1 - self.value / 100)).quantize(Decimal("0.01"))
+            price = (base * (1 - self.value / 100)).quantize(CENTS, rounding=ROUND_HALF_UP)
         elif self.kind == self.Kind.AMOUNT_OFF:
             price = base - self.value
         else:
@@ -563,6 +579,8 @@ class StoreCutSpec(models.Model):
     thickness_min_in = models.DecimalField(max_digits=4, decimal_places=2, null=True)
     thickness_max_in = models.DecimalField(max_digits=4, decimal_places=2, null=True)
     thickness_default_in = models.DecimalField(max_digits=4, decimal_places=2, null=True)
+    # How far a piece may weigh from the standard and still count as one: "100 g ±5 g" (S14.6).
+    piece_tolerance_kg = models.DecimalField(max_digits=6, decimal_places=3, null=True)
 
     class Meta:
         managed = False

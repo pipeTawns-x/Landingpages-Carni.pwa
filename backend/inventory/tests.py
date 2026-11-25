@@ -41,6 +41,7 @@ from inventory.models import (
     Favorite,
     OrderItem,
     Product,
+    Promotion,
     ReadOnlyModelError,
     price_equivalents,
     price_per_kg_from,
@@ -99,12 +100,34 @@ class PricePerLbForTests(SimpleTestCase):
         self.assertEqual(price_per_lb_for(Decimal("100.00")), Decimal("45.36"))
 
     def test_rounds_to_cents(self):
-        # 549.00 * 0.4536 = 249.0264
-        self.assertEqual(price_per_lb_for(Decimal("549.00")), Decimal("249.03"))
+        # 549.00 * 0.45359237 = 249.0222...
+        self.assertEqual(price_per_lb_for(Decimal("549.00")), Decimal("249.02"))
 
     def test_rounds_half_up_not_half_even(self):
-        # 18.75 * 0.4536 is exactly 8.505: half up gives 8.51, half even 8.50.
-        self.assertEqual(price_per_lb_for(Decimal("18.75")), Decimal("8.51"))
+        # 500000.00 * 0.45359237 is exactly 226796.185: half up gives .19, half even .18.
+        self.assertEqual(price_per_lb_for(Decimal("500000.00")), Decimal("226796.19"))
+
+    def test_uses_the_exact_pound_of_the_rest_of_the_module(self):
+        # 453.59 typed per pound is 999.99 per kilo, and 999.99 per kilo shows 453.59 per pound
+        # again (with 0.4536 it came back as 453.60: the drift GGA found).
+        per_kg = price_per_kg_from(Decimal("453.59"), "lb")
+
+        self.assertEqual(per_kg, Decimal("999.99"))
+        self.assertEqual(price_per_lb_for(per_kg), Decimal("453.59"))
+        self.assertEqual(price_per_lb_for(per_kg), price_equivalents(per_kg)["lb"])
+
+
+class PromotionPriceTests(SimpleTestCase):
+    def test_a_percent_rounds_half_up_like_the_sql(self):
+        # 10.00 * 0.9585 is exactly 9.585: half up gives 9.59, half even 9.58.
+        promo = Promotion(kind="percent", value=Decimal("4.15"))
+
+        self.assertEqual(promo.price_for(Decimal("10.00")), Decimal("9.59"))
+
+    def test_a_percent_that_lands_on_a_cent_is_unchanged(self):
+        promo = Promotion(kind="percent", value=Decimal("10"))
+
+        self.assertEqual(promo.price_for(Decimal("200.00")), Decimal("180.00"))
 
     def test_returns_a_decimal_with_two_places(self):
         result = price_per_lb_for(Decimal("100.00"))
@@ -124,7 +147,7 @@ class ProductSaveTests(TestCase):
         )
 
         product.refresh_from_db()
-        self.assertEqual(product.price_per_lb, Decimal("249.03"))
+        self.assertEqual(product.price_per_lb, Decimal("249.02"))
 
 
 class ProductUpdateSpecTests(TestCase):
@@ -1301,6 +1324,47 @@ class StoreImageUrlTests(SimpleTestCase):
             with self.subTest(address=address):
                 self.assertEqual(store_image_url(address), "")
 
+    def test_a_backslash_or_a_hidden_second_slash_is_refused(self):
+        # Browsers read a backslash as a slash and drop tabs and newlines inside an address, so
+        # each of these becomes `//evil.example` (another site) or climbs with `..`.
+        for address in (
+            "/\\evil.example/a.png",
+            "\\\\evil.example/a.png",
+            "\\/evil.example/a.png",
+            "img\\..\\x.png",
+            "img/a\\b.png",
+            "/\t/evil.example/a.png",
+            "/\n/evil.example/a.png",
+            "///evil.example/a.png",
+        ):
+            with self.subTest(address=address):
+                self.assertEqual(store_image_url(address), "")
+
+    def test_a_percent_encoded_path_is_refused(self):
+        # The browser decodes these before it resolves the path: `%2e%2e` climbs to /panel/,
+        # `%2f` and `%5c` hide a second slash, `%00` ends the name. No store picture uses `%`.
+        for address in (
+            "/img/%2e%2e/%2e%2e/panel/",
+            "/img/%2E%2E/panel/",
+            "/%2fevil.example/a.png",
+            "/%5cevil.example/a.png",
+            "img/a.png%00.html",
+            "img/%252e%252e/panel/",
+        ):
+            with self.subTest(address=address):
+                self.assertEqual(store_image_url(address), "")
+
+    def test_the_paths_accepted_today_are_still_accepted(self):
+        for address, expected in (
+            ("/img/products/tomahawk.webp", "/img/products/tomahawk.webp"),
+            ("img/products/res.webp", "/img/products/res.webp"),
+            ("/media/products/7/a-b_c.v2.webp", "/media/products/7/a-b_c.v2.webp"),
+            ("https://cdn.example/a.png", "https://cdn.example/a.png"),
+            ("http://cdn.example/a.png", "http://cdn.example/a.png"),
+        ):
+            with self.subTest(address=address):
+                self.assertEqual(store_image_url(address), expected)
+
     def test_the_product_exposes_it_as_image_src(self):
         self.assertEqual(Product(image_url="/img/a.webp").image_src, "/img/a.webp")
         self.assertEqual(Product(image_url=None).image_src, "")
@@ -1371,7 +1435,7 @@ class ProductDetailPageTests(TestCase):
     def test_the_data_of_the_product_are_shown(self):
         text = self.text(self.page())
 
-        self.assertIn("$649.00 / kg · $294.39 / lb", text)
+        self.assertIn("$649.00 / kg · $294.38 / lb", text)
         self.assertIn("Categoría Cortes Especiales", text)
         self.assertIn("Descripción Rib eye con el hueso largo entero.", text)
         self.assertIn("Cantidad mínima 0.800 kg", text)
@@ -1724,7 +1788,7 @@ class ProductFormPageTests(TestCase):
         html = self.edit_page()
 
         self.assertNotIn("price_per_lb", form_controls(html).controls)
-        self.assertIn("$294.39 por libra", self.main_text(html))
+        self.assertIn("$294.38 por libra", self.main_text(html))
 
     def test_the_confirmation_checkbox_is_there_when_editing_and_starts_unticked(self):
         confirm = form_controls(self.edit_page()).controls["confirm"]
@@ -2587,13 +2651,13 @@ class ProductAdminTests(TestCase):
 
         self.assertIn("price_per_lb", response.context["adminform"].readonly_fields)
         self.assertNotContains(response, 'name="price_per_lb"')
-        self.assertContains(response, "249.03")
+        self.assertContains(response, "249.02")
 
     def test_a_submitted_price_per_lb_is_ignored(self):
         response = self.client.post(self.change_url, self.form_data(price_per_lb="1.00"))
 
         self.assertRedirects(response, self.changelist_url)
-        self.assertEqual(self.stored_product().price_per_lb, Decimal("249.03"))
+        self.assertEqual(self.stored_product().price_per_lb, Decimal("249.02"))
 
     # confirmation of a price or minimum quantity change
 

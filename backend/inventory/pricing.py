@@ -84,15 +84,21 @@ class PieceVariant:
 
 @dataclass(frozen=True)
 class ClosedPrice:
-    """The closed price of one order line."""
+    """The closed price of one order line.
+
+    `price_per_kg` follows the schema convention of `products.price_per_kg`: it is the price of
+    one `price_unit` of the product. For a product priced per kilo that is the price per kilo; for
+    a product priced per piece or package (`source = "fixed_piece"`) it is the price of one piece,
+    the same amount as `unit_price`. The name is kept because the store already reads it.
+    """
 
     product_id: int
     mode: str
-    source: str  # "standard_size", "whole_piece", "amount" or "weight"
+    source: str  # "standard_size", "whole_piece", "fixed_piece", "amount" or "weight"
     size_id: int | None
     quantity: int | None
     unit_price: Decimal | None  # what one piece costs; None for money and weight
-    price_per_kg: Decimal
+    price_per_kg: Decimal  # the price of one `price_unit` (see the class docstring)
     weight_kg: Decimal
     total: Decimal
     warnings: list[str] = field(default_factory=list)
@@ -240,6 +246,7 @@ def close_price(
     sizes: Iterable = (),
     whole_pieces: Iterable[PieceVariant] = (),
     price_per_kg: Decimal | None = None,
+    standard_piece: "StandardPiece | None" = None,
 ) -> ClosedPrice:
     """Close the price of one line in any of the three ways to order.
 
@@ -248,15 +255,77 @@ def close_price(
     `"piece_weight_kg": "7.3"` for a whole piece). `sizes` are the product's `ProductSize` rows and
     `whole_pieces` the `PieceVariant`s on the shelf. `price_per_kg` replaces the list price when a
     promotion applies. Raises `PricingError` with a code of the store's `domain.ERROR_MESSAGES`.
+
+    A product priced per piece or package (S14.6) takes only `{"mode": "pieces", "quantity": n}`:
+    its price is fixed per piece and `standard_piece` gives the weight each piece takes from stock
+    (none for merchandise). It refuses weight, money, a size and a piece weight.
     """
     mode, line = _check_line_shape(product, line)
     per_kg = _effective_price(product, price_per_kg)
+    if (
+        product.price_unit != "kg"
+        and mode == "pieces"
+        and not {"size_id", "piece_weight_kg"} & set(line)
+    ):
+        return _close_fixed_piece(product, line, per_kg, standard_piece)
     _check_product_sells(product, mode)
     if mode == "money":
         return _close_money(product, line, per_kg)
     if mode == "weight":
         return _close_weight(product, line, per_kg)
     return _close_pieces(product, line, per_kg, tuple(sizes), tuple(whole_pieces))
+
+
+@dataclass(frozen=True)
+class StandardPiece:
+    """The standard weight of one piece and its tolerance: "100 g ±5 g" (S14.6).
+
+    Both are finite Decimals: the weight above zero, the tolerance zero or more. A float or text
+    is refused, so a view parses the user's input with its ASCII parser first (F-47).
+    """
+
+    weight_kg: Decimal
+    tolerance_kg: Decimal = Decimal("0")
+
+    def __post_init__(self) -> None:
+        if not _finite_decimal(self.weight_kg) or self.weight_kg <= 0:
+            raise PricingError("invalid_amount", "the standard weight is a Decimal above zero")
+        if not _finite_decimal(self.tolerance_kg) or self.tolerance_kg < 0:
+            raise PricingError("invalid_amount", "the tolerance is a Decimal of zero or more")
+
+    def accepts(self, weighed_kg: Decimal) -> bool:
+        """Whether a weighed piece is within the tolerance of the standard weight."""
+        if not _finite_decimal(weighed_kg):
+            raise PricingError("invalid_amount", "a weighed piece is a finite Decimal")
+        return abs(weighed_kg - self.weight_kg) <= self.tolerance_kg
+
+
+def _finite_decimal(value: object) -> bool:
+    return isinstance(value, Decimal) and value.is_finite()
+
+
+def _close_fixed_piece(
+    product, line: Mapping, per_piece: Decimal, standard_piece: StandardPiece | None
+) -> ClosedPrice:
+    # `per_piece` is `products.price_per_kg` of a product priced per piece or package: by the
+    # schema convention that column holds the price of one `price_unit` (see `ClosedPrice`).
+    # Rounded half up like the SQL quote (`v_price::numeric(10,2)`, `round(pieces * v_price, 2)`).
+    quantity = _whole_number(
+        _need(line, "quantity"), 1, MAX_PIECES, "a whole number of pieces, from 1 to 10,000"
+    )
+    weight = Decimal("0") if standard_piece is None else standard_piece.weight_kg * quantity
+    return ClosedPrice(
+        product_id=product.id,
+        mode="pieces",
+        source="fixed_piece",
+        size_id=None,
+        quantity=quantity,
+        unit_price=per_piece.quantize(CENT, rounding=ROUND_HALF_UP),
+        price_per_kg=per_piece,
+        weight_kg=weight.quantize(MILLI),
+        total=(per_piece * quantity).quantize(CENT, rounding=ROUND_HALF_UP),
+        warnings=[],
+    )
 
 
 def _need(line: Mapping, key: str) -> object:
@@ -313,7 +382,9 @@ def _close_pieces(
     quantity = _whole_number(
         _need(line, "quantity"), 1, MAX_PIECES, "a whole number of pieces, from 1 to 10,000"
     )
-    if ("size_id" in line) == ("piece_weight_kg" in line):
+    if "size_id" not in line and "piece_weight_kg" not in line:
+        raise PricingError("invalid_items", "the line names neither a size nor a piece weight")
+    if "size_id" in line and "piece_weight_kg" in line:
         raise PricingError("invalid_items", "the line names a size or a piece weight, not both")
     if "size_id" in line:
         return _close_standard_size(product, line, per_kg, quantity, sizes)

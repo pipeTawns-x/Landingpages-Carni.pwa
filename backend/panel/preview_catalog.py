@@ -40,7 +40,7 @@ PRICE_UNITS = ("kg", "piece", "package")
 # The SELECT that maps the VALUES list onto PRODUCT_COLUMNS, without spaces.
 PRODUCT_SELECT = (
     "(SELECTidFROMcategoriesWHEREslug=v.slug),v.nombre,v.descripcion,v.precio_kg,"
-    "ROUND(v.precio_kg*0.4536,2),v.imagen,v.stock,v.minimo,true,v.unidad,"
+    "ROUND(v.precio_kg*0.45359237,2),v.imagen,v.stock,v.minimo,true,v.unidad,"
     "CASEWHENv.unidad='kg'THEN'kg'ELSE'piece'END,"
     "CASEWHENv.unidad='kg'THENARRAY['money','weight']ELSEARRAY['pieces']END"
 )

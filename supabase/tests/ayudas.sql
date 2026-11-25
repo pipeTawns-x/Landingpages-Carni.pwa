@@ -117,7 +117,7 @@ BEGIN
          price_unit, sale_modes, stock_unit, track_stock)
     VALUES
         (p_id, (SELECT id FROM public.categories WHERE slug = p_category), p_name,
-         p_price, round(p_price * 0.4536, 2), p_stock, p_min_kg, true,
+         p_price, round(p_price * 0.45359237, 2), p_stock, p_min_kg, true,
          p_price_unit, p_modes, p_stock_unit, p_track);
     RETURN p_id;
 END $$;
