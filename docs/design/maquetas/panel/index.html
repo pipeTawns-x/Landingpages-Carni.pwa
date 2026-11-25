@@ -1,0 +1,407 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: blob:; style-src 'self'; script-src 'self'; font-src 'self' data:">
+  <title>Panel Carni · Maqueta</title>
+  <meta name="description" content="Maqueta navegable del panel de la Carnicería El Señor de La Misericordia: Inicio y Productos.">
+  <link rel="stylesheet" href="css/fonts.css">
+  <link rel="stylesheet" href="css/panel.css">
+</head>
+<body class="is-entering">
+  <a class="skip" href="#main">Saltar al contenido</a>
+
+  <aside class="side" id="side" aria-label="Secciones del panel">
+    <div class="side__brand">
+      <span class="side__logo" aria-hidden="true"><svg class="i"><use href="#i-flame"/></svg></span>
+      <span class="side__brand-txt"><strong>Señor de La Misericordia</strong><small>Panel de la carnicería</small></span>
+    </div>
+    <nav class="side__nav" aria-label="Principal">
+      <p class="side__group">Tienda</p>
+      <a href="#inicio" data-route="inicio" data-tip="Inicio"><svg class="i"><use href="#i-layout-dashboard"/></svg><span class="side__label">Inicio</span></a>
+      <a href="#ventas" data-route="ventas" data-tip="Ventas"><svg class="i"><use href="#i-receipt"/></svg><span class="side__label">Ventas</span></a>
+      <a href="#pedidos" data-route="pedidos" data-tip="Pedidos"><svg class="i"><use href="#i-package"/></svg><span class="side__label">Pedidos</span><span class="count" aria-label="4 por atender">4</span></a>
+      <a href="#compras" data-route="compras" data-tip="Compras"><svg class="i"><use href="#i-shopping-cart"/></svg><span class="side__label">Compras</span></a>
+      <a href="#inventario" data-route="inventario" data-tip="Inventario"><svg class="i"><use href="#i-warehouse"/></svg><span class="side__label">Inventario</span></a>
+      <a href="#productos" data-route="productos" data-tip="Productos"><svg class="i"><use href="#i-beef"/></svg><span class="side__label">Productos</span></a>
+      <p class="side__group">Clientes</p>
+      <a href="#promociones" data-route="promociones" data-tip="Promociones"><svg class="i"><use href="#i-badge-percent"/></svg><span class="side__label">Promociones</span></a>
+      <a href="#cupones" data-route="cupones" data-tip="Cupones"><svg class="i"><use href="#i-ticket"/></svg><span class="side__label">Cupones</span></a>
+      <a href="#clientes" data-route="clientes" data-tip="Clientes"><svg class="i"><use href="#i-users"/></svg><span class="side__label">Clientes</span></a>
+      <p class="side__group">Negocio</p>
+      <a href="#reportes" data-route="reportes" data-tip="Reportes"><svg class="i"><use href="#i-chart-column"/></svg><span class="side__label">Reportes</span></a>
+      <a href="#configuracion" data-route="configuracion" data-tip="Configuración"><svg class="i"><use href="#i-settings"/></svg><span class="side__label">Configuración</span></a>
+      <a href="#bitacora" data-route="bitacora" data-tip="Bitácora"><svg class="i"><use href="#i-scroll-text"/></svg><span class="side__label">Bitácora</span></a>
+    </nav>
+    <p class="side__note">Maqueta para aprobación. Pedidos y clientes de muestra; productos y precios de <code>supabase/seed.sql</code>.</p>
+  </aside>
+  <div class="scrim" id="scrim" hidden></div>
+
+  <div class="shell">
+    <header class="top" id="top">
+      <button class="iconbtn top__menu" id="menuBtn" type="button" aria-label="Abrir menú" aria-controls="side" aria-expanded="false"><svg class="i"><use href="#i-menu"/></svg></button>
+      <nav class="crumbs" aria-label="Ruta"><span>Panel</span><svg class="i i--sm" aria-hidden="true"><use href="#i-chevron-down"/></svg><strong id="crumb">Inicio</strong></nav>
+      <label class="search">
+        <span class="sr">Buscar en el panel</span>
+        <svg class="i" aria-hidden="true"><use href="#i-search"/></svg>
+        <input type="search" placeholder="Buscar producto o pedido" id="globalSearch" autocomplete="off">
+      </label>
+      <span class="sample" title="Los pedidos y clientes son de muestra">Pedidos de muestra</span>
+      <button class="iconbtn" type="button" aria-label="Notificaciones: 3 productos con stock bajo"><svg class="i"><use href="#i-bell"/></svg><span class="pip" aria-hidden="true"></span></button>
+      <span class="avatar" aria-label="Sesión de Eduardo, administrador" role="img">ET</span>
+    </header>
+
+    <main id="main" tabindex="-1">
+      <!-- INICIO -->
+      <section class="view" id="view-inicio" data-view="inicio" aria-labelledby="h-inicio">
+        <div class="hero">
+          <canvas id="fire" aria-hidden="true"></canvas>
+          <div class="hero__ring" aria-hidden="true"></div>
+          <div class="hero__copy">
+            <p class="hero__date" id="todayLabel">&nbsp;</p>
+            <h1 id="h-inicio" class="display">Así va la carnicería</h1>
+            <p class="hero__sub" id="heroSub">&nbsp;</p>
+          </div>
+          <div class="hero__tools enter" data-d="1">
+            <div class="seg" role="radiogroup" aria-label="Periodo" id="periodSeg">
+              <button type="button" role="radio" aria-checked="false" data-days="1">Hoy</button>
+              <button type="button" role="radio" aria-checked="true" data-days="7">7 días</button>
+              <button type="button" role="radio" aria-checked="false" data-days="30">30 días</button>
+              <button type="button" role="radio" aria-checked="false" data-days="90">90 días</button>
+            </div>
+            <button class="btn btn--ghost" type="button" id="csvBtn"><svg class="i"><use href="#i-download"/></svg>Exportar CSV</button>
+            <a class="btn btn--primary" href="#productos?nuevo"><svg class="i"><use href="#i-plus"/></svg>Nuevo producto</a>
+          </div>
+        </div>
+
+        <div class="board">
+          <div class="kpis enter" data-d="2" id="kpis"></div>
+
+          <div class="grid2 enter" data-d="3">
+            <article class="card card--chart" aria-labelledby="h-flow">
+              <div class="card__head">
+                <div>
+                  <h2 id="h-flow">Flujo de dinero</h2>
+                  <p class="card__meta" id="flowMeta"></p>
+                </div>
+                <div class="card__tools">
+                  <div class="seg seg--accent" role="radiogroup" aria-label="Serie" id="metricSeg">
+                    <button type="button" role="radio" aria-checked="true" data-metric="revenue">Ingresos</button>
+                    <button type="button" role="radio" aria-checked="false" data-metric="expense">Gasto</button>
+                    <button type="button" role="radio" aria-checked="false" data-metric="profit">Ganancia</button>
+                  </div>
+                  <label class="select">
+                    <span class="sr">Agrupar por</span>
+                    <select id="grainSel"><option value="semana">Por semana</option><option value="mes">Por mes</option></select>
+                    <svg class="i i--sm" aria-hidden="true"><use href="#i-chevron-down"/></svg>
+                  </label>
+                </div>
+              </div>
+              <div class="chart" id="flowChart"></div>
+              <details class="tableview"><summary>Ver como tabla</summary><div id="flowTable"></div></details>
+            </article>
+
+            <article class="card" aria-labelledby="h-heat">
+              <div class="card__head">
+                <div>
+                  <h2 id="h-heat">Horas de más venta</h2>
+                  <p class="card__meta" id="heatMeta"></p>
+                </div>
+              </div>
+              <div class="heat" id="heat"></div>
+              <details class="tableview"><summary>Ver ventas por día</summary><div id="heatTable"></div></details>
+              <div class="heatkey" aria-hidden="true"><span>Menos</span><i></i><i></i><i></i><i></i><i></i><i></i><span>Más</span></div>
+            </article>
+          </div>
+
+          <div class="grid3 enter" data-d="4">
+            <article class="card card--top" aria-labelledby="h-top">
+              <div class="card__head"><div><h2 id="h-top">Lo que más se vende</h2><p class="card__meta" id="topMeta"></p></div></div>
+              <ol class="toplist" id="topList"></ol>
+            </article>
+            <article class="card" aria-labelledby="h-orders">
+              <div class="card__head"><div><h2 id="h-orders">Pedidos de hoy</h2><p class="card__meta" id="ordersMeta"></p></div><a class="link" href="#pedidos">Ver pedidos</a></div>
+              <ul class="orders" id="ordersList"></ul>
+            </article>
+            <article class="card" aria-labelledby="h-low">
+              <div class="card__head"><div><h2 id="h-low">Stock bajo</h2><p class="card__meta">Por debajo del umbral de cada producto</p></div><a class="link" href="#productos?stock=bajo">Revisar</a></div>
+              <ul class="low" id="lowList"></ul>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- PRODUCTOS -->
+      <section class="view" id="view-productos" data-view="productos" aria-labelledby="h-productos" hidden>
+        <div class="pagehead">
+          <div>
+            <h1 id="h-productos" class="display">Productos</h1>
+            <p class="pagehead__sub" id="prodSub">53 de 53 productos · 9 categorías de supabase/seed.sql · 3 con stock bajo · SKU de maqueta (categoría + id)</p>
+          </div>
+          <button class="btn btn--primary" type="button" id="newProduct"><svg class="i"><use href="#i-plus"/></svg>Nuevo producto</button>
+        </div>
+        <div class="filters" role="search" aria-label="Filtrar productos">
+          <label class="search search--wide">
+            <span class="sr">Buscar producto</span>
+            <svg class="i" aria-hidden="true"><use href="#i-search"/></svg>
+            <input type="search" id="prodSearch" placeholder="Buscar por nombre" autocomplete="off">
+          </label>
+          <div class="chips" id="catChips" role="radiogroup" aria-label="Categoría"></div>
+          <label class="check"><input type="checkbox" id="lowOnly"><span>Solo stock bajo</span></label>
+          <label class="sortsel"><span class="sr">Ordenar por</span>
+            <span class="select"><select id="sortSel">
+              <option value="">Orden del catálogo</option>
+              <option value="name:ascending">Producto, A a Z</option>
+              <option value="name:descending">Producto, Z a A</option>
+              <option value="cat:ascending">Categoría, A a Z</option>
+              <option value="price:ascending">Precio, menor a mayor</option>
+              <option value="price:descending">Precio, mayor a menor</option>
+              <option value="offer:ascending">Precio oferta, menor a mayor</option>
+              <option value="offer:descending">Precio oferta, mayor a menor</option>
+              <option value="stock:ascending">Stock, menor a mayor</option>
+              <option value="stock:descending">Stock, mayor a menor</option>
+            </select><svg class="i" aria-hidden="true"><use href="#i-chevron-down"/></svg></span>
+          </label>
+        </div>
+        <p class="sr" id="sortStatus" role="status"></p>
+        <div class="tablewrap card" tabindex="0" role="region" aria-labelledby="tblCap">
+          <table class="ptable">
+            <caption id="tblCap" class="sr">Catálogo de productos</caption>
+            <thead>
+              <tr>
+                <th scope="col" data-sort="name"><button type="button" class="sortbtn">Producto<svg class="i sortbtn__ico" aria-hidden="true"><use href="#i-chevron-down"/></svg></button></th>
+                <th scope="col" data-sort="cat"><button type="button" class="sortbtn">Categoría<svg class="i sortbtn__ico" aria-hidden="true"><use href="#i-chevron-down"/></svg></button></th>
+                <th scope="col" class="num" data-sort="price"><button type="button" class="sortbtn">Precio<svg class="i sortbtn__ico" aria-hidden="true"><use href="#i-chevron-down"/></svg></button></th>
+                <th scope="col" class="num" data-sort="offer"><button type="button" class="sortbtn">Precio oferta<svg class="i sortbtn__ico" aria-hidden="true"><use href="#i-chevron-down"/></svg></button></th>
+                <th scope="col">Se vende por</th>
+                <th scope="col" class="num" data-sort="stock"><button type="button" class="sortbtn">Stock<svg class="i sortbtn__ico" aria-hidden="true"><use href="#i-chevron-down"/></svg></button></th>
+                <th scope="col">Disponible</th>
+                <th scope="col">Oferta</th>
+                <th scope="col"><span class="sr">Acciones</span></th>
+              </tr>
+            </thead>
+            <tbody id="prodBody"></tbody>
+          </table>
+          <p class="empty" id="prodEmpty" hidden>Ningún producto coincide. Prueba con otro nombre o quita el filtro de categoría.</p>
+        </div>
+      </section>
+
+      <!-- SECCIONES PENDIENTES -->
+      <section class="view" id="view-pendiente" data-view="pendiente" aria-labelledby="h-pend" hidden>
+        <div class="pending card">
+          <svg class="i i--xl" aria-hidden="true"><use href="#i-flame"/></svg>
+          <h1 id="h-pend" class="display"></h1>
+          <p id="pendText"></p>
+          <p class="pending__note">Esta sección no está en la maqueta. Solo Inicio y Productos están construidas para tu aprobación.</p>
+          <a class="btn btn--ghost" href="#inicio">Volver a Inicio</a>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Detail dialog (KPI or chart point) -->
+  <dialog class="dlg" id="detailDlg" aria-labelledby="detailTitle" closedby="any">
+    <div class="dlg__in">
+      <div class="dlg__head">
+        <h2 id="detailTitle"></h2>
+        <button class="iconbtn" type="button" data-close aria-label="Cerrar"><svg class="i"><use href="#i-x"/></svg></button>
+      </div>
+      <div id="detailBody"></div>
+    </div>
+  </dialog>
+
+  <!-- Delete confirm -->
+  <dialog class="dlg dlg--sm" id="confirmDlg" aria-labelledby="confirmTitle">
+    <form method="dialog" class="dlg__in">
+      <h2 id="confirmTitle">¿Borrar este producto?</h2>
+      <p id="confirmText"></p>
+      <div class="dlg__foot">
+        <button class="btn btn--ghost" value="cancel" autofocus>Cancelar</button>
+        <button class="btn btn--danger" value="ok">Borrar producto</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Product editor -->
+  <dialog class="dlg dlg--lg" id="prodDlg" aria-labelledby="prodDlgTitle" closedby="closerequest">
+    <form class="dlg__in pform" id="prodForm" novalidate>
+      <div class="dlg__head">
+        <div>
+          <h2 id="prodDlgTitle">Nuevo producto</h2>
+          <p class="card__meta" id="prodDlgMeta"></p>
+        </div>
+        <button class="iconbtn" type="button" data-close aria-label="Cerrar"><svg class="i"><use href="#i-x"/></svg></button>
+      </div>
+      <div class="pform__body">
+        <div class="pform__main">
+          <div class="tabs" role="tablist" aria-label="Secciones del producto" id="ptabs">
+            <button type="button" role="tab" id="tab-info" aria-controls="pan-info" aria-selected="true">Información</button>
+            <button type="button" role="tab" id="tab-img" aria-controls="pan-img" aria-selected="false" tabindex="-1">Imágenes</button>
+            <button type="button" role="tab" id="tab-price" aria-controls="pan-price" aria-selected="false" tabindex="-1">Precios</button>
+            <button type="button" role="tab" id="tab-inv" aria-controls="pan-inv" aria-selected="false" tabindex="-1">Inventario</button>
+          </div>
+
+          <div class="tabpanel" role="tabpanel" id="pan-info" aria-labelledby="tab-info" tabindex="0">
+            <div class="field">
+              <label for="f-name">Nombre</label>
+              <input id="f-name" name="name" required maxlength="80" autocomplete="off">
+              <p class="err" id="f-name-err" hidden>Escribe el nombre como lo verá el cliente.</p>
+            </div>
+            <div class="field">
+              <label for="f-desc">Descripción</label>
+              <textarea id="f-desc" name="desc" rows="3" maxlength="240"></textarea>
+              <p class="help">Una o dos frases. El cliente la lee en la ficha.</p>
+            </div>
+            <div class="field">
+              <label for="f-cat">Categoría</label>
+              <span class="select select--field"><select id="f-cat" name="cat"></select><svg class="i i--sm" aria-hidden="true"><use href="#i-chevron-down"/></svg></span>
+            </div>
+            <fieldset class="field">
+              <legend>Etiquetas</legend>
+              <div class="tagset">
+                <label class="tagopt"><input type="checkbox" name="t-oferta"><span><svg class="i i--sm"><use href="#i-badge-percent"/></svg>Oferta</span></label>
+                <label class="tagopt"><input type="checkbox" name="t-destacado"><span><svg class="i i--sm"><use href="#i-star"/></svg>Destacado</span></label>
+                <label class="tagopt"><input type="checkbox" name="t-nuevo"><span><svg class="i i--sm"><use href="#i-sparkles"/></svg>Nuevo</span></label>
+              </div>
+            </fieldset>
+            <div class="field">
+              <label for="f-feat">Características</label>
+              <input id="f-feat" name="feat" placeholder="Ej. Para asador, jaspeado alto" autocomplete="off">
+              <p class="help">Sepáralas con comas; se muestran como etiquetas en la ficha.</p>
+            </div>
+          </div>
+
+          <div class="tabpanel" role="tabpanel" id="pan-img" aria-labelledby="tab-img" tabindex="0" hidden>
+            <p class="help">La primera imagen es la principal del catálogo. Usa fotos propias del corte; la vista "detalle" sirve para la ficha.</p>
+            <ul class="imgs" id="imgList"></ul>
+            <button type="button" class="dropzone" id="addImg"><svg class="i"><use href="#i-image"/></svg><span>Agregar imagen</span><small>WebP o JPG, hasta 2 MB</small></button>
+          </div>
+
+          <div class="tabpanel" role="tabpanel" id="pan-price" aria-labelledby="tab-price" tabindex="0" hidden>
+            <div class="row2">
+              <div class="field">
+                <label for="f-price" id="f-price-label">Precio por kg</label>
+                <span class="money"><span aria-hidden="true">$</span><input id="f-price" name="price" inputmode="decimal" autocomplete="off"></span>
+                <p class="help" id="f-usd"></p>
+              </div>
+              <div class="field">
+                <label for="f-unit">Se cobra por</label>
+                <span class="select select--field"><select id="f-unit" name="unit"><option value="kg">Kilo</option><option value="piece">Pieza</option><option value="package">Paquete</option></select><svg class="i i--sm" aria-hidden="true"><use href="#i-chevron-down"/></svg></span>
+              </div>
+            </div>
+            <div class="row2">
+              <div class="field">
+                <label for="f-cost" id="f-cost-label">Precio de compra por kg</label>
+                <span class="money"><span aria-hidden="true">$</span><input id="f-cost" name="cost" inputmode="decimal" autocomplete="off"></span>
+                <p class="help" id="f-margin"></p>
+                <p class="err" id="f-cost-err" hidden></p>
+              </div>
+            </div>
+            <fieldset class="field">
+              <legend>Modos de venta</legend>
+              <div class="modes">
+                <label class="mode"><input type="checkbox" name="m-weight"><span><svg class="i"><use href="#i-weight"/></svg><b>Por peso</b><small>El cliente pide gramos o kilos</small></span></label>
+                <label class="mode"><input type="checkbox" name="m-money"><span><svg class="i"><use href="#i-hand-coins"/></svg><b>Por precio</b><small>"Dame $200 de bistec"</small></span></label>
+                <label class="mode"><input type="checkbox" name="m-pieces"><span><svg class="i"><use href="#i-package"/></svg><b>Por pieza</b><small>Precio fijo, peso estándar</small></span></label>
+              </div>
+              <p class="err" id="f-modes-err" hidden></p>
+            </fieldset>
+            <div class="row2" id="pieceRow">
+              <div class="field">
+                <label for="f-pw">Peso por pieza (kg)</label>
+                <input id="f-pw" name="pw" inputmode="decimal" autocomplete="off">
+              </div>
+              <div class="field">
+                <label for="f-tol">Tolerancia (±%)</label>
+                <input id="f-tol" name="tol" inputmode="numeric" autocomplete="off">
+              </div>
+            </div>
+
+            <section class="offer" aria-labelledby="h-offer">
+              <div class="offer__head">
+                <h3 id="h-offer">Configuración de oferta</h3>
+                <label class="switch"><input type="checkbox" role="switch" switch name="offerOn" id="offerOn"><span class="switch__ui" aria-hidden="true"></span><span class="sr">Oferta activa</span></label>
+              </div>
+              <div class="offer__body" id="offerBody">
+                <div class="row2">
+                  <fieldset class="field">
+                    <legend>Tipo de descuento</legend>
+                    <div class="seg seg--sm" role="radiogroup" aria-label="Tipo de descuento" id="offerType">
+                      <button type="button" role="radio" aria-checked="true" data-type="pct">Porcentaje</button>
+                      <button type="button" role="radio" aria-checked="false" data-type="price">Precio fijo</button>
+                    </div>
+                  </fieldset>
+                  <div class="field">
+                    <label for="f-offer" id="f-offer-label">Descuento (%)</label>
+                    <input id="f-offer" name="offer" inputmode="decimal" autocomplete="off">
+                    <p class="err" id="f-offer-err" hidden></p>
+                  </div>
+                </div>
+                <div class="row2">
+                  <div class="field"><label for="f-from">Válida desde</label><input type="date" id="f-from" name="from"></div>
+                  <div class="field"><label for="f-to">Válida hasta</label><input type="date" id="f-to" name="to"></div>
+                </div>
+                <fieldset class="field">
+                  <legend>Niveles de lealtad que la ven</legend>
+                  <div class="tagset" id="tiers">
+                    <label class="tagopt"><input type="checkbox" name="tier" value="Principiante"><span>Principiante</span></label>
+                    <label class="tagopt"><input type="checkbox" name="tier" value="Regular"><span>Regular</span></label>
+                    <label class="tagopt"><input type="checkbox" name="tier" value="Premium"><span>Premium</span></label>
+                    <label class="tagopt"><input type="checkbox" name="tier" value="VIP"><span>VIP</span></label>
+                  </div>
+                </fieldset>
+              </div>
+            </section>
+          </div>
+
+          <div class="tabpanel" role="tabpanel" id="pan-inv" aria-labelledby="tab-inv" tabindex="0" hidden>
+            <div class="field">
+              <label for="f-src">Fuente del stock</label>
+              <span class="select select--field"><select id="f-src" name="src"><option>Despiece propio</option><option>Proveedor</option><option>Canal completo</option></select><svg class="i i--sm" aria-hidden="true"><use href="#i-chevron-down"/></svg></span>
+              <p class="help">De dónde sale lo que se vende: del despiece de la casa o de un proveedor.</p>
+            </div>
+            <div class="row2">
+              <div class="field">
+                <label for="f-stock" id="f-stock-label">Stock (kg)</label>
+                <input id="f-stock" name="stock" inputmode="decimal" autocomplete="off">
+              </div>
+              <div class="field">
+                <label for="f-low" id="f-low-label">Avisar con stock bajo en (kg)</label>
+                <input id="f-low" name="low" inputmode="decimal" autocomplete="off">
+              </div>
+            </div>
+            <div class="field">
+              <label for="f-min" id="f-min-label">Mínimo por pedido (kg)</label>
+              <input id="f-min" name="min" inputmode="decimal" autocomplete="off">
+              <p class="help">0.250 kg es un cuarto de kilo, lo mínimo que da el cuchillo.</p>
+            </div>
+            <div class="stockbar" id="stockState"></div>
+          </div>
+        </div>
+
+        <aside class="pform__preview" aria-labelledby="h-prev">
+          <h3 id="h-prev">Así lo ve el cliente</h3>
+          <div class="pcard" id="pcard" aria-live="polite"></div>
+          <p class="help" id="tierNote"></p>
+        </aside>
+      </div>
+      <div class="dlg__foot">
+        <p class="dlg__hint" id="saveHint" role="status"></p>
+        <button class="btn btn--ghost" type="button" data-close>Cancelar</button>
+        <button class="btn btn--primary" type="submit"><svg class="i"><use href="#i-check"/></svg>Guardar producto</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div class="tip" id="tip" role="tooltip" hidden></div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script defer src="js/modules/icons.js"></script>
+  <script defer src="js/modules/catalog.js"></script>
+  <script defer src="js/modules/data.js"></script>
+  <script defer src="js/modules/fire.js"></script>
+  <script defer src="js/modules/app.js"></script>
+  <script defer src="js/modules/productos.js"></script>
+</body>
+</html>
