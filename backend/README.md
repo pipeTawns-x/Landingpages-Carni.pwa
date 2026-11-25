@@ -77,6 +77,47 @@ scripts/build_panel_css.sh --check   # the panel stylesheet is up to date (needs
 `manage.py test` runs on an in-memory SQLite database (see "Tests" below). The
 panel stylesheet is built by a script, not by `manage.py`: see "Panel stylesheet".
 
+## Local preview with synthetic data
+
+The preview serves the real pages of the store and the panel on made-up data, to look at them
+in a browser without any account. From the repository root:
+
+```bash
+PYTHON=backend/.venv/bin/python backend/scripts/preview.sh
+```
+
+The script runs `manage.py preview_seed`, prints a review invite for the synthetic admin with
+`manage.py issue_review_invite`, and runs `manage.py runserver 127.0.0.1:8000`, all with
+`--settings=config.settings_preview`, in the foreground (Ctrl+C stops it). `CARNI_PREVIEW_PORT`
+picks another port. Open the printed `/panel/invitado/...` link: its page only shows a button,
+and pressing it (a POST with CSRF) opens the panel, the same way a reviewer enters the demo (see
+"Enlaces de invitado para revisión"). The secret key is new on every start, so after a reload of
+`runserver` the session ends: open the link again while it lasts (one day).
+
+What keeps it local:
+
+- The barrier is `runserver` bound to `127.0.0.1` plus `LoopbackOnlyMiddleware`
+  (`config/urls_preview.py`), the first middleware, which answers 404 to any request whose
+  `REMOTE_ADDR` is not `127.0.0.1` or `::1`. `ALLOWED_HOSTS` (`127.0.0.1`, `localhost`) is not a
+  barrier: it only checks the `Host` header, which the client writes.
+- It never touches Supabase or Render. The settings refuse to load where `RENDER` is set, never
+  read `backend/.env` (`PYTHON_DOTENV_DISABLED`), and replace every Supabase value with a fake
+  one (`http://supabase.test`, no service role key). The secret key is random and never comes
+  from the shell.
+- The database is a SQLite file outside the repository, by default
+  `$TMPDIR/carni-preview/preview.sqlite3`; `CARNI_PREVIEW_DB` picks another absolute path, and
+  one inside the repository is refused. Its directory is created `0o700`, and one that belongs
+  to another user or that others can read is refused. Delete the file to start over.
+- The session and CSRF cookies have names of their own (`carni_preview_sessionid`,
+  `carni_preview_csrftoken`), so the preview does not overwrite those of another Django on
+  `127.0.0.1`. The store origin is the preview itself (`http://127.0.0.1:8000`).
+- `preview_seed` refuses to run without the preview settings or on a database that is not SQLite.
+- The Postgres functions of the store (quotes, metrics, lots, exchange rate) are answered by
+  `PreviewGateway`, the double of `ventas/tests/support.py`, fed from the preview database.
+
+`preview_seed` can run again at any time: every row has a fixed key, so the counts stay the same.
+The people and phone numbers are invented (`+52 444 000 ...`).
+
 ## Inventory panel
 
 The `inventory` app is the products section of the panel. Its five views are
