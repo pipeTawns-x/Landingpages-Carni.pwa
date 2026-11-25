@@ -27,13 +27,14 @@ EXCHANGE_RATE = {"rate": Decimal("18.50"), "buffer_pct": Decimal("2"), "age_days
 
 
 class PreviewGateway(FakeGateway):
-    """`FakeGateway` with the products, orders and lots of the preview database."""
+    """`FakeGateway` with the products, orders and purchases of the preview database.
+
+    Open lots are those of `FakeGateway`: none. seed.sql has no lots and no piece weights, and an
+    invented weight per piece would show a product as something it is not (S17).
+    """
 
     def __init__(self):
         super().__init__(products={}, fx=dict(EXCHANGE_RATE))
-
-    def open_lots(self):
-        return self._synthetic_open_lots()
 
     def recent_purchases(self, limit=20):
         return self._synthetic_purchases()[:limit]
@@ -55,22 +56,6 @@ class PreviewGateway(FakeGateway):
             }
             for product in Product.objects.filter(is_active=True)
         }
-
-    @staticmethod
-    def _synthetic_open_lots():
-        rows = []
-        for lot_id, product in enumerate(Product.objects.exclude(price_unit="kg"), start=1):
-            rows.append({
-                "lot_id": lot_id,
-                "product_id": product.pk,
-                "product_name": product.name,
-                "piece_weight_kg": Decimal("1.800"),
-                "pieces_left": 8,
-                "price_per_piece": product.price_per_kg,
-                "source_lot_id": None,
-                "created_at": timezone.now().isoformat(),
-            })  # fmt: skip
-        return rows
 
     @staticmethod
     def _synthetic_purchases():

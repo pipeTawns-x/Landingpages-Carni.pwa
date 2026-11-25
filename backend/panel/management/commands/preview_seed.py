@@ -1,14 +1,21 @@
-"""Fill the preview database with a synthetic butcher shop.
+"""Fill the preview database with the real catalogue and synthetic orders.
 
     manage.py preview_seed --settings=config.settings_preview
 
 It runs only with the preview settings (they set CARNI_PREVIEW) on SQLite. It creates the tables
 first, the managed ones with `migrate` and the unmanaged mirrors of the Supabase tables straight
-from their models, then writes the rows every page reads today: categories, products sold by kilo,
-by piece and as merchandise, cut specs, dated discounts, standard sizes and delivery zones, orders
-in every status, and the profile of the synthetic admin. Every row has a fixed key, so a second
-run never adds rows: it updates the categories, products, cut specs, discounts, sizes and zones,
-and leaves the orders it already wrote as they are.
+from their models, then writes:
+
+- the categories and products of `supabase/seed.sql`, read by `panel.preview_catalog` (one source
+  of products, S17), each with the unit seed.sql gives it: by kilo (sold by money and weight), by
+  piece or by package (both sold by pieces);
+- delivery zones, orders in every status and the profile of the synthetic admin. Only the
+  customers and their orders are invented; their lines name real products at their real price.
+
+Nothing else that changes how a product looks (discounts, standard sizes, piece weights) is
+seeded. Every row has a fixed key: a second run updates the catalogue and the zones and leaves the
+orders it already wrote as they are. A database that holds products seed.sql does not know (an
+older preview) is refused: delete the preview database file and run again.
 
 Every person and phone number is invented; nothing comes from Supabase.
 """
@@ -24,39 +31,15 @@ from django.core.management.base import BaseCommand, CommandError
 from django.db import connection, models, transaction
 from django.utils import timezone
 
-from inventory.models import Category, CutSpec, Product, Promotion, StoreCutSpec
+from inventory.models import Category, Product
 from panel.models import Profile
-from ventas.models import DeliveryZone, PanelOrder, ProductSize
+from panel.preview_catalog import load_catalog
+from ventas.models import DeliveryZone, PanelOrder
 
 # The Supabase user id of the synthetic admin the preview entry signs in.
 PREVIEW_ADMIN_ID = uuid.UUID("00000000-0000-4000-8000-0000000000ad")
 # Orders get ids derived from their key, so a second run finds the ones the first one wrote.
 ORDER_NAMESPACE = uuid.UUID("6f1c3c1e-9a3b-4b7a-9d0e-5c0a7e1f2b3c")
-
-CATEGORIES = [
-    ("Carnes Rojas", "carnes-rojas", 1),
-    ("Cerdo", "cerdo", 2),
-    ("Pollo", "pollo", 3),
-    ("Preparadas", "preparadas", 4),
-    ("Merch", "merch", 5),
-]
-
-# (name, category slug, price unit, price, stock, avg piece weight in kg or None)
-PRODUCTS = [
-    ("Bistec de res", "carnes-rojas", "kg", "289.00", "18.500", None),
-    ("Molida de res", "carnes-rojas", "kg", "219.00", "12.000", None),
-    ("Arrachera marinada", "carnes-rojas", "kg", "399.00", "6.250", None),
-    ("Pierna de puerco", "cerdo", "kg", "149.00", "10.000", None),
-    ("Molida mixta", "cerdo", "kg", "189.00", "4.000", None),
-    ("Pollo entero", "pollo", "piece", "165.00", "14", "1.800"),
-    ("Milanesa de res 100 g", "preparadas", "piece", "20.00", "60", "0.100"),
-    ("Hamburguesa preparada", "preparadas", "piece", "65.00", "25", "0.180"),
-    ("Delantal de la carnicería", "merch", "piece", "250.00", "12", None),
-    ("Paquete parrillero", "merch", "package", "899.00", "5", None),
-]
-
-SIZES_GRAMS = [340, 500, 700]
-SIZED_PRODUCTS = ["Bistec de res", "Arrachera marinada"]
 
 # (name, from km, to km, fee)
 ZONES = [
@@ -66,24 +49,24 @@ ZONES = [
     ("Lejana", "10", "15", "210.00"),
 ]
 
-# (key, status, days ago, customer, phone, delivery type, [(product, quantity kg, pieces)])
+# (key, status, days ago, customer, phone, delivery type, [(product of seed.sql, kilos)])
 ORDERS = [
     ("o1", "pending", 0, "Lucía Ramírez Test", "+52 444 000 0101", "delivery",
-     [("Bistec de res", "1.000", None)]),
+     [("Bistec de Res", "1.000")]),
     ("o2", "pending", 0, "Mateo Ortega Test", "+52 444 000 0102", "pickup",
-     [("Milanesa de res 100 g", "0.600", 6)]),
+     [("Arrachera", "0.750")]),
     ("o3", "confirmed", 1, "Sofía Torres Test", "+52 444 000 0103", "delivery",
-     [("Molida de res", "2.000", None), ("Pollo entero", "1.800", 1)]),
+     [("Molida de Res Especial", "2.000"), ("Pollo Entero", "1.800")]),
     ("o4", "preparing", 1, "Diego Herrera Test", "+52 444 000 0104", "pickup",
-     [("Arrachera marinada", "1.500", None)]),
+     [("Rib Eye", "0.600")]),
     ("o5", "ready", 2, "Valeria Cruz Test", "+52 444 000 0105", "delivery",
-     [("Hamburguesa preparada", "0.720", 4)]),
+     [("Chorizo Rojo", "0.500"), ("Pierna y Muslo", "1.500")]),
     ("o6", "delivered", 3, "Lucía Ramírez Test", "+52 444 000 0101", "delivery",
-     [("Pierna de puerco", "3.000", None)]),
+     [("Pierna de Cerdo sin Hueso", "3.000")]),
     ("o7", "delivered", 5, "Andrés Molina Test", "+52 444 000 0106", "pickup",
-     [("Bistec de res", "0.500", None), ("Delantal de la carnicería", "0.000", 1)]),
+     [("Bistec de Res", "0.500"), ("Costilla de Cerdo", "1.000")]),
     ("o8", "cancelled", 6, "Mateo Ortega Test", "+52 444 000 0102", "pickup",
-     [("Molida mixta", "1.000", None)]),
+     [("Chuleta de Cerdo", "1.000")]),
 ]  # fmt: skip
 
 
@@ -101,43 +84,57 @@ def ensure_tables():
                 editor.create_model(model)
 
 
-def seed_catalog():
-    categories = {}
-    for name, slug, order in CATEGORIES:
-        categories[slug], _ = Category.objects.update_or_create(
-            slug=slug, defaults={"name": name, "order": order, "is_active": True}
+def refuse_foreign_products(catalog):
+    """Stop when the database already holds products or categories seed.sql does not have."""
+    names = {product.name for product in catalog.products}
+    foreign = sorted(set(Product.objects.values_list("name", flat=True)) - names)
+    expected = {position: c.slug for position, c in enumerate(catalog.categories, start=1)}
+    foreign += sorted(
+        slug for pk, slug in Category.objects.values_list("pk", "slug") if expected.get(pk) != slug
+    )
+    if foreign:
+        raise CommandError(
+            "The preview database holds rows that are not in supabase/seed.sql "
+            f"({', '.join(foreign[:5])}). Delete the preview database file and run again."
         )
-    products = {}
-    for name, slug, unit, price, stock, piece_kg in PRODUCTS:
-        product, _ = Product.objects.update_or_create(
-            name=name,
+
+
+def seed_catalog(catalog):
+    """Write the categories and products of seed.sql, with the ids seed.sql gives them."""
+    categories = {}
+    # seed.sql truncates with RESTART IDENTITY, so its rows take the ids 1, 2, ... in order.
+    for pk, category in enumerate(catalog.categories, start=1):
+        categories[category.slug], _ = Category.objects.update_or_create(
+            pk=pk,
             defaults={
-                "category": categories[slug],
-                "description": f"{name} (synthetic preview data).",
-                "price_per_kg": Decimal(price),
-                "price_unit": unit,
-                "stock": Decimal(stock),
-                "is_active": True,
+                "name": category.name,
+                "slug": category.slug,
+                "image_url": category.image_url,
+                "is_active": category.is_active,
+                "order": category.order,
             },
         )
-        products[name] = product
-        if piece_kg is not None:
-            weight = Decimal(piece_kg)
-            CutSpec.objects.update_or_create(
-                product=product, defaults={"avg_piece_weight_kg": weight, "presentation": "piece"}
-            )
-            StoreCutSpec.objects.update_or_create(
-                product=product, defaults={"avg_piece_weight_kg": weight}
-            )
+    products = {}
+    for pk, item in enumerate(catalog.products, start=1):
+        products[item.name], _ = Product.objects.update_or_create(
+            pk=pk,
+            defaults={
+                "category": categories[item.category_slug],
+                "name": item.name,
+                "description": item.description,
+                "price_per_kg": item.price_per_kg,
+                "image_url": item.image_url,
+                "stock": item.stock,
+                "min_quantity_kg": item.min_quantity_kg,
+                "is_active": item.is_active,
+                # save() derives stock_unit and sale_modes from it, as the SELECT of seed.sql.
+                "price_unit": item.price_unit,
+            },
+        )
     return products
 
 
-def seed_prices(products, now):
-    for name in SIZED_PRODUCTS:
-        for grams in SIZES_GRAMS:
-            ProductSize.objects.update_or_create(
-                product=products[name], grams=grams, defaults={"is_active": True}
-            )
+def seed_zones():
     for name, from_km, to_km, fee in ZONES:
         DeliveryZone.objects.update_or_create(
             name=name,
@@ -145,22 +142,6 @@ def seed_prices(products, now):
                 "from_km": Decimal(from_km),
                 "to_km": Decimal(to_km),
                 "fee": Decimal(fee),
-                "is_active": True,
-            },
-        )
-    discounts = [
-        ("Bistec de res", "percent", "10.00", -2, 5),
-        ("Molida de res", "amount_off", "20.00", 7, 14),
-    ]
-    for name, kind, value, starts, ends in discounts:
-        day = now.replace(hour=0, minute=0, second=0, microsecond=0)
-        Promotion.objects.update_or_create(
-            product=products[name],
-            kind=kind,
-            defaults={
-                "value": Decimal(value),
-                "starts_at": day + timedelta(days=starts),
-                "ends_at": day + timedelta(days=ends),
                 "is_active": True,
             },
         )
@@ -172,16 +153,15 @@ def seed_orders(products, now):
         if PanelOrder.objects.filter(pk=order_id).exists():
             continue
         lines = []
-        for name, kilos, pieces in items:
+        for name, kilos in items:
             product = products[name]
-            amount = Decimal(pieces) if pieces and product.price_unit != "kg" else Decimal(kilos)
-            subtotal = (amount * product.price_per_kg).quantize(Decimal("0.01"))
+            subtotal = (Decimal(kilos) * product.price_per_kg).quantize(Decimal("0.01"))
             lines.append({
                 "product_id": product.pk,
-                "product_name": name,
-                "sale_mode": "pieces" if pieces else "weight",
+                "product_name": product.name,
+                "sale_mode": "weight",
                 "quantity_kg": kilos,
-                "pieces": pieces,
+                "pieces": None,
                 "unit_price": str(product.price_per_kg),
                 "discount": "0.00",
                 "subtotal": str(subtotal),
@@ -221,22 +201,24 @@ def seed_admin():
 
 
 class Command(BaseCommand):
-    help = "Create the preview tables and fill them with synthetic data (preview settings only)."
+    help = "Create the preview tables and fill them with the real catalogue (preview only)."
 
     def handle(self, *args, **options):
         if not getattr(settings, "CARNI_PREVIEW", False) or connection.vendor != "sqlite":
             raise CommandError(
                 "preview_seed only runs with --settings=config.settings_preview on SQLite."
             )
+        catalog = load_catalog()
         ensure_tables()
+        refuse_foreign_products(catalog)
         now = timezone.now()
         with transaction.atomic():
-            products = seed_catalog()
-            seed_prices(products, now)
+            products = seed_catalog(catalog)
+            seed_zones()
             seed_orders(products, now)
             seed_admin()
         if options["verbosity"]:
             self.stdout.write(
-                f"Preview data ready: {Product.objects.count()} products, "
-                f"{PanelOrder.objects.count()} orders, {Promotion.objects.count()} discounts."
+                f"Preview data ready: {Product.objects.count()} products from supabase/seed.sql, "
+                f"{PanelOrder.objects.count()} orders."
             )

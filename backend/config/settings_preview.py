@@ -1,4 +1,4 @@
-"""Settings for the local preview: the real pages on synthetic data, on this machine only.
+"""Settings for the local preview: real pages, real catalogue, synthetic orders, this machine only.
 
 They build on config.settings_test, which already replaces every Supabase value with a fake one
 before the regular settings are imported, and add what a browser needs: DEBUG, the loopback hosts,

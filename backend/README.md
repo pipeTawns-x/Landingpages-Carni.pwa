@@ -79,8 +79,8 @@ panel stylesheet is built by a script, not by `manage.py`: see "Panel stylesheet
 
 ## Local preview with synthetic data
 
-The preview serves the real pages of the store and the panel on made-up data, to look at them
-in a browser without any account. From the repository root:
+The preview serves the real pages of the store and the panel on the real catalogue and made-up
+orders, to look at them in a browser without any account. From the repository root:
 
 ```bash
 PYTHON=backend/.venv/bin/python backend/scripts/preview.sh
@@ -115,8 +115,20 @@ What keeps it local:
 - The Postgres functions of the store (quotes, metrics, lots, exchange rate) are answered by
   `PreviewGateway`, the double of `ventas/tests/support.py`, fed from the preview database.
 
+The products and categories are the ones of `supabase/seed.sql`, with the ids it gives them,
+read by `panel/preview_catalog.py` (one source of products; `inventory/fixtures/categories.json`
+must say the same). Each row of seed.sql says what its price is for (`unidad`: kg, piece or
+package); kilo products are sold by money and weight, the rest by pieces. No discount, standard
+size or piece weight is seeded.
+Only the customers and their orders are invented, and their lines name real products at their
+real price; the people and phone numbers are invented (`+52 444 000 ...`). The purchases of
+`/panel/compras/` are made up by `PreviewGateway` from the kilo products (cost at 60 % of the
+price); there are no open lots, because seed.sql has neither lots nor piece weights.
+
 `preview_seed` can run again at any time: every row has a fixed key, so the counts stay the same.
-The people and phone numbers are invented (`+52 444 000 ...`).
+A database that holds a product seed.sql does not have (one seeded by an older preview) is
+refused: delete the file and run again. When seed.sql changes shape, or writes the catalogue
+outside its two INSERTs (an UPDATE, a second INSERT), the reader refuses it instead of guessing.
 
 ## Inventory panel
 

@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="generator" content="archify 3.0.1">
   <meta name="archify-reader-contract" content="declared-wide-v1">
-  <title>TP: local Django preview on synthetic data Diagram</title>
+  <title>TP: local Django preview on the real catalogue and synthetic orders Diagram</title>
   <script>
     // Resolve the theme before first paint so light-preference users don't
     // see a dark flash. The toolbar script below re-applies with UI state.
@@ -4978,9 +4978,9 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
            data-preset-badge-blueprint="BLUEPRINT / REV 01"
            data-preset-badge-editorial="EDITORIAL / FIELD NOTE">
         <div class="pulse-dot"></div>
-        <h1>TP: local Django preview on synthetic data</h1>
+        <h1>TP: local Django preview on the real catalogue and synthetic orders</h1>
       </div>
-      <p class="subtitle">Settings guard, seed, review invite and the panel session</p>
+      <p class="subtitle">seed.sql is the one source of products; guards, review invite and the panel session</p>
     </div>
 
 
@@ -4988,9 +4988,9 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
     <!-- Main Diagram -->
     <div class="diagram-container" data-detail-level="read"
          data-preset-badge-editorial-plate="ARCHIFY / PLATE 04">
-      <svg viewBox="0 0 1233 660" data-layout-contract="readable-v2" role="img" lang="en" aria-labelledby="archify-diagram-title archify-diagram-description" data-preset="signal-flow" data-quality-profile="showcase">
-        <title id="archify-diagram-title">TP: local Django preview on synthetic data</title>
-        <desc id="archify-diagram-description">Settings guard, seed, review invite and the panel session</desc>
+      <svg viewBox="0 0 1226 1160" data-reader-fit="intrinsic-height" data-layout-contract="readable-v2" role="img" lang="en" aria-labelledby="archify-diagram-title archify-diagram-description" data-preset="signal-flow" data-quality-profile="showcase">
+        <title id="archify-diagram-title">TP: local Django preview on the real catalogue and synthetic orders</title>
+        <desc id="archify-diagram-description">seed.sql is the one source of products; guards, review invite and the panel session</desc>
         <!-- Definitions -->
         <defs>
           <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
@@ -5014,48 +5014,63 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
         <rect width="100%" height="100%" fill="url(#grid)" />
 
         <!-- Swimlanes -->
-        <rect data-graph-role="structural-frame" data-composition-frame-kind="lane" data-composition-frame-id="lane-0" x="40" y="52" width="1177" height="106" rx="10" class="c-lane" stroke-width="1"/>
+        <rect data-graph-role="structural-frame" data-composition-frame-kind="lane" data-composition-frame-id="lane-0" x="40" y="52" width="1170" height="106" rx="10" class="c-lane" stroke-width="1"/>
         <text x="54" y="74" class="t-dim" font-size="10" font-weight="600">01 / Developer machine</text>
 
-        <rect data-graph-role="structural-frame" data-composition-frame-kind="lane" data-composition-frame-id="lane-1" x="40" y="178" width="1177" height="106" rx="10" class="c-lane" stroke-width="1"/>
+        <rect data-graph-role="structural-frame" data-composition-frame-kind="lane" data-composition-frame-id="lane-1" x="40" y="178" width="1170" height="106" rx="10" class="c-lane" stroke-width="1"/>
         <text x="54" y="200" class="t-dim" font-size="10" font-weight="600">02 / Invite route</text>
 
-        <rect data-graph-role="structural-frame" data-composition-frame-kind="lane" data-composition-frame-id="lane-2" x="40" y="304" width="1177" height="106" rx="10" class="c-lane" stroke-width="1"/>
-        <rect data-graph-role="structural-frame" data-composition-frame-kind="exception-lane" data-composition-frame-id="lane-2-exception" x="46" y="310" width="1165" height="94" rx="8" class="c-security-group" stroke-width="1"/>
-        <text x="54" y="326" class="t-security" font-size="10" font-weight="600">EX / Settings guard</text>
+        <rect data-graph-role="structural-frame" data-composition-frame-kind="lane" data-composition-frame-id="lane-2" x="40" y="304" width="1170" height="106" rx="10" class="c-lane" stroke-width="1"/>
+        <rect data-graph-role="structural-frame" data-composition-frame-kind="exception-lane" data-composition-frame-id="lane-2-exception" x="46" y="310" width="1158" height="94" rx="8" class="c-security-group" stroke-width="1"/>
+        <text x="54" y="326" class="t-security" font-size="10" font-weight="600">EX / Guards that refuse to start</text>
 
-        <rect data-graph-role="structural-frame" data-composition-frame-kind="lane" data-composition-frame-id="lane-3" x="40" y="430" width="1177" height="106" rx="10" class="c-lane" stroke-width="1"/>
-        <text x="54" y="452" class="t-dim" font-size="10" font-weight="600">04 / Server data and panel</text>
+        <rect data-graph-role="structural-frame" data-composition-frame-kind="lane" data-composition-frame-id="lane-3" x="40" y="430" width="1170" height="234" rx="10" class="c-lane" stroke-width="1"/>
+        <text x="54" y="452" class="t-dim" font-size="10" font-weight="600">04 / preview_seed command</text>
+
+        <rect data-graph-role="structural-frame" data-composition-frame-kind="lane" data-composition-frame-id="lane-4" x="40" y="684" width="1170" height="226" rx="10" class="c-lane" stroke-width="1"/>
+        <text x="54" y="706" class="t-dim" font-size="10" font-weight="600">05 / Preview database and pages</text>
+
+        <rect data-graph-role="structural-frame" data-composition-frame-kind="lane" data-composition-frame-id="lane-5" x="40" y="930" width="1170" height="106" rx="10" class="c-lane" stroke-width="1"/>
+        <text x="54" y="952" class="t-dim" font-size="10" font-weight="600">06 / Real catalogue, one source</text>
 
         <!-- Phase headers -->
-        <line x1="71" y1="35" x2="283" y2="35" class="a-default" stroke-width="1.1"/>
-        <rect x="71" y="27" width="212" height="16" rx="4" class="c-mask"/>
-        <text x="177" y="39" class="t-muted" font-size="8" font-weight="600" text-anchor="middle">Load settings</text>
-        <line x1="423.79999999999995" y1="35" x2="743.8" y2="35" class="a-emphasis" stroke-width="1.1"/>
-        <rect x="423.79999999999995" y="27" width="319.99999999999994" height="16" rx="4" class="c-mask"/>
-        <text x="583.8" y="39" class="t-backend" font-size="8" font-weight="600" text-anchor="middle">Seed and invite</text>
-        <line x1="875" y1="35" x2="1185.4" y2="35" class="a-dashed" stroke-width="1.1"/>
-        <rect x="875" y="27" width="310.4000000000001" height="16" rx="4" class="c-mask"/>
-        <text x="1030.2" y="39" class="t-messagebus" font-size="8" font-weight="600" text-anchor="middle">Redeem and serve</text>
+        <line x1="71" y1="35" x2="590.2" y2="35" class="a-default" stroke-width="1.1"/>
+        <rect x="71" y="27" width="519.2" height="16" rx="4" class="c-mask"/>
+        <text x="330.6" y="39" class="t-muted" font-size="8" font-weight="600" text-anchor="middle">Load settings, read seed.sql</text>
+        <line x1="664.2" y1="35" x2="756.2" y2="35" class="a-emphasis" stroke-width="1.1"/>
+        <rect x="664.2" y="27" width="92" height="16" rx="4" class="c-mask"/>
+        <text x="710.2" y="39" class="t-backend" font-size="8" font-weight="600" text-anchor="middle">Seed and invite</text>
+        <line x1="868.2" y1="35" x2="1178.6000000000001" y2="35" class="a-dashed" stroke-width="1.1"/>
+        <rect x="868.2" y="27" width="310.4000000000001" height="16" rx="4" class="c-mask"/>
+        <text x="1023.4000000000001" y="39" class="t-messagebus" font-size="8" font-weight="600" text-anchor="middle">Redeem and serve</text>
 
         <!-- Workflow groups -->
-
+        <rect data-graph-role="structural-frame" data-composition-frame-kind="group" data-composition-frame-id="group-0" x="637.2" y="468" width="146" height="192" rx="9" class="c-lane" stroke-width="1"/>
+        <text x="647.2" y="466" class="t-backend" font-size="7" font-weight="600">one transaction</text>
 
         <!-- Edge paths -->
-        <path data-edge-from="seeddata" data-edge-to="invitecmd" data-edge-label="synthetic admin" data-edge-key="0" data-edge-id="admin-profile" data-composition-routing="workflow-v2-auto" data-edge-role="" data-composition-points="766.8,498;782.8,498;782.8,294;697.8,294;697.8,154" d="M 766.8 498 L 782.8 498 L 782.8 294 L 697.8 294 L 697.8 154" class="a-default" stroke-width="1.4" marker-end="url(#arrowhead)"/>
-        <path data-edge-from="gateway" data-edge-to="panel" data-edge-label="KPIs and lots" data-edge-key="1" data-edge-id="feed-panel" data-composition-routing="workflow-v2-auto" data-edge-role="" data-composition-points="990,498;1070.4,498" d="M 990 498 L 1070.4 498" class="a-dashed" stroke-width="1.4" marker-end="url(#arrowhead-dashed)"/>
-        <path data-edge-from="script" data-edge-to="settings" data-edge-label="--settings" data-edge-key="2" data-edge-id="load-settings" data-composition-routing="workflow-v2-auto" data-edge-role="" data-composition-points="186,120;202,120;202,231;237,231;237,338" d="M 186 120 L 202 120 L 202 231 L 237 231 L 237 338" class="a-default" stroke-width="1.4" marker-end="url(#arrowhead)"/>
-        <path data-edge-from="invitecmd" data-edge-to="show" data-edge-label="token link" data-edge-key="3" data-edge-id="open-link" data-composition-routing="workflow-v2-auto" data-edge-role="" data-composition-points="709.8,154;709.8,246;852,246" d="M 709.8 154 L 709.8 246 L 852 246" class="a-emphasis" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
-        <path data-edge-from="redeem" data-edge-to="panel" data-edge-label="open_panel_session" data-edge-key="4" data-edge-id="open-session" data-composition-routing="workflow-v2-auto" data-edge-role="" data-composition-points="1139.4,280;1139.4,464" d="M 1139.4 280 L 1139.4 464" class="a-emphasis" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
-        <path data-edge-from="show" data-edge-to="redeem" data-edge-label="form POST" data-edge-key="5" data-edge-id="press-button" data-composition-routing="workflow-v2-auto" data-edge-role="" data-composition-points="990,246;1070.4,246" d="M 990 246 L 1070.4 246" class="a-emphasis" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
-        <path data-edge-from="seeddata" data-edge-to="gateway" data-edge-label="reads products" data-edge-key="6" data-edge-id="read-rows" data-composition-routing="workflow-v2-auto" data-edge-role="" data-composition-points="697.8,532;697.8,548;921,548;921,532" d="M 697.8 532 L 697.8 548 L 921 548 L 921 532" class="a-dashed" stroke-width="1.4" marker-end="url(#arrowhead-dashed)"/>
-        <path data-edge-from="settings" data-edge-to="refused" data-edge-label="RENDER or bad DB" data-edge-key="7" data-edge-id="refuse" data-composition-routing="workflow-v2-auto" data-edge-role="error" data-composition-points="306,372;400.8,372" d="M 306 372 L 400.8 372" class="a-security" stroke-width="1.4" marker-end="url(#arrowhead-security)"/>
-        <path data-edge-from="settings" data-edge-to="seedcmd" data-edge-key="8" data-edge-id="run-seed" data-composition-routing="workflow-v2-auto" data-edge-role="" data-composition-points="237,406;237,498;400.8,498" d="M 237 406 L 237 498 L 400.8 498" class="a-emphasis" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
-        <path data-edge-from="seedcmd" data-edge-to="seeddata" data-edge-label="idempotent rows" data-edge-key="9" data-edge-id="write-rows" data-composition-routing="workflow-v2-auto" data-edge-role="" data-composition-points="538.8,498;628.8,498" d="M 538.8 498 L 628.8 498" class="a-emphasis" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
+        <path data-edge-from="script" data-edge-to="invitecmd" data-edge-label="after the seed" data-edge-key="0" data-edge-id="after-seed" data-composition-routing="workflow-v2-auto" data-edge-role="" data-composition-points="186,120;641.2,120" d="M 186 120 L 641.2 120" class="a-default" stroke-width="1.4" marker-end="url(#arrowhead)"/>
+        <path data-edge-from="load" data-edge-to="handle" data-edge-label="checked catalogue" data-edge-key="1" data-edge-id="checked" data-composition-routing="workflow-v2-auto" data-edge-role="" data-composition-points="544.2,964;544.2,539" d="M 544.2 964 L 544.2 539" class="a-emphasis" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
+        <path data-edge-from="seedorders" data-edge-to="sqlite" data-edge-label="commit" data-edge-key="2" data-edge-id="commit" data-composition-routing="workflow-v2-auto" data-edge-role="" data-composition-points="710.2,659;710.2,718" d="M 710.2 659 L 710.2 718" class="a-emphasis" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
+        <path data-edge-from="gateway" data-edge-to="panel" data-edge-label="KPIs and lots" data-edge-key="3" data-edge-id="feed-panel" data-composition-routing="workflow-v2-auto" data-edge-role="" data-composition-points="983.2,752;1063.6000000000001,752" d="M 983.2 752 L 1063.6000000000001 752" class="a-dashed" stroke-width="1.4" marker-end="url(#arrowhead-dashed)"/>
+        <path data-edge-from="sqlite" data-edge-to="productos" data-edge-label="lists products" data-edge-key="4" data-edge-id="list-products" data-composition-routing="workflow-v2-auto" data-edge-role="" data-composition-points="710.2,786;710.2,872;845.2,872" d="M 710.2 786 L 710.2 872 L 845.2 872" class="a-dashed" stroke-width="1.4" marker-end="url(#arrowhead-dashed)"/>
+        <path data-edge-from="script" data-edge-to="settings" data-edge-label="--settings" data-edge-key="5" data-edge-id="load-settings" data-composition-routing="workflow-v2-auto" data-edge-role="" data-composition-points="186,132;202,132;202,231;311.4,231;311.4,338" d="M 186 132 L 202 132 L 202 231 L 311.4 231 L 311.4 338" class="a-default" stroke-width="1.4" marker-end="url(#arrowhead)"/>
+        <path data-edge-from="invitecmd" data-edge-to="show" data-edge-label="token link" data-edge-key="6" data-edge-id="open-link" data-composition-routing="workflow-v2-auto" data-edge-role="" data-composition-points="710.2,154;710.2,246;845.2,246" d="M 710.2 154 L 710.2 246 L 845.2 246" class="a-default" stroke-width="1.4" marker-end="url(#arrowhead)"/>
+        <path data-edge-from="redeem" data-edge-to="panel" data-edge-label="open_panel_session" data-edge-key="7" data-edge-id="open-session" data-composition-routing="workflow-v2-auto" data-edge-role="" data-composition-points="1132.6000000000001,280;1132.6000000000001,718" d="M 1132.6000000000001 280 L 1132.6000000000001 718" class="a-default" stroke-width="1.4" marker-end="url(#arrowhead)"/>
+        <path data-edge-from="parse" data-edge-to="load" data-edge-label="SeedCatalog" data-edge-key="8" data-edge-id="parsed" data-composition-routing="workflow-v2-auto" data-edge-role="" data-composition-points="380.4,998;475.20000000000005,998" d="M 380.4 998 L 475.20000000000005 998" class="a-emphasis" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
+        <path data-edge-from="show" data-edge-to="redeem" data-edge-label="form POST" data-edge-key="9" data-edge-id="press-button" data-composition-routing="workflow-v2-auto" data-edge-role="" data-composition-points="983.2,246;1063.6000000000001,246" d="M 983.2 246 L 1063.6000000000001 246" class="a-default" stroke-width="1.4" marker-end="url(#arrowhead)"/>
+        <path data-edge-from="gateway" data-edge-to="productos" data-edge-label="quote_cart" data-edge-key="10" data-edge-id="quote" data-composition-routing="workflow-v2-auto" data-edge-role="" data-composition-points="914.2,786;914.2,838" d="M 914.2 786 L 914.2 838" class="a-dashed" stroke-width="1.4" marker-end="url(#arrowhead-dashed)"/>
+        <path data-edge-from="sqlite" data-edge-to="gateway" data-edge-label="reads rows" data-edge-key="11" data-edge-id="read-rows" data-composition-routing="workflow-v2-auto" data-edge-role="" data-composition-points="779.2,752;845.2,752" d="M 779.2 752 L 845.2 752" class="a-dashed" stroke-width="1.4" marker-end="url(#arrowhead-dashed)"/>
+        <path data-edge-from="seedsql" data-edge-to="parse" data-edge-label="SQL text" data-edge-key="12" data-edge-id="read-seed" data-composition-routing="workflow-v2-auto" data-edge-role="" data-composition-points="186,998;242.39999999999998,998" d="M 186 998 L 242.39999999999998 998" class="a-emphasis" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
+        <path data-edge-from="seedcat" data-edge-to="seedorders" data-edge-label="real products" data-edge-key="13" data-edge-id="real-products" data-composition-routing="workflow-v2-auto" data-edge-role="" data-composition-points="710.2,539;710.2,591" d="M 710.2 539 L 710.2 591" class="a-emphasis" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
+        <path data-edge-from="settings" data-edge-to="refused" data-edge-label="RENDER or bad DB" data-edge-key="14" data-edge-id="refuse" data-composition-routing="workflow-v2-auto" data-edge-role="error" data-composition-points="380.4,372;475.20000000000005,372" d="M 380.4 372 L 475.20000000000005 372" class="a-security" stroke-width="1.4" marker-end="url(#arrowhead-security)"/>
+        <path data-edge-from="handle" data-edge-to="refused" data-edge-label="bad seed.sql, foreign rows" data-edge-key="15" data-edge-id="refuse-seed" data-composition-routing="workflow-v2-auto" data-edge-role="error" data-composition-points="544.2,471;544.2,406" d="M 544.2 471 L 544.2 406" class="a-security" stroke-width="1.4" marker-end="url(#arrowhead-security)"/>
+        <path data-edge-from="settings" data-edge-to="handle" data-edge-label="CARNI_PREVIEW" data-edge-key="16" data-edge-id="run-seed" data-composition-routing="workflow-v2-auto" data-edge-role="" data-composition-points="311.4,406;311.4,505;475.20000000000005,505" d="M 311.4 406 L 311.4 505 L 475.20000000000005 505" class="a-default" stroke-width="1.4" marker-end="url(#arrowhead)"/>
+        <path data-edge-from="handle" data-edge-to="seedcat" data-edge-key="17" data-edge-id="write-catalog" data-composition-routing="workflow-v2-auto" data-edge-role="" data-composition-points="613.2,505;641.2,505" d="M 613.2 505 L 641.2 505" class="a-emphasis" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
 
         <!-- Nodes -->
-        <g id="node-script" data-node-id="script" data-node-label="preview.sh" tabindex="0" role="button" aria-label="Focus preview.sh, seed, invite, runserver, Developer machine › Load settings" aria-pressed="false" data-node-kind="external" data-node-sublabel="seed, invite, runserver" data-node-tag="scripts/preview.sh:30" data-node-context="Developer machine › Load settings">
-          <title>preview.sh · seed, invite, runserver · Developer machine › Load settings · scripts/preview.sh:30</title>
+        <g id="node-script" data-node-id="script" data-node-label="preview.sh" tabindex="0" role="button" aria-label="Focus preview.sh, seed, invite, runserver, Developer machine › Load settings, read seed.sql" aria-pressed="false" data-node-kind="external" data-node-sublabel="seed, invite, runserver" data-node-tag="preview.sh:31" data-node-context="Developer machine › Load settings, read seed.sql">
+          <title>preview.sh · seed, invite, runserver · Developer machine › Load settings, read seed.sql · preview.sh:31</title>
           <rect x="48" y="86" width="138" height="68" rx="6" class="c-mask"/>
           <rect x="48" y="86" width="138" height="68" rx="6" class="c-external" stroke-width="1.5"/>
           <g aria-hidden="true" data-semantic-sigil="external" class="semantic-sigil s-external" transform="translate(54 92) scale(0.6875)">
@@ -5064,194 +5079,303 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
           </g>
           <text data-node-label="" data-detail-anchor="" x="117" y="107" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">preview.sh</text>
           <text data-detail="context" x="117" y="124" class="t-muted" font-size="8" text-anchor="middle">seed, invite, runserver</text>
-        <text data-detail="fine" x="117" y="142" class="t-external" font-size="7" text-anchor="middle">scripts/preview.sh:30</text>
+        <text data-detail="fine" x="117" y="142" class="t-external" font-size="7" text-anchor="middle">preview.sh:31</text>
         </g>
 
-        <g id="node-invitecmd" data-node-id="invitecmd" data-node-label="issue_review_invite" tabindex="0" role="button" aria-label="Focus issue_review_invite, prints the invite link, Developer machine › Seed and invite" aria-pressed="false" data-node-kind="backend" data-node-sublabel="prints the invite link" data-node-tag="scripts/preview.sh:31" data-node-context="Developer machine › Seed and invite">
-          <title>issue_review_invite · prints the invite link · Developer machine › Seed and invite · scripts/preview.sh:31</title>
-          <rect x="628.8" y="86" width="138" height="68" rx="6" class="c-mask"/>
-          <rect x="628.8" y="86" width="138" height="68" rx="6" class="c-backend" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(634.8 92) scale(0.6875)">
+        <g id="node-invitecmd" data-node-id="invitecmd" data-node-label="issue_review_invite" tabindex="0" role="button" aria-label="Focus issue_review_invite, prints the invite link, Developer machine › Seed and invite" aria-pressed="false" data-node-kind="backend" data-node-sublabel="prints the invite link" data-node-tag="preview.sh:32" data-node-context="Developer machine › Seed and invite">
+          <title>issue_review_invite · prints the invite link · Developer machine › Seed and invite · preview.sh:32</title>
+          <rect x="641.2" y="86" width="138" height="68" rx="6" class="c-mask"/>
+          <rect x="641.2" y="86" width="138" height="68" rx="6" class="c-backend" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(647.2 92) scale(0.6875)">
             <path d="M6 3 3 8l3 5M10 3l3 5-3 5"/>
           </g>
-          <text data-node-label="" data-detail-anchor="" x="697.8" y="118.2" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">issue_review_invite</text>
-          <text data-detail="context" x="697.8" y="133.1" class="t-muted" font-size="8" text-anchor="middle">prints the invite link</text>
-        <text data-detail="fine" x="697.8" y="145.9" class="t-backend" font-size="7" text-anchor="middle">scripts/preview.sh:31</text>
+          <text data-node-label="" data-detail-anchor="" x="710.2" y="118.2" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">issue_review_invite</text>
+          <text data-detail="context" x="710.2" y="133.1" class="t-muted" font-size="8" text-anchor="middle">prints the invite link</text>
+        <text data-detail="fine" x="710.2" y="145.9" class="t-backend" font-size="7" text-anchor="middle">preview.sh:32</text>
         </g>
 
         <g id="node-show" data-node-id="show" data-node-label="GET /panel/invitado/" tabindex="0" role="button" aria-label="Focus GET /panel/invitado/, button only, no session, Invite route › Redeem and serve" aria-pressed="false" data-node-kind="frontend" data-node-sublabel="button only, no session" data-node-tag="views.py:127" data-node-context="Invite route › Redeem and serve">
           <title>GET /panel/invitado/ · button only, no session · Invite route › Redeem and serve · views.py:127</title>
-          <rect x="852" y="212" width="138" height="68" rx="6" class="c-mask"/>
-          <rect x="852" y="212" width="138" height="68" rx="6" class="c-frontend" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="frontend" class="semantic-sigil s-frontend" transform="translate(858 218) scale(0.6875)">
+          <rect x="845.2" y="212" width="138" height="68" rx="6" class="c-mask"/>
+          <rect x="845.2" y="212" width="138" height="68" rx="6" class="c-frontend" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="frontend" class="semantic-sigil s-frontend" transform="translate(851.2 218) scale(0.6875)">
             <rect x="2" y="3" width="12" height="10" rx="2"/>
             <path d="M2 6.5h12"/>
             <circle cx="4.1" cy="4.8" r=".7" class="sigil-fill"/>
             <circle cx="6.3" cy="4.8" r=".7" class="sigil-fill"/>
           </g>
-          <text data-node-label="" data-detail-anchor="" x="921" y="244" class="t-primary" font-size="10.8" font-weight="600" text-anchor="middle">GET /panel/invitado/</text>
-          <text data-detail="context" x="921" y="258.9" class="t-muted" font-size="8" text-anchor="middle">button only, no session</text>
-        <text data-detail="fine" x="921" y="271.7" class="t-frontend" font-size="7" text-anchor="middle">views.py:127</text>
+          <text data-node-label="" data-detail-anchor="" x="914.2" y="244" class="t-primary" font-size="10.8" font-weight="600" text-anchor="middle">GET /panel/invitado/</text>
+          <text data-detail="context" x="914.2" y="258.9" class="t-muted" font-size="8" text-anchor="middle">button only, no session</text>
+        <text data-detail="fine" x="914.2" y="271.7" class="t-frontend" font-size="7" text-anchor="middle">views.py:127</text>
         </g>
 
         <g id="node-redeem" data-node-id="redeem" data-node-label="POST with CSRF" tabindex="0" role="button" aria-label="Focus POST with CSRF, row locked, is_admin, Invite route › Redeem and serve" aria-pressed="false" data-node-kind="security" data-node-sublabel="row locked, is_admin" data-node-tag="views.py:136" data-node-context="Invite route › Redeem and serve">
           <title>POST with CSRF · row locked, is_admin · Invite route › Redeem and serve · views.py:136</title>
-          <rect x="1070.4" y="212" width="138" height="68" rx="6" class="c-mask"/>
-          <rect x="1070.4" y="212" width="138" height="68" rx="6" class="c-security" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="security" class="semantic-sigil s-security" transform="translate(1076.4 218) scale(0.6875)">
+          <rect x="1063.6000000000001" y="212" width="138" height="68" rx="6" class="c-mask"/>
+          <rect x="1063.6000000000001" y="212" width="138" height="68" rx="6" class="c-security" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="security" class="semantic-sigil s-security" transform="translate(1069.6000000000001 218) scale(0.6875)">
             <path d="M8 2.2 13 4v3.5c0 3.1-1.8 5.4-5 6.5-3.2-1.1-5-3.4-5-6.5V4Z"/>
             <path d="m5.8 8 1.5 1.5 3-3"/>
           </g>
-          <text data-node-label="" data-detail-anchor="" x="1139.4" y="233" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">POST with CSRF</text>
-          <text data-detail="context" x="1139.4" y="250" class="t-muted" font-size="8" text-anchor="middle">row locked, is_admin</text>
-        <text data-detail="fine" x="1139.4" y="268" class="t-security" font-size="7" text-anchor="middle">views.py:136</text>
+          <text data-node-label="" data-detail-anchor="" x="1132.6000000000001" y="233" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">POST with CSRF</text>
+          <text data-detail="context" x="1132.6000000000001" y="250" class="t-muted" font-size="8" text-anchor="middle">row locked, is_admin</text>
+        <text data-detail="fine" x="1132.6000000000001" y="268" class="t-security" font-size="7" text-anchor="middle">views.py:136</text>
         </g>
 
-        <g id="node-settings" data-node-id="settings" data-node-label="settings_preview" tabindex="0" role="button" aria-label="Focus settings_preview, RENDER, DB path, 0o700, Settings guard › Load settings" aria-pressed="false" data-node-kind="security" data-node-sublabel="RENDER, DB path, 0o700" data-node-tag="settings_preview.py:22" data-node-context="Settings guard › Load settings">
-          <title>settings_preview · RENDER, DB path, 0o700 · Settings guard › Load settings · settings_preview.py:22</title>
-          <rect x="168" y="338" width="138" height="68" rx="6" class="c-mask"/>
-          <rect x="168" y="338" width="138" height="68" rx="6" class="c-security" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="security" class="semantic-sigil s-security" transform="translate(174 344) scale(0.6875)">
+        <g id="node-settings" data-node-id="settings" data-node-label="settings_preview" tabindex="0" role="button" aria-label="Focus settings_preview, RENDER, DB path, 0o700, Guards that refuse to start › Load settings, read seed.sql" aria-pressed="false" data-node-kind="security" data-node-sublabel="RENDER, DB path, 0o700" data-node-tag="settings_preview.py:22" data-node-context="Guards that refuse to start › Load settings, read seed.sql">
+          <title>settings_preview · RENDER, DB path, 0o700 · Guards that refuse to start › Load settings, read seed.sql · settings_preview.py:22</title>
+          <rect x="242.39999999999998" y="338" width="138" height="68" rx="6" class="c-mask"/>
+          <rect x="242.39999999999998" y="338" width="138" height="68" rx="6" class="c-security" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="security" class="semantic-sigil s-security" transform="translate(248.39999999999998 344) scale(0.6875)">
             <path d="M8 2.2 13 4v3.5c0 3.1-1.8 5.4-5 6.5-3.2-1.1-5-3.4-5-6.5V4Z"/>
             <path d="m5.8 8 1.5 1.5 3-3"/>
           </g>
-          <text data-node-label="" data-detail-anchor="" x="239.8" y="359" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">settings_preview</text>
-          <text data-detail="context" x="237" y="376" class="t-muted" font-size="8" text-anchor="middle">RENDER, DB path, 0o700</text>
-        <text data-detail="fine" x="237" y="394" class="t-security" font-size="7" text-anchor="middle">settings_preview.py:22</text>
+          <text data-node-label="" data-detail-anchor="" x="314.2" y="359" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">settings_preview</text>
+          <text data-detail="context" x="311.4" y="376" class="t-muted" font-size="8" text-anchor="middle">RENDER, DB path, 0o700</text>
+        <text data-detail="fine" x="311.4" y="394" class="t-security" font-size="7" text-anchor="middle">settings_preview.py:22</text>
         </g>
 
-        <g id="node-refused" data-node-id="refused" data-node-label="ImproperlyConfigured" tabindex="0" role="button" aria-label="Focus ImproperlyConfigured, refuses to load, Settings guard › Seed and invite" aria-pressed="false" data-node-kind="security" data-node-sublabel="refuses to load" data-node-context="Settings guard › Seed and invite">
-          <title>ImproperlyConfigured · refuses to load · Settings guard › Seed and invite</title>
-          <rect x="400.8" y="346" width="138" height="52" rx="6" class="c-mask"/>
-          <rect x="400.8" y="346" width="138" height="52" rx="6" class="c-security" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="security" class="semantic-sigil s-security" transform="translate(406.8 352) scale(0.6875)">
+        <g id="node-refused" data-node-id="refused" data-node-label="Refuses to start" tabindex="0" role="button" aria-label="Focus Refuses to start, set -e stops preview.sh, Guards that refuse to start › Load settings, read seed.sql" aria-pressed="false" data-node-kind="security" data-node-sublabel="set -e stops preview.sh" data-node-tag="preview.sh:13" data-node-context="Guards that refuse to start › Load settings, read seed.sql">
+          <title>Refuses to start · set -e stops preview.sh · Guards that refuse to start › Load settings, read seed.sql · preview.sh:13</title>
+          <rect x="475.20000000000005" y="338" width="138" height="68" rx="6" class="c-mask"/>
+          <rect x="475.20000000000005" y="338" width="138" height="68" rx="6" class="c-security" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="security" class="semantic-sigil s-security" transform="translate(481.20000000000005 344) scale(0.6875)">
             <path d="M8 2.2 13 4v3.5c0 3.1-1.8 5.4-5 6.5-3.2-1.1-5-3.4-5-6.5V4Z"/>
             <path d="m5.8 8 1.5 1.5 3-3"/>
           </g>
-          <text data-node-label="" data-detail-anchor="" x="469.8" y="378" class="t-primary" font-size="10.8" font-weight="600" text-anchor="middle">ImproperlyConfigured</text>
-          <text data-detail="context" x="469.8" y="392.9" class="t-muted" font-size="8" text-anchor="middle">refuses to load</text>
+          <text data-node-label="" data-detail-anchor="" x="547" y="359" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Refuses to start</text>
+          <text data-detail="context" x="544.2" y="376" class="t-muted" font-size="8" text-anchor="middle">set -e stops preview.sh</text>
+        <text data-detail="fine" x="544.2" y="394" class="t-security" font-size="7" text-anchor="middle">preview.sh:13</text>
         </g>
 
-        <g id="node-seedcmd" data-node-id="seedcmd" data-node-label="preview_seed" tabindex="0" role="button" aria-label="Focus preview_seed, CARNI_PREVIEW + SQLite only, Server data and panel › Seed and invite" aria-pressed="false" data-node-kind="backend" data-node-sublabel="CARNI_PREVIEW + SQLite only" data-node-tag="preview_seed.py:226" data-node-context="Server data and panel › Seed and invite">
-          <title>preview_seed · CARNI_PREVIEW + SQLite only · Server data and panel › Seed and invite · preview_seed.py:226</title>
-          <rect x="400.8" y="464" width="138" height="68" rx="6" class="c-mask"/>
-          <rect x="400.8" y="464" width="138" height="68" rx="6" class="c-backend" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(406.8 470) scale(0.6875)">
+        <g id="node-handle" data-node-id="handle" data-node-label="Command.handle" tabindex="0" role="button" aria-label="Focus Command.handle, SQLite, no foreign rows, preview_seed command › Load settings, read seed.sql" aria-pressed="false" data-node-kind="backend" data-node-sublabel="SQLite, no foreign rows" data-node-tag="preview_seed.py:206" data-node-context="preview_seed command › Load settings, read seed.sql">
+          <title>Command.handle · SQLite, no foreign rows · preview_seed command › Load settings, read seed.sql · preview_seed.py:206</title>
+          <rect x="475.20000000000005" y="471" width="138" height="68" rx="6" class="c-mask"/>
+          <rect x="475.20000000000005" y="471" width="138" height="68" rx="6" class="c-backend" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(481.20000000000005 477) scale(0.6875)">
             <path d="M6 3 3 8l3 5M10 3l3 5-3 5"/>
           </g>
-          <text data-node-label="" data-detail-anchor="" x="469.8" y="485" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">preview_seed</text>
-          <text data-detail="context" x="469.8" y="502" class="t-muted" font-size="8" text-anchor="middle">CARNI_PREVIEW + SQLite only</text>
-        <text data-detail="fine" x="469.8" y="520" class="t-backend" font-size="7" text-anchor="middle">preview_seed.py:226</text>
+          <text data-node-label="" data-detail-anchor="" x="544.2" y="492" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Command.handle</text>
+          <text data-detail="context" x="544.2" y="509" class="t-muted" font-size="8" text-anchor="middle">SQLite, no foreign rows</text>
+        <text data-detail="fine" x="544.2" y="527" class="t-backend" font-size="7" text-anchor="middle">preview_seed.py:206</text>
         </g>
 
-        <g id="node-seeddata" data-node-id="seeddata" data-node-label="SQLite file" tabindex="0" role="button" aria-label="Focus SQLite file, outside the repo, Server data and panel › Seed and invite" aria-pressed="false" data-node-kind="database" data-node-sublabel="outside the repo" data-node-tag="update_or_create" data-node-context="Server data and panel › Seed and invite">
-          <title>SQLite file · outside the repo · Server data and panel › Seed and invite · update_or_create</title>
-          <rect x="628.8" y="464" width="138" height="68" rx="6" class="c-mask"/>
-          <rect x="628.8" y="464" width="138" height="68" rx="6" class="c-database" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="database" class="semantic-sigil s-database" transform="translate(634.8 470) scale(0.6875)">
+        <g id="node-seedcat" data-node-id="seedcat" data-node-label="seed_catalog" tabindex="0" role="button" aria-label="Focus seed_catalog, upsert by seed.sql id, preview_seed command › one transaction › Seed and invite" aria-pressed="false" data-node-kind="backend" data-node-sublabel="upsert by seed.sql id" data-node-tag="preview_seed.py:102" data-node-context="preview_seed command › one transaction › Seed and invite">
+          <title>seed_catalog · upsert by seed.sql id · preview_seed command › one transaction › Seed and invite · preview_seed.py:102</title>
+          <rect x="641.2" y="471" width="138" height="68" rx="6" class="c-mask"/>
+          <rect x="641.2" y="471" width="138" height="68" rx="6" class="c-backend" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(647.2 477) scale(0.6875)">
+            <path d="M6 3 3 8l3 5M10 3l3 5-3 5"/>
+          </g>
+          <text data-node-label="" data-detail-anchor="" x="710.2" y="492" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">seed_catalog</text>
+          <text data-detail="context" x="710.2" y="509" class="t-muted" font-size="8" text-anchor="middle">upsert by seed.sql id</text>
+        <text data-detail="fine" x="710.2" y="527" class="t-backend" font-size="7" text-anchor="middle">preview_seed.py:102</text>
+        </g>
+
+        <g id="node-seedorders" data-node-id="seedorders" data-node-label="seed_orders" tabindex="0" role="button" aria-label="Focus seed_orders, synthetic customers, orders, preview_seed command › one transaction › Seed and invite" aria-pressed="false" data-node-kind="backend" data-node-sublabel="synthetic customers, orders" data-node-tag="preview_seed.py:150" data-node-context="preview_seed command › one transaction › Seed and invite">
+          <title>seed_orders · synthetic customers, orders · preview_seed command › one transaction › Seed and invite · preview_seed.py:150</title>
+          <rect x="641.2" y="591" width="138" height="68" rx="6" class="c-mask"/>
+          <rect x="641.2" y="591" width="138" height="68" rx="6" class="c-backend" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(647.2 597) scale(0.6875)">
+            <path d="M6 3 3 8l3 5M10 3l3 5-3 5"/>
+          </g>
+          <text data-node-label="" data-detail-anchor="" x="710.2" y="612" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">seed_orders</text>
+          <text data-detail="context" x="710.2" y="629" class="t-muted" font-size="8" text-anchor="middle">synthetic customers, orders</text>
+        <text data-detail="fine" x="710.2" y="647" class="t-backend" font-size="7" text-anchor="middle">preview_seed.py:150</text>
+        </g>
+
+        <g id="node-sqlite" data-node-id="sqlite" data-node-label="SQLite file" tabindex="0" role="button" aria-label="Focus SQLite file, outside the repo, Preview database and pages › Seed and invite" aria-pressed="false" data-node-kind="database" data-node-sublabel="outside the repo" data-node-tag="settings_preview.py:28" data-node-context="Preview database and pages › Seed and invite">
+          <title>SQLite file · outside the repo · Preview database and pages › Seed and invite · settings_preview.py:28</title>
+          <rect x="641.2" y="718" width="138" height="68" rx="6" class="c-mask"/>
+          <rect x="641.2" y="718" width="138" height="68" rx="6" class="c-database" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="database" class="semantic-sigil s-database" transform="translate(647.2 724) scale(0.6875)">
             <ellipse cx="8" cy="4" rx="5" ry="2"/>
             <path d="M3 4v8c0 1.1 2.2 2 5 2s5-.9 5-2V4M3 8c0 1.1 2.2 2 5 2s5-.9 5-2"/>
           </g>
-          <text data-node-label="" data-detail-anchor="" x="697.8" y="485" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">SQLite file</text>
-          <text data-detail="context" x="697.8" y="502" class="t-muted" font-size="8" text-anchor="middle">outside the repo</text>
-        <text data-detail="fine" x="697.8" y="520" class="t-database" font-size="7" text-anchor="middle">update_or_create</text>
+          <text data-node-label="" data-detail-anchor="" x="710.2" y="739" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">SQLite file</text>
+          <text data-detail="context" x="710.2" y="756" class="t-muted" font-size="8" text-anchor="middle">outside the repo</text>
+        <text data-detail="fine" x="710.2" y="774" class="t-database" font-size="7" text-anchor="middle">settings_preview.py:28</text>
         </g>
 
-        <g id="node-gateway" data-node-id="gateway" data-node-label="PreviewGateway" tabindex="0" role="button" aria-label="Focus PreviewGateway, FakeGateway double, Server data and panel › Redeem and serve" aria-pressed="false" data-node-kind="messagebus" data-node-sublabel="FakeGateway double" data-node-tag="urls_preview.py:156" data-node-context="Server data and panel › Redeem and serve">
-          <title>PreviewGateway · FakeGateway double · Server data and panel › Redeem and serve · urls_preview.py:156</title>
-          <rect x="852" y="464" width="138" height="68" rx="6" class="c-mask"/>
-          <rect x="852" y="464" width="138" height="68" rx="6" class="c-messagebus" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="messagebus" class="semantic-sigil s-messagebus" transform="translate(858 470) scale(0.6875)">
+        <g id="node-gateway" data-node-id="gateway" data-node-label="PreviewGateway" tabindex="0" role="button" aria-label="Focus PreviewGateway, behind get_gateway(), Preview database and pages › Redeem and serve" aria-pressed="false" data-node-kind="messagebus" data-node-sublabel="behind get_gateway()" data-node-tag="urls_preview.py:29" data-node-context="Preview database and pages › Redeem and serve">
+          <title>PreviewGateway · behind get_gateway() · Preview database and pages › Redeem and serve · urls_preview.py:29</title>
+          <rect x="845.2" y="718" width="138" height="68" rx="6" class="c-mask"/>
+          <rect x="845.2" y="718" width="138" height="68" rx="6" class="c-messagebus" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="messagebus" class="semantic-sigil s-messagebus" transform="translate(851.2 724) scale(0.6875)">
             <path d="M2.5 4.5h11M2.5 8h11M2.5 11.5h11"/>
             <circle cx="5" cy="4.5" r="1" class="sigil-fill"/>
             <circle cx="10.5" cy="8" r="1" class="sigil-fill"/>
             <circle cx="7" cy="11.5" r="1" class="sigil-fill"/>
           </g>
-          <text data-node-label="" data-detail-anchor="" x="921" y="485" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">PreviewGateway</text>
-          <text data-detail="context" x="921" y="502" class="t-muted" font-size="8" text-anchor="middle">FakeGateway double</text>
-        <text data-detail="fine" x="921" y="520" class="t-messagebus" font-size="7" text-anchor="middle">urls_preview.py:156</text>
+          <text data-node-label="" data-detail-anchor="" x="914.2" y="739" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">PreviewGateway</text>
+          <text data-detail="context" x="914.2" y="756" class="t-muted" font-size="8" text-anchor="middle">behind get_gateway()</text>
+        <text data-detail="fine" x="914.2" y="774" class="t-messagebus" font-size="7" text-anchor="middle">urls_preview.py:29</text>
         </g>
 
-        <g id="node-panel" data-node-id="panel" data-node-label="/panel/" tabindex="0" role="button" aria-label="Focus /panel/, panel_admin_required, Server data and panel › Redeem and serve" aria-pressed="false" data-node-kind="frontend" data-node-sublabel="panel_admin_required" data-node-tag="access.py:118" data-node-context="Server data and panel › Redeem and serve">
-          <title>/panel/ · panel_admin_required · Server data and panel › Redeem and serve · access.py:118</title>
-          <rect x="1070.4" y="464" width="138" height="68" rx="6" class="c-mask"/>
-          <rect x="1070.4" y="464" width="138" height="68" rx="6" class="c-frontend" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="frontend" class="semantic-sigil s-frontend" transform="translate(1076.4 470) scale(0.6875)">
+        <g id="node-productos" data-node-id="productos" data-node-label="/productos/" tabindex="0" role="button" aria-label="Focus /productos/, public catalogue, Preview database and pages › Redeem and serve" aria-pressed="false" data-node-kind="frontend" data-node-sublabel="public catalogue" data-node-tag="productos.py:43" data-node-context="Preview database and pages › Redeem and serve">
+          <title>/productos/ · public catalogue · Preview database and pages › Redeem and serve · productos.py:43</title>
+          <rect x="845.2" y="838" width="138" height="68" rx="6" class="c-mask"/>
+          <rect x="845.2" y="838" width="138" height="68" rx="6" class="c-frontend" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="frontend" class="semantic-sigil s-frontend" transform="translate(851.2 844) scale(0.6875)">
             <rect x="2" y="3" width="12" height="10" rx="2"/>
             <path d="M2 6.5h12"/>
             <circle cx="4.1" cy="4.8" r=".7" class="sigil-fill"/>
             <circle cx="6.3" cy="4.8" r=".7" class="sigil-fill"/>
           </g>
-          <text data-node-label="" data-detail-anchor="" x="1139.4" y="485" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">/panel/</text>
-          <text data-detail="context" x="1139.4" y="502" class="t-muted" font-size="8" text-anchor="middle">panel_admin_required</text>
-        <text data-detail="fine" x="1139.4" y="520" class="t-frontend" font-size="7" text-anchor="middle">access.py:118</text>
+          <text data-node-label="" data-detail-anchor="" x="914.2" y="859" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">/productos/</text>
+          <text data-detail="context" x="914.2" y="876" class="t-muted" font-size="8" text-anchor="middle">public catalogue</text>
+        <text data-detail="fine" x="914.2" y="894" class="t-frontend" font-size="7" text-anchor="middle">productos.py:43</text>
+        </g>
+
+        <g id="node-panel" data-node-id="panel" data-node-label="/panel/" tabindex="0" role="button" aria-label="Focus /panel/, panel_admin_required, Preview database and pages › Redeem and serve" aria-pressed="false" data-node-kind="frontend" data-node-sublabel="panel_admin_required" data-node-tag="access.py:118" data-node-context="Preview database and pages › Redeem and serve">
+          <title>/panel/ · panel_admin_required · Preview database and pages › Redeem and serve · access.py:118</title>
+          <rect x="1063.6000000000001" y="718" width="138" height="68" rx="6" class="c-mask"/>
+          <rect x="1063.6000000000001" y="718" width="138" height="68" rx="6" class="c-frontend" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="frontend" class="semantic-sigil s-frontend" transform="translate(1069.6000000000001 724) scale(0.6875)">
+            <rect x="2" y="3" width="12" height="10" rx="2"/>
+            <path d="M2 6.5h12"/>
+            <circle cx="4.1" cy="4.8" r=".7" class="sigil-fill"/>
+            <circle cx="6.3" cy="4.8" r=".7" class="sigil-fill"/>
+          </g>
+          <text data-node-label="" data-detail-anchor="" x="1132.6000000000001" y="739" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">/panel/</text>
+          <text data-detail="context" x="1132.6000000000001" y="756" class="t-muted" font-size="8" text-anchor="middle">panel_admin_required</text>
+        <text data-detail="fine" x="1132.6000000000001" y="774" class="t-frontend" font-size="7" text-anchor="middle">access.py:118</text>
+        </g>
+
+        <g id="node-seedsql" data-node-id="seedsql" data-node-label="supabase/seed.sql" tabindex="0" role="button" aria-label="Focus supabase/seed.sql, only source of products, Real catalogue, one source › Load settings, read seed.sql" aria-pressed="false" data-node-kind="external" data-node-sublabel="only source of products" data-node-tag="seed.sql:38, 57" data-node-context="Real catalogue, one source › Load settings, read seed.sql">
+          <title>supabase/seed.sql · only source of products · Real catalogue, one source › Load settings, read seed.sql · seed.sql:38, 57</title>
+          <rect x="48" y="964" width="138" height="68" rx="6" class="c-mask"/>
+          <rect x="48" y="964" width="138" height="68" rx="6" class="c-external" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="external" class="semantic-sigil s-external" transform="translate(54 970) scale(0.6875)">
+            <rect x="2.5" y="5" width="8.5" height="8" rx="1.5"/>
+            <path d="M8 2.5h5.5V8M13.5 2.5 7.5 8.5"/>
+          </g>
+          <text data-node-label="" data-detail-anchor="" x="123.1" y="985" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">supabase/seed.sql</text>
+          <text data-detail="context" x="117" y="1002" class="t-muted" font-size="8" text-anchor="middle">only source of products</text>
+        <text data-detail="fine" x="117" y="1020" class="t-external" font-size="7" text-anchor="middle">seed.sql:38, 57</text>
+        </g>
+
+        <g id="node-parse" data-node-id="parse" data-node-label="parse_seed" tabindex="0" role="button" aria-label="Focus parse_seed, else SeedFormatError, Real catalogue, one source › Load settings, read seed.sql" aria-pressed="false" data-node-kind="backend" data-node-sublabel="else SeedFormatError" data-node-tag="preview_catalog.py:171" data-node-context="Real catalogue, one source › Load settings, read seed.sql">
+          <title>parse_seed · else SeedFormatError · Real catalogue, one source › Load settings, read seed.sql · preview_catalog.py:171</title>
+          <rect x="242.39999999999998" y="964" width="138" height="68" rx="6" class="c-mask"/>
+          <rect x="242.39999999999998" y="964" width="138" height="68" rx="6" class="c-backend" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(248.39999999999998 970) scale(0.6875)">
+            <path d="M6 3 3 8l3 5M10 3l3 5-3 5"/>
+          </g>
+          <text data-node-label="" data-detail-anchor="" x="311.4" y="985" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">parse_seed</text>
+          <text data-detail="context" x="311.4" y="1002" class="t-muted" font-size="8" text-anchor="middle">else SeedFormatError</text>
+        <text data-detail="fine" x="311.4" y="1020" class="t-backend" font-size="7" text-anchor="middle">preview_catalog.py:171</text>
+        </g>
+
+        <g id="node-load" data-node-id="load" data-node-label="load_catalog" tabindex="0" role="button" aria-label="Focus load_catalog, matches categories.json, Real catalogue, one source › Load settings, read seed.sql" aria-pressed="false" data-node-kind="backend" data-node-sublabel="matches categories.json" data-node-tag="preview_catalog.py:218" data-node-context="Real catalogue, one source › Load settings, read seed.sql">
+          <title>load_catalog · matches categories.json · Real catalogue, one source › Load settings, read seed.sql · preview_catalog.py:218</title>
+          <rect x="475.20000000000005" y="964" width="138" height="68" rx="6" class="c-mask"/>
+          <rect x="475.20000000000005" y="964" width="138" height="68" rx="6" class="c-backend" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(481.20000000000005 970) scale(0.6875)">
+            <path d="M6 3 3 8l3 5M10 3l3 5-3 5"/>
+          </g>
+          <text data-node-label="" data-detail-anchor="" x="544.2" y="985" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">load_catalog</text>
+          <text data-detail="context" x="544.2" y="1002" class="t-muted" font-size="8" text-anchor="middle">matches categories.json</text>
+        <text data-detail="fine" x="544.2" y="1020" class="t-backend" font-size="7" text-anchor="middle">preview_catalog.py:218</text>
         </g>
 
         <!-- Edge labels -->
-        <g data-detail="context" data-edge-from="seeddata" data-edge-to="invitecmd" data-edge-label="synthetic admin" data-edge-key="0" data-edge-id="admin-profile">
-          <rect x="699.3" y="274" width="82" height="14" rx="3" class="c-mask"/>
-          <text x="740.3" y="284" class="t-edge-default" font-size="8" text-anchor="middle">synthetic admin</text>
+        <g data-detail="context" data-edge-from="script" data-edge-to="invitecmd" data-edge-label="after the seed" data-edge-key="0" data-edge-id="after-seed">
+          <rect x="375" y="100" width="77.2" height="14" rx="3" class="c-mask"/>
+          <text x="413.6" y="110" class="t-edge-default" font-size="8" text-anchor="middle">after the seed</text>
         </g>
-        <g data-detail="context" data-edge-from="gateway" data-edge-to="panel" data-edge-label="KPIs and lots" data-edge-key="1" data-edge-id="feed-panel">
-          <rect x="994" y="478" width="72.4" height="14" rx="3" class="c-mask"/>
-          <text x="1030.2" y="488" class="t-edge-dashed" font-size="8" text-anchor="middle">KPIs and lots</text>
+        <g data-detail="context" data-edge-from="load" data-edge-to="handle" data-edge-label="checked catalogue" data-edge-key="1" data-edge-id="checked">
+          <rect x="498.40000000000003" y="741.5" width="91.6" height="14" rx="3" class="c-mask"/>
+          <text x="544.2" y="751.5" class="t-edge-emphasis" font-size="8" text-anchor="middle">checked catalogue</text>
         </g>
-        <g data-detail="context" data-edge-from="script" data-edge-to="settings" data-edge-label="--settings" data-edge-key="2" data-edge-id="load-settings">
-          <rect x="190.5" y="211" width="58" height="14" rx="3" class="c-mask"/>
-          <text x="219.5" y="221" class="t-edge-default" font-size="8" text-anchor="middle">--settings</text>
+        <g data-detail="context" data-edge-from="seedorders" data-edge-to="sqlite" data-edge-label="commit" data-edge-key="2" data-edge-id="commit">
+          <rect x="690.8000000000001" y="678.5" width="38.8" height="14" rx="3" class="c-mask"/>
+          <text x="710.2" y="688.5" class="t-edge-emphasis" font-size="8" text-anchor="middle">commit</text>
         </g>
-        <g data-detail="context" data-edge-from="invitecmd" data-edge-to="show" data-edge-label="token link" data-edge-key="3" data-edge-id="open-link">
-          <rect x="751.9" y="226" width="58" height="14" rx="3" class="c-mask"/>
-          <text x="780.9" y="236" class="t-edge-emphasis" font-size="8" text-anchor="middle">token link</text>
+        <g data-detail="context" data-edge-from="gateway" data-edge-to="panel" data-edge-label="KPIs and lots" data-edge-key="3" data-edge-id="feed-panel">
+          <rect x="987.2" y="732" width="72.4" height="14" rx="3" class="c-mask"/>
+          <text x="1023.4000000000001" y="742" class="t-edge-dashed" font-size="8" text-anchor="middle">KPIs and lots</text>
         </g>
-        <g data-detail="context" data-edge-from="redeem" data-edge-to="panel" data-edge-label="open_panel_session" data-edge-key="4" data-edge-id="open-session">
-          <rect x="1091.2" y="362" width="96.39999999999999" height="14" rx="3" class="c-mask"/>
-          <text x="1139.4" y="372" class="t-edge-emphasis" font-size="8" text-anchor="middle">open_panel_session</text>
+        <g data-detail="context" data-edge-from="sqlite" data-edge-to="productos" data-edge-label="lists products" data-edge-key="4" data-edge-id="list-products">
+          <rect x="739.1" y="852" width="77.2" height="14" rx="3" class="c-mask"/>
+          <text x="777.7" y="862" class="t-edge-dashed" font-size="8" text-anchor="middle">lists products</text>
         </g>
-        <g data-detail="context" data-edge-from="show" data-edge-to="redeem" data-edge-label="form POST" data-edge-key="5" data-edge-id="press-button">
-          <rect x="1003.6" y="226" width="53.199999999999996" height="14" rx="3" class="c-mask"/>
-          <text x="1030.2" y="236" class="t-edge-emphasis" font-size="8" text-anchor="middle">form POST</text>
+        <g data-detail="context" data-edge-from="script" data-edge-to="settings" data-edge-label="--settings" data-edge-key="5" data-edge-id="load-settings">
+          <rect x="227.7" y="211" width="58" height="14" rx="3" class="c-mask"/>
+          <text x="256.7" y="221" class="t-edge-default" font-size="8" text-anchor="middle">--settings</text>
         </g>
-        <g data-detail="context" data-edge-from="seeddata" data-edge-to="gateway" data-edge-label="reads products" data-edge-key="6" data-edge-id="read-rows">
-          <rect x="770.8" y="528" width="77.2" height="14" rx="3" class="c-mask"/>
-          <text x="809.4" y="538" class="t-edge-dashed" font-size="8" text-anchor="middle">reads products</text>
+        <g data-detail="context" data-edge-from="invitecmd" data-edge-to="show" data-edge-label="token link" data-edge-key="6" data-edge-id="open-link">
+          <rect x="748.7" y="226" width="58" height="14" rx="3" class="c-mask"/>
+          <text x="777.7" y="236" class="t-edge-default" font-size="8" text-anchor="middle">token link</text>
         </g>
-        <g data-detail="context" data-edge-from="settings" data-edge-to="refused" data-edge-label="RENDER or bad DB" data-edge-key="7" data-edge-id="refuse">
-          <rect x="310" y="352" width="86.8" height="14" rx="3" class="c-mask"/>
-          <text x="353.4" y="362" class="t-edge-security" font-size="8" text-anchor="middle">RENDER or bad DB</text>
+        <g data-detail="context" data-edge-from="redeem" data-edge-to="panel" data-edge-label="open_panel_session" data-edge-key="7" data-edge-id="open-session">
+          <rect x="1084.4" y="489" width="96.39999999999999" height="14" rx="3" class="c-mask"/>
+          <text x="1132.6000000000001" y="499" class="t-edge-default" font-size="8" text-anchor="middle">open_panel_session</text>
+        </g>
+        <g data-detail="context" data-edge-from="parse" data-edge-to="load" data-edge-label="SeedCatalog" data-edge-key="8" data-edge-id="parsed">
+          <rect x="396.40000000000003" y="978" width="62.8" height="14" rx="3" class="c-mask"/>
+          <text x="427.8" y="988" class="t-edge-emphasis" font-size="8" text-anchor="middle">SeedCatalog</text>
+        </g>
+        <g data-detail="context" data-edge-from="show" data-edge-to="redeem" data-edge-label="form POST" data-edge-key="9" data-edge-id="press-button">
+          <rect x="996.8000000000001" y="226" width="53.199999999999996" height="14" rx="3" class="c-mask"/>
+          <text x="1023.4000000000001" y="236" class="t-edge-default" font-size="8" text-anchor="middle">form POST</text>
+        </g>
+        <g data-detail="context" data-edge-from="gateway" data-edge-to="productos" data-edge-label="quote_cart" data-edge-key="10" data-edge-id="quote">
+          <rect x="885.2" y="802" width="58" height="14" rx="3" class="c-mask"/>
+          <text x="914.2" y="812" class="t-edge-dashed" font-size="8" text-anchor="middle">quote_cart</text>
+        </g>
+        <g data-detail="context" data-edge-from="sqlite" data-edge-to="gateway" data-edge-label="reads rows" data-edge-key="11" data-edge-id="read-rows">
+          <rect x="783.2" y="732" width="58" height="14" rx="3" class="c-mask"/>
+          <text x="812.2" y="742" class="t-edge-dashed" font-size="8" text-anchor="middle">reads rows</text>
+        </g>
+        <g data-detail="context" data-edge-from="seedsql" data-edge-to="parse" data-edge-label="SQL text" data-edge-key="12" data-edge-id="read-seed">
+          <rect x="190" y="978" width="48.4" height="14" rx="3" class="c-mask"/>
+          <text x="214.2" y="988" class="t-edge-emphasis" font-size="8" text-anchor="middle">SQL text</text>
+        </g>
+        <g data-detail="context" data-edge-from="seedcat" data-edge-to="seedorders" data-edge-label="real products" data-edge-key="13" data-edge-id="real-products">
+          <rect x="674" y="555" width="72.4" height="14" rx="3" class="c-mask"/>
+          <text x="710.2" y="565" class="t-edge-emphasis" font-size="8" text-anchor="middle">real products</text>
+        </g>
+        <g data-detail="context" data-edge-from="settings" data-edge-to="refused" data-edge-label="RENDER or bad DB" data-edge-key="14" data-edge-id="refuse">
+          <rect x="384.40000000000003" y="352" width="86.8" height="14" rx="3" class="c-mask"/>
+          <text x="427.8" y="362" class="t-edge-security" font-size="8" text-anchor="middle">RENDER or bad DB</text>
+        </g>
+        <g data-detail="context" data-edge-from="handle" data-edge-to="refused" data-edge-label="bad seed.sql, foreign rows" data-edge-key="15" data-edge-id="refuse-seed">
+          <rect x="476.80000000000007" y="428.5" width="134.8" height="14" rx="3" class="c-mask"/>
+          <text x="544.2" y="438.5" class="t-edge-security" font-size="8" text-anchor="middle">bad seed.sql, foreign rows</text>
+        </g>
+        <g data-detail="context" data-edge-from="settings" data-edge-to="handle" data-edge-label="CARNI_PREVIEW" data-edge-key="16" data-edge-id="run-seed">
+          <rect x="357.1" y="485" width="72.4" height="14" rx="3" class="c-mask"/>
+          <text x="393.3" y="495" class="t-edge-default" font-size="8" text-anchor="middle">CARNI_PREVIEW</text>
         </g>
 
-        <g data-detail="context" data-edge-from="seedcmd" data-edge-to="seeddata" data-edge-label="idempotent rows" data-edge-key="9" data-edge-id="write-rows">
-          <rect x="542.8" y="478" width="82" height="14" rx="3" class="c-mask"/>
-          <text x="583.8" y="488" class="t-edge-emphasis" font-size="8" text-anchor="middle">idempotent rows</text>
-        </g>
 
         <!-- Legend -->
         <g data-legend="" data-legend-bridge="">
-          <text x="20" y="560" class="t-primary" font-size="12" font-weight="650">Legend</text>
-          <g data-legend-semantic-kind="frontend" data-legend-kind="frontend" data-legend-label="User UI" data-legend-x="20" data-legend-baseline="580" data-legend-width="74">
-            <rect x="20" y="572" width="14" height="9" rx="2" class="c-frontend" stroke-width="1"/>
-            <text x="42" y="580" class="t-muted" font-size="7.5" font-weight="500">User UI</text>
+          <text x="20" y="1060" class="t-primary" font-size="12" font-weight="650">Legend</text>
+          <g data-legend-semantic-kind="frontend" data-legend-kind="frontend" data-legend-label="User UI" data-legend-x="20" data-legend-baseline="1080" data-legend-width="74">
+            <rect x="20" y="1072" width="14" height="9" rx="2" class="c-frontend" stroke-width="1"/>
+            <text x="42" y="1080" class="t-muted" font-size="7.5" font-weight="500">User UI</text>
           </g>
-          <g data-legend-semantic-kind="backend" data-legend-kind="backend" data-legend-label="Agent logic" data-legend-x="101" data-legend-baseline="580" data-legend-width="91">
-            <rect x="101" y="572" width="14" height="9" rx="2" class="c-backend" stroke-width="1"/>
-            <text x="123" y="580" class="t-muted" font-size="7.5" font-weight="500">Agent logic</text>
+          <g data-legend-semantic-kind="backend" data-legend-kind="backend" data-legend-label="Agent logic" data-legend-x="101" data-legend-baseline="1080" data-legend-width="91">
+            <rect x="101" y="1072" width="14" height="9" rx="2" class="c-backend" stroke-width="1"/>
+            <text x="123" y="1080" class="t-muted" font-size="7.5" font-weight="500">Agent logic</text>
           </g>
-          <g data-legend-semantic-kind="security" data-legend-kind="security" data-legend-label="Policy" data-legend-x="199" data-legend-baseline="580" data-legend-width="70">
-            <rect x="199" y="572" width="14" height="9" rx="2" class="c-security" stroke-width="1"/>
-            <text x="221" y="580" class="t-muted" font-size="7.5" font-weight="500">Policy</text>
+          <g data-legend-semantic-kind="security" data-legend-kind="security" data-legend-label="Policy" data-legend-x="199" data-legend-baseline="1080" data-legend-width="70">
+            <rect x="199" y="1072" width="14" height="9" rx="2" class="c-security" stroke-width="1"/>
+            <text x="221" y="1080" class="t-muted" font-size="7.5" font-weight="500">Policy</text>
           </g>
-          <g data-legend-semantic-kind="messagebus" data-legend-kind="messagebus" data-legend-label="Tool action" data-legend-x="276" data-legend-baseline="580" data-legend-width="91">
-            <rect x="276" y="572" width="14" height="9" rx="2" class="c-messagebus" stroke-width="1"/>
-            <text x="298" y="580" class="t-muted" font-size="7.5" font-weight="500">Tool action</text>
+          <g data-legend-semantic-kind="messagebus" data-legend-kind="messagebus" data-legend-label="Tool action" data-legend-x="276" data-legend-baseline="1080" data-legend-width="91">
+            <rect x="276" y="1072" width="14" height="9" rx="2" class="c-messagebus" stroke-width="1"/>
+            <text x="298" y="1080" class="t-muted" font-size="7.5" font-weight="500">Tool action</text>
           </g>
-          <g data-legend-semantic-kind="database" data-legend-kind="database" data-legend-label="Context / trace" data-legend-x="374" data-legend-baseline="580" data-legend-width="109">
-            <rect x="374" y="572" width="14" height="9" rx="2" class="c-database" stroke-width="1"/>
-            <text x="396" y="580" class="t-muted" font-size="7.5" font-weight="500">Context / trace</text>
+          <g data-legend-semantic-kind="database" data-legend-kind="database" data-legend-label="Context / trace" data-legend-x="374" data-legend-baseline="1080" data-legend-width="109">
+            <rect x="374" y="1072" width="14" height="9" rx="2" class="c-database" stroke-width="1"/>
+            <text x="396" y="1080" class="t-muted" font-size="7.5" font-weight="500">Context / trace</text>
           </g>
-          <g data-legend-semantic-kind="external" data-legend-kind="external" data-legend-label="External system" data-legend-x="490" data-legend-baseline="580" data-legend-width="109">
-            <rect x="490" y="572" width="14" height="9" rx="2" class="c-external" stroke-width="1"/>
-            <text x="512" y="580" class="t-muted" font-size="7.5" font-weight="500">External system</text>
+          <g data-legend-semantic-kind="external" data-legend-kind="external" data-legend-label="External system" data-legend-x="490" data-legend-baseline="1080" data-legend-width="109">
+            <rect x="490" y="1072" width="14" height="9" rx="2" class="c-external" stroke-width="1"/>
+            <text x="512" y="1080" class="t-muted" font-size="7.5" font-weight="500">External system</text>
           </g>
         </g>
       </svg>
@@ -5432,6 +5556,20 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
     <div class="cards">
       <div class="card">
         <div class="card-header">
+          <div class="card-dot emerald"></div>
+          <h3>One source of products (S17)</h3>
+        </div>
+        <ul>
+          <li>Categories and products come only from supabase/seed.sql (preview_catalog.py:26, 218)</li>
+          <li>Synthetic orders name real products at real prices (preview_seed.py:157, 165)</li>
+          <li>Synthetic lots from the real kg products (urls_preview.py:61)</li>
+          <li>/productos/ lists the Product rows of the same SQLite (ventas/catalog.py:47)</li>
+          <li>Quotes go through PreviewGateway.quote_cart (productos.py:113, urls_preview.py:42)</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
           <div class="card-dot rose"></div>
           <h3>Guard clauses (fail fast)</h3>
         </div>
@@ -5440,7 +5578,12 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
           <li>DB absolute and outside the repo (settings_preview.py:28)</li>
           <li>DB directory 0o700 (settings_preview.py:46)</li>
           <li>backend/.env skipped, random secret (settings_preview.py:64, 69)</li>
-          <li>Seed refuses other settings or engines (preview_seed.py:226)</li>
+          <li>Seed refuses other settings or engines (preview_seed.py:207)</li>
+          <li>Seed refuses rows seed.sql lacks (preview_seed.py:87, 213)</li>
+          <li>Unknown seed.sql shape: SeedFormatError (preview_catalog.py:62, 171)</li>
+          <li>Catalogue writes outside its two INSERTs: refused (preview_catalog.py:55, 156)</li>
+          <li>categories.json must agree with seed.sql (preview_catalog.py:231)</li>
+          <li>A failed step stops preview.sh: set -e (preview.sh:13)</li>
         </ul>
       </div>
 
@@ -5450,7 +5593,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
           <h3>Request guards</h3>
         </div>
         <ul>
-          <li>404 unless REMOTE_ADDR is loopback (urls_preview.py:150)</li>
+          <li>404 unless REMOTE_ADDR is loopback (urls_preview.py:136)</li>
           <li>404 while invites are off (views.py:179)</li>
           <li>Profile.is_admin before any use (views.py:151)</li>
           <li>Old session flushed (views.py:162)</li>
@@ -5463,13 +5606,14 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
           <h3>Patterns in the code</h3>
         </div>
         <ul>
+          <li>Template Method: Command fills handle of BaseCommand (preview_seed.py:203, 206)</li>
+          <li>Strategy: PreviewGateway replaces PostgresGateway behind get_gateway() (urls_preview.py:29, 141; ventas/services.py:414)</li>
           <li>Settings inheritance from settings_test (settings_preview.py:76)</li>
-          <li>Test double swapped in as gateway (urls_preview.py:29, 156)</li>
-          <li>Middleware for the loopback barrier (urls_preview.py:140)</li>
-          <li>Idempotent seed with update_or_create (preview_seed.py:106)</li>
+          <li>Middleware for the loopback barrier (urls_preview.py:125)</li>
+          <li>Idempotent seed with update_or_create (preview_seed.py:107, 119)</li>
           <li>Decorators: invite flag and panel guard (views.py:179, access.py:118)</li>
-          <li>Row lock in one transaction (views.py:143, models.py:177)</li>
-          <li>Token looked up by its hash (models.py:87)</li>
+          <li>Row lock in one transaction (views.py:143, panel/models.py:177)</li>
+          <li>Token looked up by its hash (panel/models.py:87)</li>
         </ul>
       </div>
     </div>

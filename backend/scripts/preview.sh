@@ -2,8 +2,9 @@
 # Seed the local preview, print a review invite for the synthetic admin, and serve it on
 # http://127.0.0.1:${CARNI_PREVIEW_PORT:-8000} in the foreground.
 #
-# The preview runs the real pages on a synthetic SQLite database outside the repository
-# (config.settings_preview). It never reads backend/.env and never reaches Supabase or Render.
+# The preview runs the real pages on a disposable SQLite database outside the repository
+# (config.settings_preview), seeded with the catalogue of supabase/seed.sql and synthetic orders.
+# It never reads backend/.env and never reaches Supabase or Render.
 # Open the printed /panel/invitado/... link and press the button to enter the panel.
 #
 #   backend/scripts/preview.sh

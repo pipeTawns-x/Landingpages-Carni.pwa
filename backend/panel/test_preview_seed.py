@@ -15,7 +15,7 @@ from django.test import SimpleTestCase, TestCase, override_settings
 from django.utils import timezone
 
 from config.urls_preview import PreviewGateway, install_preview_gateway
-from inventory.models import Category, CutSpec, Product, Promotion
+from inventory.models import Category, CutSpec, Product, Promotion, StoreCutSpec
 from panel.management.commands.preview_seed import PREVIEW_ADMIN_ID
 from panel.models import Profile
 from ventas import services
@@ -126,13 +126,11 @@ class PreviewSeedDataTests(TestCase):
 
         self.assertEqual(seeded_counts(), first)
 
-    def test_products_are_sold_by_kilo_by_piece_and_as_merchandise(self):
+    def test_products_are_sold_by_kilo_by_piece_and_by_package_as_seed_sql_says(self):
         units = set(Product.objects.values_list("price_unit", flat=True))
 
         self.assertEqual(units, {"kg", "piece", "package"})
-        merchandise = Product.objects.filter(category__slug="merch")
-        self.assertTrue(merchandise.exists())
-        self.assertFalse(merchandise.filter(price_unit="kg").exists())
+        self.assertFalse(Product.objects.filter(category__slug="merch", price_unit="kg").exists())
 
     def test_there_is_an_order_in_every_status(self):
         statuses = set(PanelOrder.objects.values_list("status", flat=True))
@@ -146,11 +144,13 @@ class PreviewSeedDataTests(TestCase):
         for phone in phones:
             self.assertTrue(phone.startswith("+52 444 000"), phone)
 
-    def test_discounts_sizes_and_zones_exist(self):
-        self.assertTrue(Promotion.objects.filter(is_active=True).exists())
-        self.assertEqual(
-            sorted(set(ProductSize.objects.values_list("grams", flat=True))), [340, 500, 700]
-        )
+    def test_nothing_that_changes_how_a_product_looks_is_invented(self):
+        self.assertEqual(Promotion.objects.count(), 0)
+        self.assertEqual(ProductSize.objects.count(), 0)
+        self.assertEqual(CutSpec.objects.count(), 0)
+        self.assertEqual(StoreCutSpec.objects.count(), 0)
+
+    def test_delivery_zones_exist(self):
         self.assertEqual(
             sorted(DeliveryZone.objects.values_list("fee", flat=True)),
             [Decimal("50.00"), Decimal("90.00"), Decimal("160.00"), Decimal("210.00")],
@@ -158,6 +158,27 @@ class PreviewSeedDataTests(TestCase):
 
     def test_the_synthetic_admin_has_an_admin_profile(self):
         self.assertTrue(Profile.is_admin(PREVIEW_ADMIN_ID))
+
+    def test_a_database_with_a_category_seed_sql_does_not_know_is_refused(self):
+        Category.objects.filter(pk=1).update(slug="otra")
+        before = seeded_counts()
+
+        with self.assertRaisesMessage(CommandError, "otra"):
+            call_command("preview_seed", verbosity=0)
+
+        self.assertEqual(seeded_counts(), before)
+        self.assertEqual(Category.objects.get(pk=1).slug, "otra")
+
+    def test_a_database_with_products_seed_sql_does_not_know_is_refused(self):
+        Product.objects.create(
+            category=Category.objects.first(), name="Arrachera marinada", price_per_kg=399
+        )
+        before = seeded_counts()
+
+        with self.assertRaisesMessage(CommandError, "Delete the preview database file"):
+            call_command("preview_seed", verbosity=0)
+
+        self.assertEqual(seeded_counts(), before)
 
 
 @override_settings(
@@ -220,6 +241,11 @@ class PreviewGatewayTests(TestCase):
         models.Model.save(old, force_insert=True)
 
         self.assertEqual(PreviewGateway().panel_kpis()["ticket_promedio_30d"], before)
+
+    def test_no_lot_is_invented_seed_sql_has_no_lots_nor_piece_weights(self):
+        self.assertTrue(Product.objects.exclude(price_unit="kg").exists())
+
+        self.assertEqual(PreviewGateway().open_lots(), [])
 
     def test_exchange_rate_is_available(self):
         self.assertEqual(PreviewGateway().current_fx()["status"], "ok")
