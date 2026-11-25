@@ -1140,3 +1140,177 @@ Riesgo de esta revisión: `Risk: none` (solo texto en este documento).
 | 5 | roadmap.sh | no usado | sin consulta propia |
 | 6 | Big School | no usado | sin consulta propia |
 | 7 | Videos | usado | 3 citas del lead verificadas contra `~/agentic-global/claude/raw/transcripts/` (arriba) |
+
+### 15.1 Delta de T7m: rondas 2 y 3 (2026-11-25, contra la instantánea v1 de las 09:51)
+
+**Qué cambió.** Comparé los SHA-256 actuales (`scratchpad/auditoria/t7m-v2-sha.txt`) con `t7m-v1/sha256.txt`:
+- cambiaron 4 archivos: `index.html`, `css/panel.css`, `js/data.js` y `js/productos.js`;
+- quedaron iguales `js/app.js`, `js/catalog.js`, `js/fire.js`, `js/icons.js` y `css/fonts.css`;
+- `diff -rq` no muestra cambios en `img/` ni en `fonts/`.
+
+**Veredicto: la maqueta pasa. Se puede commitear y abrir para Eduardo.** F-62 queda cerrado y no hay hallazgos nuevos.
+
+**Comprobaciones del delta:**
+- **Sin peticiones externas nuevas.**
+  - **URLs:** `grep` de `https?://` en los HTML, CSS y JS solo encuentra el espacio de nombres SVG.
+  - **El motivo "picado de lámina":** son dos `mask: url("data:image/svg+xml,...")` en `panel.css:508-509`. Los decodifiqué: un SVG de 114 caracteres con un solo `<path>`, sin `href`, `<image>`, `<script>`, `<foreignObject>` ni manejadores `on*`. Los otros dos `url()` son referencias internas a gradientes (`#flowFill` y `#sparkFill`).
+  - **Red y almacenamiento:** 0 coincidencias de `fetch`, XHR, WebSocket, `sendBeacon`, `import(`, Worker, almacenamiento o cookies.
+  - **CSP:** la meta de `index.html:6` no cambió (`diff` contra v1).
+  - **Scripts:** los seis llevan `src` local, ahora con `defer` (`index.html:400-405`). En `index.html` siguen 0 `<style>`, `style=`, `on*=` y scripts en línea. El único `innerHTML` sigue siendo el sprite fijo de `icons.js:3`.
+  - **Escaneo de secretos:** `gitleaks dir docs/design/maquetas/panel --redact` da "no leaks found".
+- **F-62: cerrado.** `js/data.js:32-40` trae 24 clientes visiblemente ficticios: nombre de pila más "Ejemplo" o "Muestra", y también "Taquería de Muestra" y "Restaurante de Ejemplo". No tienen teléfono ni dirección. `grep` de los nombres anteriores ("Huasteca", "Güero", "Don Chuy", "Martínez", "Hernández") en `js/` e `index.html` no encuentra nada.
+- **`js/catalog.js` sigue igual que `seed.sql`.** El hash no cambió, y mi lectura independiente (`verdad_catalog_js.py`, contra el `seed.sql` actual, que desde la sección 16 solo cambió el factor de libra) da:
+  - 53 de 53 productos;
+  - 0 diferencias de campo;
+  - 9 categorías iguales;
+  - las referencias de línea correctas.
+  
+  `catalog.js` no guarda `price_per_lb`, y la maqueta no calcula libras (`grep` de `0.4536`, `0.45359` y `2.2046` vacío).
+- **El código nuevo de `productos.js`** (orden con `aria-sort`, "Precio oferta" y SKU de maqueta) arma el DOM con `el(...)` y `textContent`, y escribe atributos fijos (`aria-sort`, `title` y `data-label`). No agrega sumideros: `grep` de `innerHTML`, `insertAdjacentHTML`, `eval` y `new Function` vacío.
+  - El SKU es derivado y está rotulado "SKU de maqueta". La columna no existe en `seed.sql`, así que si se implementa necesita su propia decisión de esquema.
+  - `productos.js:282` sigue escribiendo estilos por CSSOM, como en F-63 (b).
+
+**Notas para la implementación (amplían F-63 (c)).** El motivo va como máscara con `data:` y por eso necesita `img-src data:`. En el panel real conviene un `.svg` estático en `/static/` para no ampliar la CSP.
+
+**Candado de T7m después del delta:**
+- **3 Diseño: queda abierto solo por el OK de Eduardo.**
+  - **Estudio de las `vista*.png`:** cubierto. Los archivos existen: `~/Desktop/img/vistaadmincatalogo.png` (156 167 bytes), `~/Desktop/img/vistaagregarproducto.png` (189 098) y `~/Desktop/img/vistas-productos/vistaagregarproducto{detalle,media}.png`. El informe dice qué tomó de cada uno ("Ronda 3", 1d).
+  - **`postmortem-carni-diseno.md`:** cubierto. Comprobé las líneas que cita: `:57` (E16, gráficas del panel), `:58` (E17, tabla con orden, búsqueda y paginación), `:100` (causa 1, sin ver el movimiento), `:101` (causa 2, "Near-zero motion"), `:102` (causa 3, sin inventario de comportamientos) y `:107` (causa 8, panel en HTML plano). El propio informe marca como no atendidas L102 y L103/L92, que pide migrar en el lugar, en `backend/templates/panel/`: quedan como requisito para T7d.
+  - **Las 5 skills marcadas "no usada"** (`gsap-*`, `awwwards-animations`, `animated-component-libraries`, `apple-design` y `awesome-design-md`) siguen esperando el OK de Eduardo.
+- **2 REA:** "no aplica, requiere el OK de Eduardo".
+- **4 Patrones y diagramas:** no aplica a la maqueta según L31; llega con T7d.
+- **5 roadmap.sh, 6 Big School y 7 Videos:** cubiertos (sección 15, actualizada).
+- **1 Seguridad:** cubierto por esta sección y la 15.
+
+**Pruebas y escaneos de este delta:** hashes y `diff` contra v1, los escaneos estáticos repetidos, la decodificación de los `data:` de `panel.css`, `verdad_catalog_js.py` y `gitleaks`. Las capturas del autor en `scratchpad/t7m/r3/` no las revisé. Ningún `.env` leído.
+
+Riesgo de este delta: `Risk: none` (solo texto en este documento).
+
+## 16. Rebanada 11: T7b y T7c, corrección de los 8 puntos de GGA (L30) (2026-11-25, sin commitear, sobre HEAD `2498696d`; verificador independiente, Risk ítems 2 y 3)
+
+Alcance: los 13 archivos del informe `scratchpad/t7b/backend-datos-4.md`:
+- `backend/inventory/models.py`, `pricing.py`, `sources.py`, `tests.py`, `test_reconciliation.py`, `test_sale_modes.py`, `test_sources.py` y `migrations/0006_product_source_and_piece_tolerance.py`;
+- `docs/contratos/inventario-por-fuente.md`;
+- el literal del factor de libra en `supabase/seed.sql`, `backend/panel/preview_catalog.py`, `backend/panel/test_preview_catalog.py` y `supabase/tests/ayudas.sql`.
+
+La sección 12 ya revisó el SQL y la lógica (F-43 a F-49); aquí reviso el delta de la corrección.
+
+### Veredicto
+- **El commit local se puede hacer: no hay hallazgos que lo bloqueen.** Los tres puntos pedidos quedan bien y cada arreglo tiene una prueba que se pone roja si se revierte (12 de 12 mutantes muertos). TF1 no se rompe.
+- **Pero el push sí queda condicionado (F-65, alta para el despliegue).** Este código hace que cada consulta de `Product` y `StoreCutSpec` lea columnas que solo existen después de aplicar `supabase/migrations/20261125000001_inventario_por_fuente.sql`. Render despliega solo con cada commit que llega a `practicas-ebac`. Por eso no se empuja hasta aplicar esa migración en el Supabase de la demo, y por la sección 12 aplicarla exige antes la prueba SQL en verde con F-45.
+
+### Respuestas
+1. **`store_image_url`** (`backend/inventory/models.py:92-114`; arreglo en `:109`). Sonda propia con 34 direcciones (`scratchpad/auditoria/sonda_img.py`, salida `sonda_img.txt`):
+   - **Rechaza** (devuelve `""`): `/\evil.com`, `img\..\x`, `\\evil.com/x`, `//evil.com/x`, `///evil.com/x`, `java\tscript:`, `\x00javascript:`, `javascript:` (también en mayúsculas y con espacio delante), `data:`, `vbscript:`, `blob:`, `filesystem:`, `/img/../admin` y `/img/\x7f`.
+   - **Normaliza:** `/img/x\r\n` queda en `/img/x`, porque `strip()` corre antes de la comprobación.
+   - **Deja pasar, y no importa:** las direcciones absolutas `http(s)` vuelven tal cual (`:106-107`), incluso con tabulador (`ht\ttp://evil.com`) o con barras invertidas (`https:\\evil.com`). La política ya acepta cualquier host `http(s)`, así que eso no abre nada nuevo.
+   - **Deja pasar, y sí debería rechazar:** los segmentos `..` codificados (F-66).
+   
+   Prueba que lo fija: `StoreImageUrlTests` (`backend/inventory/tests.py:1293`). El mutante que quita `:109` da 7 fallas.
+2. **Un solo factor de libra** (`POUND_IN_KG = Decimal("0.45359237")`, `models.py:29`; se elimina `KG_TO_LB_PRICE_FACTOR`).
+   - **Mismo valor en todo lo que fija precios:** `grep` en todo el repo encuentra `0.45359237` en `seed.sql:66`, `preview_catalog.py:43`, `test_preview_catalog.py:207`, `ayudas.sql:120`, el SQL de cobro (`20261113000002_comercio_v1_cotizacion_y_pedidos.sql:110` y `20261119000001_lotes_por_pieza.sql:251`) y `supabase/tests/cotizacion-casos.json:4`. Ya no queda ningún `0.4536` en código de backend ni en SQL de `supabase/`.
+   - **Los diffs solo cambian el factor:** `git diff -U0` de `seed.sql`, `ayudas.sql`, `preview_catalog.py` y `test_preview_catalog.py` toca solo ese literal (y las dos líneas de comentario de `seed.sql:17-18`).
+   - **TF1 no se rompe:** el lector exige el mismo `SELECT` que `seed.sql`. Los mutantes que devuelven `0.4536` en `seed.sql` o en el lector mueren (18 y 21 errores), y la suite completa pasa.
+   - **Cero contra cero:** la migración Django `0006` solo cambia el estado de dos modelos `managed=False` (`AddField`, sin `RunSQL`), y `makemigrations --check` da "No changes detected".
+   - **Datos guardados:** 12 de las 53 filas de `seed.sql` bajan 1 centavo de `price_per_lb` (lista en el informe del autor). En producción, cada fila cambia la próxima vez que se guarda: no hay migración de datos, y desde ese guardado el precio por libra que se ve es el que se cobra.
+   - Las copias que quedan fuera de este alcance están en F-67.
+3. **Decimal finito.**
+   - **`sources._decimal`** (`backend/inventory/sources.py:71-74`) exige `isinstance(value, Decimal)` y `is_finite()`. Todas las entradas públicas pasan por él o por `_kg` (`:78`): `deduction_kg`, `grams_for_amount` (`:101`), `mxn_for_usd` (`:108`), `draw_stock` (`:115-124`), `cut_source` (`:129-134`), `apply_shrink` (`:149-154`), `reconcile` (`:161-171`) y `count_variance` (`:184-187`).
+   - **`StandardPiece`** (`backend/inventory/pricing.py:280-304`) exige en `__post_init__` un peso finito mayor que cero y una tolerancia finita de cero o más, y `accepts` exige un `Decimal` finito.
+   - **Lo que no cubre:** un `Decimal` construido desde texto con dígitos Unicode (F-47) sigue siendo responsabilidad del analizador ASCII de la vista, como dice el docstring (`:283-284`).
+   - **Pruebas:** `DecimalOnlyTests` (`test_sources.py:89`) y las de `StandardPiece`. Los mutantes "acepta NaN", "acepta float", "tolerancia negativa", "peso cero" y "`accepts` con NaN" mueren.
+4. **El rojo fue real (comprobado por reversión).** Sobre una exportación limpia de HEAD `2498696d` con los 13 archivos (`scratchpad/auditoria/t7bfix.1bxU`), devolví cada arreglo a su comportamiento anterior y corrí `inventory panel.test_preview_catalog panel.test_preview_seed` (script `mut_t7bfix.py`, salida `mut_t7bfix.txt`). **12 de 12 mueren:**
+
+   | Arreglo revertido | Resultado |
+   |---|---|
+   | barra invertida y control | 7 fallas |
+   | factor `0.4536` | 11 fallas |
+   | descuento con `HALF_EVEN` | 1 falla |
+   | precio por pieza con `HALF_EVEN` | 1 falla |
+   | `_decimal` sin `is_finite` | 1 falla y 11 errores |
+   | `_decimal` sin `isinstance` | 12 errores |
+   | tolerancia negativa | 1 falla |
+   | peso cero | 1 falla |
+   | `accepts` con NaN | 2 errores |
+   | leyenda siempre | 1 falla |
+   | factor viejo en `seed.sql` | 18 errores |
+   | factor viejo en el lector | 21 errores |
+   
+   No repetí el rojo del autor tal cual (sus "7 subtests", "3 fallas" y demás): revertir cada arreglo da la misma prueba con menos dependencia del orden en que trabajó.
+5. **Verde.** En esa exportación, la suite completa da **Ran 1405 tests, OK** (14.5 s), salida en `t7bfix-full.txt`.
+   - `ruff check inventory panel/preview_catalog.py panel/test_preview_catalog.py` da "All checks passed!".
+   - `gitleaks dir --redact` da "no leaks found" en los 11 archivos de código, contrato y SQL.
+
+### Hallazgos
+| ID | Gravedad | Estado | Dónde | Dueño | Resumen |
+|---|---|---|---|---|---|
+| F-65 | **alta para el despliegue** (no bloquea el commit local) | confirmado: SQL generado y lectura | `backend/inventory/models.py:209` (`source_product`), `:582` (`piece_tolerance_kg`); `render.yaml:21-23`; `backend/scripts/render_build.sh:28-30` | lead / Eduardo | `str(Product.objects.all().query)` incluye `"products"."source_product_id"`, y la consulta de `StoreCutSpec` incluye `piece_tolerance_kg`. Esas columnas solo existen después de `20261125000001_inventario_por_fuente.sql`, que está commiteada pero **no aplicada**. Render despliega `practicas-ebac` con `autoDeployTrigger: commit`, y el build solo corre `migrate` de Django, que para estos modelos no emite SQL. Si el commit llega al remoto antes de aplicar la migración en el Supabase de la demo, la tienda y el panel fallan con "column does not exist" en cada lista de productos. Condición: el orden es aplicar la migración (con la prueba SQL en verde y F-45, sección 12), después hacer push. Otra opción es no empujar hasta entonces. Que el orden quede escrito en `odd/tasks/rediseno-moderno.md` |
+| F-66 | info | sonda | `backend/inventory/models.py:110` | backend-datos-4 | `".." in address.split("/")` no ve los segmentos codificados: `/img/%2e%2e/%2e%2e/panel/` (también `%2E%2e` y `.%2e`) vuelve tal cual, y el navegador lo resuelve a `/panel/`. El impacto es bajo: es un GET del mismo origen desde un `<img>`, y las vistas GET no escriben. Aun así contradice el docstring ("a path that climbs with `..`"). Corrección: rechazar `%` en las rutas relativas (ninguna imagen real lo usa) o comprobar los segmentos sobre `unquote(address)`, con su prueba |
+| F-67 | info (seguimiento) | confirmado con `grep` | `backend/inventory/models.py:29`; `ventas/tests/support.py:35`; `supabase/migrations/20261113000002…:110`; fuera de alcance: `docs/cargar-catalogo-y-admin.sql:59`, `js/modules/core/quote.js:24`, `src/hooks/useUnidadInteligente.ts:50`, `:116`, `js/modules/core/__tests__/quote.test.js:34` | backend-datos-4; frontend; docs | (a) "Un solo factor" es una convención repetida en 7 sitios, y ninguna prueba compara `POUND_IN_KG` con `cotizacion-casos.json` (`meta.lb_kg`, que el doble ya lee en `support.py:35`) ni con el texto de la migración de cobro. Si alguien cambia uno, los demás no se enteran. Prueba propuesta: `POUND_IN_KG == Decimal(CASES["meta"]["lb_kg"])`. (b) Quedan aproximaciones fuera de esta rebanada: `docs/cargar-catalogo-y-admin.sql:59` (`0.4536`; es un script de carga del catálogo que se puede correr, y además es otra copia del catálogo, S17), y `2.20462` en `js/modules/core/quote.js:24` y en `src/hooks/useUnidadInteligente.ts`, cuyo inverso exacto es 2.2046226 |
+
+### Estado del candado (recibo de T7b y T7c en L28, para este delta)
+- **1 Seguridad:** cubierto por esta sección (verificador independiente para los ítems 2 y 3), con `gitleaks` limpio. Siguen pendientes GGA en el commit y `security-review`. La rebanada no cambia manifiestos, así que no se ejecutó `supply-chain-risk-auditor`.
+- **2 REA y 3 Diseño:** como en la sección 12 (sin cambios por esta corrección).
+- **4 Diagrama:** según el autor, `docs/diagramas/t7b-inventario-fuente.html` no cita archivos `.py`, así que no quedan citas viejas. No lo abrí.
+- **5, 6 y 7:** sin evidencia nueva en el informe de este delta. Siguen como en L28 y en la sección 12, donde el minuto del video (`?t=0`) quedó observado.
+
+### Patrones (Mermaid; sin `archify` en este agente)
+```mermaid
+flowchart LR
+  V["vista (futura T9/T7d): analizador ASCII"] --> SP["StandardPiece pricing.py:280 (__post_init__ :290, accepts :296)"]
+  V --> SRC["sources.py: _decimal :71 -> funciones puras"]
+  M["models.POUND_IN_KG :29"] --> LB["price_per_lb_for :33 (Product.save)"]
+  SEED[("seed.sql:66 ROUND(x*0.45359237)")] -->|"mismo SELECT"| PC["preview_catalog.py:43"]
+  Q[("SQL de cobro 20261113000002:110")] -. "F-67: sin prueba que una los literales" .- M
+  P["Product (managed=False) :209 source_product"] -. "F-65: columna de 20261125000001, no aplicada" .-> DB[("Supabase de la demo")]
+```
+Confirmado: `sources.py` y `StandardPiece` son **funciones puras y un objeto de valor** con validación al construirse. Eso es una técnica, no un patrón de refactoring.guru (como dijo la sección 12, llamarlos Strategy sería solo una analogía).
+
+### Pruebas y escaneos de esta revisión
+- **Pruebas:** suite completa en la exportación limpia con 1405 en OK, 12 de 12 mutantes muertos y `makemigrations --check` sin cambios.
+- **Sondas:** 34 direcciones de imagen.
+- **Lectura:** `grep` del factor en todo el repo y el SQL generado de `Product` y `StoreCutSpec`.
+- **Escaneos:** `ruff` y `gitleaks` limpios.
+- **No ejecutado:** `ayudas.sql` (no hay Postgres).
+- Ningún `.env` leído.
+- **Scratch:** `scratchpad/auditoria/` (`t7bfix.1bxU/`, `mut_t7bfix.py` y `.txt`, `sonda_img.py` y `.txt`, `t7bfix-full.txt`).
+
+Riesgo de esta revisión: `Risk: none` (solo texto en este documento).
+
+### Recibo de recursos de esta revisión
+| # | ítem | estado | evidencia |
+|---|---|---|---|
+| 1 | Seguridad | usado | `security-and-hardening` (entradas no confiables -> sonda de URL, F-66; validación de tipos -> Decimal finito); OWASP A03 (URL en `<img>`) y A05 (orden de despliegue, F-65); gitleaks limpio; `security-review` pendiente del lead |
+| 2 | REA | no aplica | revisión de seguridad |
+| 3 | Diseño | no aplica | sin interfaz |
+| 4 | Patrones y diagramas | usado | Mermaid arriba, con la técnica rotulada sin forzar GoF |
+| 5 | roadmap.sh | no usado | sin consulta nueva |
+| 6 | Big School | usado | TDD p. 9 (`temario.md:198`): el rojo comprobado por reversión de cada arreglo |
+| 7 | Videos | no usado | sin consulta |
+
+Needs skill: security-review - diff de los 13 archivos de la corrección de T7b y T7c listados arriba.
+
+### 16.1 Recheck de F-66 (2026-11-25, limitado a F-66)
+
+Cambiaron dos archivos desde la sección 16 (`cmp` contra `scratchpad/auditoria/t7bfix.1bxU`): `backend/inventory/models.py` y `backend/inventory/tests.py`. Los otros 11 son idénticos.
+
+| ID | Estado | Evidencia |
+|---|---|---|
+| F-66 | **cerrado** | Ver los cinco puntos debajo de la tabla |
+
+**Evidencia de F-66:**
+- **El arreglo.** `models.py:110` rechaza `%` en las rutas locales, junto con `\` y los caracteres de control, sin decodificar. El docstring lo explica (`:101-103`).
+- **Mi sonda repetida** (`sonda_img.py`, salida `sonda_img2.txt`). Ahora rechaza `/img/%2e%2e/%2e%2e/panel/`, `/img/%2E%2e/x`, `/img/.%2e/x`, `/%5cevil.com`, `/img/%0aevil` y `%2F%2Fevil.com`. Los casos que ya se rechazaban antes siguen rechazados.
+- **La prueba que lo fija.** `test_a_percent_encoded_path_is_refused` (`tests.py:1343`), con 6 subpruebas: `%2e%2e`, `%2E%2E`, `%2f`, `%5c`, `%00` y la doble codificación `%252e`. El mutante que quita `%` del conjunto da `Ran 363 tests, FAILED (failures=6)` en `inventory`, así que el rojo es real.
+- **No rompe imágenes reales.**
+  - **`seed.sql`:** sus 4 `%` son marcadores de `RAISE` del bloque `DO` (`:315`, `:320`, `:325`, `:328`), ninguno está en una imagen.
+  - **`public/img`:** `find public/img -type f` no encuentra ningún nombre con `%`, espacio ni carácter fuera de ASCII.
+  - **Otros datos del repo:** `grep` de rutas `/img/` con `%` en `supabase/`, `src/data/` y `backend/` (sin pruebas) no encuentra nada.
+  - **Subidas:** las imágenes subidas son URLs `https` con nombre `uuid4().hex` (`backend/inventory/storage.py:142` y `:176`), y salen por la rama `http(s)` (`models.py:107-108`) antes de esta regla.
+- **Suite y escaneos.** En la exportación limpia (HEAD `2498696d` más los 13 archivos), la suite completa da **Ran 1406 tests, OK** (salida en `t7bfix-full2.txt`), y `ruff check inventory` da "All checks passed!".
+
+**Lo que sigue abierto:**
+- **F-65 y F-67:** abiertos. El lead los registra como pendientes en el documento de feature.
+- **Push:** la condición de F-65 se mantiene. No hay push hasta aplicar `20261125000001` en el Supabase de la demo, con la prueba SQL en verde.
+
+Riesgo de este recheck: `Risk: none` (solo texto en este documento).
