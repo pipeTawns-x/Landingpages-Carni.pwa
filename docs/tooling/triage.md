@@ -1,5 +1,7 @@
 # Tooling Triage — Carni-mvp Foundation Phase
 
+> **Historical document.** The SDD rows below describe a retired workflow: no `sdd-*` agents or artifacts are used. The current workflow is ODD with TDD inside each block (`odd/tasks/<feature>.md` with verbatim requirements).
+
 This document triages every external resource identified in the PHASE 2 list (engram #427) for Carni-mvp ("Carnicería El Señor de La Misericordia"). It records the recommended action for each tool, its current install state, and a one-line rationale.
 
 **Stack constraint**: React 18 + Vite 7 + TypeScript + Express 5 + SCSS 7-1. No Next.js, no Tailwind, no Storybook. No new runtime dependencies are added here — this is a planning document only.

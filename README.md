@@ -421,7 +421,7 @@ Este repo se apoya en el stack-ia/gentle-ai base del usuario. El repositorio evi
 ### Cómo se trabaja con IA aquí
 
 - **Human-in-the-loop obligatorio**: la IA propone o acelera; el humano valida dirección visual, seguridad y decisiones de alcance.
-- **Spec-Driven Development**: explorar, proponer, especificar, diseñar, partir en tareas, aplicar y verificar.
+- **ODD con TDD**: explorar lo que ya existe, escribir el documento de la feature en `odd/tasks/<feature>.md` con los pedidos copiados textualmente, implementar bloque por bloque con la prueba en rojo antes del código, y cerrar con evidencia observada (conteo de pruebas, salida de comando o CI). SDD está retirado.
 - **Orquestación por roles**: el orquestador global del stack-ia sigue siendo la capa activa; la capa local solo agrega restricciones del producto.
 - **Memoria y continuidad**: decisiones importantes deben persistirse en el stack del usuario, no como promesas falsas dentro del repo.
 - **No destruir la base actual**: el rediseño debe mejorar el MVP existente, no reemplazarlo ignorando rutas, IDs, assets o flujos ya conectados.

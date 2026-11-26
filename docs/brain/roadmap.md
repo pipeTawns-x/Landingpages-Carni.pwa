@@ -11,9 +11,9 @@ This is the dependency-ordered plan for taking Carni-mvp from current state to f
 - [ ] Owner: approve Supabase MCP OAuth in Claude Code TUI
 - [x] Owner: rotate leaked Apify keys — done 2026-08-25, both dead (see [[security]])
 - [ ] Fix broken main branch (`5a752b3e` regression) — surgical revert or cherry-pick onto a repair branch
-- [ ] Run `/sdd-init` on Carni-mvp to cache stack + testing capabilities
+- [x] ~~Run `/sdd-init`~~ — superseded: SDD is retired. The workflow is ODD with TDD inside each block (`odd/tasks/<feature>.md`).
 
-**Deliverable**: stable main, Supabase MCP live, SDD initialized.
+**Deliverable**: stable main, Supabase MCP live.
 
 ## Phase 2 — BENTO REDESIGN (in-place, SCSS only)
 

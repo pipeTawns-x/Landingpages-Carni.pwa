@@ -1,5 +1,7 @@
 # Ruta MVP y protocolo SDD — Carni-mvp
 
+> **Documento histórico.** El protocolo SDD que aparece aquí está retirado: no se corre `/sdd-init` ni se crean artefactos SDD. El flujo vigente es ODD con TDD dentro de cada bloque, con el documento de feature en `odd/tasks/<feature>.md` y los pedidos copiados textualmente. El abogado del diablo sigue vigente antes de escribir la especificación.
+
 Fecha: 12 agosto 2026. Escrito tras leer el repo directamente, no de memoria ni de documentos previos.
 
 **Qué es esto**: la respuesta ordenada a un pedido que juntaba ocho cosas a la vez (rediseño, prácticas de EBAC, BuildAds, afiliados, Figma, animaciones). No inventa un plan nuevo — muestra que casi todo ya tiene lugar en `docs/brain/roadmap.md`, y ordena lo que faltaba.

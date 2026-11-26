@@ -1,5 +1,7 @@
 # Plan MVP completo — Carni-mvp
 
+> **Documento histórico.** El protocolo SDD que aparece aquí está retirado: no se corre `/sdd-init` ni se crean artefactos SDD. El flujo vigente es ODD con TDD dentro de cada bloque, con el documento de feature en `odd/tasks/<feature>.md` y los pedidos copiados textualmente. El abogado del diablo sigue vigente antes de escribir la especificación.
+
 Fecha: 12 agosto 2026. Escrito leyendo el repo, las migraciones y los blueprints directamente. Todo lo que no pude verificar está marcado en la sección 9.
 
 **Para qué sirve**: es el documento que se lleva a Code. Contiene el alcance completo del MVP, el estado real verificado, los huecos entre lo que hay y lo que se quiere, y el protocolo para correr el abogado del diablo fase por fase antes de escribir specs.
