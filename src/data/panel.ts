@@ -136,7 +136,12 @@ export async function cerrarSesionTrasSalirDelPanel(
     return 'sin_senal';
   }
 
-  const cerrada = await cliente.auth.signOut({ scope: 'local' }).then(({ error }) => !error, () => false);
+  let cerrada = false;
+  try {
+    cerrada = (await cliente.auth.signOut({ scope: 'local' }))?.error === null; // auth-js: `{ error: null }` si salió bien
+  } catch {
+    // Sin red o sin el cerrojo de la sesión: se prueba el respaldo.
+  }
   const resultado = cerrada || sesionLocalBorrada(cliente) ? 'cerrada' : 'fallida';
 
   url.searchParams.delete('salir');
