@@ -128,9 +128,12 @@ class MasPageTests(TestCase):
 
         page = html[html.index("<main") : html.index("</main>")]
         links = [a["href"] for a in anchors(page)]
+        # What it listed before stays, in the same order, after Entregas and Inventario.
         self.assertEqual(
             links,
             [
+                "/panel/entregas/",
+                "/panel/inventario/",
                 "/panel/compras/",
                 "/panel/descuentos/",
                 "/panel/clientes/",
@@ -139,6 +142,13 @@ class MasPageTests(TestCase):
                 "/panel/ajustes/",
             ],
         )
+
+    def test_the_page_names_entregas_and_inventario_like_the_sidebar(self):
+        html = self.client.get(self.url).content.decode()
+
+        page = html[html.index("<main") : html.index("</main>")]
+        labels = re.findall(r'<span class="flex-1">([^<]+)</span>', page)
+        self.assertEqual(labels[:3], ["Entregas", "Inventario", "Compras"])
 
     def test_the_mas_tab_is_the_current_page_and_no_sidebar_entry_is_current(self):
         html = self.client.get(self.url).content.decode()
@@ -193,6 +203,11 @@ class NavigationStateTests(SimpleTestCase):
         ("panel:buildads", "panel"): ({"/panel/buildads/": "page"}, {"/panel/mas/": "true"}),
         ("panel:productads", "panel"): ({"/panel/productads/": "page"}, {"/panel/mas/": "true"}),
         ("panel:ajustes", "panel"): ({"/panel/ajustes/": "page"}, {"/panel/mas/": "true"}),
+        # Entregas, Inventario, Compras and Descuentos also live inside Más on the phone.
+        ("panel:entregas", "panel"): ({"/panel/entregas/": "page"}, {"/panel/mas/": "true"}),
+        ("panel:inventario", "panel"): ({"/panel/inventario/": "page"}, {"/panel/mas/": "true"}),
+        ("panel:compras", "panel"): ({"/panel/compras/": "page"}, {"/panel/mas/": "true"}),
+        ("panel:descuentos", "panel"): ({"/panel/descuentos/": "page"}, {"/panel/mas/": "true"}),
         ("panel:mas", "panel"): ({}, {"/panel/mas/": "page"}),
         # The bridge and the other routes of the panel app belong to no entry.
         ("panel:acceso", "panel"): ({}, {}),
@@ -212,7 +227,7 @@ class NavigationStateTests(SimpleTestCase):
         self.assertEqual(current_links(sidebar_of(html)), {})
         self.assertEqual(current_links(tab_bar_of(html)), {})
 
-    def test_the_sidebar_has_nine_entries_and_the_tab_bar_five(self):
+    def test_the_sidebar_has_the_nine_sections_then_the_two_ad_products(self):
         html = render_frame("panel:inicio", "panel")
 
         self.assertEqual(
@@ -220,15 +235,48 @@ class NavigationStateTests(SimpleTestCase):
             [
                 "/panel/",
                 "/panel/pedidos/",
+                "/panel/entregas/",
+                "/panel/inventario/",
                 "/panel/productos/",
+                "/panel/clientes/",
                 "/panel/compras/",
                 "/panel/descuentos/",
-                "/panel/clientes/",
+                "/panel/ajustes/",
                 "/panel/buildads/",
                 "/panel/productads/",
-                "/panel/ajustes/",
             ],
         )
+
+    def test_the_sidebar_names_each_section_as_the_specification_does(self):
+        html = sidebar_of(render_frame("panel:inicio", "panel"))
+
+        labels = re.findall(r"<span>([^<]+)</span>\s*</a>", html)
+        self.assertEqual(
+            labels,
+            [
+                "Inicio",
+                "Pedidos",
+                "Entregas",
+                "Inventario",
+                "Productos y precios",
+                "Clientes",
+                "Compras",
+                "Descuentos",
+                "Ajustes",
+                "BuildAds",
+                "ProductAds",
+            ],
+        )
+
+    def test_the_ad_products_sit_in_their_own_group_after_the_sections(self):
+        html = sidebar_of(render_frame("panel:inicio", "panel"))
+
+        self.assertEqual(html.count('aria-labelledby="nav-anuncios"'), 1)
+        self.assertLess(html.index("/panel/ajustes/"), html.index('id="nav-anuncios"'))
+
+    def test_the_tab_bar_keeps_its_five_tabs(self):
+        html = render_frame("panel:inicio", "panel")
+
         self.assertEqual(
             [a["href"] for a in anchors(tab_bar_of(html))],
             ["/panel/", "/panel/pedidos/", "/panel/productos/", "/panel/clientes/", "/panel/mas/"],

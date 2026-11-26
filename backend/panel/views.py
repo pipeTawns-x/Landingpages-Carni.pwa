@@ -282,6 +282,10 @@ def mas(request):
 IN_DEVELOPMENT = {
     "buildads": "BuildAds",
     "productads": "ProductAds",
+    # Two sections of the panel that T7d builds in its slice 2 (S15.9); until then the frame links
+    # them to this page so the navigation is complete and honest.
+    "entregas": "Entregas",
+    "inventario": "Inventario",
 }
 
 
@@ -301,6 +305,20 @@ def buildads(request):
 def productads(request):
     """ProductAds: a page that says it is under development."""
     return _in_development(request, "productads")
+
+
+@panel_admin_required
+@require_safe
+def entregas(request):
+    """Entregas (deliveries and pick-ups): under development until slice 2 of T7d."""
+    return _in_development(request, "entregas")
+
+
+@panel_admin_required
+@require_safe
+def inventario(request):
+    """Inventario (entries, sources, cutting and counts): under development until slice 2."""
+    return _in_development(request, "inventario")
 
 
 CUSTOMERS_PER_PAGE = 20

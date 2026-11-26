@@ -1,0 +1,38 @@
+{% comment %}
+  Sales of the last eight weeks (Monday to Sunday), one bar per week scaled to the best one.
+  An SVG drawn on the server: one hue (sand) for the current week and a quieter step (3.4:1 on the card) for the
+  past ones, bars anchored to the baseline, a <title> per bar as the hover tooltip and the same
+  numbers as a table under "Ver tabla". Context: inicio.weeks, inicio.weeks_total, chart.
+{% endcomment %}
+<section class="flex min-w-0 flex-col gap-4 rounded-card border border-border bg-surface-1 p-4 lg:p-6" aria-labelledby="semanas-titulo">
+  <div class="flex items-baseline justify-between gap-3">
+    <h2 id="semanas-titulo" class="font-display text-titulo">Últimas 8 semanas</h2>
+    <span class="text-meta text-text-muted tabular-nums">Total ${{ inicio.weeks_total }}</span>
+  </div>
+  {% if inicio.weeks_total %}
+  <svg data-chart="weekly" class="block w-full" viewBox="0 0 {{ chart.width }} {{ chart.height }}" role="img" aria-labelledby="semanas-titulo semanas-resumen" focusable="false">
+    <desc id="semanas-resumen">{% with current=inicio.weeks|last %}Ventas de las últimas 8 semanas, de lunes a domingo. Esta semana: ${{ current.total }}.{% endwith %}</desc>
+    <line x1="0" x2="{{ chart.width }}" y1="{{ chart.base }}" y2="{{ chart.base }}" class="text-text-muted" stroke="currentColor" stroke-opacity="0.5" stroke-width="1" />
+    {% for week in inicio.weeks %}
+    <g class="{% if week.is_current %}text-sand{% else %}text-text-muted{% endif %}">
+      <rect data-week="{{ week.start|date:'Y-m-d' }}" x="{{ week.x }}" y="{{ week.y }}" width="{{ week.width }}" height="{{ week.height }}" rx="4" fill="currentColor"{% if not week.is_current %} fill-opacity="0.6"{% endif %}><title>Semana del {{ week.start|date:"d/m" }}: ${{ week.total }}, {{ week.orders }} pedido{{ week.orders|pluralize }}</title></rect>
+      <text x="{{ week.label_x }}" y="154" text-anchor="middle" font-size="12" fill="currentColor" class="tabular-nums">{{ week.start|date:"d/m" }}</text>
+    </g>
+    {% endfor %}
+  </svg>
+  {% else %}
+  <p class="rounded-control border border-border bg-surface-2 p-4 text-ui text-text-muted">Aún no hay ventas en las últimas 8 semanas.</p>
+  {% endif %}
+  <details class="group">
+    <summary class="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-control text-meta font-semibold text-text-muted hover:text-text">Ver tabla</summary>
+    <table id="semanas-tabla" class="mt-2 w-full text-left text-meta tabular-nums">
+      <caption class="sr-only">Ventas de las últimas 8 semanas, de lunes a domingo</caption>
+      <thead><tr class="text-text-muted"><th scope="col" class="py-1 font-semibold">Semana del</th><th scope="col" class="py-1 font-semibold">Pedidos</th><th scope="col" class="py-1 text-right font-semibold">Ventas</th></tr></thead>
+      <tbody>
+      {% for week in inicio.weeks %}
+      <tr class="border-t border-border"><td class="py-1">{{ week.start|date:"d/m/Y" }}</td><td class="py-1">{{ week.orders }}</td><td class="py-1 text-right">${{ week.total }}</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </details>
+</section>

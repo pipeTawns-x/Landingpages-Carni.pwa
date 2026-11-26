@@ -30,9 +30,31 @@ def _key_of(address):
         return address
 
 
+def _valid_ip(text):
+    """`text` stripped if it is an IP address, else None."""
+    text = text.strip()
+    try:
+        ipaddress.ip_address(text)
+    except ValueError:
+        return None
+    return text
+
+
 def client_ip(request):
-    """The key a limit counts: the proxy's own entry behind one, else REMOTE_ADDR."""
+    """The key a limit counts for the client of `request` (audit F-04).
+
+    Behind the proxy (Cloudflare, then Render's load balancer), the client is CF-Connecting-IP:
+    Cloudflare sets it and refuses a request whose client sent its own (error 1000). If it is
+    missing or not an IP, the last X-Forwarded-For entry, the one the proxy appended; the earlier
+    entries are written by the client and are never read, nor True-Client-IP or X-Real-IP.
+    Without a trusted proxy every header is the client's own, so only REMOTE_ADDR counts.
+    Invariant: a caller on Render's private network skips Cloudflare and can set
+    CF-Connecting-IP; if a service there ever calls Django, this rule has to be reviewed.
+    """
     if settings.CHECKOUT_TRUST_FORWARDED_FOR:
+        connecting = _valid_ip(request.META.get("HTTP_CF_CONNECTING_IP", ""))
+        if connecting:
+            return _key_of(connecting)
         forwarded = request.META.get("HTTP_X_FORWARDED_FOR", "")
         last = forwarded.rsplit(",", 1)[-1].strip()
         if last:

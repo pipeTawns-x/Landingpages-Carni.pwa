@@ -1,8 +1,12 @@
 {% extends "panel/base.html" %}
 {% comment %}
-  The home of the panel (/panel/, panel:inicio): the metrics of panel_kpis() (shape D4) and the
-  latest orders. Bars are classes from 0 to 10 of the best value, so the page needs no script and
-  no inline style.
+  The home of the panel (/panel/, panel:inicio; T7d slice 1, S15.9), drawn by
+  ventas.views.tablero.home. In this order: the four tiles of panel_kpis() (shape D4), the trends
+  (the days of this week and the last eight weeks), the money and the shelves (margin per product
+  and low stock), then what sells and the latest orders. Every number comes from the server; the
+  day bars are classes from 0 to 10 of the best value and the weekly chart is an SVG, so the page
+  needs no script and no inline style. Context: metrics and recent, inicio (panel.metrics, or
+  None when the database failed) and chart (the viewBox of the weekly SVG).
 {% endcomment %}
 {% block title %}<title>Inicio · Panel · Carnicería El Señor de La Misericordia</title>{% endblock %}
 {% block titulo %}Inicio{% endblock %}
@@ -37,10 +41,14 @@
       {% endif %}
     </li>
   </ul>
+  {% else %}
+  <p class="rounded-control border border-danger bg-surface-2 p-4 text-ui text-text">No se pudieron cargar las métricas. Revisa la conexión con la base de datos e inténtalo de nuevo.</p>
+  {% endif %}
 
   <div class="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-6">
+    {% if metrics %}
     <section class="flex min-w-0 flex-col gap-4 rounded-card border border-border bg-surface-1 p-4 lg:p-6" aria-labelledby="semana-titulo">
-      <h2 id="semana-titulo" class="font-display text-titulo">Ventas de la semana</h2>
+      <h2 id="semana-titulo" class="font-display text-titulo">Esta semana por día</h2>
       <ol role="list" class="grid grid-cols-7 gap-2">
         {% for day in metrics.semana %}
         <li class="flex min-w-0 flex-col items-center gap-2">
@@ -51,7 +59,28 @@
         {% endfor %}
       </ol>
     </section>
+    {% endif %}
 
+    {% if inicio %}
+    {% include "panel/parciales/inicio_semanas.html" %}
+    {% endif %}
+  </div>
+
+  {% if inicio %}
+  <div class="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-6">
+    {% include "panel/parciales/inicio_margen.html" %}
+    {% include "panel/parciales/inicio_stock.html" %}
+    {% comment %}
+      Reserved for T7b (backend-datos): the shrinkage % and the stock per source go here as two
+      more sections of this grid once their data exists. Nothing is drawn for them before that.
+    {% endcomment %}
+  </div>
+  {% else %}
+  <p class="rounded-control border border-danger bg-surface-2 p-4 text-ui text-text">No se pudieron cargar las tendencias ni el stock. Revisa la conexión con la base de datos e inténtalo de nuevo.</p>
+  {% endif %}
+
+  <div class="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-6">
+    {% if metrics %}
     <section class="flex min-w-0 flex-col gap-4 rounded-card border border-border bg-surface-1 p-4 lg:p-6" aria-labelledby="top-titulo">
       <h2 id="top-titulo" class="font-display text-titulo">Lo que más se vende</h2>
       {% if metrics.top5 %}
@@ -71,32 +100,30 @@
       <p class="rounded-control border border-border bg-surface-2 p-4 text-ui text-text-muted">Aún no hay ventas en los últimos 30 días.</p>
       {% endif %}
     </section>
-  </div>
-  {% else %}
-  <p class="rounded-control border border-danger bg-surface-2 p-4 text-ui text-text">No se pudieron cargar las métricas. Revisa la conexión con la base de datos e inténtalo de nuevo.</p>
-  {% endif %}
-
-  <section class="flex min-w-0 flex-col gap-4 rounded-card border border-border bg-surface-1 p-4 lg:p-6" aria-labelledby="recientes-titulo">
-    <div class="flex items-start justify-between gap-3">
-      <h2 id="recientes-titulo" class="font-display text-titulo">Pedidos recientes</h2>
-      <a class="inline-flex min-h-11 items-center justify-center gap-2 whitespace-nowrap rounded-control border border-border-control bg-surface-2 px-3 text-ui text-text transition-[background-color,scale] duration-160 ease-out-strong hover:bg-surface-3 active:scale-[0.97] motion-reduce:transition-none" href="{% url 'orders:board' %}">Tablero de pedidos</a>
-    </div>
-    {% if recent %}
-    <ul role="list" class="flex flex-col gap-3">
-      {% for order in recent %}
-      <li class="flex flex-col gap-2 rounded-control border border-border bg-surface-2 p-3">
-        <div class="flex items-start justify-between gap-3">
-          <a class="font-semibold text-text underline decoration-transparent underline-offset-4 transition-colors duration-160 hover:decoration-sand" href="{% url 'ventas:pedido_detalle' order.pk %}">{{ order.customer_name|default:"Sin nombre" }} · {{ order.short_id }}</a>
-          <span class="font-semibold tabular-nums">${{ order.total_mxn }}</span>
-        </div>
-        <p class="text-meta text-text-muted"><span class="inline-flex h-6 items-center rounded-control border border-border bg-surface-2 px-2 text-meta font-semibold">{{ order.status_label }}</span> {{ order.channel_label }} · {{ order.created_at|date:"d/m H:i" }}</p>
-      </li>
-      {% endfor %}
-    </ul>
-    {% else %}
-    <p class="rounded-control border border-border bg-surface-2 p-4 text-ui text-text-muted">Todavía no hay pedidos. Registra uno desde Nueva venta.</p>
     {% endif %}
-  </section>
+
+    <section class="flex min-w-0 flex-col gap-4 rounded-card border border-border bg-surface-1 p-4 lg:p-6" aria-labelledby="recientes-titulo">
+      <div class="flex items-start justify-between gap-3">
+        <h2 id="recientes-titulo" class="font-display text-titulo">Pedidos recientes</h2>
+        <a class="inline-flex min-h-11 items-center justify-center gap-2 whitespace-nowrap rounded-control border border-border-control bg-surface-2 px-3 text-ui text-text transition-[background-color,scale] duration-160 ease-out-strong hover:bg-surface-3 active:scale-[0.97] motion-reduce:transition-none" href="{% url 'orders:board' %}">Tablero de pedidos</a>
+      </div>
+      {% if recent %}
+      <ul role="list" class="flex flex-col gap-3">
+        {% for order in recent %}
+        <li class="flex flex-col gap-2 rounded-control border border-border bg-surface-2 p-3">
+          <div class="flex items-start justify-between gap-3">
+            <a class="min-w-0 font-semibold text-text underline decoration-transparent underline-offset-4 transition-colors duration-160 hover:decoration-sand" href="{% url 'ventas:pedido_detalle' order.pk %}">{{ order.customer_name|default:"Sin nombre" }} · {{ order.short_id }}</a>
+            <span class="font-semibold tabular-nums">${{ order.total_mxn }}</span>
+          </div>
+          <p class="text-meta text-text-muted"><span class="inline-flex h-6 items-center rounded-control border border-border bg-surface-2 px-2 text-meta font-semibold">{{ order.status_label }}</span> {{ order.channel_label }} · {{ order.created_at|date:"d/m H:i" }}</p>
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p class="rounded-control border border-border bg-surface-2 p-4 text-ui text-text-muted">Todavía no hay pedidos. Registra uno desde Nueva venta.</p>
+      {% endif %}
+    </section>
+  </div>
 
   <nav class="flex flex-wrap gap-2" aria-label="Accesos rápidos">
     <a class="inline-flex min-h-11 items-center justify-center gap-2 whitespace-nowrap rounded-control border border-border-control bg-surface-2 px-3 text-ui text-text transition-[background-color,scale] duration-160 ease-out-strong hover:bg-surface-3 active:scale-[0.97] motion-reduce:transition-none" href="{% url 'ventas:nueva' %}">Nueva venta</a>

@@ -1,0 +1,38 @@
+{% comment %}
+  Margin of each product: the price per kilo against the cost of a kilo that can be sold (cost
+  per kilo bought over the yield of the cut), the thinnest first so the one to fix is on top.
+  A loss carries an icon and the word "Pierde", never the color alone. Context: inicio.margins,
+  inicio.without_cost.
+{% endcomment %}
+<section class="flex min-w-0 flex-col gap-4 rounded-card border border-border bg-surface-1 p-4 lg:p-6" aria-labelledby="margen-titulo">
+  <div class="flex items-baseline justify-between gap-3">
+    <h2 id="margen-titulo" class="font-display text-titulo">Margen por producto</h2>
+    <span class="text-meta text-text-muted">Precio contra costo por kg</span>
+  </div>
+  {% if inicio.margins %}
+  <ul role="list" class="flex flex-col divide-y divide-border">
+    {% for row in inicio.margins|slice:":6" %}
+    <li class="flex items-center justify-between gap-3 py-3">
+      <span class="flex min-w-0 flex-col">
+        <a class="truncate font-semibold text-text underline decoration-transparent underline-offset-4 transition-colors duration-160 hover:decoration-sand" href="{% url 'inventory:detail' row.id %}">{{ row.name }}</a>
+        <span class="text-meta text-text-muted tabular-nums">${{ row.price_per_kg }} − ${{ row.cost_per_kg }}</span>
+      </span>
+      <span class="flex shrink-0 flex-col items-end">
+        {% if row.is_loss %}
+        <span class="inline-flex items-center gap-1 font-semibold text-red-text tabular-nums"><svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4 2.5 20h19L12 4ZM12 10v4M12 17h.01" /></svg>Pierde -${{ row.margin_mxn|cut:"-" }}</span>
+        {% else %}
+        <span class="font-semibold tabular-nums">${{ row.margin_mxn }}</span>
+        {% endif %}
+        <span class="text-meta text-text-muted tabular-nums">{{ row.margin_pct }} %</span>
+      </span>
+    </li>
+    {% endfor %}
+  </ul>
+  {% if inicio.margins|length > 6 %}<a class="text-meta font-semibold text-text underline underline-offset-4 hover:decoration-sand" href="{% url 'inventory:list' %}">Ver los {{ inicio.margins|length }} productos</a>{% endif %}
+  {% else %}
+  <p class="rounded-control border border-border bg-surface-2 p-4 text-ui text-text-muted">Sin costos registrados. Registra una compra en <a class="font-semibold text-text underline underline-offset-4" href="{% url 'panel:compras' %}">Compras</a> para ver el margen de cada producto.</p>
+  {% endif %}
+  {% if inicio.margins and inicio.without_cost %}
+  <p class="text-meta text-text-muted">{{ inicio.without_cost }} producto{{ inicio.without_cost|pluralize }} sin costo registrado. <a class="font-semibold text-text underline underline-offset-4" href="{% url 'panel:compras' %}">Registrar compra</a></p>
+  {% endif %}
+</section>

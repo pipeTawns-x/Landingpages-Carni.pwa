@@ -1,0 +1,29 @@
+{% comment %}
+  Products with low stock: at or below inicio.low_stock_threshold (5 kg, or 5 pieces; a
+  provisional threshold, assumption A6, until a field holds a minimum per product), the
+  emptiest first, each linked to its product. An empty one says "Agotado" next to its icon.
+  The stock per source arrives with T7b. Context: inicio.low_stock, inicio.low_stock_threshold.
+{% endcomment %}
+<section class="flex min-w-0 flex-col gap-4 rounded-card border border-border bg-surface-1 p-4 lg:p-6" aria-labelledby="stock-titulo">
+  <div class="flex items-baseline justify-between gap-3">
+    <h2 id="stock-titulo" class="font-display text-titulo">Stock bajo</h2>
+    <span class="text-meta text-text-muted">{{ inicio.low_stock_threshold }} kg o piezas, o menos (umbral provisional)</span>
+  </div>
+  {% if inicio.low_stock %}
+  <ul role="list" class="flex flex-col divide-y divide-border">
+    {% for row in inicio.low_stock|slice:":8" %}
+    <li class="flex items-center justify-between gap-3 py-3">
+      <a class="min-w-0 truncate font-semibold text-text underline decoration-transparent underline-offset-4 transition-colors duration-160 hover:decoration-sand" href="{% url 'inventory:detail' row.id %}">{{ row.name }}</a>
+      {% if row.is_out %}
+      <span class="inline-flex shrink-0 items-center gap-1 font-semibold text-red-text"><svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4 2.5 20h19L12 4ZM12 10v4M12 17h.01" /></svg>Agotado</span>
+      {% else %}
+      <span class="shrink-0 font-semibold text-sand tabular-nums">{{ row.stock }} {{ row.unit }}</span>
+      {% endif %}
+    </li>
+    {% endfor %}
+  </ul>
+  {% if inicio.low_stock|length > 8 %}<a class="text-meta font-semibold text-text underline underline-offset-4 hover:decoration-sand" href="{% url 'inventory:list' %}">Ver los {{ inicio.low_stock|length }} productos</a>{% endif %}
+  {% else %}
+  <p class="rounded-control border border-border bg-surface-2 p-4 text-ui text-text-muted">Todos los productos tienen existencias suficientes.</p>
+  {% endif %}
+</section>

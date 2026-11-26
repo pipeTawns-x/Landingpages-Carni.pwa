@@ -118,6 +118,27 @@ class InDevelopmentTests(TestCase):
                 self.assertIn('viewBox="0 0 24 24"', html.split('id="proximamente-titulo"')[0])
                 self.assertContains(response, product, count=html.count(product))
 
+    def test_entregas_and_inventario_are_guarded_pages_in_development_until_slice_2(self):
+        for name, title, path in (
+            ("panel:entregas", "Entregas", "/panel/entregas/"),
+            ("panel:inventario", "Inventario", "/panel/inventario/"),
+        ):
+            with self.subTest(name=name):
+                self.assertEqual(reverse(name), path)
+                response = self.client.get(path)
+                html = response.content.decode()
+
+                self.assertTemplateUsed(response, "panel/proximamente.html")
+                self.assertEqual(
+                    re.findall(r"<h1[^>]*>(.*?)</h1>", html, flags=re.DOTALL)[0].strip(), title
+                )
+                self.assertContains(response, "Página en desarrollo")
+                self.assertEqual(self.client.post(path).status_code, 405)
+                anonymous = self.client_class().get(path)
+                self.assertRedirects(
+                    anonymous, reverse("panel:acceso"), fetch_redirect_response=False
+                )
+
     def test_the_sidebar_and_the_phone_menu_list_them_and_not_publicidad(self):
         html = self.client.get(reverse("panel:mas")).content.decode()
 
