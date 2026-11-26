@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Provider } from 'react-redux';
 import { ThemeProvider } from 'styled-components';
 import { Lupa } from '@src/components/Lupa/Lupa';
+import { usarDisparadoresLupa } from '@src/components/Lupa/montar';
 import { usePedido } from '@src/hooks/usePedido';
 import { CarrilCategorias } from '@src/components/CarrilCategorias/CarrilCategorias';
 import { CartPanel } from '@src/components/CartPanel/CartPanel';
@@ -11,6 +12,7 @@ import type { CartLegacyItem, OrderLine, Product } from '@src/types/database';
 import { HashRouter, Route, Routes, useNavigate, useSearchParams } from 'react-router-dom';
 import { ProductoDetalle } from '@src/pages/ProductoDetalle';
 import { Carrito } from '@src/pages/Carrito';
+import { Hoja } from '@src/ui/Hoja';
 import { fetchProducts, mountReactNode, categoryLabel, categorySlugOf, assetUrl } from './shared';
 import { carniTheme } from '@src/theme/carniTheme';
 import { store } from '@src/redux/store';
@@ -444,10 +446,36 @@ function CarritoGlobal(): JSX.Element {
 
 /**
  * On the catalogue a result routes in place; nothing reloads.
+ *
+ * The Lupa no longer opens itself: it is content, and `Hoja` is the frame. This
+ * is the catalogue's version of the wrapper that `montarLupa()` builds for
+ * `index.html` and `accessweb.html`, with the only difference that a result
+ * navigates inside this router instead of leaving for `products.html`.
  */
 function LupaConRuta(): JSX.Element {
   const navegar = useNavigate();
-  return <Lupa onPickProduct={(producto) => navegar(`/producto/${producto.id}`)} />;
+  const [abierta, setAbierta] = useState<boolean>(false);
+
+  usarDisparadoresLupa(abierta, () => setAbierta(true));
+
+  return (
+    <Hoja
+      abierta={abierta}
+      alCerrar={() => setAbierta(false)}
+      nombre="buscar"
+      lado="centro"
+      titulo="Buscar"
+      etiquetaCerrar="Cerrar la búsqueda"
+      focoEnContenido
+    >
+      <Lupa
+        onPickProduct={(producto) => {
+          setAbierta(false);
+          navegar(`/producto/${producto.id}`);
+        }}
+      />
+    </Hoja>
+  );
 }
 
 function CatalogoConRutas(): JSX.Element {

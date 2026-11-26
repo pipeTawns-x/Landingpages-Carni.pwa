@@ -4,93 +4,70 @@
  * Viven aparte del `.tsx` porque el enunciado del modulo pide un archivo de
  * estilos por componente, y porque separa la decision visual de la logica: el
  * componente dice QUE renderiza, este archivo dice COMO se ve.
+ *
+ * DE DONDE SALE CADA COLOR: DOS FUENTES, UNA DECLARADA
+ * ---------------------------------------------------
+ * Este componente vive en dos paginas que no comparten hoja de estilos:
+ *
+ *   - la carcasa nueva (landing, catalogo), oscura, con los tokens `--color-*`
+ *     de `src/styles/tailwind.css`;
+ *   - las paginas viejas (index, products, accessweb), claras, que nunca
+ *     cargaron Tailwind —cargar su preflight ahi parte el Bootstrap que las
+ *     sostiene— y siguen con la paleta de `carniTheme`.
+ *
+ * Por eso cada color se escribe `var(--token, valor-viejo)`: en la carcasa manda
+ * el token y la pagina vieja cae al valor de `carniTheme`. La paleta vieja no se
+ * copia a mano en ningun sitio: se lee del tema, que es donde ya vivia.
+ *
+ * Consecuencia que conviene no perder: la hoja y su marco los pone `Hoja`, no
+ * este archivo. Aqui solo se pinta CONTENIDO.
  */
 
 import styled from 'styled-components';
+import { carniTheme } from '@src/theme/carniTheme';
 
-export const Backdrop = styled.div<{ $open: boolean }>`
-  position: fixed;
-  inset: 0;
-  z-index: 1020;
-  background: rgba(5, 5, 5, 0.45);
-  opacity: ${({ $open }) => ($open ? 1 : 0)};
-  visibility: ${({ $open }) => ($open ? 'visible' : 'hidden')};
-  transition: opacity 0.28s ease, visibility 0s linear ${({ $open }) => ($open ? '0s' : '0.28s')};
-  pointer-events: ${({ $open }) => ($open ? 'auto' : 'none')};
-`;
+/* ------------------------------------------------------------- tokens ---- */
+
+/** Texto principal. */
+const TEXTO = `var(--color-text, ${carniTheme.colors.carniBrown})`;
+
+/** Texto apagado: etiquetas, unidades, "sin resultados". */
+const TEXTO_APAGADO = `var(--color-text-muted, ${carniTheme.colors.textMuted})`;
+
+/** Fondo de la hoja. */
+const SUPERFICIE = `var(--color-surface-1, ${carniTheme.colors.surface})`;
+
+/** Fondo de la banda gris de la foto. */
+const SUPERFICIE_2 = `var(--color-surface-2, ${carniTheme.colors.surfaceMuted})`;
 
 /**
- * El popin TAPA EL ENCABEZADO, y esa es la pieza que faltaba.
- *
- * Colgaba del header (`top: var(--carni-header-h)`), asi que la pildora de
- * busqueda de la barra seguia a la vista con su propia lupa mientras el campo
- * del popin mostraba otra. Eduardo lo vio y lo dijo con todas las letras: "se
- * ven 2 lupas y eso no esta bien, hay que hacerlo igual que la LV, que solo es
- * una lupa".
- *
- * En la referencia no hay ningun truco para esconder la del header: el panel
- * arranca en `top: 0` y la tapa. El wordmark de adentro pasa a ser el unico
- * ancla de marca mientras dura la busqueda. Una sola lupa porque solo hay una
- * barra visible, no porque se este ocultando nada.
+ * El dorado se queda: `carniTheme` lo documenta como el token de kickers, y una
+ * etiqueta en versalitas ES un kicker. Se adapta el patron, no la paleta.
  */
-export const Popin = styled.div<{ $open: boolean }>`
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 1040;
-  display: flex;
-  flex-direction: column;
-  background: ${({ theme }) => theme.colors.surface};
-  box-shadow: ${({ theme }) => theme.shadowXl};
-  opacity: ${({ $open }) => ($open ? 1 : 0)};
-  visibility: ${({ $open }) => ($open ? 'visible' : 'hidden')};
-  transform: ${({ $open }) => ($open ? 'translateY(0)' : 'translateY(-12px)')};
-  transition: opacity 0.28s ease, transform 0.28s ease, visibility 0s linear ${({ $open }) => ($open ? '0s' : '0.28s')};
-  pointer-events: ${({ $open }) => ($open ? 'auto' : 'none')};
-`;
+const DORADO = `var(--color-gold, ${carniTheme.colors.carniGold})`;
 
-export const Inner = styled.div`
-  position: relative;
-  flex: 1 1 auto;
-  overflow-y: auto;
-  padding: 1.75rem 0 2rem;
-`;
+/** El anillo de foco: arena en la carcasa, el rojo viejo en las paginas suyas. */
+const FOCO = `var(--color-sand, ${carniTheme.colors.carniRed})`;
 
-export const Encabezado = styled.div`
-  position: relative;
-  padding: 0 1.5rem 1.25rem;
-  text-align: center;
-`;
+/**
+ * Filetes y lavados derivados del texto, no colores sueltos.
+ *
+ * Antes eran `rgba(54, 52, 50, 0.22)` y sus hermanos, escritos a mano. Sobre un
+ * fondo oscuro un negro al 22 % no se ve: el mismo valor hay que sacarlo de la
+ * tinta que haya delante. `color-mix` hace justo eso.
+ */
+const MEZCLA = (porcentaje: number): string =>
+  `color-mix(in srgb, ${TEXTO} ${porcentaje}%, transparent)`;
 
-export const Wordmark = styled.h2`
-  margin: 0;
-  font-size: 1.15rem;
-  font-weight: 700;
-  letter-spacing: 0.28em;
-  text-transform: uppercase;
-  color: ${({ theme }) => theme.colors.carniBrown};
-`;
-
-export const CerrarEsquina = styled.button`
-  position: absolute;
-  top: -0.35rem;
-  right: 1.5rem;
-  border: 0;
-  background: none;
-  font-size: 1.35rem;
-  line-height: 1;
-  cursor: pointer;
-  color: ${({ theme }) => theme.colors.carniBrown};
-  opacity: 0.7;
-
-  &:hover { opacity: 1; }
-  &:focus-visible {
-    outline: 2px solid ${({ theme }) => theme.colors.carniRed};
-    outline-offset: 3px;
-  }
-`;
+/**
+ * Se mueve a mano donde se animaba color de fondo y no `all`.
+ *
+ * `theme.transitionFast` es `all 0.15s ease`, y `all` transiciona tambien lo que
+ * nadie quiere mover —el ancho de una caja al cargar una fuente—: en una rejilla
+ * de seis columnas eso se ve como un tirón. Se nombran las propiedades y el
+ * tiempo se queda en 150 ms, que es lo que se veía antes.
+ */
+const MOVIMIENTO = '0.15s ease';
 
 /**
  * Texto que solo existe para un lector de pantalla.
@@ -111,6 +88,23 @@ export const SoloLectores = styled.span`
   border: 0;
 `;
 
+/**
+ * El cuerpo de la hoja: contenido y scroll.
+ *
+ * Antes esta caja era la que hacia scroll dentro del popin, que ocupaba la
+ * ventana entera. Ahora quien scrollea es el contenedor de `Hoja` —mismo
+ * problema, misma solucion, en el sitio que corresponde— y aqui solo queda el
+ * aire de arriba y de abajo.
+ */
+export const Cuerpo = styled.div`
+  position: relative;
+  padding: 1.75rem 0 2rem;
+`;
+
+/* Pildora centrada, como la referencia. Antes era una linea inferior de ancho
+   completo y llevaba un icono de lupa adentro; ese icono era la SEGUNDA lupa
+   que se veia en pantalla. Fuera. La de cerrar tampoco va aqui: vive en el
+   marco de `Hoja`, lejos del campo, donde no se confunde con la de limpiar. */
 export const SearchForm = styled.form`
   display: flex;
   align-items: center;
@@ -118,12 +112,12 @@ export const SearchForm = styled.form`
   width: min(605px, calc(100% - 3rem));
   margin: 0 auto;
   padding: 0.7rem 1.2rem;
-  border: 1px solid rgba(54, 52, 50, 0.22);
+  border: 1px solid ${MEZCLA(22)};
   border-radius: 999px;
-  background: ${({ theme }) => theme.colors.surface};
+  background: ${SUPERFICIE};
 
   &:focus-within {
-    border-color: rgba(54, 52, 50, 0.5);
+    border-color: ${MEZCLA(50)};
   }
 `;
 
@@ -134,10 +128,10 @@ export const SearchInput = styled.input`
   outline: none;
   background: transparent;
   font-size: 1rem;
-  color: ${({ theme }) => theme.colors.carniBrown};
+  color: ${TEXTO};
   padding: 0.25rem 0;
   ::placeholder {
-    color: ${({ theme }) => theme.colors.textMuted};
+    color: ${TEXTO_APAGADO};
     opacity: 1;
   }
 `;
@@ -148,20 +142,20 @@ export const GhostButton = styled.button`
   height: 34px;
   border: none;
   border-radius: 50%;
-  background: rgba(54, 52, 50, 0.07);
-  color: ${({ theme }) => theme.colors.carniBrown};
+  background: ${MEZCLA(7)};
+  color: ${TEXTO};
   font-size: 1.05rem;
   line-height: 1;
   cursor: pointer;
-  transition: transform ${({ theme }) => theme.transitionFast}, background ${({ theme }) => theme.transitionFast};
+  transition: transform ${MOVIMIENTO}, background-color ${MOVIMIENTO};
 
   &:hover {
     transform: rotate(90deg);
-    background: rgba(54, 52, 50, 0.14);
+    background: ${MEZCLA(14)};
   }
 
   &:focus-visible {
-    outline: 2px solid ${({ theme }) => theme.colors.carniRed};
+    outline: 2px solid ${FOCO};
     outline-offset: 2px;
   }
 `;
@@ -187,21 +181,21 @@ export const RowLabel = styled.span`
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  /* El dorado se queda: carniTheme lo documenta como el token de kickers, y una
-     etiqueta en versalitas ES un kicker. Se adapta el patron, no la paleta. */
-  color: ${({ theme }) => theme.colors.carniGold};
+  color: ${DORADO};
 `;
 
+/* Texto plano, no pildora. En la referencia las tendencias son enlaces y el
+   hover las subraya — se comprobo en el video, con el cursor sobre "bolsas". */
 export const Chip = styled.button`
   border: 0;
   border-radius: 0;
   background: none;
   padding: 0;
-  color: ${({ theme }) => theme.colors.carniBrown};
+  color: ${TEXTO};
   font-size: 0.9rem;
   font-weight: 400;
   cursor: pointer;
-  transition: color ${({ theme }) => theme.transitionFast};
+  transition: color ${MOVIMIENTO};
 
   &:hover {
     text-decoration: underline;
@@ -209,13 +203,16 @@ export const Chip = styled.button`
   }
 
   &:focus-visible {
-    outline: 2px solid ${({ theme }) => theme.colors.carniRed};
+    outline: 2px solid ${FOCO};
     outline-offset: 3px;
   }
 `;
 
+/* Las recientes SI son pildoras: llevan su propia x para borrarse, y sin
+   carcasa esa x quedaria flotando junto al texto sin decir a quien pertenece.
+   Como extiende Chip, hay que devolverle lo que Chip acaba de perder. */
 export const RecentChip = styled(Chip)`
-  border: 1px solid rgba(54, 52, 50, 0.18);
+  border: 1px solid ${MEZCLA(18)};
   border-radius: 999px;
   padding: 0.3rem 0.8rem;
   font-size: 0.8rem;
@@ -224,7 +221,7 @@ export const RecentChip = styled(Chip)`
   align-items: center;
   gap: 0.4rem;
 
-  &:hover { text-decoration: none; background: rgba(54, 52, 50, 0.05); }
+  &:hover { text-decoration: none; background: ${MEZCLA(5)}; }
 
   i {
     font-style: normal;
@@ -239,9 +236,12 @@ export const SectionHeader = styled.h3`
   font-size: 0.75rem;
   font-weight: 400;
   letter-spacing: 0.06em;
-  color: ${({ theme }) => theme.colors.textMuted};
+  color: ${TEXTO_APAGADO};
 `;
 
+/* SEIS columnas, y bajando por escalones.
+   `minmax(0, 1fr)` no es opcional: con `auto`, un nombre largo ensancha su
+   pista y desarma la rejilla entera. */
 export const ResultsGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));
@@ -252,6 +252,8 @@ export const ResultsGrid = styled.div`
   @media (max-width: 600px)  { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 `;
 
+/* Vertical: foto arriba, texto debajo. Era horizontal con una miniatura de
+   56px, que es una lista de resultados, no una vitrina. */
 export const ResultCard = styled.button`
   display: flex;
   flex-direction: column;
@@ -266,22 +268,24 @@ export const ResultCard = styled.button`
   &:hover img { opacity: 0.88; }
 
   &:focus-visible {
-    outline: 2px solid ${({ theme }) => theme.colors.carniRed};
+    outline: 2px solid ${FOCO};
     outline-offset: -2px;
   }
 `;
 
+/* `contain`, no `cover`: la foto se ve entera sobre su fondo, sin recortarle el
+   corte al cliente. El gris con aire es lo que le da la vitrina. */
 export const ResultThumb = styled.img`
   width: 100%;
   height: auto;
   aspect-ratio: 3 / 4;
   object-fit: contain;
-  background: ${({ theme }) => theme.colors.surfaceMuted};
+  background: ${SUPERFICIE_2};
   padding: 0.9rem;
-  transition: opacity ${({ theme }) => theme.transitionFast};
+  transition: opacity ${MOVIMIENTO};
 `;
 
-/* El texto vive FUERA de la banda gris, sobre blanco. */
+/* El texto vive FUERA de la banda gris, sobre el fondo de la hoja. */
 export const ResultInfo = styled.span`
   min-width: 0;
   display: flex;
@@ -290,10 +294,13 @@ export const ResultInfo = styled.span`
   padding: 0.6rem 0.75rem 1.1rem;
 `;
 
+/* Dos lineas, no una. "Filete de Pollo Empanizado" cortado en la primera es
+   media palabra; el `min-height` mantiene los precios alineados en la fila
+   aunque un nombre ocupe una linea y su vecino dos. */
 export const ResultName = styled.strong`
   font-size: 0.82rem;
   font-weight: 400;
-  color: ${({ theme }) => theme.colors.carniBrown};
+  color: ${TEXTO};
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -306,18 +313,18 @@ export const ResultName = styled.strong`
 export const ResultPrice = styled.span`
   font-size: 0.85rem;
   font-weight: 700;
-  color: ${({ theme }) => theme.colors.carniBrown};
+  color: ${TEXTO};
   white-space: nowrap;
 
   small {
     font-weight: 500;
-    color: ${({ theme }) => theme.colors.textMuted};
+    color: ${TEXTO_APAGADO};
   }
 `;
 
 export const EmptyState = styled.p`
   margin: 1rem 0 0;
-  color: ${({ theme }) => theme.colors.textMuted};
+  color: ${TEXTO_APAGADO};
   font-size: 0.9rem;
   font-style: italic;
 `;

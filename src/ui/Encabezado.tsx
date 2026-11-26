@@ -9,10 +9,11 @@ export interface EncabezadoProps {
   cuenta: number;
   menuAbierto: boolean;
   carritoAbierto: boolean;
+  buscarAbierto: boolean;
   alAbrirMenu: () => void;
   alAbrirCarrito: () => void;
-  /** 'catalogo.html#buscar' en la landing; '#buscar' en el catálogo. */
-  hrefBuscar: string;
+  /** Abre la hoja de búsqueda. Un botón, no un enlace: la búsqueda es una superposición de la carcasa. */
+  alAbrirBuscar: () => void;
 }
 
 /** Alto del encabezado sin la zona segura, en píxeles. Debe coincidir con las clases de abajo. */
@@ -154,9 +155,10 @@ export function Encabezado({
   cuenta,
   menuAbierto,
   carritoAbierto,
+  buscarAbierto,
   alAbrirMenu,
   alAbrirCarrito,
-  hrefBuscar
+  alAbrirBuscar
 }: EncabezadoProps): JSX.Element {
   const paso = usePasoPortada(sobrePortada);
   const insignia = usePopInsignia(cuenta);
@@ -196,9 +198,18 @@ export function Encabezado({
         </a>
 
         <div className="flex items-center justify-self-end">
-          <a href={hrefBuscar} aria-label="Buscar en el catálogo" className={BOTON}>
+          <button
+            type="button"
+            data-abre="buscar"
+            aria-label="Buscar en el catálogo"
+            aria-haspopup="dialog"
+            aria-expanded={buscarAbierto}
+            aria-controls="hoja-buscar"
+            onClick={alAbrirBuscar}
+            className={BOTON}
+          >
             <IconoBuscar />
-          </a>
+          </button>
 
           <button
             type="button"

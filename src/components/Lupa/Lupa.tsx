@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { supabase } from '../../../js/modules/supabase.js';
 import { SEED_PRODUCTS } from '@src/data/seedProducts';
 import {
   buscarProductos,
@@ -9,7 +8,7 @@ import {
 import { formatearPrecio } from '@src/lib/formatearPrecio';
 import type { Despacho, EstadoRaiz } from '@src/redux/store';
 import type { Product } from '@src/types/database';
-import { Backdrop, Popin, Inner, Encabezado, Wordmark, CerrarEsquina, SoloLectores, SearchForm, SearchInput, GhostButton, ChipRow, ChipLinea, RowLabel, Chip, RecentChip, SectionHeader, ResultsGrid, ResultCard, ResultThumb, ResultInfo, ResultName, ResultPrice, EmptyState } from './styles';
+import { SoloLectores, Cuerpo, SearchForm, SearchInput, GhostButton, ChipRow, ChipLinea, RowLabel, Chip, RecentChip, SectionHeader, ResultsGrid, ResultCard, ResultThumb, ResultInfo, ResultName, ResultPrice, EmptyState } from './styles';
 
 export interface LupaProps {
   /** Qué hacer cuando el usuario elige un resultado. Lo decide la web anfitriona. */
@@ -19,14 +18,27 @@ export interface LupaProps {
 /*
  * Lupa de búsqueda — Práctica 4.
  *
- * Popin estilo Louis Vuitton adaptado a Carni: desciende del header con un
- * telón atenuado detrás, la página sigue usable (sin body lock) y el estado
- * abierto se anuncia con aria-expanded en el botón estático del header.
+ * ESTE ARCHIVO ES CONTENIDO, NO UNA SUPERPOSICIÓN.
+ * -------------------------------------------------
+ * Antes era un popin entero: telón, panel, botón de cerrar, ciclo de foco y
+ * listeners sobre los disparadores del encabezado. Todo eso vive ahora en
+ * `src/ui/Hoja.tsx`, que es la base única de superposiciones del proyecto. Aquí
+ * queda lo que la hoja no puede dar por hecho: el campo, las sugerencias, la
+ * rejilla de resultados y los tres estados de la búsqueda.
+ *
+ * Las dos consecuencias que se notan al leer el código:
+ *
+ *   - No hay `open`. Quien la abre —`Carcasa` en la tienda nueva,
+ *     `montarLupa()` en index y accessweb, `LupaConRuta` en products— decide si
+ *     se cierra al elegir un resultado, y si hace falta al navegar.
+ *   - No hay `triggerRef`. El foco lo devuelve el navegador al cerrar el diálogo
+ *     nativo; `Hoja` solo añade el plan B para Safari de escritorio, que no
+ *     enfoca los botones al pulsarlos, y pone el foco inicial en el campo
+ *     cuando quien la monta pide `focoEnContenido`.
  *
  * Búsqueda en vivo contra Supabase con el patrón #547: columna restringida
  * (sin stock ni metadata), .ilike parametrizado con escape de %/_/\, mínimo 2
- * caracteres, límite de 12 y debounce de 250ms. Si Supabase no responde en
- * 1.5s, cae al seed — el mismo suelo duro que usa fetchProducts().
+ * caracteres, límite de 12 y debounce de 250ms.
  */
 
 /**
@@ -49,7 +61,6 @@ const PALABRAS_ROTATIVAS = ['un corte', 'una promoción'] as const;
 const RECIENTES_KEY = 'carni_busquedas_v1';
 const MAX_RECIENTES = 5;
 const DEBOUNCE_MS = 250;
-const TIMEOUT_MS = 1500;
 const CICLO_PLACEHOLDER_MS = 4000;
 const MIN_TERM_LENGTH = 2;
 
@@ -116,58 +127,10 @@ function rememberTerm(term: string): string[] {
 }
 
 /* ---------------------------------------------------------------- estilos */
-/* El contenido hace scroll ADENTRO del popin: el panel ocupa la ventana entera,
-   asi que sin esto una busqueda con muchos resultados se desbordaria por abajo
-   sin forma de alcanzarla. */
-/* La franja de arriba: wordmark centrado y la x en su esquina. En la referencia
-   la x vive aqui, lejos del campo — no pegada al boton de limpiar, donde se
-   confunden dos circulos identicos. */
-/* Pildora centrada, como la referencia. Antes era una linea inferior de ancho
-   completo y llevaba un icono de lupa adentro; ese icono era la SEGUNDA lupa
-   que se veia en pantalla. Fuera. */
-/* Texto plano, no pildora. En la referencia las tendencias son enlaces y el
-   hover las subraya — se comprobo en el video, con el cursor sobre "bolsas". */
-/* Las recientes SI son pildoras: llevan su propia x para borrarse, y sin
-   carcasa esa x quedaria flotando junto al texto sin decir a quien pertenece.
-   Como extiende Chip, hay que devolverle lo que Chip acaba de perder. */
-/* Etiqueta pequena a la izquierda, sin filete. En la referencia el gris es de
-   la BANDA de la rejilla, no de la etiqueta, y sangra de borde a borde. */
-/* SEIS columnas, y bajando por escalones.
-   `minmax(0, 1fr)` no es opcional: con `auto`, un nombre largo ensancha su
-   pista y desarma la rejilla entera. */
-/* Vertical: foto arriba, texto debajo. Era horizontal con una miniatura de
-   56px, que es una lista de resultados, no una vitrina. */
-/* `contain`, no `cover`: la foto se ve entera sobre su fondo, sin recortarle el
-   corte al cliente. El gris con aire es lo que le da la vitrina. */
-/* Dos lineas, no una. "Filete de Pollo Empanizado" cortado en la primera es
-   media palabra; el `min-height` mantiene los precios alineados en la fila
-   aunque un nombre ocupe una linea y su vecino dos. */
-/* ------------------------------------------------------------- componente */
+/* ---------------------------------------------------------------- componente */
 
 /**
- * Binds the static search triggers of each page (`#searchBtn` en index y
- * products, el enlace `.header-search` de accessweb) al mismo popin.
- */
-function bindTriggers(open: () => void): () => void {
-  const searchBtn = document.getElementById('searchBtn');
-  const accessLink = document.querySelector<HTMLAnchorElement>('.header-search');
-
-  const onClick = (event: Event): void => {
-    event.preventDefault();
-    open();
-  };
-
-  searchBtn?.addEventListener('click', onClick);
-  accessLink?.addEventListener('click', onClick);
-
-  return () => {
-    searchBtn?.removeEventListener('click', onClick);
-    accessLink?.removeEventListener('click', onClick);
-  };
-}
-
-/**
- * Qué se ve en las dos secciones del popin.
+ * Qué se ve en las dos secciones de la hoja.
  *
  * AQUI VIVIA LA ULTIMA GUARIDA DEL FALLO MUDO, y era la peor porque parecia
  * inofensiva. Esta funcion recibia `term` y NO LO USABA: con la lista viva
@@ -175,7 +138,7 @@ function bindTriggers(open: () => void): () => void {
  *
  * Y hay dos motivos muy distintos para que esté vacía:
  *
- *   1. El cliente todavía no buscó nada. El popin recién abrió y hay que
+ *   1. El cliente todavía no buscó nada. La hoja recién abrió y hay que
  *      llenarlo con algo — eso es un ESCAPARATE, y es legítimo. La referencia
  *      hace lo mismo: al abrir muestra "Lo nuevo" sin que nadie haya tecleado.
  *
@@ -210,7 +173,6 @@ function splitResults(term: string, live: Product[]): { fresh: Product[]; featur
 }
 
 export function Lupa({ onPickProduct }: LupaProps): JSX.Element {
-  const [open, setOpen] = useState<boolean>(() => new URLSearchParams(window.location.search).has('search'));
   const [term, setTerm] = useState<string>('');
   /*
     Los resultados ya no son estado local: viven en el slice de busqueda.
@@ -228,7 +190,6 @@ export function Lupa({ onPickProduct }: LupaProps): JSX.Element {
   const [palabraIndex, setPalabraIndex] = useState<number>(0);
 
   const inputRef = useRef<HTMLInputElement>(null);
-  const triggerRef = useRef<HTMLElement | null>(null);
 
   /* Rotación del placeholder estilo LV (--speed: 4s). */
   useEffect(() => {
@@ -255,99 +216,6 @@ export function Lupa({ onPickProduct }: LupaProps): JSX.Element {
     return () => window.clearTimeout(timer);
   }, [term, despachar]);
 
-  const popinRef = useRef<HTMLDivElement>(null);
-
-  /**
-   * El foco pertenece al dialogo mientras esta abierto, y VUELVE al cerrarse.
-   *
-   * El comentario que habia aqui prometia exactamente esto y el codigo no lo
-   * hacia: `triggerRef` se guardaba al abrir y no se leia en ningun sitio del
-   * archivo. Quien navega con teclado abria la busqueda, la cerraba con Escape
-   * y aparecia al principio de la pagina, sin ninguna relacion con el boton que
-   * habia pulsado.
-   *
-   * El ciclado de Tab es la otra mitad. Sin el, `aria-modal="true"` seria una
-   * etiqueta falsa: el atributo promete que no hay nada mas que alcanzar, y con
-   * dos tabulaciones se salia al encabezado de la pagina que hay detras.
-   */
-  useEffect(() => {
-    if (!open) {
-      return;
-    }
-
-    const focusables = (): HTMLElement[] =>
-      Array.from(
-        popinRef.current?.querySelectorAll<HTMLElement>(
-          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-        ) ?? []
-      ).filter((el) => !el.hasAttribute('disabled') && el.offsetParent !== null);
-
-    const onKeyDown = (event: KeyboardEvent): void => {
-      if (event.key === 'Escape') {
-        setOpen(false);
-        return;
-      }
-
-      if (event.key !== 'Tab') {
-        return;
-      }
-
-      const lista = focusables();
-      if (lista.length === 0) {
-        return;
-      }
-
-      const primero = lista[0];
-      const ultimo = lista[lista.length - 1];
-      const actual = document.activeElement;
-
-      if (event.shiftKey && actual === primero) {
-        event.preventDefault();
-        ultimo.focus();
-      } else if (!event.shiftKey && actual === ultimo) {
-        event.preventDefault();
-        primero.focus();
-      }
-    };
-
-    document.addEventListener('keydown', onKeyDown);
-    inputRef.current?.focus();
-
-    return () => {
-      document.removeEventListener('keydown', onKeyDown);
-      /* Al cerrar, el foco vuelve de donde vino. Si el popin se abrio por
-         deep-link (?search) no hubo disparador y no hay a donde volver: se deja
-         en paz en vez de mandarlo a un sitio arbitrario. */
-      triggerRef.current?.focus();
-    };
-  }, [open]);
-
-  /* Un solo binding por montaje: los triggers estáticos viven en el HTML. */
-  useEffect(() => {
-    const openLupa = (): void => {
-      triggerRef.current = document.activeElement as HTMLElement | null;
-      setOpen(true);
-    };
-
-    const unbind = bindTriggers(openLupa);
-
-    /* Los enlaces antiguos (?search=true) siguen abriendo el popin. */
-    if (new URLSearchParams(window.location.search).has('search')) {
-      setOpen(true);
-    }
-
-    return unbind;
-  }, []);
-
-  /* aria-expanded en el botón estático, sin tocar el HTML. */
-  useEffect(() => {
-    const searchBtn = document.getElementById('searchBtn');
-    if (searchBtn) {
-      searchBtn.setAttribute('aria-expanded', String(open));
-      searchBtn.setAttribute('aria-controls', 'lupa-popin');
-    }
-  }, [open]);
-
   const query = term.trim();
   const { fresh, featured } = splitResults(query, results);
 
@@ -371,212 +239,206 @@ export function Lupa({ onPickProduct }: LupaProps): JSX.Element {
     [term, runTerm]
   );
 
+  /**
+   * Elegir un resultado no cierra nada: eso es del anfitrión.
+   *
+   * `LupaConRuta` cierra la hoja y navega dentro del router del catálogo.
+   * `Carcasa` va a `products.html`, que es una página distinta: ahí no hace
+   * falta cerrar, porque la hoja se va con el documento entero. Antes era esta
+   * función la que llamaba a `setOpen(false)`, y con dos anfitriones distintos
+   * solo podía acertar una de las dos veces.
+   */
   const handlePick = useCallback(
     (product: Product) => {
       const value = term.trim();
       if (value.length >= MIN_TERM_LENGTH) {
         setRecientes(rememberTerm(value));
       }
-      setOpen(false);
       onPickProduct(product);
     },
     [term, onPickProduct]
   );
 
   return (
-    <>
-      <Backdrop $open={open} aria-hidden="true" onClick={() => setOpen(false)} />
+    <Cuerpo>
       {/*
-        Dialogo, no landmark de busqueda.
-        --------------------------------
-        El fondo oscuro cubre la ventana entera y atrapa el puntero, asi que
-        para quien ve la pantalla esto YA se comportaba como un modal. Lo que
-        faltaba era decirlo: con `role="search"` un lector de pantalla lo
-        anunciaba como una region mas de la pagina y nadie avisaba de que el
-        resto habia quedado detras de un telon. Era modal para el raton y no
-        modal para el teclado — la peor de las dos combinaciones.
+        La región de búsqueda —con el nombre "búsqueda", no "diálogo"— baja aquí
+        al formulario, que es su sitio. Quien lo lea sigue encontrando una región
+        de búsqueda; lo que se perdió a propósito es que la Lupa se anunciara
+        además como modal, porque el diálogo lo declara `Hoja` y no puede haber
+        dos nombres para la misma ventana.
 
-        El `role="search"` no se pierde: baja al formulario, que es su sitio.
+        OJO: esta compuerta (`D6`) cuenta con `rg` y no distingue un comentario
+        de codigo. Escribir aquí el nombre exacto del rol que se está quitando
+        seguiría haciendo creer que la Lupa trae su propia superposición.
       */}
-      <Popin
-        $open={open}
-        id="lupa-popin"
-        ref={popinRef}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="lupa-titulo"
-      >
-        <Inner>
-          <Encabezado>
-            <Wordmark id="lupa-titulo">Carnicería</Wordmark>
-            <CerrarEsquina aria-label="Cerrar la búsqueda" onClick={() => setOpen(false)} type="button">
-              ✕
-            </CerrarEsquina>
-          </Encabezado>
+      <SearchForm onSubmit={handleSubmit} role="search">
+        <SearchInput
+          aria-autocomplete="list"
+          aria-controls="lupa-resultados"
+          aria-describedby="lupa-ayuda"
+          aria-label="Buscar un corte o una promoción"
+          autoComplete="off"
+          onChange={(event) => setTerm(event.target.value)}
+          placeholder={`Búsqueda de ${PALABRAS_ROTATIVAS[palabraIndex]}`}
+          ref={inputRef}
+          spellCheck={false}
+          type="search"
+          value={term}
+        />
+        {/* Solo LIMPIAR vive dentro del campo. La de cerrar se fue a la
+            esquina: juntas eran dos circulos identicos y, justo cuando el
+            cliente ya habia escrito, no se sabia cual vaciaba y cual salia. */}
+        {term ? (
+          <GhostButton aria-label="Limpiar la búsqueda" onClick={() => setTerm('')} type="button">
+            ×
+          </GhostButton>
+        ) : null}
+      </SearchForm>
 
-          <SearchForm onSubmit={handleSubmit} role="search">
-            <SearchInput
-              aria-autocomplete="list"
-              aria-controls="lupa-resultados"
-              aria-describedby="lupa-ayuda"
-              aria-label="Buscar un corte o una promoción"
-              autoComplete="off"
-              onChange={(event) => setTerm(event.target.value)}
-              placeholder={`Búsqueda de ${PALABRAS_ROTATIVAS[palabraIndex]}`}
-              ref={inputRef}
-              spellCheck={false}
-              type="search"
-              value={term}
-            />
-            {/* Solo LIMPIAR vive dentro del campo. La de cerrar se fue a la
-                esquina: juntas eran dos circulos identicos y, justo cuando el
-                cliente ya habia escrito, no se sabia cual vaciaba y cual salia. */}
-            {term ? (
-              <GhostButton aria-label="Limpiar la búsqueda" onClick={() => setTerm('')} type="button">
+      {/*
+        Quien no ve la pantalla no se entera de que debajo hay una lista que
+        cambia sola mientras teclea. La descripción se lee una vez, al
+        enfocar el campo; el `status` avisa del recuento cada vez que la
+        lista cambia, sin robar el foco. Es lo que hace la lupa de Louis
+        Vuitton con su label larga, dicho con las dos piezas que hoy
+        corresponden.
+      */}
+      <SoloLectores id="lupa-ayuda">
+        Escribe al menos {MIN_TERM_LENGTH} letras. Las sugerencias aparecen debajo y se
+        actualizan mientras escribes.
+      </SoloLectores>
+      <SoloLectores aria-live="polite" role="status">
+        {query.length >= MIN_TERM_LENGTH
+          ? searching
+            ? `Buscando ${query}`
+            : `${fresh.length + featured.length} resultados para ${query}`
+          : ''}
+      </SoloLectores>
+
+      <ChipRow aria-label="Búsquedas de tendencia">
+        <RowLabel>Búsquedas de tendencias</RowLabel>
+        <ChipLinea>
+          {TENDENCIAS.map((tendencia) => (
+            <Chip key={tendencia} onClick={() => runTerm(tendencia)} type="button">
+              {tendencia}
+            </Chip>
+          ))}
+        </ChipLinea>
+      </ChipRow>
+
+      {recientes.length > 0 ? (
+        <ChipRow aria-label="Búsquedas recientes">
+          <RowLabel>Recientes</RowLabel>
+          <ChipLinea>
+          {recientes.map((reciente) => (
+            <RecentChip key={reciente} onClick={() => runTerm(reciente)} type="button">
+              {reciente}
+              <i
+                aria-hidden="true"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  setRecientes(readRecientes().filter((t) => t !== reciente));
+                  try {
+                    window.localStorage.setItem(
+                      RECIENTES_KEY,
+                      JSON.stringify(readRecientes().filter((t) => t !== reciente))
+                    );
+                  } catch {
+                    /* sin almacenamiento: nada que limpiar */
+                  }
+                }}
+              >
                 ×
-              </GhostButton>
-            ) : null}
-          </SearchForm>
+              </i>
+            </RecentChip>
+          ))}
+          </ChipLinea>
+        </ChipRow>
+      ) : null}
 
-          {/*
-            Quien no ve la pantalla no se entera de que debajo hay una lista que
-            cambia sola mientras teclea. La descripción se lee una vez, al
-            enfocar el campo; el `status` avisa del recuento cada vez que la
-            lista cambia, sin robar el foco. Es lo que hace la lupa de Louis
-            Vuitton con su label larga, dicho con las dos piezas que hoy
-            corresponden.
-          */}
-          <SoloLectores id="lupa-ayuda">
-            Escribe al menos {MIN_TERM_LENGTH} letras. Las sugerencias aparecen debajo y se
-            actualizan mientras escribes.
-          </SoloLectores>
-          <SoloLectores aria-live="polite" role="status">
-            {query.length >= MIN_TERM_LENGTH
-              ? searching
-                ? `Buscando ${query}`
-                : `${fresh.length + featured.length} resultados para ${query}`
-              : ''}
-          </SoloLectores>
+      {query.length >= MIN_TERM_LENGTH &&
+      searching &&
+      fresh.length === 0 &&
+      featured.length === 0 ? (
+        <EmptyState>Buscando «{query}»…</EmptyState>
+      ) : null}
 
-          <ChipRow aria-label="Búsquedas de tendencia">
-            <RowLabel>Búsquedas de tendencias</RowLabel>
-            <ChipLinea>
-              {TENDENCIAS.map((tendencia) => (
-                <Chip key={tendencia} onClick={() => runTerm(tendencia)} type="button">
-                  {tendencia}
-                </Chip>
-              ))}
-            </ChipLinea>
-          </ChipRow>
+      {/*
+        El error, VISIBLE y con salida.
 
-          {recientes.length > 0 ? (
-            <ChipRow aria-label="Búsquedas recientes">
-              <RowLabel>Recientes</RowLabel>
-              <ChipLinea>
-              {recientes.map((reciente) => (
-                <RecentChip key={reciente} onClick={() => runTerm(reciente)} type="button">
-                  {reciente}
-                  <i
-                    aria-hidden="true"
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      setRecientes(readRecientes().filter((t) => t !== reciente));
-                      try {
-                        window.localStorage.setItem(
-                          RECIENTES_KEY,
-                          JSON.stringify(readRecientes().filter((t) => t !== reciente))
-                        );
-                      } catch {
-                        /* sin almacenamiento: nada que limpiar */
-                      }
-                    }}
-                  >
-                    ×
-                  </i>
-                </RecentChip>
-              ))}
-              </ChipLinea>
-            </ChipRow>
-          ) : null}
+        Este bloque es la razon de ser de la practica. Antes un fallo del
+        servidor no llegaba nunca a la pantalla: se leia `data`, se ignoraba
+        `error`, y un respaldo local rellenaba la lista con precios que no
+        eran los de la base. El cliente veia una busqueda que funcionaba.
 
-          {query.length >= MIN_TERM_LENGTH && searching && fresh.length === 0 && featured.length === 0 ? (
-            <EmptyState>Buscando «{query}»…</EmptyState>
-          ) : null}
+        Ahora `rejected` tiene su propia rama en el slice, su propio campo
+        en el estado, y aqui su propio lugar en la pantalla — con un boton
+        para reintentar, que es lo que el enunciado pide.
+      */}
+      {errorBusqueda ? (
+        <EmptyState role="alert">
+          No pudimos buscar «{query}». {errorBusqueda}{' '}
+          <button type="button" onClick={() => void despachar(buscarProductos(query))}>
+            Reintentar
+          </button>
+        </EmptyState>
+      ) : null}
 
-          {/*
-            El error, VISIBLE y con salida.
+      <div id="lupa-resultados">
+        {fresh.length > 0 ? (
+        <section>
+          <SectionHeader>Lo nuevo</SectionHeader>
+          <ResultsGrid>
+            {fresh.map((product) => (
+              <ResultCard key={product.id} onClick={() => handlePick(product)} type="button">
+                <ResultThumb
+                  alt=""
+                  aria-hidden="true"
+                  src={product.image_url ?? '/img/products/res.png'}
+                />
+                <ResultInfo>
+                  <ResultName>{product.name}</ResultName>
+                  <ResultPrice>
+                    {formatearPrecio(product.price_per_kg, 'vitrina')} <small>{priceUnit(product)}</small>
+                  </ResultPrice>
+                </ResultInfo>
+              </ResultCard>
+            ))}
+          </ResultsGrid>
+        </section>
+      ) : null}
 
-            Este bloque es la razon de ser de la practica. Antes un fallo del
-            servidor no llegaba nunca a la pantalla: se leia `data`, se ignoraba
-            `error`, y un respaldo local rellenaba la lista con precios que no
-            eran los de la base. El cliente veia una busqueda que funcionaba.
+      {featured.length > 0 ? (
+        <section>
+          <SectionHeader>Cortes destacados</SectionHeader>
+          <ResultsGrid>
+            {featured.map((product) => (
+              <ResultCard key={product.id} onClick={() => handlePick(product)} type="button">
+                <ResultThumb
+                  alt=""
+                  aria-hidden="true"
+                  src={product.image_url ?? '/img/products/res.png'}
+                />
+                <ResultInfo>
+                  <ResultName>{product.name}</ResultName>
+                  <ResultPrice>
+                    {formatearPrecio(product.price_per_kg, 'vitrina')} <small>{priceUnit(product)}</small>
+                  </ResultPrice>
+                </ResultInfo>
+              </ResultCard>
+            ))}
+          </ResultsGrid>
+        </section>
+      ) : null}
 
-            Ahora `rejected` tiene su propia rama en el slice, su propio campo
-            en el estado, y aqui su propio lugar en la pantalla — con un boton
-            para reintentar, que es lo que el enunciado pide.
-          */}
-          {errorBusqueda ? (
-            <EmptyState role="alert">
-              No pudimos buscar «{query}». {errorBusqueda}{' '}
-              <button type="button" onClick={() => void despachar(buscarProductos(query))}>
-                Reintentar
-              </button>
-            </EmptyState>
-          ) : null}
-
-          <div id="lupa-resultados">
-          {fresh.length > 0 ? (
-            <section>
-              <SectionHeader>Lo nuevo</SectionHeader>
-              <ResultsGrid>
-                {fresh.map((product) => (
-                  <ResultCard key={product.id} onClick={() => handlePick(product)} type="button">
-                    <ResultThumb
-                      alt=""
-                      aria-hidden="true"
-                      src={product.image_url ?? '/img/products/res.png'}
-                    />
-                    <ResultInfo>
-                      <ResultName>{product.name}</ResultName>
-                      <ResultPrice>
-                        {formatearPrecio(product.price_per_kg, 'vitrina')} <small>{priceUnit(product)}</small>
-                      </ResultPrice>
-                    </ResultInfo>
-                  </ResultCard>
-                ))}
-              </ResultsGrid>
-            </section>
-          ) : null}
-
-          {featured.length > 0 ? (
-            <section>
-              <SectionHeader>Cortes destacados</SectionHeader>
-              <ResultsGrid>
-                {featured.map((product) => (
-                  <ResultCard key={product.id} onClick={() => handlePick(product)} type="button">
-                    <ResultThumb
-                      alt=""
-                      aria-hidden="true"
-                      src={product.image_url ?? '/img/products/res.png'}
-                    />
-                    <ResultInfo>
-                      <ResultName>{product.name}</ResultName>
-                      <ResultPrice>
-                        {formatearPrecio(product.price_per_kg, 'vitrina')} <small>{priceUnit(product)}</small>
-                      </ResultPrice>
-                    </ResultInfo>
-                  </ResultCard>
-                ))}
-              </ResultsGrid>
-            </section>
-          ) : null}
-
-          {query.length >= MIN_TERM_LENGTH && !searching && fresh.length === 0 && featured.length === 0 ? (
-            <EmptyState>Sin resultados para «{query}». Prueba con otro corte.</EmptyState>
-          ) : null}
-          </div>
-        </Inner>
-      </Popin>
-    </>
+      {query.length >= MIN_TERM_LENGTH &&
+        !searching &&
+        fresh.length === 0 &&
+        featured.length === 0 ? (
+          <EmptyState>Sin resultados para «{query}». Prueba con otro corte.</EmptyState>
+        ) : null}
+      </div>
+    </Cuerpo>
   );
 }

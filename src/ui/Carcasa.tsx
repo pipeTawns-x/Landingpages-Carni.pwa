@@ -2,9 +2,11 @@ import { useState, type ReactNode } from 'react';
 import { useSelector } from 'react-redux';
 import { Asistente } from '@src/asistente/Asistente';
 import type { EstadoRaiz } from '@src/redux/store';
+import type { Product } from '@src/types/database';
 import { CarritoHoja } from './CarritoHoja';
 import { Encabezado } from './Encabezado';
 import { InsigniaDatos } from './InsigniaDatos';
+import { LupaHoja } from './LupaHoja';
 import { MenuHoja } from './MenuHoja';
 import { Pie } from './Pie';
 
@@ -15,7 +17,7 @@ export interface CarcasaProps {
   children: ReactNode;
 }
 
-type Superposicion = 'menu' | 'carrito' | null;
+type Superposicion = 'menu' | 'carrito' | 'buscar' | null;
 
 /**
  * Lo que comparten la landing y el catálogo: encabezado, contenido, pie, menú,
@@ -31,6 +33,16 @@ export function Carcasa({ pagina, sobrePortada = false, children }: CarcasaProps
 
   const cerrar = (): void => setAbierta(null);
 
+  /**
+   * Elegir un corte en la búsqueda sigue yendo a `products.html` con el producto
+   * en el hash, que es a donde iban las páginas viejas. Cuando el catálogo
+   * termine de mudarse a `catalogo.html` con su propia ruta de detalle, esta es
+   * la línea que cambia — y solo esta.
+   */
+  const elegirProducto = (producto: Product): void => {
+    window.location.href = `products.html#/producto/${producto.id}`;
+  };
+
   return (
     <>
       <a
@@ -45,9 +57,10 @@ export function Carcasa({ pagina, sobrePortada = false, children }: CarcasaProps
         cuenta={cuenta}
         menuAbierto={abierta === 'menu'}
         carritoAbierto={abierta === 'carrito'}
+        buscarAbierto={abierta === 'buscar'}
         alAbrirMenu={() => setAbierta('menu')}
         alAbrirCarrito={() => setAbierta('carrito')}
-        hrefBuscar={pagina === 'catalogo' ? '#buscar' : 'catalogo.html#buscar'}
+        alAbrirBuscar={() => setAbierta('buscar')}
       />
 
       <div className="flex min-h-dvh flex-col">
@@ -65,6 +78,7 @@ export function Carcasa({ pagina, sobrePortada = false, children }: CarcasaProps
 
       <MenuHoja abierta={abierta === 'menu'} alCerrar={cerrar} pagina={pagina} />
       <CarritoHoja abierta={abierta === 'carrito'} alCerrar={cerrar} />
+      <LupaHoja abierta={abierta === 'buscar'} alCerrar={cerrar} alElegir={elegirProducto} />
       <Asistente pagina={pagina} />
       {import.meta.env.DEV ? <InsigniaDatos /> : null}
     </>

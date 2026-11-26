@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Carni — Landing rediseñada</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Geist:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0B0B0C; --s1:#151517; --s2:#1C1C1F; --s3:#232326; --line:#3F3F46;
+  --tx:#F5F3EF; --mut:#A8A29B; --red:#DC2626; --red-h:#C81E1E;
+  --sand:#E4D1B0; --gold:#F59E0B; --ok:#059669;
+  --r-sm:8px; --r-md:12px; --r-lg:16px; --r-xl:24px;
+  --display:"Fraunces",Georgia,serif; --ui:"Geist",system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--tx);font:400 16px/1.5 var(--ui);-webkit-font-smoothing:antialiased}
+img{display:block;max-width:100%}
+.wrap{max-width:1280px;margin-inline:auto;padding-inline:16px}
+@media(min-width:1024px){.wrap{padding-inline:40px}}
+.num{font-variant-numeric:tabular-nums}
+
+/* ---------- barra de aviso ---------- */
+.notice{background:var(--s1);border-bottom:1px solid var(--line);font-size:13px;color:var(--mut);text-align:center;padding:10px 16px}
+.notice b{color:var(--sand);font-weight:500}
+
+/* ---------- encabezado ---------- */
+header{position:sticky;top:0;z-index:20;background:rgba(11,11,12,.92);border-bottom:1px solid var(--line)}
+.bar{display:flex;align-items:center;gap:12px;height:64px}
+.icon-btn{width:44px;height:44px;display:grid;place-items:center;border:1px solid var(--line);border-radius:var(--r-md);background:var(--s1);color:var(--tx);cursor:pointer}
+.icon-btn:hover{border-color:var(--red)}
+.brand{display:flex;flex-direction:column;align-items:center;margin-inline:auto;line-height:1}
+.brand b{font:600 18px/1 var(--display);letter-spacing:.14em}
+.brand span{font-size:9px;letter-spacing:.22em;color:var(--mut);margin-top:4px}
+.nav{display:none;gap:28px;font-size:14px}
+.nav a{color:var(--mut);text-decoration:none;padding:6px 0;border-bottom:2px solid transparent}
+.nav a.on{color:var(--tx);border-bottom-color:var(--red)}
+.nav a:hover{color:var(--tx)}
+.cart-btn{position:relative}
+.cart-btn .dot{position:absolute;top:-4px;right:-4px;min-width:20px;height:20px;padding:0 5px;background:var(--red);color:#fff;border-radius:999px;font:600 11px/20px var(--ui);text-align:center}
+@media(min-width:1024px){
+  .bar{height:76px}
+  .nav{display:flex}
+  .brand{margin-inline:0 auto}
+  .burger{display:none}
+}
+
+/* ---------- portada ---------- */
+.hero{position:relative;min-height:520px;display:flex;align-items:flex-end;overflow:hidden}
+@media(min-width:1024px){.hero{min-height:660px}}
+.hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:saturate(.95)}
+.hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(11,11,12,.25) 0%,rgba(11,11,12,.55) 45%,var(--bg) 100%)}
+.hero .wrap{position:relative;z-index:1;padding-block:48px}
+.eyebrow{font:500 11px/1 var(--ui);letter-spacing:.2em;text-transform:uppercase;color:var(--sand);margin-bottom:16px}
+.hero h1{font:400 40px/1.06 var(--display);letter-spacing:-.02em;max-width:14ch}
+@media(min-width:1024px){.hero h1{font-size:68px}}
+.hero p{color:var(--mut);margin-top:16px;max-width:46ch}
+.cta-row{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:52px;padding:0 24px;border-radius:999px;font:600 15px var(--ui);text-decoration:none;border:1px solid transparent;cursor:pointer}
+.btn-pri{background:var(--red);color:#fff}
+.btn-pri:hover{background:var(--red-h)}
+.btn-sec{background:transparent;color:var(--tx);border-color:var(--line)}
+.btn-sec:hover{border-color:var(--sand)}
+.btn-sm{height:44px;padding:0 18px;font-size:14px}
+
+/* ---------- franja de confianza ---------- */
+.trust{border-block:1px solid var(--line);background:var(--s1)}
+.trust ul{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line)}
+.trust li{background:var(--s1);padding:18px 16px;font-size:13px;color:var(--mut)}
+.trust li b{display:block;color:var(--tx);font:500 14px var(--ui);margin-bottom:2px}
+@media(min-width:1024px){.trust ul{grid-template-columns:repeat(4,1fr)}}
+
+/* ---------- secciones ---------- */
+section{padding-block:56px}
+@media(min-width:1024px){section{padding-block:88px}}
+.head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:24px}
+.head h2{font:400 28px/1.15 var(--display);letter-spacing:-.01em}
+@media(min-width:1024px){.head h2{font-size:38px}}
+.head a{color:var(--mut);font-size:14px;text-decoration:none;border-bottom:1px solid var(--line);padding-bottom:2px;white-space:nowrap}
+.head a:hover{color:var(--tx);border-color:var(--red)}
+
+/* ---------- bento de categorías ---------- */
+.bento{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.tile{position:relative;border-radius:var(--r-lg);overflow:hidden;border:1px solid var(--line);min-height:150px;display:flex;align-items:flex-end;text-decoration:none;color:var(--tx)}
+.tile img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .5s cubic-bezier(.16,1,.3,1)}
+.tile:hover img{transform:scale(1.04)}
+.tile .cap{position:relative;width:100%;padding:12px 14px;background:linear-gradient(180deg,transparent,rgba(11,11,12,.92) 62%)}
+.tile .cap b{display:block;font:500 15px var(--ui)}
+.tile .cap span{font-size:12px;color:var(--mut)}
+.tile.big{grid-column:span 2;min-height:240px}
+@media(min-width:1024px){
+  .bento{grid-template-columns:repeat(4,1fr);grid-auto-rows:190px;gap:16px}
+  .tile{min-height:0}
+  .tile.big{grid-column:span 2;grid-row:span 2;min-height:0}
+  .tile .cap b{font-size:17px}
+}
+
+/* ---------- tarjeta de producto (la única) ---------- */
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+@media(min-width:768px){.grid{grid-template-columns:repeat(3,1fr);gap:16px}}
+@media(min-width:1024px){.grid{grid-template-columns:repeat(4,1fr)}}
+.card{background:var(--s1);border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden;display:flex;flex-direction:column;transition:border-color .16s,transform .16s}
+.card:hover{border-color:rgba(220,38,38,.45);transform:translateY(-2px)}
+.card .ph{position:relative;aspect-ratio:4/5;overflow:hidden}
+.card .ph img{width:100%;height:100%;object-fit:cover}
+.badge{position:absolute;top:10px;left:10px;background:rgba(11,11,12,.82);border:1px solid var(--line);color:var(--tx);font:500 11px var(--ui);padding:4px 8px;border-radius:999px}
+.badge.off{background:rgba(245,158,11,.14);border-color:rgba(245,158,11,.5);color:var(--gold)}
+.card .body{padding:14px;display:flex;flex-direction:column;gap:6px;flex:1}
+.kicker{font:500 10px var(--ui);letter-spacing:.16em;text-transform:uppercase;color:var(--mut)}
+.card h3{font:500 15px/1.25 var(--ui)}
+.card p{font-size:12.5px;color:var(--mut);line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.price{margin-top:auto;display:flex;align-items:baseline;gap:6px}
+.price b{font:600 18px var(--ui)}
+.price span{font-size:12px;color:var(--mut)}
+.price .lb{margin-left:auto;font-size:11px;color:var(--mut)}
+.add{margin-top:10px;height:44px;border-radius:999px;background:var(--red);color:#fff;border:0;font:600 14px var(--ui);cursor:pointer}
+.add:hover{background:var(--red-h)}
+.card.out .ph img{filter:grayscale(.65) brightness(.7)}
+.card.out .add{background:var(--s3);color:var(--mut);cursor:not-allowed}
+
+/* ---------- reseñas ---------- */
+.marquee{display:flex;gap:12px;overflow:hidden;mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent)}
+.q{min-width:260px;background:var(--s1);border:1px solid var(--line);border-radius:var(--r-lg);padding:16px}
+.q .stars{color:var(--gold);font-size:13px;letter-spacing:2px}
+.q p{margin:10px 0 12px;font-size:14px;line-height:1.5}
+.q .who{display:flex;align-items:center;gap:10px}
+.q .av{width:32px;height:32px;border-radius:999px;background:var(--s3);border:1px solid var(--line);display:grid;place-items:center;font:600 12px var(--ui);color:var(--sand)}
+.q .who b{font:500 13px var(--ui)}
+.q .who span{font-size:12px;color:var(--mut)}
+
+/* ---------- preguntas ---------- */
+.faq{border-top:1px solid var(--line)}
+.faq details{border-bottom:1px solid var(--line)}
+.faq summary{list-style:none;cursor:pointer;padding:18px 0;display:flex;align-items:center;gap:16px;font:500 15px var(--ui)}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"+";margin-left:auto;color:var(--mut);font-size:20px;line-height:1}
+.faq details[open] summary::after{content:"–";color:var(--red)}
+.faq .a{padding:0 0 18px;color:var(--mut);font-size:14px;max-width:70ch}
+
+/* ---------- horario y contacto ---------- */
+.two{display:grid;gap:16px}
+@media(min-width:1024px){.two{grid-template-columns:1.2fr .8fr;gap:24px}}
+.panel{background:var(--s1);border:1px solid var(--line);border-radius:var(--r-lg);padding:24px}
+.panel h3{font:400 22px var(--display);margin-bottom:12px}
+.panel p{color:var(--mut);font-size:14px;line-height:1.6}
+.hours{list-style:none;margin-top:14px}
+.hours li{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line);font-size:14px}
+.hours li:last-child{border:0}
+.hours span{color:var(--mut)}
+.chan{display:grid;gap:10px;margin-top:16px}
+.chan a{display:flex;align-items:center;gap:12px;height:52px;padding:0 16px;border:1px solid var(--line);border-radius:var(--r-md);color:var(--tx);text-decoration:none;font-size:14px;background:var(--s2)}
+.chan a:hover{border-color:var(--sand)}
+.chan a small{margin-left:auto;color:var(--mut)}
+
+/* ---------- pie ---------- */
+footer{border-top:1px solid var(--line);background:var(--s1);padding-block:36px;margin-top:8px}
+.fgrid{display:grid;gap:24px}
+@media(min-width:768px){.fgrid{grid-template-columns:2fr 1fr 1fr}}
+footer h4{font:500 12px var(--ui);letter-spacing:.14em;text-transform:uppercase;color:var(--mut);margin-bottom:12px}
+footer ul{list-style:none;display:grid;gap:8px;font-size:14px}
+footer a{color:var(--tx);text-decoration:none}
+footer a:hover{color:var(--sand)}
+.copy{margin-top:28px;padding-top:16px;border-top:1px solid var(--line);color:var(--mut);font-size:12.5px;display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between}
+
+/* ---------- burbuja ---------- */
+.bubble{position:fixed;right:16px;bottom:16px;width:56px;height:56px;border-radius:999px;background:var(--red);color:#fff;display:grid;place-items:center;border:0;cursor:pointer;z-index:30}
+.bubble:hover{background:var(--red-h)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<div class="notice">Hoy pedís y te llega: <b>entrega el mismo día</b> en zonas participantes de San Luis Potosí</div>
+
+<header>
+  <div class="wrap bar">
+    <button class="icon-btn burger" aria-label="Abrir menú">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+    </button>
+    <nav class="nav">
+      <a href="#" class="on">Inicio</a><a href="#">Cortes</a><a href="#">Preparados</a><a href="#">Ofertas</a><a href="#">Nosotros</a>
+    </nav>
+    <div class="brand"><b>CARNICERÍA</b><span>EL SEÑOR DE LA MISERICORDIA</span></div>
+    <button class="icon-btn" aria-label="Buscar">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg>
+    </button>
+    <button class="icon-btn cart-btn" aria-label="Mi pedido">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 7h12l-1 13H7L6 7Z"/><path d="M9 7a3 3 0 0 1 6 0"/></svg>
+      <span class="dot num">3</span>
+    </button>
+  </div>
+</header>
+
+<div class="hero">
+  <img src="../../../public/img/products/res.webp" alt="Corte de res sobre la tabla del carnicero">
+  <div class="wrap">
+    <p class="eyebrow">Carnicería de barrio · San Luis Potosí</p>
+    <h1>El corte que pedís, cortado como lo pedís.</h1>
+    <p>Elegí por kilo, por precio o por pieza. Nosotros lo cortamos al grosor que uses y te lo mandamos el mismo día.</p>
+    <div class="cta-row">
+      <a class="btn btn-pri" href="#">Ver el catálogo</a>
+      <a class="btn btn-sec" href="#">Pedir por WhatsApp</a>
+    </div>
+  </div>
+</div>
+
+<div class="trust">
+  <div class="wrap">
+    <ul>
+      <li><b>Corte a tu medida</b>Grosor y presentación</li>
+      <li><b>Mismo día</b>Pedidos antes de las 4 pm</li>
+      <li><b>Mínimo $150</b>Recoger en tienda sin mínimo</li>
+      <li><b>Pago seguro</b>Tarjeta o en la tienda</li>
+    </ul>
+  </div>
+</div>
+
+<section>
+  <div class="wrap">
+    <div class="head"><h2>Nuestras categorías</h2><a href="#">Ver todo</a></div>
+    <div class="bento">
+      <a class="tile big" href="#"><img src="../../../public/img/products/res.webp" alt=""><span class="cap"><b>Carnes rojas</b><span>Res, ternera y cortes premium</span></span></a>
+      <a class="tile" href="#"><img src="../../../public/img/products/cerdo.webp" alt=""><span class="cap"><b>Cerdo</b><span>Chuleta, lomo, costilla</span></span></a>
+      <a class="tile" href="#"><img src="../../../public/img/products/pollo.webp" alt=""><span class="cap"><b>Pollo</b><span>Entero y en piezas</span></span></a>
+      <a class="tile" href="#"><img src="../../../public/img/products/embutidos.webp" alt=""><span class="cap"><b>Embutidos</b><span>Chorizo, longaniza, jamón</span></span></a>
+      <a class="tile" href="#"><img src="../../../public/img/products/preparados.webp" alt=""><span class="cap"><b>Preparados</b><span>Listos para el sartén</span></span></a>
+      <a class="tile" href="#"><img src="../../../public/img/products/ofertas.webp" alt=""><span class="cap"><b>Ofertas</b><span>Paquetes de la semana</span></span></a>
+      <a class="tile" href="#"><img src="../../../public/img/products/merch.webp" alt=""><span class="cap"><b>Merch</b><span>Cuchillos, delantales, gorras</span></span></a>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="head"><h2>Lo que se lleva la gente</h2><a href="#">Ver el catálogo</a></div>
+    <div class="grid">
+      <article class="card">
+        <div class="ph"><img src="../../../public/img/products/res.webp" alt=""><span class="badge">18 en stock</span></div>
+        <div class="body">
+          <span class="kicker">Carnes rojas</span>
+          <h3>Arrachera marinada</h3>
+          <p>Marinada en casa desde la noche anterior. Lista para la parrilla.</p>
+          <div class="price"><b class="num">$449</b><span>/ kg</span><span class="lb num">$204 / lb</span></div>
+          <button class="add">Agregar</button>
+        </div>
+      </article>
+      <article class="card">
+        <div class="ph"><img src="../../../public/img/products/premium.webp" alt=""><span class="badge">6 en stock</span></div>
+        <div class="body">
+          <span class="kicker">Cortes especiales</span>
+          <h3>Rib eye de 2.5 cm</h3>
+          <p>Grosor de asador, marmoleo parejo. Se corta al momento.</p>
+          <div class="price"><b class="num">$689</b><span>/ kg</span><span class="lb num">$313 / lb</span></div>
+          <button class="add">Agregar</button>
+        </div>
+      </article>
+      <article class="card">
+        <div class="ph"><img src="../../../public/img/products/embutidos.webp" alt=""><span class="badge off">Oferta</span></div>
+        <div class="body">
+          <span class="kicker">Embutidos</span>
+          <h3>Chorizo rojo del norte</h3>
+          <p>Receta de la casa, con especias molidas aquí mismo.</p>
+          <div class="price"><b class="num">$189</b><span>/ kg</span><span class="lb num">$86 / lb</span></div>
+          <button class="add">Agregar</button>
+        </div>
+      </article>
+      <article class="card out">
+        <div class="ph"><img src="../../../public/img/products/preparados.webp" alt=""><span class="badge">Sin existencias</span></div>
+        <div class="body">
+          <span class="kicker">Preparados</span>
+          <h3>Bistec adobado</h3>
+          <p>Adobo de chile guajillo. Vuelve el jueves por la mañana.</p>
+          <div class="price"><b class="num">$299</b><span>/ kg</span><span class="lb num">$136 / lb</span></div>
+          <button class="add" disabled>Avisarme</button>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section style="padding-top:0">
+  <div class="wrap">
+    <div class="head"><h2>Lo que dicen los clientes</h2><a href="#">4.7 en Google</a></div>
+    <div class="marquee">
+      <div class="q"><div class="stars">★★★★★</div><p>«Pedí arrachera para diez personas y llegó cortada justo como la pedí. No tuve que volver a la carnicería.»</p><div class="who"><span class="av">AV</span><div><b>Armando Viramontes</b><br><span>Cliente desde 2024</span></div></div></div>
+      <div class="q"><div class="stars">★★★★★</div><p>«Buena carne, buen precio y buena atención. El chorizo rojo es el mejor de la zona.»</p><div class="who"><span class="av">MG</span><div><b>María González</b><br><span>Compra cada semana</span></div></div></div>
+      <div class="q"><div class="stars">★★★★☆</div><p>«Me gusta poder pedir por precio: digo cuánto quiero gastar y ellos ajustan el corte.»</p><div class="who"><span class="av">JR</span><div><b>Jorge Rentería</b><br><span>Taquería El Güero</span></div></div></div>
+      <div class="q"><div class="stars">★★★★★</div><p>«Llegó el mismo día y bien empacado. Ya no compro carne en el súper.»</p><div class="who"><span class="av">LS</span><div><b>Lucía Salas</b><br><span>Colonia Jardín</span></div></div></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="head"><h2>Preguntas frecuentes</h2></div>
+    <div class="faq">
+      <details open><summary>¿Hasta qué hora puedo pedir para que llegue hoy?</summary><div class="a">Los pedidos que entran antes de las 4 de la tarde salen el mismo día. Después de esa hora se preparan para la mañana siguiente.</div></details>
+      <details><summary>¿Puedo pedir un grosor específico?</summary><div class="a">Sí. En cada corte elegís el grosor antes de agregarlo al pedido, y el carnicero lo corta así. Si no elegís, va al grosor de la casa.</div></details>
+      <details><summary>¿Cuánto es el mínimo para entrega a domicilio?</summary><div class="a">El mínimo es de $150 para entrega a domicilio. Si recogés en la tienda no hay mínimo.</div></details>
+      <details><summary>¿Cómo puedo pagar?</summary><div class="a">Con tarjeta al confirmar el pedido, o en la tienda cuando lo recogés.</div></details>
+      <details><summary>¿Qué pasa si se me olvidó agregar algo?</summary><div class="a">Escribinos por WhatsApp con tu número de pedido y lo sumamos al mismo paquete, siempre que no haya salido todavía.</div></details>
+    </div>
+  </div>
+</section>
+
+<section style="padding-top:0">
+  <div class="wrap two">
+    <div class="panel">
+      <h3>Quiénes somos</h3>
+      <p>Somos una carnicería de barrio en San Luis Potosí. Elegimos la carne nosotros, la cortamos al momento y la entregamos el mismo día. La confianza se gana corte por corte: por eso el precio que ves es el que pagas, y el corte que pides es el que llega.</p>
+      <ul class="hours">
+        <li>Lunes a sábado <span class="num">8:00 – 17:00</span></li>
+        <li>Domingos y festivos <span>Cerrado</span></li>
+        <li>Agua Marina 110, Col. Jardín <span>San Luis Potosí</span></li>
+      </ul>
+    </div>
+    <div class="panel">
+      <h3>Contacto directo</h3>
+      <p>Si preferís pedir hablando, te contestamos nosotros mismos.</p>
+      <div class="chan">
+        <a href="#">WhatsApp <small>444 123 4567</small></a>
+        <a href="#">Teléfono <small>444 271 3470</small></a>
+        <a href="#">Correo <small>contacto@carni.mx</small></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="fgrid">
+      <div>
+        <div class="brand" style="align-items:flex-start;margin:0 0 12px"><b>CARNICERÍA</b><span>EL SEÑOR DE LA MISERICORDIA</span></div>
+        <p style="color:var(--mut);font-size:14px;max-width:44ch">Carne fresca, cortada a tu medida y entregada el mismo día en San Luis Potosí.</p>
+      </div>
+      <div><h4>Tienda</h4><ul><li><a href="#">Catálogo</a></li><li><a href="#">Ofertas</a></li><li><a href="#">Merch</a></li><li><a href="#">Mi pedido</a></li></ul></div>
+      <div><h4>Información</h4><ul><li><a href="#">Cómo pedir</a></li><li><a href="#">Entregas</a></li><li><a href="#">Preguntas</a></li><li><a href="#">Mi cuenta</a></li></ul></div>
+    </div>
+    <div class="copy"><span>© 2026 Carnicería El Señor de La Misericordia</span><span>Hecho en San Luis Potosí</span></div>
+  </div>
+</footer>
+
+<button class="bubble" aria-label="Abrir el asistente">
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 12a8 8 0 0 1-8 8H7l-4 3V12a8 8 0 0 1 8-8h2a8 8 0 0 1 8 8Z"/></svg>
+</button>
+
+</body>
+</html>
